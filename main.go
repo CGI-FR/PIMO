@@ -32,7 +32,6 @@ type MapMaskConfiguration struct {
 
 // GetMaskingEngine return the MaskEngine configured for that string
 func (mmc MapMaskConfiguration) GetMaskingEngine(key string) (MaskEngine, bool) {
-
 	engine, test := mmc.config[key]
 	return engine, test
 }

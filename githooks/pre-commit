@@ -1,0 +1,10 @@
+#!/bin/bash
+set -e
+if git status --porcelain | grep "^.M" > /dev/null
+then
+    echo "🚽 Add or stash unstaged changes before commit"
+    exit 1
+else
+    echo "👌 Nothing to stash"
+fi
+make lint test
