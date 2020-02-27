@@ -8,33 +8,47 @@ import (
 
 func TestMaskingShouldReturnEmptyWhenInputISEmpty(t *testing.T) {
 
-	masking := MaskingFactory(MaskConfiguration{})
-	data := Dictionnary{}
-	result := masking(data)
+	maskingEngine := MaskingFactory(MapMaskConfiguration{})
+	data := Dictionary{}
+	result := maskingEngine.Mask(data)
 
 	assert.Equal(t, data, result, "should be empty")
 
 }
 
 func TestMaskingShouldNoReplaceInsensitiveValue(t *testing.T) {
-	masking := MaskingFactory(MaskConfiguration{})
+	maskingEngine := MaskingFactory(MapMaskConfiguration{})
 
-	data := Dictionnary{"project": "ER456"}
-	result := masking(data)
+	data := Dictionary{"project": "ER456"}
+	result := maskingEngine.Mask(data)
 
 	assert.Equal(t, data, result, "should be equal")
 
 }
 
 func TestMaskingShouldReplaceSensitiveValue(t *testing.T) {
-	nameMasking := func(name interface{}) interface{} { return "Toto" }
+	nameMasking := FunctionMaskEngine{func(name Entry) Entry { return "Toto" }}
 
-	masking := MaskingFactory(MaskConfiguration{"name": nameMasking})
+	maskingEngine := MaskingFactory(MapMaskConfiguration{map[string]MaskEngine{"name": nameMasking}})
 
-	data := Dictionnary{"name": "Benjamin"}
-	result := masking(data)
+	data := Dictionary{"name": "Benjamin"}
+	result := maskingEngine.Mask(data)
 	t.Log(result)
 
 	assert.NotEqual(t, data, result, "should be masked")
+
+}
+
+func TestMaskingShouldReplaceValueInNestedDictionary(t *testing.T) {
+	nameMasking := FunctionMaskEngine{func(name Entry) Entry { return "Toto" }}
+
+	customerMaskingEngine := MaskingFactory(MapMaskConfiguration{map[string]MaskEngine{"name": nameMasking}})
+	maskingEngine := MaskingFactory(MapMaskConfiguration{map[string]MaskEngine{"customer": customerMaskingEngine}})
+
+	data := Dictionary{"customer": Dictionary{"name": "Benjamin"}, "project": "MyProject"}
+	result := maskingEngine.Mask(data)
+	t.Log(result)
+	want := Dictionary{"customer": Dictionary{"name": "Toto"}, "project": "MyProject"}
+	assert.Equal(t, want, result, "should be masked")
 
 }
