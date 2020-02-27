@@ -1,5 +1,7 @@
 package main
 
+import "strings"
+
 // Dictionary is a Map with string as key and Entry as value
 type Dictionary = map[string]Entry
 
@@ -11,9 +13,16 @@ type MaskEngine interface {
 	Mask(Entry) Entry
 }
 
+// NewMaskConfiguration build new configuration
+func NewMaskConfiguration() MaskConfiguration {
+	return MapMaskConfiguration{map[string]MaskEngine{}}
+}
+
 // MaskConfiguration is a configuration to mask dictionaries content
 type MaskConfiguration interface {
 	GetMaskingEngine(string) (MaskEngine, bool)
+	WithEntry(string, MaskEngine) MaskConfiguration
+	AsEngine() MaskEngine
 }
 
 // MapMaskConfiguration Implements MaskConfiguration with a map
@@ -28,6 +37,23 @@ func (mmc MapMaskConfiguration) GetMaskingEngine(key string) (MaskEngine, bool) 
 	return engine, test
 }
 
+// WithEntry append engine for entry in the configuration and return modified configuration
+func (mmc MapMaskConfiguration) WithEntry(key string, engine MaskEngine) MaskConfiguration {
+	mainEntry := strings.SplitN(key, ".", 2)
+	if len(mainEntry) == 2 {
+		mmc.config[mainEntry[0]] = NewMaskConfiguration().WithEntry(mainEntry[1], engine).AsEngine()
+	} else {
+		mmc.config[key] = engine
+	}
+
+	return mmc
+}
+
+// AsEngine return engine with configuration
+func (mmc MapMaskConfiguration) AsEngine() MaskEngine {
+	return MaskingEngineFactory(mmc)
+}
+
 // FunctionMaskEngine implements MaskEngine with a simple function
 type FunctionMaskEngine struct {
 	function func(Entry) Entry
@@ -36,8 +62,8 @@ type FunctionMaskEngine struct {
 // Mask delegate mask algorithm to the function
 func (fme FunctionMaskEngine) Mask(e Entry) Entry { return fme.function(e) }
 
-// MaskingFactory return Masking function data without private information
-func MaskingFactory(config MaskConfiguration) MaskEngine {
+// MaskingEngineFactory return Masking function data without private information
+func MaskingEngineFactory(config MaskConfiguration) MaskEngine {
 	return FunctionMaskEngine{func(input Entry) Entry {
 		output := Dictionary{}
 
