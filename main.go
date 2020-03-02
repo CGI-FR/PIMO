@@ -1,6 +1,9 @@
 package main
 
-import "strings"
+import (
+	"os/exec"
+	"strings"
+)
 
 // Dictionary is a Map with string as key and Entry as value
 type Dictionary = map[string]Entry
@@ -81,4 +84,22 @@ func MaskingEngineFactory(config MaskConfiguration) MaskEngine {
 		}
 		return output
 	}}
+}
+
+// CommandMaskEngine implements MaskEngine with a console command
+type CommandMaskEngine struct {
+	cmd string
+}
+
+// Mask delegate mask algorithm to an external program
+func (cme CommandMaskEngine) Mask(e Entry) Entry {
+	splitCommand := strings.Split(cme.cmd, " ")
+	out, err := exec.Command(splitCommand[0], splitCommand[1:]...).Output()
+
+	resulting := strings.Trim(string(out), "\n")
+	if err != nil {
+		return "ERROR"
+	}
+	return resulting
+
 }

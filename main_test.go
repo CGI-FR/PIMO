@@ -7,6 +7,7 @@ import (
 )
 
 var nameMasking = FunctionMaskEngine{func(name Entry) Entry { return "Toto" }}
+var nameProgramMasking = CommandMaskEngine{"echo Toto"}
 
 func TestMaskingShouldReturnEmptyWhenInputISEmpty(t *testing.T) {
 	maskingEngine := NewMaskConfiguration().AsEngine()
@@ -36,6 +37,21 @@ func TestMaskingShouldReplaceSensitiveValue(t *testing.T) {
 	t.Log(result)
 
 	assert.NotEqual(t, data, result, "should be masked")
+}
+
+func TestMaskingShouldReplaceSensitiveValueByCommand(t *testing.T) {
+	config := NewMaskConfiguration().
+		WithEntry("name", nameProgramMasking)
+
+	maskingEngine := MaskingEngineFactory(config)
+
+	data := Dictionary{"name": "Benjamin"}
+	result := maskingEngine.Mask(data)
+	t.Log(result)
+	waited := Dictionary{"name": "Toto"}
+
+	assert.NotEqual(t, data, result, "should be masked")
+	assert.Equal(t, waited, result, "should be Toto")
 }
 
 func TestMaskingShouldReplaceValueInNestedDictionary(t *testing.T) {
