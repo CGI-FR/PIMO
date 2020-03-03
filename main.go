@@ -1,8 +1,10 @@
 package main
 
 import (
+	"math/rand"
 	"os/exec"
 	"strings"
+	"time"
 )
 
 // Dictionary is a Map with string as key and Entry as value
@@ -102,4 +104,15 @@ func (cme CommandMaskEngine) Mask(e Entry) Entry {
 	}
 	return resulting
 
+}
+
+// MaskList is a list of masking value
+type MaskList struct {
+	list []string
+}
+
+// Mask choose a mask value randomly
+func (ml MaskList) Mask(e Entry) Entry {
+	rand.Seed(time.Now().UnixNano())
+	return ml.list[rand.Intn(len(ml.list))]
 }
