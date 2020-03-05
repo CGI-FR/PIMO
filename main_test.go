@@ -35,7 +35,6 @@ func TestMaskingShouldReplaceSensitiveValue(t *testing.T) {
 
 	data := Dictionary{"name": "Benjamin"}
 	result := maskingEngine.Mask(data)
-	t.Log(result)
 
 	assert.NotEqual(t, data, result, "should be masked")
 }
@@ -48,7 +47,6 @@ func TestMaskingShouldReplaceSensitiveValueByCommand(t *testing.T) {
 
 	data := Dictionary{"name": "Benjamin"}
 	result := maskingEngine.Mask(data)
-	t.Log(result)
 	waited := Dictionary{"name": "Toto"}
 
 	assert.NotEqual(t, data, result, "should be masked")
@@ -63,7 +61,6 @@ func TestMaskingShouldReplaceSensitiveValueByRandomInList(t *testing.T) {
 
 	data := Dictionary{"name": "Benjamin"}
 	result := maskingEngine.Mask(data)
-	t.Log(result)
 
 	assert.NotEqual(t, data, result, "should be masked")
 
@@ -81,7 +78,6 @@ func TestMaskingShouldReplaceValueInNestedDictionary(t *testing.T) {
 
 	data := Dictionary{"customer": Dictionary{"name": "Benjamin"}, "project": "MyProject"}
 	result := maskingEngine.Mask(data)
-	t.Log(result)
 	want := Dictionary{"customer": Dictionary{"name": "Toto"}, "project": "MyProject"}
 	assert.Equal(t, want, result, "should be masked")
 }
@@ -94,4 +90,26 @@ func TestWithEntryShouldBuildNestedConfigurationWhenKeyContainsDot(t *testing.T)
 
 	_, okbis := config.GetMaskingEngine("customer.name")
 	assert.False(t, okbis, "should be same configuration")
+}
+
+func TestMaskingShouldReplaceSensitiveValueByWeightedRandom(t *testing.T) {
+	NameWeighted := []WeightedChoice{{data: "Michel", weight: 4}, {data: "Marc", weight: 1}}
+	weightMask := NewWeightedMaskList(NameWeighted)
+	config := NewMaskConfiguration().
+		WithEntry("name", weightMask)
+
+	maskingEngine := MaskingEngineFactory(config)
+
+	wait := Dictionary{"name": "Michel"}
+	equal := 0
+	data := Dictionary{"name": "Benjamin"}
+	for i := 0; i < 1000; i++ {
+		result := maskingEngine.Mask(data).(map[string]Entry)
+		if result["name"].(string) == wait["name"] {
+			equal++
+		}
+	}
+
+	assert.True(t, equal >= 750, "Should be more than 750 Michel")
+	assert.True(t, equal <= 850, "Should be more than 150 Marc")
 }

@@ -5,6 +5,8 @@ import (
 	"os/exec"
 	"strings"
 	"time"
+
+	wr "github.com/mroth/weightedrand"
 )
 
 // Dictionary is a Map with string as key and Entry as value
@@ -96,6 +98,7 @@ type CommandMaskEngine struct {
 // Mask delegate mask algorithm to an external program
 func (cme CommandMaskEngine) Mask(e Entry) Entry {
 	splitCommand := strings.Split(cme.cmd, " ")
+	/* #nosec */
 	out, err := exec.Command(splitCommand[0], splitCommand[1:]...).Output()
 
 	resulting := strings.Trim(string(out), "\n")
@@ -103,7 +106,6 @@ func (cme CommandMaskEngine) Mask(e Entry) Entry {
 		return "ERROR"
 	}
 	return resulting
-
 }
 
 // MaskList is a list of masking value
@@ -115,4 +117,29 @@ type MaskList struct {
 func (ml MaskList) Mask(e Entry) Entry {
 	rand.Seed(time.Now().UnixNano())
 	return ml.list[rand.Intn(len(ml.list))]
+}
+
+// WeightedChoice is a tuple of choice and weight for WeightedMaskList
+type WeightedChoice struct {
+	data   Entry
+	weight uint
+}
+
+// WeightedMaskList is a list of masking value with weight for random
+type WeightedMaskList struct {
+	cs wr.Chooser
+}
+
+// NewWeightedMaskList return a WeightedMaskList from slice of entry and weights
+func NewWeightedMaskList(list []WeightedChoice) WeightedMaskList {
+	var cs []wr.Choice
+	for k := range list {
+		cs = append(cs, wr.Choice{Item: list[k].data, Weight: list[k].weight})
+	}
+	return WeightedMaskList{wr.NewChooser(cs...)}
+}
+
+// Mask choose a mask value randomly with weight for choice
+func (wml WeightedMaskList) Mask(e Entry) Entry {
+	return wml.cs.Pick()
 }
