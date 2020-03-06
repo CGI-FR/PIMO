@@ -3,6 +3,7 @@ package main
 import (
 	"regexp"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -188,4 +189,34 @@ func TestMaskingShouldReplaceSensitiveValueByRegex(t *testing.T) {
 	match, _ := regexp.MatchString(regex, result["phone"].(string))
 	assert.NotEqual(t, data, result, "should be masked")
 	assert.True(t, match, "should match the regexp")
+}
+
+func TestMaskingShouldReplaceDateByRandom(t *testing.T) {
+	dateMin := time.Date(1970, 1, 1, 0, 0, 0, 0, time.UTC)
+	dateMax := time.Date(2000, 1, 1, 0, 0, 0, 0, time.UTC)
+	dateRange := NewDateMask(dateMin, dateMax)
+
+	config := NewMaskConfiguration().
+		WithEntry("date", dateRange)
+
+	maskingEngine := MaskingEngineFactory(config)
+	data := Dictionary{"date": time.Date(2019, 3, 2, 0, 0, 0, 0, time.UTC)}
+
+	result := maskingEngine.Mask(data).(map[string]Entry)
+
+	assert.Greater(t, dateMax.Sub(result["date"].(time.Time)).Microseconds(), int64(0),
+		"%v should be before max date %v", result["date"].(time.Time), dateMax)
+
+	assert.Less(t, dateMin.Sub(result["date"].(time.Time)).Microseconds(), int64(0),
+		"%v should be after min date %v", result["date"].(time.Time), dateMin)
+
+	equal := 0
+	for i := 0; i < 1000; i++ {
+		result := maskingEngine.Mask(data).(map[string]Entry)
+		if result["date"] == data["date"] {
+			equal++
+		}
+	}
+
+	assert.True(t, equal <= 1, "Shouldn't be the same date less than 0.1% of time")
 }

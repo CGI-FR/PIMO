@@ -208,3 +208,23 @@ func (rm RegexMask) Mask(e Entry) Entry {
 	out := rm.generator.Generate()
 	return out
 }
+
+// DateMask is a struct to mask the date
+type DateMask struct {
+	dateMin time.Time
+	dateMax time.Time
+}
+
+// NewDateMask create
+func NewDateMask(min, max time.Time) DateMask {
+	t1 := min
+	t2 := max
+	return DateMask{t1, t2}
+}
+
+// Mask choose a mask date randomly
+func (dateRange DateMask) Mask(e Entry) Entry {
+	delta := dateRange.dateMax.Unix() - dateRange.dateMin.Unix()
+	sec := time.Unix(rand.Int63n(delta)+dateRange.dateMin.Unix(), 0)
+	return sec
+}
