@@ -158,3 +158,19 @@ func TestMaskingShouldReplaceSensitiveValueByConstantValue(t *testing.T) {
 	assert.NotEqual(t, data, result, "should be masked")
 	assert.Equal(t, waited, result, "should be Toto")
 }
+
+func TestMaskingShouldReplaceSensitiveValueByRandomNumber(t *testing.T) {
+	min := 7
+	max := 77
+	ageMask := RandomIntMask{min, max}
+	config := NewMaskConfiguration().
+		WithEntry("age", ageMask)
+
+	maskingEngine := MaskingEngineFactory(config)
+	data := Dictionary{"age": 83}
+	result := maskingEngine.Mask(data).(map[string]Entry)
+
+	assert.NotEqual(t, data, result, "Should be masked")
+	assert.True(t, result["age"].(int) >= min, "Should be more than min")
+	assert.True(t, result["age"].(int) <= max, "Should be less than max")
+}

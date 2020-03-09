@@ -151,7 +151,7 @@ type WeightedMaskList struct {
 	cs wr.Chooser
 }
 
-// NewWeightedMaskList return a WeightedMaskList from slice of entry and weights
+// NewWeightedMaskList returns a WeightedMaskList from slice of entry and weights
 func NewWeightedMaskList(list []WeightedChoice) WeightedMaskList {
 	var cs []wr.Choice
 	for k := range list {
@@ -178,4 +178,15 @@ func NewConstMask(data Entry) ConstMask {
 // Mask return a Constant from a ConstMask
 func (cm ConstMask) Mask(e Entry) Entry {
 	return cm.constValue
+}
+
+// RandomIntMask is a list of number to mask randomly
+type RandomIntMask struct {
+	min int
+	max int
+}
+
+// Mask choose a mask int randomly within boundary
+func (rim RandomIntMask) Mask(e Entry) Entry {
+	return rand.Intn(rim.max+1-rim.min) + rim.min
 }
