@@ -143,3 +143,18 @@ func TestMaskingShouldReplaceSensitiveValueByWeightedRandom(t *testing.T) {
 	assert.True(t, equal >= 750, "Should be more than 750 Michel")
 	assert.True(t, equal <= 850, "Should be less than 150 Marc")
 }
+
+func TestMaskingShouldReplaceSensitiveValueByConstantValue(t *testing.T) {
+	maskingConstant := "Toto"
+	constMask := NewConstMask(maskingConstant)
+	config := NewMaskConfiguration().
+		WithEntry("name", constMask)
+	maskingEngine := MaskingEngineFactory(config)
+
+	data := Dictionary{"name": "Benjamin"}
+	result := maskingEngine.Mask(data)
+	waited := Dictionary{"name": "Toto"}
+
+	assert.NotEqual(t, data, result, "should be masked")
+	assert.Equal(t, waited, result, "should be Toto")
+}

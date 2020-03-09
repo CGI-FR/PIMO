@@ -164,3 +164,18 @@ func NewWeightedMaskList(list []WeightedChoice) WeightedMaskList {
 func (wml WeightedMaskList) Mask(e Entry) Entry {
 	return wml.cs.Pick()
 }
+
+//ConstMask is a value that always mask
+type ConstMask struct {
+	constValue Entry
+}
+
+// NewConstMask return a ConstantMask from a value
+func NewConstMask(data Entry) ConstMask {
+	return ConstMask{data}
+}
+
+// Mask return a Constant from a ConstMask
+func (cm ConstMask) Mask(e Entry) Entry {
+	return cm.constValue
+}
