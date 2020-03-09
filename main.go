@@ -1,6 +1,7 @@
 package main
 
 import (
+	"hash/fnv"
 	"math/rand"
 	"os/exec"
 	"strings"
@@ -108,15 +109,35 @@ func (cme CommandMaskEngine) Mask(e Entry) Entry {
 	return resulting
 }
 
-// MaskList is a list of masking value
-type MaskList struct {
+// MaskRandomList is a list of masking value and a rand init to mask
+type MaskRandomList struct {
+	rand *rand.Rand
 	list []string
 }
 
+// NewMaskRandomList create a MaskRandomList
+func NewMaskRandomList(list []string) MaskRandomList {
+	return MaskRandomList{rand.New(rand.NewSource(time.Now().UnixNano())), list}
+}
+
 // Mask choose a mask value randomly
-func (ml MaskList) Mask(e Entry) Entry {
-	rand.Seed(time.Now().UnixNano())
-	return ml.list[rand.Intn(len(ml.list))]
+func (mrl MaskRandomList) Mask(e Entry) Entry {
+	return mrl.list[mrl.rand.Intn(len(mrl.list))]
+}
+
+// MaskHashList is a list of masking value for hash masking
+type MaskHashList struct {
+	list []string
+}
+
+// Mask choose a mask value by hash
+func (mhl MaskHashList) Mask(e Entry) Entry {
+	h := fnv.New32a()
+	_, err := h.Write([]byte(e.(string)))
+	if err != nil {
+		return "ERROR"
+	}
+	return mhl.list[int(h.Sum32())%len(mhl.list)]
 }
 
 // WeightedChoice is a tuple of choice and weight for WeightedMaskList

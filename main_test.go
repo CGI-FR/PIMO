@@ -8,7 +8,7 @@ import (
 
 var nameMasking = FunctionMaskEngine{func(name Entry) Entry { return "Toto" }}
 var nameProgramMasking = CommandMaskEngine{"echo Toto"}
-var nameList = MaskList{[]string{"Michel", "Marc", "Matthias", "Youen", "Alexis"}}
+var nameList = []string{"Michel", "Marc", "Matthias", "Youen", "Alexis"}
 
 func TestMaskingShouldReturnEmptyWhenInputISEmpty(t *testing.T) {
 	maskingEngine := NewMaskConfiguration().AsEngine()
@@ -55,7 +55,7 @@ func TestMaskingShouldReplaceSensitiveValueByCommand(t *testing.T) {
 
 func TestMaskingShouldReplaceSensitiveValueByRandomInList(t *testing.T) {
 	config := NewMaskConfiguration().
-		WithEntry("name", nameList)
+		WithEntry("name", NewMaskRandomList(nameList))
 
 	maskingEngine := MaskingEngineFactory(config)
 
@@ -65,7 +65,37 @@ func TestMaskingShouldReplaceSensitiveValueByRandomInList(t *testing.T) {
 	assert.NotEqual(t, data, result, "should be masked")
 
 	namemap := result.(map[string]Entry)
-	assert.Contains(t, nameList.list, namemap["name"], "Should be in the list")
+	assert.Contains(t, nameList, namemap["name"], "Should be in the list")
+}
+
+func TestMaskingShouldReplaceSensitiveValueByRandomAndDifferent(t *testing.T) {
+	config := NewMaskConfiguration().
+		WithEntry("name", NewMaskRandomList(nameList))
+	maskingEngine := MaskingEngineFactory(config)
+
+	data := Dictionary{"name": "Benjamin"}
+	diff := 0
+	for i := 0; i < 1000; i++ {
+		result := maskingEngine.Mask(data)
+		resultBis := maskingEngine.Mask(data)
+		if result.(map[string]Entry)["name"] != resultBis.(map[string]Entry)["name"] {
+			diff++
+		}
+	}
+	assert.True(t, diff >= 750, "Should be the same less than 250 times")
+}
+
+func TestMaskingShouldReplaceSensitiveValueByHashing(t *testing.T) {
+	config := NewMaskConfiguration().
+		WithEntry("name", MaskHashList{nameList})
+
+	maskingEngine := MaskingEngineFactory(config)
+
+	data := Dictionary{"name": "Alexis"}
+	result := maskingEngine.Mask(data)
+	resultBis := maskingEngine.Mask(data)
+
+	assert.Equal(t, result, resultBis, "Should be hashed the same way")
 }
 
 func TestMaskingShouldReplaceValueInNestedDictionary(t *testing.T) {
@@ -111,5 +141,5 @@ func TestMaskingShouldReplaceSensitiveValueByWeightedRandom(t *testing.T) {
 	}
 
 	assert.True(t, equal >= 750, "Should be more than 750 Michel")
-	assert.True(t, equal <= 850, "Should be more than 150 Marc")
+	assert.True(t, equal <= 850, "Should be less than 150 Marc")
 }
