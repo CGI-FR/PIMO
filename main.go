@@ -112,11 +112,11 @@ func (cme CommandMaskEngine) Mask(e Entry) Entry {
 // MaskRandomList is a list of masking value and a rand init to mask
 type MaskRandomList struct {
 	rand *rand.Rand
-	list []string
+	list []Entry
 }
 
 // NewMaskRandomList create a MaskRandomList
-func NewMaskRandomList(list []string) MaskRandomList {
+func NewMaskRandomList(list []Entry) MaskRandomList {
 	return MaskRandomList{rand.New(rand.NewSource(time.Now().UnixNano())), list}
 }
 
@@ -127,7 +127,7 @@ func (mrl MaskRandomList) Mask(e Entry) Entry {
 
 // MaskHashList is a list of masking value for hash masking
 type MaskHashList struct {
-	list []string
+	list []Entry
 }
 
 // Mask choose a mask value by hash

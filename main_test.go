@@ -8,7 +8,7 @@ import (
 
 var nameMasking = FunctionMaskEngine{func(name Entry) Entry { return "Toto" }}
 var nameProgramMasking = CommandMaskEngine{"echo Toto"}
-var nameList = []string{"Michel", "Marc", "Matthias", "Youen", "Alexis"}
+var nameList = []Entry{"Michel", "Marc", "Matthias", "Youen", "Alexis"}
 
 func TestMaskingShouldReturnEmptyWhenInputISEmpty(t *testing.T) {
 	maskingEngine := NewMaskConfiguration().AsEngine()
