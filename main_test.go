@@ -1,6 +1,7 @@
 package main
 
 import (
+	"regexp"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -173,4 +174,18 @@ func TestMaskingShouldReplaceSensitiveValueByRandomNumber(t *testing.T) {
 	assert.NotEqual(t, data, result, "Should be masked")
 	assert.True(t, result["age"].(int) >= min, "Should be more than min")
 	assert.True(t, result["age"].(int) <= max, "Should be less than max")
+}
+
+func TestMaskingShouldReplaceSensitiveValueByRegex(t *testing.T) {
+	regex := "0[1-7]( ([0-9]){2}){4}"
+	regmask := NewRegexMask(regex)
+	config := NewMaskConfiguration().
+		WithEntry("phone", regmask)
+	maskingEngine := MaskingEngineFactory(config)
+
+	data := Dictionary{"phone": "00 00 00 00 00"}
+	result := maskingEngine.Mask(data).(map[string]Entry)
+	match, _ := regexp.MatchString(regex, result["phone"].(string))
+	assert.NotEqual(t, data, result, "should be masked")
+	assert.True(t, match, "should match the regexp")
 }

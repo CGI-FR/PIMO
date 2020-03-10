@@ -8,6 +8,7 @@ import (
 	"time"
 
 	wr "github.com/mroth/weightedrand"
+	regen "github.com/zach-klippenstein/goregen"
 )
 
 // Dictionary is a Map with string as key and Entry as value
@@ -165,7 +166,7 @@ func (wml WeightedMaskList) Mask(e Entry) Entry {
 	return wml.cs.Pick()
 }
 
-//ConstMask is a value that always mask
+//ConstMask is a value that always mask the same way
 type ConstMask struct {
 	constValue Entry
 }
@@ -189,4 +190,21 @@ type RandomIntMask struct {
 // Mask choose a mask int randomly within boundary
 func (rim RandomIntMask) Mask(e Entry) Entry {
 	return rand.Intn(rim.max+1-rim.min) + rim.min
+}
+
+//RegexMask is a value that mask thanks to a regular expression
+type RegexMask struct {
+	generator regen.Generator
+}
+
+//NewRegexMask return a RegexMask from a regexp
+func NewRegexMask(exp string) RegexMask {
+	generator, _ := regen.NewGenerator(exp, &regen.GeneratorArgs{RngSource: rand.NewSource(time.Now().UnixNano())})
+	return RegexMask{generator}
+}
+
+//Mask returns a string thanks to a regular expression
+func (rm RegexMask) Mask(e Entry) Entry {
+	out := rm.generator.Generate()
+	return out
 }
