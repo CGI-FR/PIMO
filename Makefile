@@ -57,9 +57,6 @@ tidy: ## Refresh modules (add missing, remove unused)
 
 .PHONY: lint
 lint: ## Examines Go source code and reports suspicious constructs
-ifeq (, $(shell which golangci-lint))
-	curl -sfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh| sh -s -- -b $(go env GOPATH)/bin v1.21.0
-endif
 	golangci-lint run -E misspell -E gocyclo -E gosec -E unparam -E goimports -E nakedret -E gocritic -E whitespace
 
 .PHONY: build-%
