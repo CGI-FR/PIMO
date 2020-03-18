@@ -1,12 +1,15 @@
 package main
 
 import (
+	"errors"
 	"hash/fnv"
+	"io/ioutil"
 	"math/rand"
 	"os/exec"
 	"strings"
 	"time"
 
+	"github.com/goccy/go-yaml"
 	wr "github.com/mroth/weightedrand"
 	regen "github.com/zach-klippenstein/goregen"
 )
@@ -116,9 +119,14 @@ type MaskRandomList struct {
 	list []Entry
 }
 
-// NewMaskRandomList create a MaskRandomList
+// NewMaskRandomList create a MaskRandomList with no seed
 func NewMaskRandomList(list []Entry) MaskRandomList {
-	return MaskRandomList{rand.New(rand.NewSource(time.Now().UnixNano())), list}
+	return NewMaskRandomListSeeded(list, time.Now().UnixNano())
+}
+
+// NewMaskRandomListSeeded create a MaskRandomList with a seed
+func NewMaskRandomListSeeded(list []Entry, seed int64) MaskRandomList {
+	return MaskRandomList{rand.New(rand.NewSource(seed)), list}
 }
 
 // Mask choose a mask value randomly
@@ -227,4 +235,85 @@ func (dateRange DateMask) Mask(e Entry) Entry {
 	delta := dateRange.dateMax.Unix() - dateRange.dateMin.Unix()
 	sec := time.Unix(rand.Int63n(delta)+dateRange.dateMin.Unix(), 0)
 	return sec
+}
+
+// YAMLStructure of the file
+type YAMLStructure struct {
+	Version string `yaml:"version"`
+	Seed    int64  `yaml:"seed"`
+	Masking []struct {
+		Selector struct {
+			Jsonpath string `yaml:"jsonpath"`
+		} `yaml:"selector"`
+		Mask struct {
+			Constant     Entry   `yaml:"constant"`
+			RandomChoice []Entry `yaml:"randomChoice"`
+			Command      string  `yaml:"command"`
+			RandomInt    struct {
+				Min int `yaml:"min"`
+				Max int `yaml:"max"`
+			} `yaml:"randomInt"`
+			WeightedChoice []struct {
+				Choice Entry `yaml:"choice"`
+				Weight uint  `yaml:"weight"`
+			} `yaml:"weightedChoice"`
+			Regex string  `yaml:"regex"`
+			Hash  []Entry `yaml:"hash"`
+		} `yaml:"mask"`
+	} `yaml:"masking"`
+}
+
+// YamlConfig create a MaskConfiguration from a file
+func YamlConfig(filename string) (MaskConfiguration, error) {
+	source, _ := ioutil.ReadFile(filename)
+	var conf YAMLStructure
+	err := yaml.Unmarshal(source, &conf)
+	if err != nil {
+		return NewMaskConfiguration(), errors.New("Unable to unmarshal YAML file")
+	}
+	if conf.Seed == 0 {
+		conf.Seed = time.Now().UnixNano()
+	}
+	config := NewMaskConfiguration()
+	for _, v := range conf.Masking {
+		nbArg := 0
+		if v.Mask.Constant != nil {
+			config.WithEntry(v.Selector.Jsonpath, NewConstMask(v.Mask.Constant))
+			nbArg++
+		}
+		if len(v.Mask.RandomChoice) != 0 {
+			config.WithEntry(v.Selector.Jsonpath, NewMaskRandomListSeeded(v.Mask.RandomChoice, conf.Seed))
+			nbArg++
+		}
+		if len(v.Mask.Command) != 0 {
+			config.WithEntry(v.Selector.Jsonpath, CommandMaskEngine{v.Mask.Command})
+			nbArg++
+		}
+		if v.Mask.RandomInt.Max != 0 || v.Mask.RandomInt.Min != 0 {
+			config.WithEntry(v.Selector.Jsonpath, RandomIntMask{v.Mask.RandomInt.Min, v.Mask.RandomInt.Max})
+			nbArg++
+		}
+		if len(v.Mask.WeightedChoice) != 0 {
+			var maskWeight []WeightedChoice
+			for _, v := range v.Mask.WeightedChoice {
+				maskWeight = append(maskWeight, WeightedChoice{v.Choice, v.Weight})
+			}
+			config.WithEntry(v.Selector.Jsonpath, NewWeightedMaskList(maskWeight))
+			nbArg++
+		}
+		if len(v.Mask.Regex) != 0 {
+			config.WithEntry(v.Selector.Jsonpath, NewRegexMask(v.Mask.Regex))
+			nbArg++
+		}
+		if len(v.Mask.Hash) != 0 {
+			var maskHash MaskHashList
+			maskHash.list = append(maskHash.list, v.Mask.Hash...)
+			config.WithEntry(v.Selector.Jsonpath, maskHash)
+			nbArg++
+		}
+		if nbArg == 0 || nbArg >= 2 {
+			return NewMaskConfiguration(), errors.New("Not the right number of argument")
+		}
+	}
+	return config, nil
 }

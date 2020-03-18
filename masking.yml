@@ -1,0 +1,43 @@
+version: "1"
+seed: 42
+masking:
+  - selector:
+      jsonpath: "customer.phone"
+    mask:
+      regex: "0[1-7]( ([0-9]){2}){4}"
+  - selector:
+      jsonpath: "name1"
+    mask:
+      constant: "Toto"
+  - selector:
+      jsonpath: "name2"
+    mask:
+      randomChoice:
+       - "Mickael"
+       - "Mathieu"
+       - "Marcelle"
+  - selector:
+      jsonpath: "age"
+    mask:
+      randomInt:
+        min: 25
+        max: 32
+  - selector:
+      jsonpath: "name3"
+    mask:
+      command: "echo Dorothy"
+  - selector:
+      jsonpath: "surname"
+    mask:
+      weightedChoice:
+        - choice: "Dupont"
+          weight: 9
+        - choice: "Dupond"
+          weight: 1
+  - selector:
+      jsonpath: "address.town"
+    mask:
+      hash:
+        - "Emerald City"
+        - "Ruby City"
+        - "Sapphire City"

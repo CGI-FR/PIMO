@@ -37,7 +37,6 @@ func TestMaskingShouldReplaceSensitiveValue(t *testing.T) {
 
 	data := Dictionary{"name": "Benjamin"}
 	result := maskingEngine.Mask(data)
-
 	assert.NotEqual(t, data, result, "should be masked")
 }
 
@@ -219,4 +218,42 @@ func TestMaskingShouldReplaceDateByRandom(t *testing.T) {
 	}
 
 	assert.True(t, equal <= 1, "Shouldn't be the same date less than 0.1% of time")
+}
+
+func A(me MaskEngine, boo bool) MaskEngine {
+	return me
+}
+
+func TestShouldCreateAMaskConfigurationFromAFile(t *testing.T) {
+	filename := "masking.yml"
+	config, _ := YamlConfig(filename)
+	regex := "0[1-7]( ([0-9]){2}){4}"
+	constMask := NewConstMask("Toto")
+	regmask := NewRegexMask(regex)
+	randList := NewMaskRandomListSeeded([]Entry{"Mickael", "Mathieu", "Marcelle"}, int64(42))
+	nameWeighted := []WeightedChoice{{data: "Dupont", weight: 9}, {data: "Dupond", weight: 1}}
+	waited := NewMaskConfiguration().
+		WithEntry("customer.phone", regmask).
+		WithEntry("name1", constMask).
+		WithEntry("name2", randList).
+		WithEntry("age", RandomIntMask{25, 32}).
+		WithEntry("name3", CommandMaskEngine{"echo Dorothy"}).
+		WithEntry("surname", NewWeightedMaskList(nameWeighted)).
+		WithEntry("address.town", MaskHashList{[]Entry{"Emerald City", "Ruby City", "Sapphire City"}})
+
+	assert.Equal(t, A(config.GetMaskingEngine("customer.phone")), A(waited.GetMaskingEngine("customer.phone")), "customer.phone not equal")
+	assert.Equal(t, A(config.GetMaskingEngine("name1")), A(waited.GetMaskingEngine("name1")), "name1 not equal")
+	assert.Equal(t, A(config.GetMaskingEngine("name2")), A(waited.GetMaskingEngine("name2")), "name2 not equal")
+	assert.Equal(t, A(config.GetMaskingEngine("age")), A(waited.GetMaskingEngine("age")), "age not equal")
+	assert.Equal(t, A(config.GetMaskingEngine("name3")), A(waited.GetMaskingEngine("name3")), "name3 not equal")
+	assert.Equal(t, A(config.GetMaskingEngine("surname")), A(waited.GetMaskingEngine("surname")), "surname not equal")
+	assert.Equal(t, A(config.GetMaskingEngine("address.town")), A(waited.GetMaskingEngine("address.town")), "surname not equal")
+}
+
+func TestShouldReturnAnErrorWithMultipleArguments(t *testing.T) {
+	filename := "wrongMasking.yml"
+	conf, err := YamlConfig(filename)
+	t.Log(conf)
+	t.Log(err)
+	assert.NotEqual(t, err, nil, "Should not be nil")
 }
