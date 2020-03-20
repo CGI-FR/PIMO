@@ -257,3 +257,11 @@ func TestShouldReturnAnErrorWithMultipleArguments(t *testing.T) {
 	t.Log(err)
 	assert.NotEqual(t, err, nil, "Should not be nil")
 }
+
+func TestShouldCreateDictionaryFromJsonLine(t *testing.T) {
+	jsonline := []byte("{\"name\":\"Benjamin\",\"age\":35}")
+	dic, _ := JSONToDictionary(jsonline)
+	waited := Dictionary{"name": "Benjamin", "age": float64(35)}
+
+	assert.Equal(t, dic, waited, "Should create the right Dictionary")
+}

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"errors"
 	"hash/fnv"
 	"io/ioutil"
@@ -316,4 +317,14 @@ func YamlConfig(filename string) (MaskConfiguration, error) {
 		}
 	}
 	return config, nil
+}
+
+//JSONToDictionary return a dictionary from a jsonline
+func JSONToDictionary(jsonline []byte) (Dictionary, error) {
+	var dic Dictionary
+	err := json.Unmarshal(jsonline, &dic)
+	if err != nil {
+		return nil, err
+	}
+	return dic, nil
 }
