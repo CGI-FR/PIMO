@@ -1,11 +1,14 @@
 package main
 
 import (
+	"bufio"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"hash/fnv"
 	"io/ioutil"
 	"math/rand"
+	"os"
 	"os/exec"
 	"strings"
 	"time"
@@ -327,4 +330,31 @@ func JSONToDictionary(jsonline []byte) (Dictionary, error) {
 		return nil, err
 	}
 	return dic, nil
+}
+
+//StopIteratorError is an error for le JSONLineIterator
+type StopIteratorError struct{}
+
+func (e StopIteratorError) Error() string {
+	return fmt.Sprintf("Iterator couldn't find any value")
+}
+
+// JSONLineIterator export line to JSON format.
+type JSONLineIterator struct {
+	file     *os.File
+	fscanner *bufio.Scanner
+}
+
+// NewJSONLineIterator creates a new JSONLineIterator.
+func NewJSONLineIterator(file *os.File) JSONLineIterator {
+	return JSONLineIterator{file, bufio.NewScanner(file)}
+}
+
+// Next convert next line to JSONLine
+func (jli *JSONLineIterator) Next() (Dictionary, error) {
+	if !jli.fscanner.Scan() {
+		return nil, StopIteratorError{}
+	}
+	line := jli.fscanner.Bytes()
+	return JSONToDictionary(line)
 }

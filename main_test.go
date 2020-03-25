@@ -1,6 +1,8 @@
 package main
 
 import (
+	"io/ioutil"
+	"os"
 	"regexp"
 	"testing"
 	"time"
@@ -264,4 +266,48 @@ func TestShouldCreateDictionaryFromJsonLine(t *testing.T) {
 	waited := Dictionary{"name": "Benjamin", "age": float64(35)}
 
 	assert.Equal(t, dic, waited, "Should create the right Dictionary")
+}
+
+func TestShouldIterateOverEntryIterator(t *testing.T) {
+	tmpfile, _ := ioutil.TempFile("", "example")
+	defer os.Remove(tmpfile.Name())
+	_, errwrite := tmpfile.Write([]byte(`{"age":2, "name":"Toto"}`))
+	if errwrite != nil {
+		assert.Fail(t, "can't write")
+	}
+
+	_, errwrite = tmpfile.Write([]byte("\n"))
+	if errwrite != nil {
+		assert.Fail(t, "can't write")
+	}
+
+	_, errwrite = tmpfile.Write([]byte(`{"age":15, "name":"Benjamin"}`))
+	if errwrite != nil {
+		assert.Fail(t, "can't write")
+	}
+
+	_, errwrite = tmpfile.Seek(0, 0)
+	if errwrite != nil {
+		assert.Fail(t, "can't seek")
+	}
+
+	jsonlineIterator := NewJSONLineIterator(tmpfile)
+	entry, err := jsonlineIterator.Next()
+	if err != nil {
+		assert.Fail(t, err.Error())
+	}
+
+	waited := Dictionary{"age": float64(2), "name": "Toto"}
+	assert.Equal(t, entry, waited, "First read should be equal")
+
+	entry, err = jsonlineIterator.Next()
+	if err != nil {
+		assert.Fail(t, "ERROR OPENING JSONLINEITERATOR")
+	}
+
+	waited = Dictionary{"age": float64(15), "name": "Benjamin"}
+	assert.Equal(t, entry, waited, "Second read should be equal")
+
+	_, err = jsonlineIterator.Next()
+	assert.Equal(t, err, StopIteratorError{}, "Should return an end of iterator error")
 }
