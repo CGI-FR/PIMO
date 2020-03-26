@@ -358,3 +358,13 @@ func (jli *JSONLineIterator) Next() (Dictionary, error) {
 	line := jli.fscanner.Bytes()
 	return JSONToDictionary(line)
 }
+
+//DictionaryToJSON create a jsonline from a dictionary
+func DictionaryToJSON(dic Dictionary) ([]byte, error) {
+	jsonline, err := json.Marshal(dic)
+	if err != nil {
+		return nil, err
+	}
+	jsonline = append(jsonline, "\n"...)
+	return jsonline, nil
+}

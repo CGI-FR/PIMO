@@ -311,3 +311,11 @@ func TestShouldIterateOverEntryIterator(t *testing.T) {
 	_, err = jsonlineIterator.Next()
 	assert.Equal(t, err, StopIteratorError{}, "Should return an end of iterator error")
 }
+
+func TestShouldCreateJsonLineFromDictionary(t *testing.T) {
+	dic := Dictionary{"age": 35, "name": "Benjamin"}
+	jsonline, _ := DictionaryToJSON(dic)
+	waited := []byte("{\"age\":35,\"name\":\"Benjamin\"}\n")
+
+	assert.Equal(t, jsonline, waited, "Should create the right JsonLine")
+}
