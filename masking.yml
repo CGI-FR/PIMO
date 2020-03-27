@@ -6,7 +6,7 @@ masking:
     mask:
       regex: "0[1-7]( ([0-9]){2}){4}"
   - selector:
-      jsonpath: "name1"
+      jsonpath: "name"
     mask:
       constant: "Toto"
   - selector:
@@ -41,3 +41,7 @@ masking:
         - "Emerald City"
         - "Ruby City"
         - "Sapphire City"
+  - selector:
+      jsonpath: "personne.name"
+    mask:
+      constant: "Toto"

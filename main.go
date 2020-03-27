@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"hash/fnv"
+	"io"
 	"io/ioutil"
 	"math/rand"
 	"os"
@@ -341,13 +342,12 @@ func (e StopIteratorError) Error() string {
 
 // JSONLineIterator export line to JSON format.
 type JSONLineIterator struct {
-	file     *os.File
 	fscanner *bufio.Scanner
 }
 
 // NewJSONLineIterator creates a new JSONLineIterator.
-func NewJSONLineIterator(file *os.File) JSONLineIterator {
-	return JSONLineIterator{file, bufio.NewScanner(file)}
+func NewJSONLineIterator(file io.Reader) JSONLineIterator {
+	return JSONLineIterator{bufio.NewScanner(file)}
 }
 
 // Next convert next line to JSONLine
@@ -367,4 +367,25 @@ func DictionaryToJSON(dic Dictionary) ([]byte, error) {
 	}
 	jsonline = append(jsonline, "\n"...)
 	return jsonline, nil
+}
+
+func main() {
+	maskingfile := "masking.yml"
+	config, err := YamlConfig(maskingfile)
+	if err != nil {
+		println("ERROR : No masking file found")
+		os.Exit(-1)
+	}
+	maskingEngine := MaskingEngineFactory(config)
+	reader := NewJSONLineIterator(os.Stdin)
+	for {
+		dic, err := reader.Next()
+		if err != nil {
+			println("Enable to  transform this line")
+			break
+		}
+		masked := maskingEngine.Mask(dic).(map[string]Entry)
+		jsonline, _ := DictionaryToJSON(masked)
+		os.Stdout.Write(jsonline)
+	}
 }

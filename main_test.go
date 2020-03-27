@@ -236,7 +236,7 @@ func TestShouldCreateAMaskConfigurationFromAFile(t *testing.T) {
 	nameWeighted := []WeightedChoice{{data: "Dupont", weight: 9}, {data: "Dupond", weight: 1}}
 	waited := NewMaskConfiguration().
 		WithEntry("customer.phone", regmask).
-		WithEntry("name1", constMask).
+		WithEntry("name", constMask).
 		WithEntry("name2", randList).
 		WithEntry("age", RandomIntMask{25, 32}).
 		WithEntry("name3", CommandMaskEngine{"echo Dorothy"}).
@@ -244,7 +244,7 @@ func TestShouldCreateAMaskConfigurationFromAFile(t *testing.T) {
 		WithEntry("address.town", MaskHashList{[]Entry{"Emerald City", "Ruby City", "Sapphire City"}})
 
 	assert.Equal(t, A(config.GetMaskingEngine("customer.phone")), A(waited.GetMaskingEngine("customer.phone")), "customer.phone not equal")
-	assert.Equal(t, A(config.GetMaskingEngine("name1")), A(waited.GetMaskingEngine("name1")), "name1 not equal")
+	assert.Equal(t, A(config.GetMaskingEngine("name")), A(waited.GetMaskingEngine("name")), "name1 not equal")
 	assert.Equal(t, A(config.GetMaskingEngine("name2")), A(waited.GetMaskingEngine("name2")), "name2 not equal")
 	assert.Equal(t, A(config.GetMaskingEngine("age")), A(waited.GetMaskingEngine("age")), "age not equal")
 	assert.Equal(t, A(config.GetMaskingEngine("name3")), A(waited.GetMaskingEngine("name3")), "name3 not equal")
