@@ -323,13 +323,29 @@ func YamlConfig(filename string) (MaskConfiguration, error) {
 	return config, nil
 }
 
+//InterfaceToDictionary returns a dictionary from an interface
+func InterfaceToDictionary(inter interface{}) Dictionary {
+	dic := make(map[string]Entry)
+	mapint := inter.(map[string]interface{})
+	for k, v := range mapint {
+		switch v.(type) {
+		case map[string]interface{}:
+			dic[k] = InterfaceToDictionary(v)
+		default:
+			dic[k] = v
+		}
+	}
+	return dic
+}
+
 //JSONToDictionary return a dictionary from a jsonline
 func JSONToDictionary(jsonline []byte) (Dictionary, error) {
-	var dic Dictionary
-	err := json.Unmarshal(jsonline, &dic)
+	var inter interface{}
+	err := json.Unmarshal(jsonline, &inter)
 	if err != nil {
 		return nil, err
 	}
+	dic := InterfaceToDictionary(inter)
 	return dic, nil
 }
 
@@ -350,7 +366,7 @@ func NewJSONLineIterator(file io.Reader) JSONLineIterator {
 	return JSONLineIterator{bufio.NewScanner(file)}
 }
 
-// Next convert next line to JSONLine
+// Next convert next line to dictionary
 func (jli *JSONLineIterator) Next() (Dictionary, error) {
 	if !jli.fscanner.Scan() {
 		return nil, StopIteratorError{}

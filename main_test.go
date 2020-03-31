@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"io/ioutil"
 	"os"
 	"regexp"
@@ -318,4 +319,12 @@ func TestShouldCreateJsonLineFromDictionary(t *testing.T) {
 	waited := []byte("{\"age\":35,\"name\":\"Benjamin\"}\n")
 
 	assert.Equal(t, jsonline, waited, "Should create the right JsonLine")
+}
+
+func TestNextShouldUnmarshalNestedJSON(t *testing.T) {
+	jsonline := []byte(`{"personne":{"name": "Benjamin", "age" : 35}}`)
+	jsonlineIterator := NewJSONLineIterator(bytes.NewReader(jsonline))
+	dic, _ := jsonlineIterator.Next()
+	waited := Dictionary{"personne": Dictionary{"name": "Benjamin", "age": float64(35)}}
+	assert.Equal(t, dic, waited, "Should create a nested Dictionary")
 }
