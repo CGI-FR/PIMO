@@ -389,7 +389,7 @@ func main() {
 	maskingfile := "masking.yml"
 	config, err := YamlConfig(maskingfile)
 	if err != nil {
-		println("ERROR : No masking file found")
+		println("ERROR : Masking.yml not working properly")
 		os.Exit(-1)
 	}
 	maskingEngine := MaskingEngineFactory(config)

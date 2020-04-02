@@ -41,7 +41,3 @@ masking:
         - "Emerald City"
         - "Ruby City"
         - "Sapphire City"
-  - selector:
-      jsonpath: "personne.name"
-    mask:
-      constant: "Toto"
