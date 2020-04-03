@@ -229,12 +229,17 @@ func A(me MaskEngine, boo bool) MaskEngine {
 
 func TestShouldCreateAMaskConfigurationFromAFile(t *testing.T) {
 	filename := "masking.yml"
-	config, _ := YamlConfig(filename)
+	config, err := YamlConfig(filename)
+	if err != nil {
+		t.Log(err)
+	}
 	regex := "0[1-7]( ([0-9]){2}){4}"
 	constMask := NewConstMask("Toto")
 	regmask := NewRegexMask(regex)
 	randList := NewMaskRandomListSeeded([]Entry{"Mickael", "Mathieu", "Marcelle"}, int64(42))
 	nameWeighted := []WeightedChoice{{data: "Dupont", weight: 9}, {data: "Dupond", weight: 1}}
+	dateMin := time.Date(1970, 1, 1, 0, 0, 0, 0, time.UTC)
+	dateMax := time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC)
 	waited := NewMaskConfiguration().
 		WithEntry("customer.phone", regmask).
 		WithEntry("name", constMask).
@@ -242,7 +247,8 @@ func TestShouldCreateAMaskConfigurationFromAFile(t *testing.T) {
 		WithEntry("age", RandomIntMask{25, 32}).
 		WithEntry("name3", CommandMaskEngine{"echo Dorothy"}).
 		WithEntry("surname", NewWeightedMaskList(nameWeighted)).
-		WithEntry("address.town", MaskHashList{[]Entry{"Emerald City", "Ruby City", "Sapphire City"}})
+		WithEntry("address.town", MaskHashList{[]Entry{"Emerald City", "Ruby City", "Sapphire City"}}).
+		WithEntry("date", NewDateMask(dateMin, dateMax))
 
 	assert.Equal(t, A(config.GetMaskingEngine("customer.phone")), A(waited.GetMaskingEngine("customer.phone")), "customer.phone not equal")
 	assert.Equal(t, A(config.GetMaskingEngine("name")), A(waited.GetMaskingEngine("name")), "name1 not equal")
@@ -251,6 +257,7 @@ func TestShouldCreateAMaskConfigurationFromAFile(t *testing.T) {
 	assert.Equal(t, A(config.GetMaskingEngine("name3")), A(waited.GetMaskingEngine("name3")), "name3 not equal")
 	assert.Equal(t, A(config.GetMaskingEngine("surname")), A(waited.GetMaskingEngine("surname")), "surname not equal")
 	assert.Equal(t, A(config.GetMaskingEngine("address.town")), A(waited.GetMaskingEngine("address.town")), "surname not equal")
+	assert.Equal(t, A(config.GetMaskingEngine("date")), A(waited.GetMaskingEngine("date")), "date not equal")
 }
 
 func TestShouldReturnAnErrorWithMultipleArguments(t *testing.T) {

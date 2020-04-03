@@ -262,8 +262,12 @@ type YAMLStructure struct {
 				Choice Entry `yaml:"choice"`
 				Weight uint  `yaml:"weight"`
 			} `yaml:"weightedChoice"`
-			Regex string  `yaml:"regex"`
-			Hash  []Entry `yaml:"hash"`
+			Regex    string  `yaml:"regex"`
+			Hash     []Entry `yaml:"hash"`
+			RandDate struct {
+				DateMin time.Time `yaml:"dateMin"`
+				DateMax time.Time `yaml:"dateMax"`
+			} `yaml:"randDate"`
 		} `yaml:"mask"`
 	} `yaml:"masking"`
 }
@@ -274,7 +278,7 @@ func YamlConfig(filename string) (MaskConfiguration, error) {
 	var conf YAMLStructure
 	err := yaml.Unmarshal(source, &conf)
 	if err != nil {
-		return NewMaskConfiguration(), errors.New("Unable to unmarshal YAML file")
+		return NewMaskConfiguration(), err
 	}
 	if conf.Seed == 0 {
 		conf.Seed = time.Now().UnixNano()
@@ -314,6 +318,10 @@ func YamlConfig(filename string) (MaskConfiguration, error) {
 			var maskHash MaskHashList
 			maskHash.list = append(maskHash.list, v.Mask.Hash...)
 			config.WithEntry(v.Selector.Jsonpath, maskHash)
+			nbArg++
+		}
+		if v.Mask.RandDate.DateMin != v.Mask.RandDate.DateMax {
+			config.WithEntry(v.Selector.Jsonpath, NewDateMask(v.Mask.RandDate.DateMin, v.Mask.RandDate.DateMax))
 			nbArg++
 		}
 		if nbArg == 0 || nbArg >= 2 {
