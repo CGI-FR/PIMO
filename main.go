@@ -228,7 +228,7 @@ type DateMask struct {
 	dateMax time.Time
 }
 
-// NewDateMask create
+// NewDateMask create a date mask
 func NewDateMask(min, max time.Time) DateMask {
 	t1 := min
 	t2 := max
@@ -240,6 +240,25 @@ func (dateRange DateMask) Mask(e Entry) Entry {
 	delta := dateRange.dateMax.Unix() - dateRange.dateMin.Unix()
 	sec := time.Unix(rand.Int63n(delta)+dateRange.dateMin.Unix(), 0)
 	return sec
+}
+
+//IncrementalMask is a struct to create incremental int
+type IncrementalMask struct {
+	value     *int
+	increment int
+}
+
+// NewIncrementalMask create an IncrementalMask
+func NewIncrementalMask(start, incr int) IncrementalMask {
+	value := &start
+	return IncrementalMask{value, incr}
+}
+
+// Mask masks a value with an incremental int
+func (incr IncrementalMask) Mask(e Entry) Entry {
+	output := *incr.value
+	*incr.value += incr.increment
+	return output
 }
 
 // YAMLStructure of the file
@@ -268,6 +287,10 @@ type YAMLStructure struct {
 				DateMin time.Time `yaml:"dateMin"`
 				DateMax time.Time `yaml:"dateMax"`
 			} `yaml:"randDate"`
+			Incremental struct {
+				Start     int `yaml:"start"`
+				Increment int `yaml:"increment"`
+			} `yaml:"incremental"`
 		} `yaml:"mask"`
 	} `yaml:"masking"`
 }
@@ -322,6 +345,10 @@ func YamlConfig(filename string) (MaskConfiguration, error) {
 		}
 		if v.Mask.RandDate.DateMin != v.Mask.RandDate.DateMax {
 			config.WithEntry(v.Selector.Jsonpath, NewDateMask(v.Mask.RandDate.DateMin, v.Mask.RandDate.DateMax))
+			nbArg++
+		}
+		if v.Mask.Incremental.Increment != 0 {
+			config.WithEntry(v.Selector.Jsonpath, NewIncrementalMask(v.Mask.Incremental.Start, v.Mask.Incremental.Increment))
 			nbArg++
 		}
 		if nbArg == 0 || nbArg >= 2 {

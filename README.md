@@ -34,7 +34,8 @@ The following types of masks can be used :
 * `command` is to mask with the output of a console command given in argument.
 * `weightedChoice` is to mask with a random value from a list with probability, both given with the arguments `choice` and `weight`.
 * `hash` is to mask with a value from a list by mashing the original value, allowing to mask a value the same way every time.
-* `randomDate` is to mask a date with a random date between `dateMin` and `dateMax`.
+* `randDate` is to mask a date with a random date between `dateMin` and `dateMax`.
+* `incremental` is to mask datas with incremental value starting from `start` with a step of `increment`.
 
 A full `masking.yml` file exemple, using every kind of mask, is given with the source code.
 
@@ -47,3 +48,120 @@ To use PIMO to mask a `data.json`, use in the following way :
 ```
 
 This takes the `data.json` file, masks the datas contained inside it and put the result in a `maskedData.json` file.
+
+## Exemple  
+This section will give exemples for every type of masking.
+
+### regex
+
+```
+  - selector:
+      jsonpath: "phone"
+    mask:
+      regex: "0[1-7]( ([0-9]){2}){4}"
+```
+
+This exemple will mask the `phone` field of the input jsonlines with a random string respecting the regular expression.
+
+### constant
+
+```
+  - selector:
+      jsonpath: "name"
+    mask:
+      constant: "Toto"
+```
+This exemple will mask the `name` field of the input jsonlines with the value of the `constant` field.
+
+### randomChoice
+
+```
+  - selector:
+      jsonpath: "name"
+    mask:
+      randomChoice:
+       - "Mickael"
+       - "Mathieu"
+       - "Marcelle"
+```
+
+This exemple will mask the `name` field of the input jsonlines with random values from the `randomChoice` list.
+
+### randonInt
+
+```
+  - selector:
+      jsonpath: "age"
+    mask:
+      randomInt:
+        min: 25
+        max: 32
+```
+
+This exemple will mask the `age` field of the input jsonlines with a random number between `min` and `max` included.
+
+### command
+
+```
+  - selector:
+      jsonpath: "name"
+    mask:
+      command: "echo Dorothy"
+```
+
+This exemple will mask the `name` field of the input jsonlines with the output of the given commande. In this case, `Dorothy`.
+
+### weightedChoice
+
+```
+  - selector:
+      jsonpath: "surname"
+    mask:
+      weightedChoice:
+        - choice: "Dupont"
+          weight: 9
+        - choice: "Dupond"
+          weight: 1
+```
+
+This exemple will mask the `surname` field of the input jsonlines with a random value in the `weightedChoice` list with a probability proportional at the `weight` field.
+
+### hash
+
+```
+  - selector:
+      jsonpath: "town"
+    mask:
+      hash:
+        - "Emerald City"
+        - "Ruby City"
+        - "Sapphire City"
+```
+
+This exemple will mask the `town` field of the input jsonlines with a value from the `hash` list. The value will be chosen thanks to a hashing of the original value, allowing the output to be always the same in case of identical inputs.
+
+### randDate 
+
+```
+  - selector:
+      jsonpath: "date"
+    mask:
+      randDate:
+        dateMin: "1970-01-01T00:00:00Z"
+        dateMax: "2020-01-01T00:00:00Z"
+```
+
+This exemple will mask the `date` field of the input jsonlines with a random date between `dateMin` and `dateMax`. In this case the date will be between the 1st January 1970 and the 1st January 2020. 
+
+### incremental
+
+```
+  - selector:
+      jsonpath: "id"
+    mask:
+      incremental:
+        start: 1
+        increment: 1
+```
+
+This exemple will mask the `id` field of the input jsonlines with incremental values. The first jsonline's `id` will be masked by 1, the second's by 2, etc...

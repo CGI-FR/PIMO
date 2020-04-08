@@ -223,6 +223,24 @@ func TestMaskingShouldReplaceDateByRandom(t *testing.T) {
 	assert.True(t, equal <= 1, "Shouldn't be the same date less than 0.1% of time")
 }
 
+func TestMaskingShouldCreateIncrementalInt(t *testing.T) {
+	incrementMask := NewIncrementalMask(1, 1)
+	secIncrMask := NewIncrementalMask(5, 2)
+	config := NewMaskConfiguration().
+		WithEntry("id1", incrementMask).
+		WithEntry("id2", secIncrMask)
+
+	maskingEngine := MaskingEngineFactory(config)
+	firstData := Dictionary{"id1": 0, "id2": 0}
+	secondData := Dictionary{"id1": 0, "id2": 0}
+	firstMasked := maskingEngine.Mask(firstData)
+	firstWaited := Dictionary{"id1": 1, "id2": 5}
+	assert.Equal(t, firstMasked, firstWaited, "First  id masking should be equal")
+	secondMasked := maskingEngine.Mask(secondData)
+	secondWaited := Dictionary{"id1": 2, "id2": 7}
+	assert.Equal(t, secondMasked, secondWaited, "Second id masking should be equal")
+}
+
 func A(me MaskEngine, boo bool) MaskEngine {
 	return me
 }
