@@ -27,7 +27,7 @@ type Entry interface{}
 
 // MaskEngine is a masking algorithm
 type MaskEngine interface {
-	Mask(Entry) Entry
+	Mask(Entry, ...Dictionary) Entry
 }
 
 // NewMaskConfiguration build new configuration
@@ -76,7 +76,7 @@ type FunctionMaskEngine struct {
 }
 
 // Mask delegate mask algorithm to the function
-func (fme FunctionMaskEngine) Mask(e Entry) Entry { return fme.function(e) }
+func (fme FunctionMaskEngine) Mask(e Entry, context ...Dictionary) Entry { return fme.function(e) }
 
 // MaskingEngineFactory return Masking function data without private information
 func MaskingEngineFactory(config MaskConfiguration) MaskEngine {
@@ -106,7 +106,7 @@ type CommandMaskEngine struct {
 }
 
 // Mask delegate mask algorithm to an external program
-func (cme CommandMaskEngine) Mask(e Entry) Entry {
+func (cme CommandMaskEngine) Mask(e Entry, context ...Dictionary) Entry {
 	splitCommand := strings.Split(cme.cmd, " ")
 	/* #nosec */
 	out, err := exec.Command(splitCommand[0], splitCommand[1:]...).Output()
@@ -135,7 +135,7 @@ func NewMaskRandomListSeeded(list []Entry, seed int64) MaskRandomList {
 }
 
 // Mask choose a mask value randomly
-func (mrl MaskRandomList) Mask(e Entry) Entry {
+func (mrl MaskRandomList) Mask(e Entry, context ...Dictionary) Entry {
 	return mrl.list[mrl.rand.Intn(len(mrl.list))]
 }
 
@@ -145,7 +145,7 @@ type MaskHashList struct {
 }
 
 // Mask choose a mask value by hash
-func (mhl MaskHashList) Mask(e Entry) Entry {
+func (mhl MaskHashList) Mask(e Entry, context ...Dictionary) Entry {
 	h := fnv.New32a()
 	_, err := h.Write([]byte(e.(string)))
 	if err != nil {
@@ -175,7 +175,7 @@ func NewWeightedMaskList(list []WeightedChoice) WeightedMaskList {
 }
 
 // Mask choose a mask value randomly with weight for choice
-func (wml WeightedMaskList) Mask(e Entry) Entry {
+func (wml WeightedMaskList) Mask(e Entry, context ...Dictionary) Entry {
 	return wml.cs.Pick()
 }
 
@@ -190,7 +190,7 @@ func NewConstMask(data Entry) ConstMask {
 }
 
 // Mask return a Constant from a ConstMask
-func (cm ConstMask) Mask(e Entry) Entry {
+func (cm ConstMask) Mask(e Entry, context ...Dictionary) Entry {
 	return cm.constValue
 }
 
@@ -201,7 +201,7 @@ type RandomIntMask struct {
 }
 
 // Mask choose a mask int randomly within boundary
-func (rim RandomIntMask) Mask(e Entry) Entry {
+func (rim RandomIntMask) Mask(e Entry, context ...Dictionary) Entry {
 	return rand.Intn(rim.max+1-rim.min) + rim.min
 }
 
@@ -217,7 +217,7 @@ func NewRegexMask(exp string) RegexMask {
 }
 
 //Mask returns a string thanks to a regular expression
-func (rm RegexMask) Mask(e Entry) Entry {
+func (rm RegexMask) Mask(e Entry, context ...Dictionary) Entry {
 	out := rm.generator.Generate()
 	return out
 }
@@ -236,7 +236,7 @@ func NewDateMask(min, max time.Time) DateMask {
 }
 
 // Mask choose a mask date randomly
-func (dateRange DateMask) Mask(e Entry) Entry {
+func (dateRange DateMask) Mask(e Entry, context ...Dictionary) Entry {
 	delta := dateRange.dateMax.Unix() - dateRange.dateMin.Unix()
 	sec := time.Unix(rand.Int63n(delta)+dateRange.dateMin.Unix(), 0)
 	return sec
@@ -255,7 +255,7 @@ func NewIncrementalMask(start, incr int) IncrementalMask {
 }
 
 // Mask masks a value with an incremental int
-func (incr IncrementalMask) Mask(e Entry) Entry {
+func (incr IncrementalMask) Mask(e Entry, context ...Dictionary) Entry {
 	output := *incr.value
 	*incr.value += incr.increment
 	return output
