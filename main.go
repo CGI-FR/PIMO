@@ -104,7 +104,7 @@ func MaskingEngineFactory(config MaskConfiguration) MaskEngine {
 			if present {
 				engine, ok := config.GetMaskingEngine(key)
 				if ok {
-					output[key] = engine.Mask(output[key])
+					output[key] = engine.Mask(output[key], output)
 				}
 			}
 		}
@@ -274,6 +274,16 @@ func (incr IncrementalMask) Mask(e Entry, context ...Dictionary) Entry {
 	return output
 }
 
+// ReplacementMask is to mask a value with another field
+type ReplacementMask struct {
+	field string
+}
+
+// Mask masks a value with another field of the json
+func (remp ReplacementMask) Mask(e Entry, context ...Dictionary) Entry {
+	return context[0][remp.field]
+}
+
 // YAMLStructure of the file
 type YAMLStructure struct {
 	Version string `yaml:"version"`
@@ -304,6 +314,7 @@ type YAMLStructure struct {
 				Start     int `yaml:"start"`
 				Increment int `yaml:"increment"`
 			} `yaml:"incremental"`
+			Replacement string `yaml:"replacement"`
 		} `yaml:"mask"`
 	} `yaml:"masking"`
 }
@@ -362,6 +373,10 @@ func YamlConfig(filename string) (MaskConfiguration, error) {
 		}
 		if v.Mask.Incremental.Increment != 0 {
 			config.WithEntry(v.Selector.Jsonpath, NewIncrementalMask(v.Mask.Incremental.Start, v.Mask.Incremental.Increment))
+			nbArg++
+		}
+		if len(v.Mask.Replacement) != 0 {
+			config.WithEntry(v.Selector.Jsonpath, ReplacementMask{v.Mask.Replacement})
 			nbArg++
 		}
 		if nbArg == 0 || nbArg >= 2 {

@@ -191,6 +191,33 @@ func TestMaskingShouldReplaceSensitiveValueByRegex(t *testing.T) {
 	assert.True(t, match, "should match the regexp")
 }
 
+func TestMaskingShouldReplaceSensitiveValueByAnotherField(t *testing.T) {
+	remplacement := ReplacementMask{"name1"}
+	config := NewMaskConfiguration().
+		WithEntry("name2", remplacement)
+	maskingEngine := MaskingEngineFactory(config)
+
+	data := Dictionary{"name1": "Dupont", "name2": "Dupond"}
+	result := maskingEngine.Mask(data)
+	waited := Dictionary{"name1": "Dupont", "name2": "Dupont"}
+	assert.NotEqual(t, result, data, "Should be different")
+	assert.Equal(t, waited, result, "Should be masked with the other value")
+}
+
+func TestMaskingShouldReplaceSensitiveValueByAMaskedField(t *testing.T) {
+	remplacement := ReplacementMask{"name1"}
+	constant := NewConstMask("Toto")
+	config := NewMaskConfiguration().
+		WithEntry("name1", constant).
+		WithEntry("name2", remplacement)
+	maskingEngine := MaskingEngineFactory(config)
+
+	data := Dictionary{"name1": "Dupont", "name2": "Dupond"}
+	result := maskingEngine.Mask(data)
+	waited := Dictionary{"name1": "Toto", "name2": "Toto"}
+	assert.Equal(t, waited, result, "Should be masked with the constant value")
+}
+
 func TestMaskingShouldReplaceDateByRandom(t *testing.T) {
 	dateMin := time.Date(1970, 1, 1, 0, 0, 0, 0, time.UTC)
 	dateMax := time.Date(2000, 1, 1, 0, 0, 0, 0, time.UTC)
@@ -264,7 +291,8 @@ func TestShouldCreateAMaskConfigurationFromAFile(t *testing.T) {
 		WithEntry("name3", CommandMaskEngine{"echo Dorothy"}).
 		WithEntry("surname", NewWeightedMaskList(nameWeighted)).
 		WithEntry("address.town", MaskHashList{[]Entry{"Emerald City", "Ruby City", "Sapphire City"}}).
-		WithEntry("date", NewDateMask(dateMin, dateMax))
+		WithEntry("date", NewDateMask(dateMin, dateMax)).
+		WithEntry("name4", ReplacementMask{"name1"})
 
 	assert.Equal(t, A(config.GetMaskingEngine("customer.phone")), A(waited.GetMaskingEngine("customer.phone")), "customer.phone not equal")
 	assert.Equal(t, A(config.GetMaskingEngine("name")), A(waited.GetMaskingEngine("name")), "name1 not equal")

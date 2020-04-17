@@ -47,3 +47,7 @@ masking:
       randDate:
         dateMin: "1970-01-01T00:00:00Z"
         dateMax: "2020-01-01T00:00:00Z"
+  - selector:
+      jsonpath: "name4"
+    mask:
+      replacement: "name"

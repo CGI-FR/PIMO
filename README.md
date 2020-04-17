@@ -165,3 +165,12 @@ This exemple will mask the `date` field of the input jsonlines with a random dat
 ```
 
 This exemple will mask the `id` field of the input jsonlines with incremental values. The first jsonline's `id` will be masked by 1, the second's by 2, etc...
+
+### replacement
+
+```
+  - selector:
+      jsonpath: "name4"
+    mask:
+      replacement: "name"
+```
