@@ -32,7 +32,7 @@ type MaskEngine interface {
 
 // NewMaskConfiguration build new configuration
 func NewMaskConfiguration() MaskConfiguration {
-	return MapMaskConfiguration{map[string]MaskEngine{}}
+	return MapMaskConfiguration{map[string]MaskEngine{}, []string{}}
 }
 
 // MaskConfiguration is a configuration to mask dictionaries content
@@ -40,11 +40,13 @@ type MaskConfiguration interface {
 	GetMaskingEngine(string) (MaskEngine, bool)
 	WithEntry(string, MaskEngine) MaskConfiguration
 	AsEngine() MaskEngine
+	Entries() []string
 }
 
 // MapMaskConfiguration Implements MaskConfiguration with a map
 type MapMaskConfiguration struct {
-	config map[string]MaskEngine
+	config     map[string]MaskEngine
+	componants []string
 }
 
 // GetMaskingEngine return the MaskEngine configured for that string
@@ -60,9 +62,15 @@ func (mmc MapMaskConfiguration) WithEntry(key string, engine MaskEngine) MaskCon
 		mmc.config[mainEntry[0]] = NewMaskConfiguration().WithEntry(mainEntry[1], engine).AsEngine()
 	} else {
 		mmc.config[key] = engine
+		mmc.componants = append(mmc.componants, key)
 	}
 
 	return mmc
+}
+
+//Entries list every mask in mmc in order
+func (mmc MapMaskConfiguration) Entries() []string {
+	return mmc.componants
 }
 
 // AsEngine return engine with configuration
@@ -82,20 +90,25 @@ func (fme FunctionMaskEngine) Mask(e Entry, context ...Dictionary) Entry { retur
 func MaskingEngineFactory(config MaskConfiguration) MaskEngine {
 	return FunctionMaskEngine{func(input Entry) Entry {
 		output := Dictionary{}
-
 		dico, ok := input.(Dictionary)
 		if !ok {
 			return input
 		}
 
 		for k, v := range dico {
-			engine, ok := config.GetMaskingEngine(k)
-			if ok {
-				output[k] = engine.Mask(v)
-			} else {
-				output[k] = v
+			output[k] = v
+		}
+
+		for _, key := range config.Entries() {
+			_, present := output[key]
+			if present {
+				engine, ok := config.GetMaskingEngine(key)
+				if ok {
+					output[key] = engine.Mask(output[key])
+				}
 			}
 		}
+
 		return output
 	}}
 }

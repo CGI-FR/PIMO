@@ -52,7 +52,6 @@ func TestMaskingShouldReplaceSensitiveValueByCommand(t *testing.T) {
 	data := Dictionary{"name": "Benjamin"}
 	result := maskingEngine.Mask(data)
 	waited := Dictionary{"name": "Toto"}
-
 	assert.NotEqual(t, data, result, "should be masked")
 	assert.Equal(t, waited, result, "should be Toto")
 }
@@ -65,7 +64,6 @@ func TestMaskingShouldReplaceSensitiveValueByRandomInList(t *testing.T) {
 
 	data := Dictionary{"name": "Benjamin"}
 	result := maskingEngine.Mask(data)
-
 	assert.NotEqual(t, data, result, "should be masked")
 
 	namemap := result.(map[string]Entry)
@@ -187,7 +185,7 @@ func TestMaskingShouldReplaceSensitiveValueByRegex(t *testing.T) {
 	maskingEngine := MaskingEngineFactory(config)
 
 	data := Dictionary{"phone": "00 00 00 00 00"}
-	result := maskingEngine.Mask(data).(map[string]Entry)
+	result := maskingEngine.Mask(data).(Dictionary)
 	match, _ := regexp.MatchString(regex, result["phone"].(string))
 	assert.NotEqual(t, data, result, "should be masked")
 	assert.True(t, match, "should match the regexp")
