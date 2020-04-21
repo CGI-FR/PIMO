@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -12,6 +13,7 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+	"text/template"
 	"time"
 
 	"github.com/goccy/go-yaml"
@@ -284,6 +286,25 @@ func (remp ReplacementMask) Mask(e Entry, context ...Dictionary) Entry {
 	return context[0][remp.field]
 }
 
+// TemplateMask is to mask a value thanks to a template
+type TemplateMask struct {
+	template *template.Template
+}
+
+// NewTemplateMask create an TemplateMask
+func NewTemplateMask(text string) TemplateMask {
+	tmpl := strings.ReplaceAll(text, "{{", "{{.")
+	temp, _ := template.New("template").Parse(tmpl)
+	return TemplateMask{temp}
+}
+
+// Mask masks a value with a template
+func (tmpl TemplateMask) Mask(e Entry, context ...Dictionary) Entry {
+	var output bytes.Buffer
+	tmpl.template.Execute(&output, context[0])
+	return output.String()
+}
+
 // YAMLStructure of the file
 type YAMLStructure struct {
 	Version string `yaml:"version"`
@@ -315,6 +336,7 @@ type YAMLStructure struct {
 				Increment int `yaml:"increment"`
 			} `yaml:"incremental"`
 			Replacement string `yaml:"replacement"`
+			Template    string `yaml:"template"`
 		} `yaml:"mask"`
 	} `yaml:"masking"`
 }
@@ -377,6 +399,10 @@ func YamlConfig(filename string) (MaskConfiguration, error) {
 		}
 		if len(v.Mask.Replacement) != 0 {
 			config.WithEntry(v.Selector.Jsonpath, ReplacementMask{v.Mask.Replacement})
+			nbArg++
+		}
+		if len(v.Mask.Template) != 0 {
+			config.WithEntry(v.Selector.Jsonpath, NewTemplateMask(v.Mask.Template))
 			nbArg++
 		}
 		if nbArg == 0 || nbArg >= 2 {

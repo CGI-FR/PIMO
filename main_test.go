@@ -191,6 +191,19 @@ func TestMaskingShouldReplaceSensitiveValueByRegex(t *testing.T) {
 	assert.True(t, match, "should match the regexp")
 }
 
+func TestMaskingShouldReplaceSensitiveValueByTemplate(t *testing.T) {
+	template := "{{name}}.{{surname}}@gmail.com"
+	tempMask := NewTemplateMask(template)
+	config := NewMaskConfiguration().
+		WithEntry("mail", tempMask)
+	maskingEngine := MaskingEngineFactory(config)
+
+	data := Dictionary{"name": "Jean", "surname": "Bonbeur", "mail": "jean44@outlook.com"}
+	result := maskingEngine.Mask(data)
+	waited := Dictionary{"name": "Jean", "surname": "Bonbeur", "mail": "Jean.Bonbeur@gmail.com"}
+	assert.Equal(t, waited, result, "Should create the right mail")
+}
+
 func TestMaskingShouldReplaceSensitiveValueByAnotherField(t *testing.T) {
 	remplacement := ReplacementMask{"name1"}
 	config := NewMaskConfiguration().
@@ -292,7 +305,8 @@ func TestShouldCreateAMaskConfigurationFromAFile(t *testing.T) {
 		WithEntry("surname", NewWeightedMaskList(nameWeighted)).
 		WithEntry("address.town", MaskHashList{[]Entry{"Emerald City", "Ruby City", "Sapphire City"}}).
 		WithEntry("date", NewDateMask(dateMin, dateMax)).
-		WithEntry("name4", ReplacementMask{"name1"})
+		WithEntry("name4", ReplacementMask{"name1"}).
+		WithEntry("mail", NewTemplateMask("{{surname}}.{{name}}@gmail.com"))
 
 	assert.Equal(t, A(config.GetMaskingEngine("customer.phone")), A(waited.GetMaskingEngine("customer.phone")), "customer.phone not equal")
 	assert.Equal(t, A(config.GetMaskingEngine("name")), A(waited.GetMaskingEngine("name")), "name1 not equal")
@@ -302,6 +316,7 @@ func TestShouldCreateAMaskConfigurationFromAFile(t *testing.T) {
 	assert.Equal(t, A(config.GetMaskingEngine("surname")), A(waited.GetMaskingEngine("surname")), "surname not equal")
 	assert.Equal(t, A(config.GetMaskingEngine("address.town")), A(waited.GetMaskingEngine("address.town")), "surname not equal")
 	assert.Equal(t, A(config.GetMaskingEngine("date")), A(waited.GetMaskingEngine("date")), "date not equal")
+	assert.Equal(t, A(config.GetMaskingEngine("mail")), A(waited.GetMaskingEngine("mail")), "mail not equal")
 }
 
 func TestShouldReturnAnErrorWithMultipleArguments(t *testing.T) {

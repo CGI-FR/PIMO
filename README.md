@@ -174,3 +174,16 @@ This exemple will mask the `id` field of the input jsonlines with incremental va
     mask:
       replacement: "name"
 ```
+
+This exemple will mask the `name4` field of the input jsonlines with the field `name` of the jsonline. This selector must be placed after the `name` selector to be masked with the new value and it must be placed before the `name` selector to be masked by the previous value.
+
+### template
+
+```
+  - selector:
+      jsonpath: "mail"
+    mask:
+      template: "{{surname}}.{{name}}@gmail.com"
+```
+
+This exemple will mask the `mail` field of the input jsonlines respecting the given template. In the `masking.yml` config fil, this selector must be placed after the fields contained in the template to mask with the new values and  before the other fields to be masked with the old values.

@@ -51,3 +51,7 @@ masking:
       jsonpath: "name4"
     mask:
       replacement: "name"
+  - selector:
+      jsonpath: "mail"
+    mask:
+      template: "{{surname}}.{{name}}@gmail.com"
