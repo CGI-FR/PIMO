@@ -293,8 +293,7 @@ type TemplateMask struct {
 
 // NewTemplateMask create an TemplateMask
 func NewTemplateMask(text string) TemplateMask {
-	tmpl := strings.ReplaceAll(text, "{{", "{{.")
-	temp, _ := template.New("template").Parse(tmpl)
+	temp, _ := template.New("template").Parse(text)
 	return TemplateMask{temp}
 }
 

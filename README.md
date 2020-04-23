@@ -183,7 +183,16 @@ This exemple will mask the `name4` field of the input jsonlines with the field `
   - selector:
       jsonpath: "mail"
     mask:
-      template: "{{surname}}.{{name}}@gmail.com"
+      template: "{{.surname}}.{{.name}}@gmail.com"
 ```
 
-This exemple will mask the `mail` field of the input jsonlines respecting the given template. In the `masking.yml` config fil, this selector must be placed after the fields contained in the template to mask with the new values and  before the other fields to be masked with the old values.
+This exemple will mask the `mail` field of the input jsonlines respecting the given template. In the `masking.yml` config fil, this selector must be placed after the fields contained in the template to mask with the new values and  before the other fields to be masked with the old values. In the case of a nested js, the template must respect the following exemple : 
+
+```
+  - selector:
+      jsonpath: "user.mail"
+    mask:
+      template: "{{.user.surname}}.{{.user.name}}@gmail.com"
+```
+
+The format for the template should respect the `text/template` package : https://golang.org/pkg/text/template/
