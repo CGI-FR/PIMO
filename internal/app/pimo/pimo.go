@@ -1,4 +1,4 @@
-package main
+package pimo
 
 import (
 	"bufio"
@@ -10,7 +10,6 @@ import (
 	"io"
 	"io/ioutil"
 	"math/rand"
-	"os"
 	"os/exec"
 	"strings"
 	"text/template"
@@ -48,7 +47,7 @@ type MaskConfiguration interface {
 // MapMaskConfiguration Implements MaskConfiguration with a map
 type MapMaskConfiguration struct {
 	config     map[string]MaskEngine
-	componants []string
+	components []string
 }
 
 // GetMaskingEngine return the MaskEngine configured for that string
@@ -64,7 +63,7 @@ func (mmc MapMaskConfiguration) WithEntry(key string, engine MaskEngine) MaskCon
 		mmc.config[mainEntry[0]] = NewMaskConfiguration().WithEntry(mainEntry[1], engine).AsEngine()
 	} else {
 		mmc.config[key] = engine
-		mmc.componants = append(mmc.componants, key)
+		mmc.components = append(mmc.components, key)
 	}
 
 	return mmc
@@ -72,7 +71,7 @@ func (mmc MapMaskConfiguration) WithEntry(key string, engine MaskEngine) MaskCon
 
 //Entries list every mask in mmc in order
 func (mmc MapMaskConfiguration) Entries() []string {
-	return mmc.componants
+	return mmc.components
 }
 
 // AsEngine return engine with configuration
@@ -300,7 +299,10 @@ func NewTemplateMask(text string) TemplateMask {
 // Mask masks a value with a template
 func (tmpl TemplateMask) Mask(e Entry, context ...Dictionary) Entry {
 	var output bytes.Buffer
-	tmpl.template.Execute(&output, context[0])
+	err := tmpl.template.Execute(&output, context[0])
+	if err != nil {
+		return "ERROR"
+	}
 	return output.String()
 }
 
@@ -471,25 +473,4 @@ func DictionaryToJSON(dic Dictionary) ([]byte, error) {
 	}
 	jsonline = append(jsonline, "\n"...)
 	return jsonline, nil
-}
-
-func main() {
-	maskingfile := "masking.yml"
-	config, err := YamlConfig(maskingfile)
-	if err != nil {
-		println("ERROR : Masking.yml not working properly")
-		os.Exit(-1)
-	}
-	maskingEngine := MaskingEngineFactory(config)
-	reader := NewJSONLineIterator(os.Stdin)
-	for {
-		dic, err := reader.Next()
-		if err != nil {
-			println("Enable to  transform this line")
-			break
-		}
-		masked := maskingEngine.Mask(dic).(map[string]Entry)
-		jsonline, _ := DictionaryToJSON(masked)
-		os.Stdout.Write(jsonline)
-	}
 }

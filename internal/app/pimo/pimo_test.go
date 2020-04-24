@@ -1,4 +1,4 @@
-package main
+package pimo
 
 import (
 	"bytes"
@@ -297,7 +297,7 @@ func A(me MaskEngine, boo bool) MaskEngine {
 }
 
 func TestShouldCreateAMaskConfigurationFromAFile(t *testing.T) {
-	filename := "masking.yml"
+	filename := "../../../test/masking.yml"
 	config, err := YamlConfig(filename)
 	if err != nil {
 		t.Log(err)
@@ -333,7 +333,7 @@ func TestShouldCreateAMaskConfigurationFromAFile(t *testing.T) {
 }
 
 func TestShouldReturnAnErrorWithMultipleArguments(t *testing.T) {
-	filename := "wrongMasking.yml"
+	filename := "../../../test/wrongMasking.yml"
 	conf, err := YamlConfig(filename)
 	t.Log(conf)
 	t.Log(err)
