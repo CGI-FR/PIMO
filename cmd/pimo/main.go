@@ -15,6 +15,8 @@ var (
 	commit    string
 	buildDate string
 	builtBy   string
+
+	iteration int
 )
 
 var rootCmd = &cobra.Command{
@@ -29,17 +31,23 @@ var rootCmd = &cobra.Command{
 			println("ERROR : Masking.yml not working properly")
 			os.Exit(-1)
 		}
-		maskingEngine := pimo.MaskingEngineFactory(config)
-		reader := pimo.NewJSONLineIterator(os.Stdin)
-		for {
-			dic, err := reader.Next()
-			if err != nil {
-				println("Enable to  transform this line")
-				break
+		if iteration != 0 {
+			maskingEngine := pimo.MaskingEngineFactory(config)
+			reader := pimo.NewJSONLineIterator(os.Stdin)
+			for {
+				i := 0
+				dic, err := reader.Next()
+				for i != iteration {
+					if err != nil {
+						println("Enable to  transform this line")
+						break
+					}
+					masked := maskingEngine.Mask(dic).(map[string]pimo.Entry)
+					jsonline, _ := pimo.DictionaryToJSON(masked)
+					os.Stdout.Write(jsonline)
+					i++
+				}
 			}
-			masked := maskingEngine.Mask(dic).(map[string]pimo.Entry)
-			jsonline, _ := pimo.DictionaryToJSON(masked)
-			os.Stdout.Write(jsonline)
 		}
 	},
 }
@@ -49,4 +57,8 @@ func main() {
 		fmt.Println(err)
 		os.Exit(1)
 	}
+}
+
+func init() {
+	rootCmd.PersistentFlags().IntVarP(&iteration, "repeat", "r", 1, "number of iteration to mask each input")
 }

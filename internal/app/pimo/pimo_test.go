@@ -329,7 +329,7 @@ func TestShouldCreateAMaskConfigurationFromAFile(t *testing.T) {
 		WithEntry("name4", ReplacementMask{"name1"}).
 		WithEntry("mail", NewTemplateMask("{{.surname}}.{{.name}}@gmail.com"))
 
-	waitedOrder := []string{"customer", "name", "name2", "age", "name3", "surname", "address", "date"}
+	waitedOrder := []string{"customer", "name", "name2", "age", "name3", "surname", "address", "date", "name4", "mail"}
 	actualOrder := config.Entries()
 	assert.Equal(t, waitedOrder, actualOrder, "Should be the same order")
 	assert.Equal(t, A(config.GetMaskingEngine("customer.phone")), A(waited.GetMaskingEngine("customer.phone")), "customer.phone not equal")

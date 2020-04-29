@@ -345,9 +345,12 @@ type YAMLStructure struct {
 
 // YamlConfig create a MaskConfiguration from a file
 func YamlConfig(filename string) (MaskConfiguration, error) {
-	source, _ := ioutil.ReadFile(filename)
+	source, err := ioutil.ReadFile(filename)
+	if err != nil {
+		return NewMaskConfiguration(), err
+	}
 	var conf YAMLStructure
-	err := yaml.Unmarshal(source, &conf)
+	err = yaml.Unmarshal(source, &conf)
 	if err != nil {
 		return NewMaskConfiguration(), err
 	}
@@ -400,11 +403,11 @@ func YamlConfig(filename string) (MaskConfiguration, error) {
 			nbArg++
 		}
 		if len(v.Mask.Replacement) != 0 {
-			config.WithEntry(v.Selector.Jsonpath, ReplacementMask{v.Mask.Replacement})
+			config = config.WithEntry(v.Selector.Jsonpath, ReplacementMask{v.Mask.Replacement})
 			nbArg++
 		}
 		if len(v.Mask.Template) != 0 {
-			config.WithEntry(v.Selector.Jsonpath, NewTemplateMask(v.Mask.Template))
+			config = config.WithEntry(v.Selector.Jsonpath, NewTemplateMask(v.Mask.Template))
 			nbArg++
 		}
 		if nbArg == 0 || nbArg >= 2 {
