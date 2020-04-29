@@ -61,6 +61,7 @@ func (mmc MapMaskConfiguration) WithEntry(key string, engine MaskEngine) MaskCon
 	mainEntry := strings.SplitN(key, ".", 2)
 	if len(mainEntry) == 2 {
 		mmc.config[mainEntry[0]] = NewMaskConfiguration().WithEntry(mainEntry[1], engine).AsEngine()
+		mmc.components = append(mmc.components, mainEntry[0])
 	} else {
 		mmc.config[key] = engine
 		mmc.components = append(mmc.components, key)
@@ -357,19 +358,19 @@ func YamlConfig(filename string) (MaskConfiguration, error) {
 	for _, v := range conf.Masking {
 		nbArg := 0
 		if v.Mask.Constant != nil {
-			config.WithEntry(v.Selector.Jsonpath, NewConstMask(v.Mask.Constant))
+			config = config.WithEntry(v.Selector.Jsonpath, NewConstMask(v.Mask.Constant))
 			nbArg++
 		}
 		if len(v.Mask.RandomChoice) != 0 {
-			config.WithEntry(v.Selector.Jsonpath, NewMaskRandomListSeeded(v.Mask.RandomChoice, conf.Seed))
+			config = config.WithEntry(v.Selector.Jsonpath, NewMaskRandomListSeeded(v.Mask.RandomChoice, conf.Seed))
 			nbArg++
 		}
 		if len(v.Mask.Command) != 0 {
-			config.WithEntry(v.Selector.Jsonpath, CommandMaskEngine{v.Mask.Command})
+			config = config.WithEntry(v.Selector.Jsonpath, CommandMaskEngine{v.Mask.Command})
 			nbArg++
 		}
 		if v.Mask.RandomInt.Max != 0 || v.Mask.RandomInt.Min != 0 {
-			config.WithEntry(v.Selector.Jsonpath, RandomIntMask{v.Mask.RandomInt.Min, v.Mask.RandomInt.Max})
+			config = config.WithEntry(v.Selector.Jsonpath, RandomIntMask{v.Mask.RandomInt.Min, v.Mask.RandomInt.Max})
 			nbArg++
 		}
 		if len(v.Mask.WeightedChoice) != 0 {
@@ -377,25 +378,25 @@ func YamlConfig(filename string) (MaskConfiguration, error) {
 			for _, v := range v.Mask.WeightedChoice {
 				maskWeight = append(maskWeight, WeightedChoice{v.Choice, v.Weight})
 			}
-			config.WithEntry(v.Selector.Jsonpath, NewWeightedMaskList(maskWeight))
+			config = config.WithEntry(v.Selector.Jsonpath, NewWeightedMaskList(maskWeight))
 			nbArg++
 		}
 		if len(v.Mask.Regex) != 0 {
-			config.WithEntry(v.Selector.Jsonpath, NewRegexMask(v.Mask.Regex))
+			config = config.WithEntry(v.Selector.Jsonpath, NewRegexMask(v.Mask.Regex))
 			nbArg++
 		}
 		if len(v.Mask.Hash) != 0 {
 			var maskHash MaskHashList
 			maskHash.list = append(maskHash.list, v.Mask.Hash...)
-			config.WithEntry(v.Selector.Jsonpath, maskHash)
+			config = config.WithEntry(v.Selector.Jsonpath, maskHash)
 			nbArg++
 		}
 		if v.Mask.RandDate.DateMin != v.Mask.RandDate.DateMax {
-			config.WithEntry(v.Selector.Jsonpath, NewDateMask(v.Mask.RandDate.DateMin, v.Mask.RandDate.DateMax))
+			config = config.WithEntry(v.Selector.Jsonpath, NewDateMask(v.Mask.RandDate.DateMin, v.Mask.RandDate.DateMax))
 			nbArg++
 		}
 		if v.Mask.Incremental.Increment != 0 {
-			config.WithEntry(v.Selector.Jsonpath, NewIncrementalMask(v.Mask.Incremental.Start, v.Mask.Incremental.Increment))
+			config = config.WithEntry(v.Selector.Jsonpath, NewIncrementalMask(v.Mask.Incremental.Start, v.Mask.Incremental.Increment))
 			nbArg++
 		}
 		if len(v.Mask.Replacement) != 0 {

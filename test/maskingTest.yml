@@ -1,0 +1,11 @@
+version: "1"
+seed: 42
+masking:
+  - selector:
+      jsonpath: "name"
+    mask:
+      constant: "Toto"
+  - selector:
+      jsonpath: "phone"
+    mask:
+      regex: "0[1-7]( ([0-9]){2}){4}"

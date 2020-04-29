@@ -1,2 +1,3 @@
 {"age":35,"name":"Benjamin"}
 {"personne": {"name":"Benjamin","surname":"Toto"}}
+{"age":76, "name":"Benjamin", "customer":{"phone":"0000000000", "town":"Nantes"}}

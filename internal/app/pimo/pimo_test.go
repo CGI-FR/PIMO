@@ -107,7 +107,6 @@ func TestMaskingShouldReplaceValueInNestedDictionary(t *testing.T) {
 		)
 
 	maskingEngine := MaskingEngineFactory(config)
-
 	data := Dictionary{"customer": Dictionary{"name": "Benjamin"}, "project": "MyProject"}
 	result := maskingEngine.Mask(data)
 	want := Dictionary{"customer": Dictionary{"name": "Toto"}, "project": "MyProject"}
@@ -152,13 +151,22 @@ func TestMaskingShouldReplaceSensitiveValueByConstantValue(t *testing.T) {
 	config := NewMaskConfiguration().
 		WithEntry("name", constMask)
 	maskingEngine := MaskingEngineFactory(config)
-
 	data := Dictionary{"name": "Benjamin"}
 	result := maskingEngine.Mask(data)
 	waited := Dictionary{"name": "Toto"}
-
 	assert.NotEqual(t, data, result, "should be masked")
 	assert.Equal(t, waited, result, "should be Toto")
+}
+
+func TestYamlConfigShouldCreateEntriesInTheYamlOrder(t *testing.T) {
+	maskingfile := "../../../test/maskingTest.yml"
+	config, err := YamlConfig(maskingfile)
+	if err != nil {
+		t.Log(err)
+	}
+	actualEntries := config.Entries()
+	waitedEntries := []string{"name", "phone"}
+	assert.Equal(t, actualEntries, waitedEntries, "Should be the same")
 }
 
 func TestMaskingShouldReplaceSensitiveValueByRandomNumber(t *testing.T) {
@@ -321,6 +329,9 @@ func TestShouldCreateAMaskConfigurationFromAFile(t *testing.T) {
 		WithEntry("name4", ReplacementMask{"name1"}).
 		WithEntry("mail", NewTemplateMask("{{.surname}}.{{.name}}@gmail.com"))
 
+	waitedOrder := []string{"customer", "name", "name2", "age", "name3", "surname", "address", "date"}
+	actualOrder := config.Entries()
+	assert.Equal(t, waitedOrder, actualOrder, "Should be the same order")
 	assert.Equal(t, A(config.GetMaskingEngine("customer.phone")), A(waited.GetMaskingEngine("customer.phone")), "customer.phone not equal")
 	assert.Equal(t, A(config.GetMaskingEngine("name")), A(waited.GetMaskingEngine("name")), "name1 not equal")
 	assert.Equal(t, A(config.GetMaskingEngine("name2")), A(waited.GetMaskingEngine("name2")), "name2 not equal")

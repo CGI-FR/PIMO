@@ -1,0 +1,8 @@
+version: "1"
+seed: 42
+masking:
+  - selector:
+      jsonpath: "name1"
+    mask:
+      constant: "Toto"
+      command: "echo Dorothy"
