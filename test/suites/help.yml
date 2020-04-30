@@ -1,0 +1,13 @@
+name: help features
+testcases:
+- name: short version
+  steps:
+  - script: pimo -h
+- name: long version
+  steps:
+  - script: pimo --help
+- name: unknown flag
+  steps:
+  - script: pimo -unknown
+    assertions:
+    - result.code ShouldEqual 1

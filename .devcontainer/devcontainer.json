@@ -11,6 +11,9 @@
     "postCreateCommand": "make init",
     "workspaceFolder": "/workspace",
     // "overrideCommand": "",
+    "remoteEnv": {
+        "PATH": "${containerEnv:PATH}:/workspace/bin/",
+    },
     "extensions": [
         "ms-vscode.go",
         "IBM.output-colorizer",
