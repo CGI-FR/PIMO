@@ -7,4 +7,4 @@ then
 else
     echo "👌 Nothing to stash"
 fi
-make lint test
+make lint test venom

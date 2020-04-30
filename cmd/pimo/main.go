@@ -28,8 +28,8 @@ var rootCmd = &cobra.Command{
 		maskingfile := "masking.yml"
 		config, err := pimo.YamlConfig(maskingfile)
 		if err != nil {
-			println("ERROR : Masking.yml not working properly")
-			os.Exit(-1)
+			println("ERROR : masking.yml not working properly")
+			os.Exit(1)
 		}
 		if iteration != 0 {
 			maskingEngine := pimo.MaskingEngineFactory(config)
