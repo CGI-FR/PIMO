@@ -4,6 +4,8 @@ SHELL := /bin/bash # Use bash syntax
 
 # Build variables
 BUILD_DIR ?= bin
+TEST_WS_DIR ?= test/workspace
+
 VERSION ?= $(shell git describe --tags --exact-match 2>/dev/null || git symbolic-ref -q --short HEAD)
 COMMIT_HASH ?= $(shell git rev-parse HEAD 2>/dev/null)
 BUILD_DATE ?= $(shell date +%FT%T%z)
@@ -108,6 +110,10 @@ ifeq (${RELEASE}, 1)
 	docker push ${DOCKER_IMAGE}:${MAJOR}
 	docker push ${DOCKER_IMAGE}:latest
 endif
+
+.PHONY: venom
+venom: build ## Exec tests with venom
+	mkdir -p ${TEST_WS_DIR} && cd ${TEST_WS_DIR} && venom run ../suites/*yml
 
 .PHONY: license
 license: mkdir docker ## Scan dependencies and licenses
