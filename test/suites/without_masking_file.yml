@@ -1,8 +1,8 @@
 name: whitout file masking.yaml
 testcases:
-- name: without maksing.yml file
+- name: without masking.yml file
   steps:
-  - script: rm -f maksing.yml
+  - script: rm -f masking.yml
   - script: pimo
     assertions:
     - result.systemerr ShouldContainSubstring masking.yml not working properly

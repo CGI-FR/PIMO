@@ -39,8 +39,12 @@ var rootCmd = &cobra.Command{
 				dic, err := reader.Next()
 				for i != iteration {
 					if err != nil {
-						println("Enable to  transform this line")
-						break
+						if (err == pimo.StopIteratorError{}) {
+							os.Exit(0)
+						} else {
+							os.Stderr.WriteString(err.Error())
+							os.Exit(1)
+						}
 					}
 					masked := maskingEngine.Mask(dic).(map[string]pimo.Entry)
 					jsonline, _ := pimo.DictionaryToJSON(masked)

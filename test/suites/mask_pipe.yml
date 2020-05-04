@@ -1,0 +1,10 @@
+name: pipe features
+testcases:
+- name: End of file
+  steps:
+  - script: cp ../masking.yml masking.yml
+  - script: echo {} | pimo
+    assertions:
+    - result.code  ShouldEqual 0
+    - result.systemout ShouldEqual {}
+    - result.systemerr ShouldBeEmpty
