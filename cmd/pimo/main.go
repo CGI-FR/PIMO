@@ -42,8 +42,8 @@ var rootCmd = &cobra.Command{
 						if (err == pimo.StopIteratorError{}) {
 							os.Exit(0)
 						} else {
-							os.Stderr.WriteString(err.Error())
-							os.Exit(1)
+							os.Stderr.WriteString(err.Error() + "\n")
+							os.Exit(2)
 						}
 					}
 					masked := maskingEngine.Mask(dic).(map[string]pimo.Entry)

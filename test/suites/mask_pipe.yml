@@ -8,3 +8,11 @@ testcases:
     - result.code  ShouldEqual 0
     - result.systemout ShouldEqual {}
     - result.systemerr ShouldBeEmpty
+- name: not json
+  steps:
+  - script: cp ../masking.yml masking.yml
+  - script: echo "{}\n { "| pimo
+    assertions:
+    - result.code  ShouldEqual 2
+    - result.systemout ShouldEqual {}
+    - result.systemerr ShouldContainSubstring unexpected end of JSON input
