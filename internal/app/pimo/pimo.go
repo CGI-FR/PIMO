@@ -11,6 +11,8 @@ import (
 	"io/ioutil"
 	"math/rand"
 	"os/exec"
+	"regexp"
+	"strconv"
 	"strings"
 	"text/template"
 	"time"
@@ -128,7 +130,7 @@ func (cme CommandMaskEngine) Mask(e Entry, context ...Dictionary) Entry {
 
 	resulting := strings.Trim(string(out), "\n")
 	if err != nil {
-		return "ERROR"
+		return "ERROR IN THE COMMAND LINE"
 	}
 	return resulting
 }
@@ -307,6 +309,72 @@ func (tmpl TemplateMask) Mask(e Entry, context ...Dictionary) Entry {
 	return output.String()
 }
 
+// DurationMask is to mask a value thanks to a template
+type DurationMask struct {
+	duration time.Duration
+}
+
+// NewDurationMask create a DurationMask with a ISO8601 duration string
+func NewDurationMask(text string) (DurationMask, error) {
+	dur, err := ParseDuration(text)
+	return DurationMask{dur}, err
+}
+
+// Mask masks a value with a template
+func (dura DurationMask) Mask(e Entry, context ...Dictionary) Entry {
+	var t time.Time
+	var err error
+	switch v := e.(type) {
+	case string:
+		t, err = time.Parse(time.RFC3339, v)
+	case time.Time:
+		t = v
+	default:
+		return e
+	}
+	if err != nil {
+		return err.Error()
+	}
+	return t.Add(dura.duration)
+}
+
+// ParseDuration parse a ISO8601 into time.Duration
+// Modified from : https://stackoverflow.com/questions/28125963/golang-parse-time-duration
+func ParseDuration(str string) (time.Duration, error) {
+	durationRegex := regexp.MustCompile(`(-)?P(?P<years>\d+Y)?(?P<months>\d+M)?(?P<days>\d+D)?T?(?P<hours>\d+H)?(?P<minutes>\d+M)?(?P<seconds>\d+S)?`)
+	matches := durationRegex.FindStringSubmatch(str)
+	if len(matches) == 0 {
+		return time.Duration(0), fmt.Errorf("%s isn't ISO 8601 duration", str)
+	}
+
+	years := ParseInt64(matches[2])
+	months := ParseInt64(matches[3])
+	days := ParseInt64(matches[4])
+	hours := ParseInt64(matches[5])
+	minutes := ParseInt64(matches[6])
+	seconds := ParseInt64(matches[7])
+
+	hour := int64(time.Hour)
+	minute := int64(time.Minute)
+	second := int64(time.Second)
+
+	if matches[1] == "-" {
+		return time.Duration(-1 * (years*24*365*hour + months*30*24*hour + days*24*hour + hours*hour + minutes*minute + seconds*second)), nil
+	}
+	return time.Duration(years*24*365*hour + months*30*24*hour + days*24*hour + hours*hour + minutes*minute + seconds*second), nil
+}
+
+func ParseInt64(value string) int64 {
+	if len(value) == 0 {
+		return 0
+	}
+	parsed, err := strconv.Atoi(value[:len(value)-1])
+	if err != nil {
+		return 0
+	}
+	return int64(parsed)
+}
+
 // YAMLStructure of the file
 type YAMLStructure struct {
 	Version string `yaml:"version"`
@@ -339,6 +407,7 @@ type YAMLStructure struct {
 			} `yaml:"incremental"`
 			Replacement string `yaml:"replacement"`
 			Template    string `yaml:"template"`
+			Duration    string `yaml:"duration"`
 		} `yaml:"mask"`
 	} `yaml:"masking"`
 }
@@ -408,6 +477,14 @@ func YamlConfig(filename string) (MaskConfiguration, error) {
 		}
 		if len(v.Mask.Template) != 0 {
 			config = config.WithEntry(v.Selector.Jsonpath, NewTemplateMask(v.Mask.Template))
+			nbArg++
+		}
+		if len(v.Mask.Duration) != 0 {
+			mask, err := NewDurationMask(v.Mask.Duration)
+			if err != nil {
+				return nil, err
+			}
+			config = config.WithEntry(v.Selector.Jsonpath, mask)
 			nbArg++
 		}
 		if nbArg == 0 || nbArg >= 2 {

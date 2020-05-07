@@ -282,6 +282,46 @@ func TestMaskingShouldReplaceDateByRandom(t *testing.T) {
 	assert.True(t, equal <= 1, "Shouldn't be the same date less than 0.1% of time")
 }
 
+func TestParseDurationShouldCreateTimeDuration(t *testing.T) {
+	dur, err := ParseDuration("P2Y6M5DT12H35M30S")
+	assert.Equal(t, nil, err, "error is not nil")
+	waited := time.Duration(2*24*365*int64(time.Hour) + 6*30*24*int64(time.Hour) + 5*24*int64(time.Hour) + 12*int64(time.Hour) + 35*int64(time.Minute) + 30*int64(time.Second))
+	assert.Equal(t, waited, dur, "should return the good duration")
+	negadur, err := ParseDuration("-PT2H")
+	assert.Equal(t, nil, err, "error is not nil")
+	negawaited := time.Duration(-2 * int64(time.Hour))
+	assert.Equal(t, negawaited, negadur, "Should return a negative duration")
+}
+
+func TestMaskingShouldReplaceDateByIncrement(t *testing.T) {
+	duration := "P60D"
+	durationMask, err := NewDurationMask(duration)
+
+	assert.Equal(t, nil, err, "error is not nil")
+
+	config := NewMaskConfiguration().
+		WithEntry("date", durationMask)
+
+	maskingEngine := MaskingEngineFactory(config)
+	data := Dictionary{"date": time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC)}
+	result := maskingEngine.Mask(data)
+	waited := Dictionary{"date": time.Date(2020, 3, 1, 0, 0, 0, 0, time.UTC)}
+	assert.Equal(t, result, waited, "Should change the date according to mask")
+	duration = "-P60D"
+	durationMask, err = NewDurationMask(duration)
+
+	assert.Equal(t, nil, err, "error is not nil")
+
+	config = NewMaskConfiguration().
+		WithEntry("date", durationMask)
+
+	maskingEngine = MaskingEngineFactory(config)
+	data = Dictionary{"date": time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC)}
+	result = maskingEngine.Mask(data)
+	waited = Dictionary{"date": time.Date(2019, 11, 2, 0, 0, 0, 0, time.UTC)}
+	assert.Equal(t, result, waited, "Should change the date according to mask")
+}
+
 func TestMaskingShouldCreateIncrementalInt(t *testing.T) {
 	incrementMask := NewIncrementalMask(1, 1)
 	secIncrMask := NewIncrementalMask(5, 2)
@@ -301,6 +341,10 @@ func TestMaskingShouldCreateIncrementalInt(t *testing.T) {
 }
 
 func A(me MaskEngine, boo bool) MaskEngine {
+	return me
+}
+
+func Must(me MaskEngine, err error) MaskEngine {
 	return me
 }
 
@@ -327,9 +371,10 @@ func TestShouldCreateAMaskConfigurationFromAFile(t *testing.T) {
 		WithEntry("address.town", MaskHashList{[]Entry{"Emerald City", "Ruby City", "Sapphire City"}}).
 		WithEntry("date", NewDateMask(dateMin, dateMax)).
 		WithEntry("name4", ReplacementMask{"name1"}).
-		WithEntry("mail", NewTemplateMask("{{.surname}}.{{.name}}@gmail.com"))
+		WithEntry("mail", NewTemplateMask("{{.surname}}.{{.name}}@gmail.com")).
+		WithEntry("last_contact", Must(NewDurationMask("-P60D")))
 
-	waitedOrder := []string{"customer", "name", "name2", "age", "name3", "surname", "address", "date", "name4", "mail"}
+	waitedOrder := []string{"customer", "name", "name2", "age", "name3", "surname", "address", "date", "name4", "mail", "last_contact"}
 	actualOrder := config.Entries()
 	assert.Equal(t, waitedOrder, actualOrder, "Should be the same order")
 	assert.Equal(t, A(config.GetMaskingEngine("customer.phone")), A(waited.GetMaskingEngine("customer.phone")), "customer.phone not equal")
@@ -341,6 +386,7 @@ func TestShouldCreateAMaskConfigurationFromAFile(t *testing.T) {
 	assert.Equal(t, A(config.GetMaskingEngine("address.town")), A(waited.GetMaskingEngine("address.town")), "surname not equal")
 	assert.Equal(t, A(config.GetMaskingEngine("date")), A(waited.GetMaskingEngine("date")), "date not equal")
 	assert.Equal(t, A(config.GetMaskingEngine("mail")), A(waited.GetMaskingEngine("mail")), "mail not equal")
+	assert.Equal(t, A(config.GetMaskingEngine("last_contact")), A(waited.GetMaskingEngine("last_contact")), "last_contact not equal")
 }
 
 func TestShouldReturnAnErrorWithMultipleArguments(t *testing.T) {

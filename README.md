@@ -6,7 +6,7 @@ PIMO is a tool for data masking. It can mask datas from JSONline and return othe
 
 Pimo requires a yaml configuration file to works. This file must be named `masking.yml` and be placed in the working directory. The file must respect the following format :
 
-```
+```yaml
 version: "1"
 seed: 42
 masking:
@@ -25,7 +25,7 @@ masking:
 
 ## Possible masks
 
-The following types of masks can be used : 
+The following types of masks can be used :
 
 * `regex` is to mask using a regular expression given in argument.
 * `constant` is to mask the value by a constant value given in argument.
@@ -35,26 +35,32 @@ The following types of masks can be used :
 * `weightedChoice` is to mask with a random value from a list with probability, both given with the arguments `choice` and `weight`.
 * `hash` is to mask with a value from a list by mashing the original value, allowing to mask a value the same way every time.
 * `randDate` is to mask a date with a random date between `dateMin` and `dateMax`.
+* `duration` is to mask a date by adding or removing a certain number of days.
 * `incremental` is to mask datas with incremental value starting from `start` with a step of `increment`.
+* `remplacement` is to mask a data with another data from the jsonline.
+* `template` is to mask a data with a template using other values from the jsonline.
 
 A full `masking.yml` file exemple, using every kind of mask, is given with the source code.
 
 In case two types of mask are entered in the same selector, the program can't extract the masking configuration and will return an error. The file `wrongMasking.yml` provided with the source illustrate that error.
 
 ## Usage
-To use PIMO to mask a `data.json`, use in the following way : 
-```
+
+To use PIMO to mask a `data.json`, use in the following way :  
+
+```bash
 ./pimo <data.json >maskedData.json
 ```
 
 This takes the `data.json` file, masks the datas contained inside it and put the result in a `maskedData.json` file.
 
-## Exemple  
+## Exemple
+
 This section will give exemples for every type of masking.
 
 ### regex
 
-```
+```yaml
   - selector:
       jsonpath: "phone"
     mask:
@@ -65,17 +71,18 @@ This exemple will mask the `phone` field of the input jsonlines with a random st
 
 ### constant
 
-```
+```yaml
   - selector:
       jsonpath: "name"
     mask:
       constant: "Toto"
 ```
+
 This exemple will mask the `name` field of the input jsonlines with the value of the `constant` field.
 
 ### randomChoice
 
-```
+```yaml
   - selector:
       jsonpath: "name"
     mask:
@@ -89,7 +96,7 @@ This exemple will mask the `name` field of the input jsonlines with random value
 
 ### randonInt
 
-```
+```yaml
   - selector:
       jsonpath: "age"
     mask:
@@ -102,7 +109,7 @@ This exemple will mask the `age` field of the input jsonlines with a random numb
 
 ### command
 
-```
+```yaml
   - selector:
       jsonpath: "name"
     mask:
@@ -113,7 +120,7 @@ This exemple will mask the `name` field of the input jsonlines with the output o
 
 ### weightedChoice
 
-```
+```yaml
   - selector:
       jsonpath: "surname"
     mask:
@@ -128,7 +135,7 @@ This exemple will mask the `surname` field of the input jsonlines with a random 
 
 ### hash
 
-```
+```yaml
   - selector:
       jsonpath: "town"
     mask:
@@ -140,9 +147,9 @@ This exemple will mask the `surname` field of the input jsonlines with a random 
 
 This exemple will mask the `town` field of the input jsonlines with a value from the `hash` list. The value will be chosen thanks to a hashing of the original value, allowing the output to be always the same in case of identical inputs.
 
-### randDate 
+### randDate
 
-```
+```yaml
   - selector:
       jsonpath: "date"
     mask:
@@ -151,11 +158,22 @@ This exemple will mask the `town` field of the input jsonlines with a value from
         dateMax: "2020-01-01T00:00:00Z"
 ```
 
-This exemple will mask the `date` field of the input jsonlines with a random date between `dateMin` and `dateMax`. In this case the date will be between the 1st January 1970 and the 1st January 2020. 
+This exemple will mask the `date` field of the input jsonlines with a random date between `dateMin` and `dateMax`. In this case the date will be between the 1st January 1970 and the 1st January 2020.
+
+### duration
+
+```yaml
+  - selector:
+      jsonpath: "last_contact"
+    mask:
+      duration: "-P2D"
+```
+
+This exemple will mask the `last_contact` field of the input jsonlines by decreasing its value by 2 days. The duration field should match the ISO 8601 standard for durations.
 
 ### incremental
 
-```
+```yaml
   - selector:
       jsonpath: "id"
     mask:
@@ -168,7 +186,7 @@ This exemple will mask the `id` field of the input jsonlines with incremental va
 
 ### replacement
 
-```
+```yaml
   - selector:
       jsonpath: "name4"
     mask:
@@ -179,20 +197,20 @@ This exemple will mask the `name4` field of the input jsonlines with the field `
 
 ### template
 
-```
+```yaml
   - selector:
       jsonpath: "mail"
     mask:
       template: "{{.surname}}.{{.name}}@gmail.com"
 ```
 
-This exemple will mask the `mail` field of the input jsonlines respecting the given template. In the `masking.yml` config fil, this selector must be placed after the fields contained in the template to mask with the new values and  before the other fields to be masked with the old values. In the case of a nested js, the template must respect the following exemple : 
+This exemple will mask the `mail` field of the input jsonlines respecting the given template. In the `masking.yml` config fil, this selector must be placed after the fields contained in the template to mask with the new values and  before the other fields to be masked with the old values. In the case of a nested json, the template must respect the following exemple :
 
-```
+```yaml
   - selector:
       jsonpath: "user.mail"
     mask:
       template: "{{.user.surname}}.{{.user.name}}@gmail.com"
 ```
 
-The format for the template should respect the `text/template` package : https://golang.org/pkg/text/template/
+The format for the template should respect the `text/template` package : <https://golang.org/pkg/text/template/>

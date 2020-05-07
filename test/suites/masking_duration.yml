@@ -1,0 +1,57 @@
+name: duration features
+testcases:
+- name: duration masking
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "date"
+          mask:
+            duration: "-P2D"
+      EOF
+  - script: cat masking.yml
+  - script: |-
+      echo '{"date": "2020-01-01T00:00:00Z"}' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemoutjson.date ShouldEqual "2019-12-30T00:00:00Z"
+    - result.systemerr ShouldBeEmpty
+- name: duration masking with not iso 8061
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "date"
+          mask:
+            duration: "- 2 j"
+      EOF
+  - script: |-
+      echo '{"date": "2020-01-01T00:00:00Z"}' | pimo
+    assertions:
+    - result.code ShouldEqual 1
+    - result.systemout ShouldBeEmpty
+    - result.systemerr ShouldContainSubstring - 2 j isn't ISO 8601 duration
+- name: duration masking with not iso 8061
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "date"
+          mask:
+            duration: "-P2D"
+      EOF
+  - script: |-
+      echo '{"date": "Toto", "name" : "Alexis"}'  | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldContainSubstring cannot parse
+    - result.systemerr ShouldBeEmpty

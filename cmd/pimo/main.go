@@ -28,7 +28,7 @@ var rootCmd = &cobra.Command{
 		maskingfile := "masking.yml"
 		config, err := pimo.YamlConfig(maskingfile)
 		if err != nil {
-			println("ERROR : masking.yml not working properly")
+			println("ERROR : masking.yml not working properly, %s", err.Error())
 			os.Exit(1)
 		}
 		if iteration != 0 {
@@ -47,7 +47,11 @@ var rootCmd = &cobra.Command{
 						}
 					}
 					masked := maskingEngine.Mask(dic).(map[string]pimo.Entry)
-					jsonline, _ := pimo.DictionaryToJSON(masked)
+					jsonline, err := pimo.DictionaryToJSON(masked)
+					if err != nil {
+						os.Stderr.WriteString(err.Error() + "\n")
+						os.Exit(3)
+					}
 					os.Stdout.Write(jsonline)
 					i++
 				}
