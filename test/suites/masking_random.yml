@@ -1,0 +1,49 @@
+name: random features
+testcases:
+- name: random mask
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "name"
+          mask:
+            randomChoice:
+              - "Mickael"
+              - "Mathieu"
+              - "Marcel"
+      EOF
+  - script: |-
+      echo '{"name": "Toto"}' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemoutjson.name ShouldNotEqual Toto
+    - result.systemoutjson.name ShouldBeIn Mickael Mathieu Marcel
+    - result.systemerr ShouldBeEmpty
+- name: random int should not always mask the same way
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "name"
+          mask:
+            randomChoice:
+              - "Mickael"
+              - "Mathieu"
+              - "Marcel"
+      EOF
+  - script: |-
+      echo '{"name": "Toto"}' | pimo --repeat=10 > first.txt
+  - script: |-
+      echo '{"name": "Toto"}' | pimo --repeat=10 > second.txt
+  - script: |-
+      diff first.txt second.txt
+    assertions:
+    - result.systemout ShouldNotBeEmpty
+  - script: rm -f first.txt
+  - script: rm -f second.txt

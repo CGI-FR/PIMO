@@ -1,0 +1,42 @@
+name: Regex features
+testcases:
+- name: Regex mask
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "name"
+          mask:
+            regex: "[A-Z]oto([a-z]){3}"
+      EOF
+  - script: |-
+      echo '{"name": "Benjamin"}' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemoutjson.name ShouldContainSubstring oto
+    - result.systemerr ShouldBeEmpty
+- name: regex should not always mask the same way
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "name"
+          mask:
+            regex: "[A-Z]oto([a-z]){3}"
+      EOF
+  - script: |-
+      echo '{"name": "Benjamin"}' | pimo --repeat=10 > first.txt
+  - script: |-
+      echo '{"name": "Benjamin"}' | pimo --repeat=10 > second.txt
+  - script: |-
+      diff first.txt second.txt
+    assertions:
+    - result.systemout ShouldNotBeEmpty
+  - script: rm -f first.txt
+  - script: rm -f second.txt

@@ -1,0 +1,48 @@
+name: hash features
+testcases:
+- name: hash mask
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "name"
+          mask:
+            hash:
+              - "Mickael"
+              - "Mathieu"
+              - "Marcel"
+      EOF
+  - script: |-
+      echo '{"name": "Toto"}' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemoutjson.name ShouldNotEqual Toto
+    - result.systemerr ShouldBeEmpty
+- name: hash mask should mask the same way
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "name"
+          mask:
+            hash:
+              - "Mickael"
+              - "Mathieu"
+              - "Marcel"
+      EOF
+  - script: |-
+      echo '{"name": "Toto"}' | pimo > first.txt
+  - script: |-
+      echo '{"name": "Toto"}' | pimo > second.txt
+  - script: |-
+      diff first.txt second.txt
+    assertions:
+    - result.systemout ShouldBeEmpty
+  - script: rm -f first.txt
+  - script: rm -f second.txt

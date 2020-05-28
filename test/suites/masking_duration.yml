@@ -19,7 +19,7 @@ testcases:
     - result.code ShouldEqual 0
     - result.systemoutjson.date ShouldEqual "2019-12-30T00:00:00Z"
     - result.systemerr ShouldBeEmpty
-- name: duration masking with not iso 8061
+- name: duration masking with not iso 8601 mask
   steps:
   - script: rm -f masking.yml
   - script: |-
@@ -37,7 +37,7 @@ testcases:
     - result.code ShouldEqual 1
     - result.systemout ShouldBeEmpty
     - result.systemerr ShouldContainSubstring - 2 j isn't ISO 8601 duration
-- name: duration masking with not iso 8061
+- name: duration masking with not iso 8601 json
   steps:
   - script: rm -f masking.yml
   - script: |-
@@ -52,6 +52,6 @@ testcases:
   - script: |-
       echo '{"date": "Toto", "name" : "Alexis"}'  | pimo
     assertions:
-    - result.code ShouldEqual 0
-    - result.systemout ShouldContainSubstring cannot parse
-    - result.systemerr ShouldBeEmpty
+    - result.code ShouldEqual 4
+    - result.systemout ShouldBeEmpty
+    - result.systemerr ShouldContainSubstring cannot parse

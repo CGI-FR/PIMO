@@ -1,0 +1,47 @@
+name: random int features
+testcases:
+- name: random int
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "age"
+          mask:
+            randomInt:
+              min: 25
+              max: 35
+      EOF
+  - script: |-
+      echo '{"age": 38}' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemoutjson.age ShouldNotEqual 38
+    - result.systemoutjson.age ShouldBeBetweenOrEqual 25 35
+    - result.systemerr ShouldBeEmpty
+- name: random int should not always mask the same way
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "age"
+          mask:
+            randomInt:
+              min: 25
+              max: 35
+      EOF
+  - script: |-
+      echo '{"age": "38"}' | pimo --repeat=10 > first.txt
+  - script: |-
+      echo '{"age": "38"}' | pimo --repeat=10 > second.txt
+  - script: |-
+      diff first.txt second.txt
+    assertions:
+    - result.systemout ShouldNotBeEmpty
+  - script: rm -f first.txt
+  - script: rm -f second.txt

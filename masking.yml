@@ -55,3 +55,7 @@ masking:
       jsonpath: "mail"
     mask:
       template: "{{.surname}}.{{.name}}@gmail.com"
+  - selector:
+      jsonpath: "last_contact"
+    mask:
+      duration: "-P60D"

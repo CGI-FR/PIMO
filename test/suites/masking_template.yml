@@ -1,0 +1,12 @@
+name: template features
+testcases:
+- name: template mask
+  steps:
+  - script: rm -f masking.yml
+  - script: cp ../masking_template.yml masking.yml
+  - script: |-
+      echo '{"mail": "jean-bonbeur@hotmail.fr", "name": "jean", "surname": "bonbeur"}' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemoutjson.mail ShouldEqual bonbeur.jean@gmail.com
+    - result.systemerr ShouldBeEmpty
