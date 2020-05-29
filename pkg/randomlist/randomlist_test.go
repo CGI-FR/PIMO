@@ -52,10 +52,27 @@ func TestNewMaskFromConfigShouldCreateAMask(t *testing.T) {
 	assert.Nil(t, err, "error should be nil")
 }
 
+func TestNewMaskFromConfigShouldCreateAMaskFromAList(t *testing.T) {
+	maskingConfig := model.Masking{Mask: model.MaskType{RandomChoiceInURI: "file://../../test/names.txt"}}
+	mask, present, err := NewMaskFromConfig(maskingConfig, 0)
+	waitedMask := NewMask([]model.Entry{"Mickael", "Marc", "Benjamin"}, 0)
+	assert.Equal(t, waitedMask, mask, "should be equal")
+	assert.True(t, present, "should be true")
+	assert.Nil(t, err, "error should be nil")
+}
+
 func TestNewMaskFromConfigShouldNotCreateAMaskFromAnEmptyConfig(t *testing.T) {
 	maskingConfig := model.Masking{Mask: model.MaskType{}}
 	mask, present, err := NewMaskFromConfig(maskingConfig, 0)
 	assert.Nil(t, mask, "should be nil")
 	assert.False(t, present, "should be false")
 	assert.Nil(t, err, "error should be nil")
+}
+
+func TestNewMaskFromConfigShouldReturnErrorFromADoubleConfig(t *testing.T) {
+	maskingConfig := model.Masking{Mask: model.MaskType{RandomChoice: []model.Entry{"Michael", "Paul", "Marc"}, RandomChoiceInURI: "file://../../test/names.txt"}}
+	mask, present, err := NewMaskFromConfig(maskingConfig, 0)
+	assert.Nil(t, mask, "should be nil")
+	assert.False(t, present, "should be false")
+	assert.NotNil(t, err, "error should be nil")
 }

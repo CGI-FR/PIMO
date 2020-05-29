@@ -1,9 +1,11 @@
 package randomlist
 
 import (
+	"fmt"
 	"math/rand"
 
 	"makeit.imfr.cgi.com/makeit2/scm/lino/pimo/pkg/model"
+	"makeit.imfr.cgi.com/makeit2/scm/lino/pimo/pkg/uri"
 )
 
 // MaskEngine is a list of masking value and a rand init to mask
@@ -24,8 +26,15 @@ func (mrl MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.En
 
 // NewMaskFromConfig create a mask from a yaml config
 func NewMaskFromConfig(conf model.Masking, seed int64) (model.MaskEngine, bool, error) {
+	if len(conf.Mask.RandomChoice) != 0 && len(conf.Mask.RandomChoiceInURI) != 0 {
+		return nil, false, fmt.Errorf("2 différent random choices")
+	}
 	if len(conf.Mask.RandomChoice) != 0 {
 		return NewMask(conf.Mask.RandomChoice, seed), true, nil
+	}
+	if len(conf.Mask.RandomChoiceInURI) != 0 {
+		list, err := uri.Read(conf.Mask.RandomChoiceInURI)
+		return NewMask(list, seed), true, err
 	}
 	return nil, false, nil
 }

@@ -1,0 +1,21 @@
+name: random in uri features
+testcases:
+- name: random mask
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "name"
+          mask:
+            randomChoiceInUri: file://../names.txt
+      EOF
+  - script: |-
+      echo '{"name": "Toto"}' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemoutjson.name ShouldNotEqual Toto
+    - result.systemoutjson.name ShouldBeIn Mickael Marc Benjamin
+    - result.systemerr ShouldBeEmpty

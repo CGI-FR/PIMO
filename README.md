@@ -46,7 +46,7 @@ In case two types of mask are entered in the same selector, the program can't ex
 
 ## Usage
 
-To use PIMO to mask a `data.json`, use in the following way :  
+To use PIMO to mask a `data.json`, use in the following way :
 
 ```bash
 ./pimo <data.json >maskedData.json
@@ -214,3 +214,14 @@ This exemple will mask the `mail` field of the input jsonlines respecting the gi
 ```
 
 The format for the template should respect the `text/template` package : <https://golang.org/pkg/text/template/>
+
+### randomChoiceInUri
+
+```yaml
+  - selector:
+      jsonpath: "name5"
+    mask:
+      randomChoiceInUri: "file://names.txt"
+```
+
+This exemple will mask the `name5` field of the input jsonlines with a random name from a liste contained in the names.txt file.

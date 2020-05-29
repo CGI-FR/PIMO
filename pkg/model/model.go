@@ -133,18 +133,19 @@ type WeightedChoiceType struct {
 }
 
 type MaskType struct {
-	Constant       Entry                `yaml:"constant"`
-	RandomChoice   []Entry              `yaml:"randomChoice"`
-	Command        string               `yaml:"command"`
-	RandomInt      RandIntType          `yaml:"randomInt"`
-	WeightedChoice []WeightedChoiceType `yaml:"weightedChoice"`
-	Regex          string               `yaml:"regex"`
-	Hash           []Entry              `yaml:"hash"`
-	RandDate       RandDateType         `yaml:"randDate"`
-	Incremental    IncrementalType      `yaml:"incremental"`
-	Replacement    string               `yaml:"replacement"`
-	Template       string               `yaml:"template"`
-	Duration       string               `yaml:"duration"`
+	Constant          Entry                `yaml:"constant"`
+	RandomChoice      []Entry              `yaml:"randomChoice"`
+	RandomChoiceInURI string               `yaml:"randomChoiceInUri"`
+	Command           string               `yaml:"command"`
+	RandomInt         RandIntType          `yaml:"randomInt"`
+	WeightedChoice    []WeightedChoiceType `yaml:"weightedChoice"`
+	Regex             string               `yaml:"regex"`
+	Hash              []Entry              `yaml:"hash"`
+	RandDate          RandDateType         `yaml:"randDate"`
+	Incremental       IncrementalType      `yaml:"incremental"`
+	Replacement       string               `yaml:"replacement"`
+	Template          string               `yaml:"template"`
+	Duration          string               `yaml:"duration"`
 }
 type Masking struct {
 	Selector SelectorType `yaml:"selector"`
