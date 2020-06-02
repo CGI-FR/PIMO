@@ -3,6 +3,7 @@ package uri
 import (
 	"bufio"
 	"fmt"
+	"net/http"
 	"net/url"
 	"os"
 
@@ -26,15 +27,19 @@ func Read(uri string) ([]model.Entry, error) {
 		}
 		return result, nil
 	}
-
-	// file, err := os.Open(uri)
-	// if err != nil {
-	// 	return nil, err
-	// }
-	// scanner := bufio.NewScanner(file)
-	// for scanner.Scan() {
-	// 	result = append(result, scanner.Text())
-	// }
+	if u.Scheme == "http" || u.Scheme == "https" {
+		/* #nosec */
+		rep, err := http.Get(uri)
+		if err != nil {
+			return nil, err
+		}
+		defer rep.Body.Close()
+		scanner := bufio.NewScanner(rep.Body)
+		for scanner.Scan() {
+			result = append(result, scanner.Text())
+		}
+		return result, nil
+	}
 
 	return nil, fmt.Errorf("Not a valid scheme")
 }

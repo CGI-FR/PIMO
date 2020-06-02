@@ -15,3 +15,13 @@ func TestUriReaderShouldCreateListFromDoc(t *testing.T) {
 	waitedList := []model.Entry{"Mickael", "Marc", "Benjamin"}
 	assert.Equal(t, waitedList, nameList, "Should return the right list")
 }
+
+func TestUriReaderShouldCreateListFromLink(t *testing.T) {
+	link := "https://gist.githubusercontent.com/youencgi/68548750b266136db183ad4bdfd6436a/raw/c735e55a9553f3db7f649c16616ebf22b46d7bfb/gistfile1.txt"
+	nameList, err := Read(link)
+	if err != nil {
+		assert.Fail(t, err.Error())
+	}
+	waitedList := []model.Entry{"Mickael", "Marc", "Benjamin"}
+	assert.Equal(t, waitedList, nameList, "Should return the right list")
+}
