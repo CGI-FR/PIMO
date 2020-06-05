@@ -141,6 +141,7 @@ type MaskType struct {
 	WeightedChoice    []WeightedChoiceType `yaml:"weightedChoice"`
 	Regex             string               `yaml:"regex"`
 	Hash              []Entry              `yaml:"hash"`
+	HashInURI         string               `yaml:"hashInUri"`
 	RandDate          RandDateType         `yaml:"randDate"`
 	Incremental       IncrementalType      `yaml:"incremental"`
 	Replacement       string               `yaml:"replacement"`

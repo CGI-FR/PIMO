@@ -7,6 +7,7 @@ import (
 	"net/url"
 	"os"
 
+	"makeit.imfr.cgi.com/makeit2/scm/lino/pimo/pkg/maskingdata"
 	"makeit.imfr.cgi.com/makeit2/scm/lino/pimo/pkg/model"
 )
 
@@ -37,6 +38,17 @@ func Read(uri string) ([]model.Entry, error) {
 		scanner := bufio.NewScanner(rep.Body)
 		for scanner.Scan() {
 			result = append(result, scanner.Text())
+		}
+		return result, nil
+	}
+	if u.Scheme == "pimo" {
+		list, ok := maskingdata.MapData[u.Host]
+		if !ok {
+			return nil, fmt.Errorf("Not a Pimo inside file")
+		}
+		result := make([]model.Entry, len(list))
+		for i, v := range list {
+			result[i] = v
 		}
 		return result, nil
 	}

@@ -94,6 +94,17 @@ This exemple will mask the `name` field of the input jsonlines with the value of
 
 This exemple will mask the `name` field of the input jsonlines with random values from the `randomChoice` list.
 
+### randomChoiceInUri
+
+```yaml
+  - selector:
+      jsonpath: "name"
+    mask:
+      randomChoiceInUri: "file://names.txt
+```
+
+This exemple will mask the `name` field of the input jsonlines with random values from the list nameFR contained in pimo. The different URI usable with this selector are : `pimo`, `file` and `http`/`https`.
+
 ### randonInt
 
 ```yaml
@@ -146,6 +157,17 @@ This exemple will mask the `surname` field of the input jsonlines with a random 
 ```
 
 This exemple will mask the `town` field of the input jsonlines with a value from the `hash` list. The value will be chosen thanks to a hashing of the original value, allowing the output to be always the same in case of identical inputs.
+
+### hashInUri
+
+```yaml
+  - selector:
+      jsonpath: "name"
+    mask:
+      hashInUri: "pimo://nameFR
+```
+
+This exemple will mask the `name` field of the input jsonlines with a value from the list nameFR contained in pimo, the same way as for `hash` mask. The different URI usable with this selector are : `pimo`, `file` and `http`/`https`.
 
 ### randDate
 
@@ -214,14 +236,3 @@ This exemple will mask the `mail` field of the input jsonlines respecting the gi
 ```
 
 The format for the template should respect the `text/template` package : <https://golang.org/pkg/text/template/>
-
-### randomChoiceInUri
-
-```yaml
-  - selector:
-      jsonpath: "name5"
-    mask:
-      randomChoiceInUri: "file://names.txt"
-```
-
-This exemple will mask the `name5` field of the input jsonlines with a random name from a liste contained in the names.txt file.

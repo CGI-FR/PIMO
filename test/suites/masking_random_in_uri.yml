@@ -10,7 +10,7 @@ testcases:
         - selector:
             jsonpath: "name"
           mask:
-            randomChoiceInUri: file://../names.txt
+            randomChoiceInUri: "file://../names.txt"
       EOF
   - script: |-
       echo '{"name": "Toto"}' | pimo

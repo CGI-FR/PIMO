@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"makeit.imfr.cgi.com/makeit2/scm/lino/pimo/pkg/maskingdata"
 	"makeit.imfr.cgi.com/makeit2/scm/lino/pimo/pkg/model"
 )
 
@@ -24,4 +25,15 @@ func TestUriReaderShouldCreateListFromLink(t *testing.T) {
 	}
 	waitedList := []model.Entry{"Mickael", "Marc", "Benjamin"}
 	assert.Equal(t, waitedList, nameList, "Should return the right list")
+}
+
+func TestUriReaderShouldCreateListFromInsideFiles(t *testing.T) {
+	nameList, err := Read("pimo://nameFR")
+	if err != nil {
+		assert.Fail(t, err.Error())
+	}
+	waitedList := append(maskingdata.NameFRM, maskingdata.NameFRF...)
+	for i := range waitedList {
+		assert.Equal(t, waitedList[i], nameList[i], "Should return the right list")
+	}
 }

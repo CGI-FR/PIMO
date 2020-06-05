@@ -6,6 +6,7 @@ import (
 	"errors"
 	"io"
 	"io/ioutil"
+	"strconv"
 	"time"
 
 	"github.com/goccy/go-yaml"
@@ -47,7 +48,7 @@ func YamlConfig(filename string, factories []func(model.Masking, int64) (model.M
 			}
 		}
 		if nbArg == 0 || nbArg >= 2 {
-			return config, errors.New("Not the right number of argument for " + v.Selector.Jsonpath)
+			return config, errors.New("Not the right number of argument for " + v.Selector.Jsonpath + ". There should be 1 and there is " + strconv.Itoa(nbArg))
 		}
 	}
 	return config, nil
