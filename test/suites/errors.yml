@@ -71,4 +71,4 @@ testcases:
     assertions:
     - result.code ShouldEqual 5
     - result.systemout ShouldBeEmpty
-    - result.systemerr ShouldContainSubstring both flags
+    - result.systemerr ShouldContainSubstring use both

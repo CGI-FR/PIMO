@@ -103,7 +103,7 @@ This exemple will mask the `name` field of the input jsonlines with random value
       randomChoiceInUri: "file://names.txt
 ```
 
-This exemple will mask the `name` field of the input jsonlines with random values from the list nameFR contained in pimo. The different URI usable with this selector are : `pimo`, `file` and `http`/`https`.
+This exemple will mask the `name` field of the input jsonlines with random values from the list contained in the name.txt file. The different URI usable with this selector are : `pimo`, `file` and `http`/`https`.
 
 ### randonInt
 

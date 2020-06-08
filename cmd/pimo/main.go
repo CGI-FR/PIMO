@@ -41,7 +41,7 @@ var rootCmd = &cobra.Command{
 	Version: fmt.Sprintf("%v (commit=%v date=%v by=%v)", version, commit, buildDate, builtBy),
 	Run: func(cmd *cobra.Command, args []string) {
 		if skipField && skipLine {
-			os.Stderr.WriteString("Can't use both flags \n")
+			os.Stderr.WriteString("Can't use both skipField and skipLine flags \n")
 			os.Exit(5)
 		}
 		maskingfile := "masking.yml"

@@ -27,7 +27,7 @@ func (mrl MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.En
 // NewMaskFromConfig create a mask from a yaml config
 func NewMaskFromConfig(conf model.Masking, seed int64) (model.MaskEngine, bool, error) {
 	if len(conf.Mask.RandomChoice) != 0 && len(conf.Mask.RandomChoiceInURI) != 0 {
-		return nil, false, fmt.Errorf("2 différent random choices")
+		return nil, false, fmt.Errorf("2 different random choices")
 	}
 	if len(conf.Mask.RandomChoice) != 0 {
 		return NewMask(conf.Mask.RandomChoice, seed), true, nil

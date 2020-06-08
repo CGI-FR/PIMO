@@ -22,7 +22,7 @@ func (hm MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Ent
 
 func NewMaskFromConfig(conf model.Masking, seed int64) (model.MaskEngine, bool, error) {
 	if len(conf.Mask.Hash) != 0 && len(conf.Mask.HashInURI) != 0 {
-		return nil, false, fmt.Errorf("2 différent hash choices")
+		return nil, false, fmt.Errorf("2 different hash choices")
 	}
 	if len(conf.Mask.Hash) != 0 {
 		var maskHash MaskEngine
