@@ -88,7 +88,7 @@ func TestYamlConfigShouldCreateEntriesInTheYamlOrder(t *testing.T) {
 	assert.Equal(t, actualEntries, waitedEntries, "Should be the same")
 }
 
-func A(me model.MaskEngine, boo bool) model.MaskEngine {
+func A(me model.MaskContextEngine, boo bool) model.MaskContextEngine {
 	return me
 }
 

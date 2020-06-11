@@ -65,16 +65,12 @@ func TestMaskingShouldReturnAnErrorIfNotATime(t *testing.T) {
 	duration := "P2D"
 	durationMask, _ := NewMask(duration)
 
-	config := model.NewMaskConfiguration().
-		WithEntry("date", durationMask)
-
-	maskingEngine := model.MaskingEngineFactory(config)
 	data := model.Dictionary{"date": "SomeText"}
-	_, err := maskingEngine.Mask(data)
+	_, err := durationMask.Mask(data)
 	assert.NotNil(t, err, "Error shouldn't Be Nil")
 
 	secondData := model.Dictionary{"date": 12}
-	result, err := maskingEngine.Mask(secondData)
+	result, err := durationMask.Mask(secondData)
 	waitedResult := model.Dictionary{"date": 12}
 	assert.Equal(t, waitedResult, result, "Shouldn't have change")
 	assert.NotNil(t, err, "err should not be nil")

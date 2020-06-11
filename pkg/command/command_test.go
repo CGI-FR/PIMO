@@ -26,15 +26,11 @@ func TestMaskingShouldReplaceSensitiveValueByCommand(t *testing.T) {
 
 func TestMaskingShouldReturnAnErrorInCaseOfWrongCommand(t *testing.T) {
 	nameCommandMasking := NewMask("WrongCommand")
-	config := model.NewMaskConfiguration().
-		WithEntry("name", nameCommandMasking)
-
-	maskingEngine := model.MaskingEngineFactory(config)
 
 	data := model.Dictionary{"name": "Benjamin"}
-	result, err := maskingEngine.Mask(data)
+	result, err := nameCommandMasking.Mask(data)
 	resultmap := result.(map[string]model.Entry)
-	assert.Equal(t, nil, resultmap["name"], "Result should be nil")
+	assert.Equal(t, "Benjamin", resultmap["name"], "Result should unchanged")
 	assert.NotEqual(t, nil, err, "Error should not be nil")
 }
 

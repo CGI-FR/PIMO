@@ -25,7 +25,7 @@ func (cme MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.En
 
 	resulting := strings.Trim(string(out), "\n")
 	if err != nil {
-		return nil, err
+		return e, err
 	}
 	return resulting, nil
 }

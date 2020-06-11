@@ -54,6 +54,7 @@ testcases:
     - result.code ShouldEqual 0
     - result.systemout ShouldContainSubstring other
     - result.systemerr ShouldContainSubstring cannot parse
+    - result.systemout ShouldNotContainSubstring date
 - name: skip field error
   steps:
   - script: rm -f masking.yml
