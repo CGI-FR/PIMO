@@ -27,20 +27,18 @@ func TestMaskingShouldCreateIncrementalInt(t *testing.T) {
 	assert.Equal(t, secondMasked, secondWaited, "Second id masking should be equal")
 }
 
-func TestNewMaskFromConfigShouldCreateAMask(t *testing.T) {
+func TestRegistryMaskToConfigurationShouldCreateAMask(t *testing.T) {
 	maskingConfig := model.Masking{Mask: model.MaskType{Incremental: model.IncrementalType{Start: 1, Increment: 3}}}
-	mask, present, err := NewMaskFromConfig(maskingConfig, 0)
-	incrementMask := mask.(MaskEngine)
-	waitedMask := NewMask(1, 3)
-	assert.Equal(t, waitedMask.Increment, incrementMask.Increment, "should be equal")
-	assert.Equal(t, &waitedMask.Value, &incrementMask.Value, "Should have the right value")
+	conf, present, err := RegistryMaskToConfiguration(maskingConfig, model.NewMaskConfiguration(), 0)
+	waitedConf := model.NewMaskConfiguration().WithEntry("", NewMask(1, 3))
+	assert.Equal(t, conf, waitedConf, "should be equal")
 	assert.True(t, present, "should be true")
 	assert.Nil(t, err, "error should be nil")
 }
 
-func TestNewMaskFromConfigShouldNotCreateAMaskFromAnEmptyConfig(t *testing.T) {
+func TestRegistryMaskToConfigurationShouldNotCreateAMaskFromAnEmptyConfig(t *testing.T) {
 	maskingConfig := model.Masking{Mask: model.MaskType{}}
-	mask, present, err := NewMaskFromConfig(maskingConfig, 0)
+	mask, present, err := RegistryMaskToConfiguration(maskingConfig, model.NewMaskConfiguration(), 0)
 	assert.Nil(t, mask, "should be nil")
 	assert.False(t, present, "should be false")
 	assert.Nil(t, err, "error should be nil")

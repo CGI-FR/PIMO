@@ -22,8 +22,6 @@ import (
 	"makeit.imfr.cgi.com/makeit2/scm/lino/pimo/pkg/weightedchoice"
 )
 
-var nameMasking = model.FunctionMaskEngine{Function: func(name model.Entry) (model.Entry, error) { return "Toto", nil }}
-
 func TestMaskingShouldReturnEmptyWhenInputISEmpty(t *testing.T) {
 	maskingEngine := model.NewMaskConfiguration().AsEngine()
 	data := model.Dictionary{}
@@ -42,6 +40,8 @@ func TestMaskingShouldNoReplaceInsensitiveValue(t *testing.T) {
 }
 
 func TestMaskingShouldReplaceSensitiveValue(t *testing.T) {
+	var nameMasking = model.FunctionMaskEngine{Function: func(name model.Entry) (model.Entry, error) { return "Toto", nil }}
+
 	config := model.NewMaskConfiguration().
 		WithEntry("name", nameMasking)
 
@@ -54,6 +54,8 @@ func TestMaskingShouldReplaceSensitiveValue(t *testing.T) {
 }
 
 func TestMaskingShouldReplaceValueInNestedDictionary(t *testing.T) {
+	var nameMasking = model.FunctionMaskEngine{Function: func(name model.Entry) (model.Entry, error) { return "Toto", nil }}
+
 	config := model.NewMaskConfiguration().
 		WithEntry("customer", model.NewMaskConfiguration().
 			WithEntry("name", nameMasking).AsEngine(),
@@ -68,6 +70,8 @@ func TestMaskingShouldReplaceValueInNestedDictionary(t *testing.T) {
 }
 
 func TestWithEntryShouldBuildNestedConfigurationWhenKeyContainsDot(t *testing.T) {
+	var nameMasking = model.FunctionMaskEngine{Function: func(name model.Entry) (model.Entry, error) { return "Toto", nil }}
+
 	config := model.NewMaskConfiguration().
 		WithEntry("customer.name", nameMasking)
 	_, ok := config.GetMaskingEngine("customer")
@@ -79,7 +83,7 @@ func TestWithEntryShouldBuildNestedConfigurationWhenKeyContainsDot(t *testing.T)
 
 func TestYamlConfigShouldCreateEntriesInTheYamlOrder(t *testing.T) {
 	maskingfile := "../../../test/maskingTest.yml"
-	config, err := YamlConfig(maskingfile, []func(model.Masking, int64) (model.MaskEngine, bool, error){constant.NewMaskFromConfig, command.NewMaskFromConfig, regex.NewMaskFromConfig})
+	config, err := YamlConfig(maskingfile, []func(model.Masking, model.MaskConfiguration, int64) (model.MaskConfiguration, bool, error){constant.RegistryMaskToConfiguration, command.RegistryMaskToConfiguration, regex.RegistryMaskToConfiguration})
 	if err != nil {
 		t.Log(err)
 	}
@@ -98,18 +102,18 @@ func Must(me model.MaskEngine, err error) model.MaskEngine {
 
 func TestShouldCreateAMaskConfigurationFromAFile(t *testing.T) {
 	filename := "../../../test/masking.yml"
-	factory := []func(model.Masking, int64) (model.MaskEngine, bool, error){
-		constant.NewMaskFromConfig,
-		command.NewMaskFromConfig,
-		randomlist.NewMaskFromConfig,
-		randomint.NewMaskFromConfig,
-		weightedchoice.NewMaskFromConfig,
-		regex.NewMaskFromConfig,
-		hash.NewMaskFromConfig,
-		randdate.NewMaskFromConfig,
-		replacement.NewMaskFromConfig,
-		duration.NewMaskFromConfig,
-		templatemask.NewMaskFromConfig,
+	factory := []func(model.Masking, model.MaskConfiguration, int64) (model.MaskConfiguration, bool, error){
+		constant.RegistryMaskToConfiguration,
+		command.RegistryMaskToConfiguration,
+		randomlist.RegistryMaskToConfiguration,
+		randomint.RegistryMaskToConfiguration,
+		weightedchoice.RegistryMaskToConfiguration,
+		regex.RegistryMaskToConfiguration,
+		hash.RegistryMaskToConfiguration,
+		randdate.RegistryMaskToConfiguration,
+		replacement.RegistryMaskToConfiguration,
+		duration.RegistryMaskToConfiguration,
+		templatemask.RegistryMaskToConfiguration,
 	}
 	config, err := YamlConfig(filename, factory)
 	if err != nil {
@@ -159,7 +163,7 @@ func TestShouldCreateAMaskConfigurationFromAFile(t *testing.T) {
 
 func TestShouldReturnAnErrorWithMultipleArguments(t *testing.T) {
 	filename := "../../../test/wrongMasking.yml"
-	conf, err := YamlConfig(filename, []func(model.Masking, int64) (model.MaskEngine, bool, error){constant.NewMaskFromConfig, command.NewMaskFromConfig})
+	conf, err := YamlConfig(filename, []func(model.Masking, model.MaskConfiguration, int64) (model.MaskConfiguration, bool, error){constant.RegistryMaskToConfiguration, command.RegistryMaskToConfiguration})
 	t.Log(conf)
 	t.Log(err)
 	assert.NotEqual(t, err, nil, "Should not be nil")

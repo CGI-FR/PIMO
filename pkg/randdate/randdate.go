@@ -26,9 +26,9 @@ func (dateRange MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (mo
 	return sec, nil
 }
 
-func NewMaskFromConfig(conf model.Masking, seed int64) (model.MaskEngine, bool, error) {
+func RegistryMaskToConfiguration(conf model.Masking, config model.MaskConfiguration, seed int64) (model.MaskConfiguration, bool, error) {
 	if conf.Mask.RandDate.DateMin != conf.Mask.RandDate.DateMax {
-		return NewMask(conf.Mask.RandDate.DateMin, conf.Mask.RandDate.DateMax, seed), true, nil
+		return config.WithEntry(conf.Selector.Jsonpath, NewMask(conf.Mask.RandDate.DateMin, conf.Mask.RandDate.DateMax, seed)), true, nil
 	}
 	return nil, false, nil
 }

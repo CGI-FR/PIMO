@@ -24,17 +24,17 @@ func (mrl MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.En
 	return mrl.list[mrl.rand.Intn(len(mrl.list))], nil
 }
 
-// NewMaskFromConfig create a mask from a yaml config
-func NewMaskFromConfig(conf model.Masking, seed int64) (model.MaskEngine, bool, error) {
+// RegistryMaskToConfiguration create a mask from a yaml config
+func RegistryMaskToConfiguration(conf model.Masking, config model.MaskConfiguration, seed int64) (model.MaskConfiguration, bool, error) {
 	if len(conf.Mask.RandomChoice) != 0 && len(conf.Mask.RandomChoiceInURI) != 0 {
 		return nil, false, fmt.Errorf("2 different random choices")
 	}
 	if len(conf.Mask.RandomChoice) != 0 {
-		return NewMask(conf.Mask.RandomChoice, seed), true, nil
+		return config.WithEntry(conf.Selector.Jsonpath, NewMask(conf.Mask.RandomChoice, seed)), true, nil
 	}
 	if len(conf.Mask.RandomChoiceInURI) != 0 {
 		list, err := uri.Read(conf.Mask.RandomChoiceInURI)
-		return NewMask(list, seed), true, err
+		return config.WithEntry(conf.Selector.Jsonpath, NewMask(list, seed)), true, err
 	}
 	return nil, false, nil
 }

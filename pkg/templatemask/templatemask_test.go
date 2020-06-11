@@ -41,27 +41,28 @@ func TestMaskingShouldReplaceSensitiveValueByTemplateInNested(t *testing.T) {
 	assert.Equal(t, waited, result, "Should create the right mail")
 }
 
-func TestNewMaskFromConfigShouldCreateAMask(t *testing.T) {
+func TestRegistryMaskToConfigurationShouldCreateAMask(t *testing.T) {
 	maskingConfig := model.Masking{Mask: model.MaskType{Template: "{{.name}}.{{.surname}}@gmail.com"}}
-	mask, present, err := NewMaskFromConfig(maskingConfig, 0)
+	config, present, err := RegistryMaskToConfiguration(maskingConfig, model.NewMaskConfiguration(), 0)
 	assert.Nil(t, err, "error should be nil")
-	waitedMask, err := NewMask("{{.name}}.{{.surname}}@gmail.com")
-	assert.Equal(t, waitedMask, mask, "should be equal")
+	mask, _ := NewMask("{{.name}}.{{.surname}}@gmail.com")
+	waitedConfig := model.NewMaskConfiguration().WithEntry("", mask)
+	assert.Equal(t, waitedConfig, config, "should be equal")
 	assert.True(t, present, "should be true")
 	assert.Nil(t, err, "error should be nil")
 }
 
-func TestNewMaskFromConfigShouldNotCreateAMaskFromAnEmptyConfig(t *testing.T) {
+func TestRegistryMaskToConfigurationShouldNotCreateAMaskFromAnEmptyConfig(t *testing.T) {
 	maskingConfig := model.Masking{Mask: model.MaskType{}}
-	mask, present, err := NewMaskFromConfig(maskingConfig, 0)
+	mask, present, err := RegistryMaskToConfiguration(maskingConfig, model.NewMaskConfiguration(), 0)
 	assert.Nil(t, mask, "should be nil")
 	assert.False(t, present, "should be false")
 	assert.Nil(t, err, "error should be nil")
 }
 
-func TestNewMaskFromConfigShouldReturnAnErrorInWrongConfig(t *testing.T) {
+func TestRegistryMaskToConfigurationShouldReturnAnErrorInWrongConfig(t *testing.T) {
 	maskingConfig := model.Masking{Mask: model.MaskType{Template: "{{.name}.{{.surname}}@gmail.com"}}
-	mask, present, err := NewMaskFromConfig(maskingConfig, 0)
+	mask, present, err := RegistryMaskToConfiguration(maskingConfig, model.NewMaskConfiguration(), 0)
 	assert.Nil(t, mask, "should be nil")
 	assert.False(t, present, "should be true")
 	assert.NotNil(t, err, "error shouldn't be nil")

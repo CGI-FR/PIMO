@@ -23,9 +23,9 @@ func (incr MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.E
 	return output, nil
 }
 
-func NewMaskFromConfig(conf model.Masking, seed int64) (model.MaskEngine, bool, error) {
+func RegistryMaskToConfiguration(conf model.Masking, config model.MaskConfiguration, seed int64) (model.MaskConfiguration, bool, error) {
 	if conf.Mask.Incremental.Increment != 0 {
-		return NewMask(conf.Mask.Incremental.Start, conf.Mask.Incremental.Increment), true, nil
+		return config.WithEntry(conf.Selector.Jsonpath, NewMask(conf.Mask.Incremental.Start, conf.Mask.Incremental.Increment)), true, nil
 	}
 	return nil, false, nil
 }

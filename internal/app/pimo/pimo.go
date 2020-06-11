@@ -21,7 +21,7 @@ type YAMLStructure struct {
 }
 
 // YamlConfig create a MaskConfiguration from a file
-func YamlConfig(filename string, factories []func(model.Masking, int64) (model.MaskEngine, bool, error)) (model.MaskConfiguration, error) {
+func YamlConfig(filename string, factories []func(model.Masking, model.MaskConfiguration, int64) (model.MaskConfiguration, bool, error)) (model.MaskConfiguration, error) {
 	source, err := ioutil.ReadFile(filename)
 	if err != nil {
 		return model.NewMaskConfiguration(), err
@@ -38,16 +38,16 @@ func YamlConfig(filename string, factories []func(model.Masking, int64) (model.M
 	for _, v := range conf.Masking {
 		nbArg := 0
 		for _, factory := range factories {
-			mask, present, err := factory(v, conf.Seed)
+			newConfig, present, err := factory(v, config, conf.Seed)
 			if err != nil {
 				return nil, err
 			}
 			if present {
-				config = config.WithEntry(v.Selector.Jsonpath, mask)
+				config = newConfig
 				nbArg++
 			}
 		}
-		if nbArg == 0 || nbArg >= 2 {
+		if nbArg != 1 {
 			return config, errors.New("Not the right number of argument for " + v.Selector.Jsonpath + ". There should be 1 and there is " + strconv.Itoa(nbArg))
 		}
 	}

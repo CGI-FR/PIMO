@@ -42,21 +42,19 @@ func TestMaskingShouldReplaceDateByRandom(t *testing.T) {
 	assert.True(t, equal <= 1, "Shouldn't be the same date less than 0.1% of time")
 }
 
-func TestNewMaskFromConfigShouldCreateAMask(t *testing.T) {
+func TestRegistryMaskToConfigurationShouldCreateAMask(t *testing.T) {
 	min := time.Date(1990, 1, 1, 0, 0, 0, 0, time.UTC)
 	max := time.Date(2000, 1, 1, 0, 0, 0, 0, time.UTC)
 	maskingConfig := model.Masking{Mask: model.MaskType{RandDate: model.RandDateType{DateMin: min, DateMax: max}}}
-	mask, present, err := NewMaskFromConfig(maskingConfig, 0)
-	dateMask := mask.(MaskEngine)
-	assert.Equal(t, min, dateMask.DateMin, "should be equal")
-	assert.Equal(t, max, dateMask.DateMax, "datemax should be te same")
+	config, present, err := RegistryMaskToConfiguration(maskingConfig, model.NewMaskConfiguration(), 0)
+	assert.NotNil(t, config, "config shouldn't be nil")
 	assert.True(t, present, "should be true")
 	assert.Nil(t, err, "error should be nil")
 }
 
-func TestNewMaskFromConfigShouldNotCreateAMaskFromAnEmptyConfig(t *testing.T) {
+func TestRegistryMaskToConfigurationShouldNotCreateAMaskFromAnEmptyConfig(t *testing.T) {
 	maskingConfig := model.Masking{Mask: model.MaskType{}}
-	mask, present, err := NewMaskFromConfig(maskingConfig, 0)
+	mask, present, err := RegistryMaskToConfiguration(maskingConfig, model.NewMaskConfiguration(), 0)
 	assert.Nil(t, mask, "should be nil")
 	assert.False(t, present, "should be false")
 	assert.Nil(t, err, "error should be nil")

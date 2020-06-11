@@ -25,13 +25,13 @@ func (tmpl MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.E
 	return output.String(), err
 }
 
-func NewMaskFromConfig(conf model.Masking, seed int64) (model.MaskEngine, bool, error) {
+func RegistryMaskToConfiguration(conf model.Masking, config model.MaskConfiguration, seed int64) (model.MaskConfiguration, bool, error) {
 	if len(conf.Mask.Template) != 0 {
 		mask, err := NewMask(conf.Mask.Template)
 		if err != nil {
 			return nil, false, err
 		}
-		return mask, true, nil
+		return config.WithEntry(conf.Selector.Jsonpath, mask), true, nil
 	}
 	return nil, false, nil
 }

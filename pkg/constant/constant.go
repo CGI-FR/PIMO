@@ -19,9 +19,9 @@ func (cm MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Ent
 	return cm.constValue, nil
 }
 
-func NewMaskFromConfig(conf model.Masking, seed int64) (model.MaskEngine, bool, error) {
+func RegistryMaskToConfiguration(conf model.Masking, config model.MaskConfiguration, seed int64) (model.MaskConfiguration, bool, error) {
 	if conf.Mask.Constant != nil {
-		return NewMask(conf.Mask.Constant), true, nil
+		return config.WithEntry(conf.Selector.Jsonpath, NewMask(conf.Mask.Constant)), true, nil
 	}
 	return nil, false, nil
 }

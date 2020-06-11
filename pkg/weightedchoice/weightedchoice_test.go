@@ -31,19 +31,19 @@ func TestMaskingShouldReplaceSensitiveValueByWeightedRandom(t *testing.T) {
 	assert.True(t, equal <= 850, "Should be less than 150 Marc")
 }
 
-func TestNewMaskFromConfigShouldCreateAMask(t *testing.T) {
+func TestRegistryMaskToConfigurationShouldCreateAMask(t *testing.T) {
 	maskingChoice := []model.WeightedChoiceType{{Choice: "Dupont", Weight: 9}, {Choice: "Dupond", Weight: 1}}
 	maskingConfig := model.Masking{Mask: model.MaskType{WeightedChoice: maskingChoice}}
-	mask, present, err := NewMaskFromConfig(maskingConfig, 0)
-	waitedMask := NewMask(maskingChoice, 0)
-	assert.Equal(t, waitedMask, mask, "should be equal")
+	config, present, err := RegistryMaskToConfiguration(maskingConfig, model.NewMaskConfiguration(), 0)
+	waitedConfig := model.NewMaskConfiguration().WithEntry("", NewMask(maskingChoice, 0))
+	assert.Equal(t, waitedConfig, config, "should be equal")
 	assert.True(t, present, "should be true")
 	assert.Nil(t, err, "error should be nil")
 }
 
-func TestNewMaskFromConfigShouldNotCreateAMaskFromAnEmptyConfig(t *testing.T) {
+func TestRegistryMaskToConfigurationShouldNotCreateAMaskFromAnEmptyConfig(t *testing.T) {
 	maskingConfig := model.Masking{Mask: model.MaskType{}}
-	mask, present, err := NewMaskFromConfig(maskingConfig, 0)
+	mask, present, err := RegistryMaskToConfiguration(maskingConfig, model.NewMaskConfiguration(), 0)
 	assert.Nil(t, mask, "should be nil")
 	assert.False(t, present, "should be false")
 	assert.Nil(t, err, "error should be nil")
