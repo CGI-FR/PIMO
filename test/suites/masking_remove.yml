@@ -1,0 +1,21 @@
+name: remove features
+testcases:
+- name: remove mask
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "surname"
+          mask:
+            remove: true
+      EOF
+  - script: |-
+      echo '{"surname": "Toto", "name": "Benjamin"}' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemoutjson.name ShouldEqual Benjamin
+    - result.systemerr ShouldBeEmpty
+    - result.systemout ShouldNotContainSubstring Toto

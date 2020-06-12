@@ -186,6 +186,7 @@ type MaskType struct {
 	Replacement       string               `yaml:"replacement"`
 	Template          string               `yaml:"template"`
 	Duration          string               `yaml:"duration"`
+	Remove            bool                 `yaml:"remove"`
 }
 type Masking struct {
 	Selector SelectorType `yaml:"selector"`
