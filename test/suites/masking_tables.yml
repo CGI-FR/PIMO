@@ -1,0 +1,20 @@
+name: table masking features
+testcases:
+- name: table mask
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "name"
+          mask:
+            constant: "Dorothy"
+      EOF
+  - script: |-
+      echo '{"name": ["Toto","Tata"]}' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldContainSubstring ["Dorothy","Dorothy"]
+    - result.systemerr ShouldBeEmpty
