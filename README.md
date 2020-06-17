@@ -39,6 +39,7 @@ The following types of masks can be used :
 * `incremental` is to mask datas with incremental value starting from `start` with a step of `increment`.
 * `remplacement` is to mask a data with another data from the jsonline.
 * `template` is to mask a data with a template using other values from the jsonline.
+* `remove` is to mask a field by completely removing it.
 
 A full `masking.yml` file exemple, using every kind of mask, is given with the source code.
 
@@ -52,7 +53,7 @@ To use PIMO to mask a `data.json`, use in the following way :
 ./pimo <data.json >maskedData.json
 ```
 
-This takes the `data.json` file, masks the datas contained inside it and put the result in a `maskedData.json` file.
+This takes the `data.json` file, masks the datas contained inside it and put the result in a `maskedData.json` file. If datas are in a tables (for exemple multiples names), then each field of this table will be masked using the given mask.
 
 ## Exemple
 
@@ -236,3 +237,14 @@ This exemple will mask the `mail` field of the input jsonlines respecting the gi
 ```
 
 The format for the template should respect the `text/template` package : <https://golang.org/pkg/text/template/>
+
+### Remove
+
+```yaml
+  - selector:
+      jsonpath: "useless-field"
+    mask:
+      remove: true
+```
+
+This field will mask the `useless-field` of the input jsonlines by completely deleting it.
