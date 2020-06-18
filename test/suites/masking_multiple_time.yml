@@ -1,0 +1,29 @@
+name: Multiple different masks
+testcases:
+- name: mask, use to replace, remove
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "name2"
+          mask:
+            constant: "Benjamin"
+        - selector:
+            jsonpath: "name"
+          mask:
+            replacement: "name2"
+        - selector:
+            jsonpath: "name2"
+          mask:
+            remove: true
+      EOF
+  - script: |-
+      echo '{"name": "Toto", "name2": "Henri"}' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemoutjson.name ShouldEqual Benjamin
+    - result.systemoutjson ShouldNotContainKey name2
+    - result.systemerr ShouldBeEmpty
