@@ -23,7 +23,7 @@ type MaskContextEngine interface {
 
 // NewMaskConfiguration build new configuration
 func NewMaskConfiguration() MaskConfiguration {
-	return MapMaskConfiguration{map[string]MaskContextEngine{}, []string{}}
+	return MapMaskConfiguration{[]MaskKey{}}
 }
 
 // MaskConfiguration is a configuration to mask dictionaries content
@@ -33,19 +33,18 @@ type MaskConfiguration interface {
 	WithContextEntry(string, MaskContextEngine) MaskConfiguration
 	AsEngine() MaskEngine
 	AsContextEngine() MaskContextEngine
-	Entries() []string
+	Entries() []MaskKey
+}
+
+// MaskKeyStruct is a structure containing a maskengine and the key which need the mask
+type MaskKey struct {
+	maskCont MaskContextEngine
+	Key      string
 }
 
 // MapMaskConfiguration Implements MaskConfiguration with a map
 type MapMaskConfiguration struct {
-	config     map[string]MaskContextEngine
-	components []string
-}
-
-// GetMaskingEngine return the MaskEngine configured for that string
-func (mmc MapMaskConfiguration) GetMaskingEngine(key string) (MaskContextEngine, bool) {
-	engine, test := mmc.config[key]
-	return engine, test
+	config []MaskKey
 }
 
 // WithEntry append engine for entry in the configuration and return modified configuration
@@ -56,19 +55,24 @@ func (mmc MapMaskConfiguration) WithEntry(key string, engine MaskEngine) MaskCon
 func (mmc MapMaskConfiguration) WithContextEntry(key string, engine MaskContextEngine) MaskConfiguration {
 	mainEntry := strings.SplitN(key, ".", 2)
 	if len(mainEntry) == 2 {
-		mmc.config[mainEntry[0]] = NewMaskConfiguration().WithContextEntry(mainEntry[1], engine).AsContextEngine()
-		mmc.components = append(mmc.components, mainEntry[0])
+		mmc.config = append(mmc.config, MaskKey{NewMaskConfiguration().WithContextEntry(mainEntry[1], engine).AsContextEngine(), mainEntry[0]})
+		//mmc.config[mainEntry[0]] = NewMaskConfiguration().WithContextEntry(mainEntry[1], engine).AsContextEngine()
+		//mmc.components = append(mmc.components, mainEntry[0])
 	} else {
-		mmc.config[key] = engine
-		mmc.components = append(mmc.components, key)
+		mmc.config = append(mmc.config, MaskKey{engine, key})
 	}
 
 	return mmc
 }
 
-//Entries list every mask in mmc in order
-func (mmc MapMaskConfiguration) Entries() []string {
-	return mmc.components
+// GetMaskingEngine return the MaskEngine configured for that string
+func (mmc MapMaskConfiguration) GetMaskingEngine(key string) (MaskContextEngine, bool) {
+	for _, k := range mmc.config {
+		if k.Key == key {
+			return k.maskCont, true
+		}
+	}
+	return nil, false
 }
 
 // AsEngine return engine with configuration
@@ -79,6 +83,11 @@ func (mmc MapMaskConfiguration) AsEngine() MaskEngine {
 // AsEngine return engine with configuration
 func (mmc MapMaskConfiguration) AsContextEngine() MaskContextEngine {
 	return ContextWrapper{mmc.AsEngine()}
+}
+
+//Entries list every mask in mmc in order
+func (mmc MapMaskConfiguration) Entries() []MaskKey {
+	return mmc.config
 }
 
 // MaskingEngineFactory return Masking function data without private information
@@ -95,16 +104,16 @@ func MaskingEngineFactory(config MaskConfiguration) FunctionMaskEngine {
 		}
 		var errMask error
 		errMask = nil
-		for _, key := range config.Entries() {
-			_, present := output[key]
+		for _, maskKey := range config.Entries() {
+			_, present := output[maskKey.Key]
 			if present {
-				engine, ok := config.GetMaskingEngine(key)
+				engine := maskKey.maskCont
 				if ok {
 					var err error
-					output, err = engine.MaskContext(output, key)
+					output, err = engine.MaskContext(output, maskKey.Key)
 					if err != nil {
 						errMask = err
-						delete(output, key)
+						delete(output, maskKey.Key)
 					}
 				}
 			}

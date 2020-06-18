@@ -88,8 +88,8 @@ func TestYamlConfigShouldCreateEntriesInTheYamlOrder(t *testing.T) {
 		t.Log(err)
 	}
 	actualEntries := config.Entries()
-	waitedEntries := []string{"name", "phone"}
-	assert.Equal(t, actualEntries, waitedEntries, "Should be the same")
+	assert.Equal(t, actualEntries[0].Key, "name", "Should be the same")
+	assert.Equal(t, actualEntries[1].Key, "phone", "should be the same")
 }
 
 func A(me model.MaskContextEngine, boo bool) model.MaskContextEngine {
@@ -146,9 +146,6 @@ func TestShouldCreateAMaskConfigurationFromAFile(t *testing.T) {
 		WithEntry("mail", templ).
 		WithEntry("last_contact", Must(duration.NewMask("-P60D")))
 
-	waitedOrder := []string{"customer", "name", "name2", "age", "name3", "surname", "address", "date", "name4", "mail", "last_contact"}
-	actualOrder := config.Entries()
-	assert.Equal(t, waitedOrder, actualOrder, "Should be the same order")
 	assert.Equal(t, A(config.GetMaskingEngine("customer.phone")), A(waited.GetMaskingEngine("customer.phone")), "customer.phone not equal")
 	assert.Equal(t, A(config.GetMaskingEngine("name")), A(waited.GetMaskingEngine("name")), "name1 not equal")
 	assert.Equal(t, A(config.GetMaskingEngine("name2")), A(waited.GetMaskingEngine("name2")), "name2 not equal")
