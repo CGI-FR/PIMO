@@ -30,7 +30,7 @@ func RegistryMaskToConfiguration(conf model.Masking, config model.MaskConfigurat
 		return config.WithEntry(conf.Selector.Jsonpath, maskHash), true, nil
 	}
 	if len(conf.Mask.HashInURI) != 0 {
-		list, err := uri.Read(conf.Mask.RandomChoiceInURI)
+		list, err := uri.Read(conf.Mask.HashInURI)
 		return config.WithEntry(conf.Selector.Jsonpath, MaskEngine{list}), true, err
 	}
 	return nil, false, nil
