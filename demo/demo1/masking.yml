@@ -1,0 +1,26 @@
+version: "1"
+seed: 42
+masking:
+  - selector:
+      jsonpath: "name"
+    mask:
+      constant: "Benjamin"
+  - selector:
+      jsonpath: "surname"
+    mask:
+      randomChoice:
+        - Dupont
+        - Dupond
+  - selector:
+      jsonpath: "town"
+    mask:
+      hash:
+        - "Emerald City"
+        - "Ruby City"
+        - "Sapphire City"
+  - selector:
+      jsonpath: "age"
+    mask:
+      randomInt:
+        min: 18
+        max: 90

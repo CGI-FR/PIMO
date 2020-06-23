@@ -1,0 +1,21 @@
+version: "1"
+seed: 42
+masking:
+  - selector:
+      jsonpath: "identity.name"
+    mask:
+      randomChoiceInUri: "pimo://nameFR"
+  - selector:
+      jsonpath: "identity.surname"
+    mask:
+      hashInUri: "pimo://surnameFR"
+  - selector:
+      jsonpath: "town"
+    mask:
+      randomChoiceInUri: "pimo://townFR"
+  - selector:
+      jsonpath: "identity.age"
+    mask:
+      randomInt:
+        min: 18
+        max: 90

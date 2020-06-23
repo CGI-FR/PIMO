@@ -40,7 +40,7 @@ func YamlConfig(filename string, factories []func(model.Masking, model.MaskConfi
 		for _, factory := range factories {
 			newConfig, present, err := factory(v, config, conf.Seed)
 			if err != nil {
-				return nil, err
+				return nil, errors.New(err.Error() + " for " + v.Selector.Jsonpath)
 			}
 			if present {
 				config = newConfig
