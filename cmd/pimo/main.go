@@ -6,6 +6,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"makeit.imfr.cgi.com/makeit2/scm/lino/pimo/internal/app/pimo"
+	"makeit.imfr.cgi.com/makeit2/scm/lino/pimo/pkg/add"
 	"makeit.imfr.cgi.com/makeit2/scm/lino/pimo/pkg/command"
 	"makeit.imfr.cgi.com/makeit2/scm/lino/pimo/pkg/constant"
 	"makeit.imfr.cgi.com/makeit2/scm/lino/pimo/pkg/duration"
@@ -107,6 +108,7 @@ func run(config model.MaskConfiguration) {
 
 func injectMaskFactories() []func(model.Masking, model.MaskConfiguration, int64) (model.MaskConfiguration, bool, error) {
 	return []func(model.Masking, model.MaskConfiguration, int64) (model.MaskConfiguration, bool, error){
+		add.RegistryMaskToConfiguration,
 		constant.RegistryMaskToConfiguration,
 		command.RegistryMaskToConfiguration,
 		randomlist.RegistryMaskToConfiguration,

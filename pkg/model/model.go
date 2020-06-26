@@ -105,20 +105,16 @@ func MaskingEngineFactory(config MaskConfiguration) FunctionMaskEngine {
 		var errMask error
 		errMask = nil
 		for _, maskKey := range config.Entries() {
-			_, present := output[maskKey.Key]
-			if present {
-				engine := maskKey.maskCont
-				if ok {
-					var err error
-					output, err = engine.MaskContext(output, maskKey.Key)
-					if err != nil {
-						errMask = err
-						delete(output, maskKey.Key)
-					}
+			engine := maskKey.maskCont
+			if ok {
+				var err error
+				output, err = engine.MaskContext(output, maskKey.Key)
+				if err != nil {
+					errMask = err
+					delete(output, maskKey.Key)
 				}
 			}
 		}
-
 		return output, errMask
 	}}
 }
@@ -198,6 +194,7 @@ type WeightedChoiceType struct {
 }
 
 type MaskType struct {
+	Add               Entry                `yaml:"add"`
 	Constant          Entry                `yaml:"constant"`
 	RandomChoice      []Entry              `yaml:"randomChoice"`
 	RandomChoiceInURI string               `yaml:"randomChoiceInUri"`

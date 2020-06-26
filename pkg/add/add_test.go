@@ -1,4 +1,4 @@
-package remove
+package add
 
 import (
 	"testing"
@@ -8,22 +8,22 @@ import (
 )
 
 func TestMaskingShouldRemoveField(t *testing.T) {
-	removeMask := NewMask()
+	addMask := NewMask("newvalue")
 	config := model.NewMaskConfiguration().
-		WithContextEntry("field", removeMask)
+		WithContextEntry("newfield", addMask)
 	maskingEngine := model.MaskingEngineFactory(config)
-	data := model.Dictionary{"field": "SomeInformation", "otherfield": "SomeOtherInformation"}
+	data := model.Dictionary{"field": "SomeInformation"}
 	result, err := maskingEngine.Mask(data)
 	assert.Equal(t, nil, err, "error should be nil")
-	waited := model.Dictionary{"otherfield": "SomeOtherInformation"}
+	waited := model.Dictionary{"field": "SomeInformation", "newfield": "newvalue"}
 	assert.NotEqual(t, data, result, "field should be removed")
 	assert.Equal(t, waited, result, "should be Toto")
 }
 
 func TestRegistryMaskToConfigurationShouldCreateAMask(t *testing.T) {
-	maskingConfig := model.Masking{Selector: model.SelectorType{Jsonpath: "field"}, Mask: model.MaskType{Remove: true}}
+	maskingConfig := model.Masking{Selector: model.SelectorType{Jsonpath: "field"}, Mask: model.MaskType{Add: "value"}}
 	mask, present, err := RegistryMaskToConfiguration(maskingConfig, model.NewMaskConfiguration(), 0)
-	waitedMask := model.NewMaskConfiguration().WithContextEntry("field", NewMask())
+	waitedMask := model.NewMaskConfiguration().WithContextEntry("field", NewMask("value"))
 	assert.Equal(t, waitedMask, mask, "should be equal")
 	assert.True(t, present, "should be true")
 	assert.Nil(t, err, "error should be nil")

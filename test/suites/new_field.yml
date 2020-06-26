@@ -1,0 +1,21 @@
+name: new_field features
+testcases:
+- name: adding field mask
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "newfield"
+          mask:
+            add: "newvalue"
+      EOF
+  - script: |-
+      echo '{"name": "Toto"}' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemoutjson.name ShouldEqual Toto
+    - result.systemoutjson.newfield ShouldEqual newvalue
+    - result.systemerr ShouldBeEmpty
