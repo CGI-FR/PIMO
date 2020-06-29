@@ -9,7 +9,7 @@ type MaskEngine struct {
 	Field string
 }
 
-// NewMask return a CommandMask from a value
+// NewMask return a mask containing another field of the dictionary
 func NewMask(field string) MaskEngine {
 	return MaskEngine{field}
 }
@@ -19,6 +19,7 @@ func (remp MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.E
 	return context[0][remp.Field], nil
 }
 
+// RegistryMaskToConfiguration create a mask from a yaml config
 func RegistryMaskToConfiguration(conf model.Masking, config model.MaskConfiguration, seed int64) (model.MaskConfiguration, bool, error) {
 	if len(conf.Mask.Replacement) != 0 {
 		return config.WithEntry(conf.Selector.Jsonpath, NewMask(conf.Mask.Replacement)), true, nil

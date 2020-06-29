@@ -23,6 +23,7 @@ func (incr MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.E
 	return output, nil
 }
 
+// Create a mask from a configuration
 func RegistryMaskToConfiguration(conf model.Masking, config model.MaskConfiguration, seed int64) (model.MaskConfiguration, bool, error) {
 	if conf.Mask.Incremental.Increment != 0 {
 		return config.WithEntry(conf.Selector.Jsonpath, NewMask(conf.Mask.Incremental.Start, conf.Mask.Incremental.Increment)), true, nil

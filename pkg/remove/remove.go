@@ -4,11 +4,11 @@ import (
 	"makeit.imfr.cgi.com/makeit2/scm/lino/pimo/pkg/model"
 )
 
-//MaskEngine is a value that always mask the same way
+//MaskEngine is an empty mask to link to a field to remove
 type MaskEngine struct {
 }
 
-// NewMask return a ConstantMask from a value
+// NewMask return an empty mask
 func NewMask() MaskEngine {
 	return MaskEngine{}
 }
@@ -20,6 +20,7 @@ func (rm MaskEngine) MaskContext(context model.Dictionary, key string) (model.Di
 	return context, nil
 }
 
+// RegistryMaskToConfiguration create a mask from a yaml config
 func RegistryMaskToConfiguration(conf model.Masking, config model.MaskConfiguration, seed int64) (model.MaskConfiguration, bool, error) {
 	if conf.Mask.Remove {
 		return config.WithContextEntry(conf.Selector.Jsonpath, NewMask()), true, nil

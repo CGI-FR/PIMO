@@ -24,6 +24,7 @@ func (rm MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Ent
 	return out, nil
 }
 
+// RegistryMaskToConfiguration create a mask from a yaml config
 func RegistryMaskToConfiguration(conf model.Masking, config model.MaskConfiguration, seed int64) (model.MaskConfiguration, bool, error) {
 	if len(conf.Mask.Regex) != 0 {
 		mask, err := NewMask(conf.Mask.Regex, seed)

@@ -20,6 +20,7 @@ func (hm MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Ent
 	return hm.List[int(h.Sum32())%len(hm.List)], err
 }
 
+// Create a mask from a configuration
 func RegistryMaskToConfiguration(conf model.Masking, config model.MaskConfiguration, seed int64) (model.MaskConfiguration, bool, error) {
 	if len(conf.Mask.Hash) != 0 && len(conf.Mask.HashInURI) != 0 {
 		return nil, false, fmt.Errorf("2 different hash choices")
