@@ -1,15 +1,18 @@
 version: "1"
-seed: 43
+seed: 42
 masking:
   - selector:
       jsonpath: "name"
     mask:
-      randomChoiceInUri: "pimo://nameFR"
+      randomChoice:
+        - Mickael
+        - Toto
+        - Benjamin
   - selector:
       jsonpath: "surname"
     mask:
-      randomChoiceInUri: "pimo://surnameFR"
+      regex: "(Mar|Ber)t(rand|in)"
   - selector:
       jsonpath: "identity.name"
     mask:
-      randomChoiceInUri: "pimo://nameFRF"
+      randomChoiceInUri: "pimo://nameFR"

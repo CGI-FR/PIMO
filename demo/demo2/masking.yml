@@ -4,18 +4,25 @@ masking:
   - selector:
       jsonpath: "identity.name"
     mask:
-      randomChoiceInUri: "pimo://nameFR"
+      command: "echo Dorothy"
   - selector:
       jsonpath: "identity.surname"
     mask:
-      hashInUri: "pimo://surnameFR"
-  - selector:
-      jsonpath: "town"
-    mask:
-      randomChoiceInUri: "pimo://townFR"
+      weightedChoice:
+        - choice: "Dupont"
+          weight: 3
+        - choice: "Dupond"
+          weight: 1
   - selector:
       jsonpath: "identity.age"
     mask:
       randomInt:
         min: 18
         max: 90
+  - selector:
+      jsonpath: "town"
+    mask:
+      randomChoice:
+        - "Paris"
+        - "Nantes"
+        - "Carquefou"
