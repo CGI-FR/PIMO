@@ -154,7 +154,6 @@ func TestShouldCreateAMaskConfigurationFromAFile(t *testing.T) {
 	assert.Equal(t, A(config.GetMaskingEngine("surname")), A(waited.GetMaskingEngine("surname")), "surname not equal")
 	assert.Equal(t, A(config.GetMaskingEngine("address.town")), A(waited.GetMaskingEngine("address.town")), "surname not equal")
 	assert.Equal(t, A(config.GetMaskingEngine("date")), A(waited.GetMaskingEngine("date")), "date not equal")
-	assert.Equal(t, A(config.GetMaskingEngine("mail")), A(waited.GetMaskingEngine("mail")), "mail not equal")
 	assert.Equal(t, A(config.GetMaskingEngine("last_contact")), A(waited.GetMaskingEngine("last_contact")), "last_contact not equal")
 }
 

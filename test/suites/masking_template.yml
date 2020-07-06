@@ -10,3 +10,25 @@ testcases:
     - result.code ShouldEqual 0
     - result.systemoutjson.mail ShouldEqual bonbeur.jean@gmail.com
     - result.systemerr ShouldBeEmpty
+- name: template format to lower
+  steps:
+  - script: rm -f masking.yml
+  - script: cp ../masking_template_lower.yml masking.yml
+  - script: |-
+      echo '{"mail": "jean-bonbeur@hotmail.fr", "name": "JEAN", "surname": "BoNbEuR"}' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemoutjson.mail ShouldEqual bonbeur.jean@gmail.com
+    - result.systemoutjson.mail ShouldNotEqual BoNbEuR.JEAN@gmail.com
+    - result.systemerr ShouldBeEmpty
+- name: template format without accent and to lower
+  steps:
+  - script: rm -f masking.yml
+  - script: cp ../masking_template_noacc.yml masking.yml
+  - script: |-
+      echo '{"mail": "jean-bonbeur@hotmail.fr", "name": "Léa", "surname": "Noël"}' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemoutjson.mail ShouldEqual noel.lea@gmail.com
+    - result.systemoutjson.mail ShouldNotEqual Noël.Léa@gmail.com
+    - result.systemerr ShouldBeEmpty

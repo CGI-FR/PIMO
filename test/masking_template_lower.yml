@@ -1,0 +1,7 @@
+version: "1"
+seed: 42
+masking:
+  - selector:
+      jsonpath: "mail"
+    mask:
+      template: "{{.surname | ToLower}}.{{.name | ToLower}}@gmail.com"

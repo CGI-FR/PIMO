@@ -50,7 +50,7 @@ func main() {
 			maskingfile := "masking.yml"
 			config, err := pimo.YamlConfig(maskingfile, injectMaskFactories())
 			if err != nil {
-				println("ERROR : masking.yml not working properly, ", err.Error())
+				os.Stderr.WriteString("ERROR : masking.yml not working properly, " + err.Error())
 				os.Exit(1)
 			}
 			run(config)
