@@ -5,5 +5,6 @@ This folder contains every file necessary for demos of PIMO program. Here are th
 * First demo - Simple use of PIMO
 * Second demo - Masking nested datas
 * Third demo - Masking Tables of datas
+* Fourth demo - Using other datas in mask
 
 More demos are to come.

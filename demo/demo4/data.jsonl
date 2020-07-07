@@ -1,0 +1,4 @@
+{"replacement": "Some better value", "fieldToReplace": "Some value"}
+{"field1": "First field data", "field2": "Second field data", "compositeField": "Unimportant value"}
+{"replacement": "Value1", "fieldToReplace": "Value0", "field1": "data1", "field2": "data2", "compositeField": "Unimportant value"}
+{"field1": "AàEéè", "field2": "äâGêë", "compositeField": "Unimportant value"}

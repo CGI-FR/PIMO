@@ -1,0 +1,11 @@
+version: "1"
+seed: 42
+masking:
+  - selector:
+      jsonpath: "fieldToReplace"
+    mask:
+      replacement: "replacement"
+  - selector:
+      jsonpath: "compositeField"
+    mask:
+      template: "{{.field1}}+{{.field2}}"
