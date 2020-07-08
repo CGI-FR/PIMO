@@ -40,6 +40,7 @@ The following types of masks can be used :
 * `remplacement` is to mask a data with another data from the jsonline.
 * `template` is to mask a data with a template using other values from the jsonline.
 * `remove` is to mask a field by completely removing it.
+* `add` is a mask to add a field to the jsonline.
 
 A full `masking.yml` file exemple, using every kind of mask, is given with the source code.
 
@@ -248,3 +249,16 @@ The format for the template should respect the `text/template` package : <https:
 ```
 
 This field will mask the `useless-field` of the input jsonlines by completely deleting it.
+
+### Add
+
+```yaml
+  - selector:
+      jsonpath: "newField"
+    mask:
+      add: "newvalue"
+```
+
+This exemple will create the field `newField` containing the value `newvalue`. This value can be a string, a number, a boolean... 
+
+The field will be created in every input jsonline that doesn't already contains this field.
