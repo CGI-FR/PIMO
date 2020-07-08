@@ -239,6 +239,17 @@ This exemple will mask the `mail` field of the input jsonlines respecting the gi
 
 The format for the template should respect the `text/template` package : <https://golang.org/pkg/text/template/>
 
+The template mask can format the fields used. The following exemple will create a mail address without accent or upper case:
+
+```yaml
+  - selector:
+      jsonpath: "user.mail"
+    mask:
+      template: "{{.surname | NoAccent | ToLower}}.{{.name | NoAccent | ToLower}}@gmail.com"
+```
+
+Available formats are : NoAccent, ToLower, ToUpper.
+
 ### Remove
 
 ```yaml
