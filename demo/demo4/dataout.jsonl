@@ -1,4 +1,0 @@
-{"fieldToReplace":"Some better value","replacement":"Some better value"}
-{"compositeField":"First field data+Second field data","field1":"First field data","field2":"Second field data"}
-{"compositeField":"data1+data2","field1":"data1","field2":"data2","fieldToReplace":"Value1","replacement":"Value1"}
-{"compositeField":"AàEéè+äâGêë","field1":"AàEéè","field2":"äâGêë"}

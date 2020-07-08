@@ -1,0 +1,12 @@
+version: "1"
+masking:
+  - selector:
+      jsonpath: "birth"
+    mask:
+      randDate:
+        dateMin: "2010-01-01T00:00:00Z"
+        dateMax: "2020-01-01T00:00:00Z"
+  - selector:
+      jsonpath: "birth"
+    mask:
+      duration: "-P20Y"
