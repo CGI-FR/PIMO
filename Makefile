@@ -12,6 +12,9 @@ BUILD_DATE ?= $(shell date +%FT%T%z)
 BUILD_BY ?= $(shell git config user.email)
 LDFLAGS += -X main.version=${VERSION} -X main.commit=${COMMIT_HASH} -X main.buildDate=${BUILD_DATE} -X main.builtBy=${BUILD_BY}
 
+PLATFORMS=darwin linux windows
+ARCHITECTURES=386 amd64
+
 # Project variables
 RELEASE := $(shell [[ $(VERSION) =~ ^[0-9]*.[0-9]*.[0-9]*$$ ]] && echo 1 || echo 0 )
 MAJOR := $(shell echo $(VERSION) | cut -f1 -d.)
@@ -85,6 +88,17 @@ release-%: mkdir
 
 .PHONY: release
 release: clean info lint $(patsubst cmd/%,release-%,$(wildcard cmd/*)) ## Build all binaries for production
+
+
+.PHONY: release-all
+release-all: clean info  ## Build all binaries for production
+	$(foreach GOOS, $(PLATFORMS),\
+	$(foreach GOARCH, $(ARCHITECTURES), $(shell export GOOS=$(GOOS); export GOARCH=$(GOARCH); GO111MODULE=on CGO_ENABLED=0 go build ${GOARGS} -ldflags "-w -s ${LDFLAGS}" -o ${BUILD_DIR}/pimo-$(GOOS)-$(GOARCH) ./cmd/pimo )))
+	mkdir -p ${BUILD_DIR}/pimo
+	cp ${BUILD_DIR}/pimo-* ${BUILD_DIR}/pimo
+	cp -r demo/ ${BUILD_DIR}/pimo/
+	cp README.md ${BUILD_DIR}/pimo
+	cd ${BUILD_DIR} && tar czvf pimo-$(VERSION).tar.gz pimo
 
 .PHONY: docker
 docker: info ## Build docker image locally
