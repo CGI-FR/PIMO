@@ -1,0 +1,10 @@
+version: "1"
+masking:
+  - selector:
+      jsonpath: "newField"
+    mask:
+      add: "New Value"
+  - selector:
+      jsonpath: "fieldToRemove"
+    mask:
+      remove: true
