@@ -210,6 +210,7 @@ type MaskType struct {
 	Template          string               `yaml:"template"`
 	Duration          string               `yaml:"duration"`
 	Remove            bool                 `yaml:"remove"`
+	RangeMask         int                  `yaml:"range"`
 }
 type Masking struct {
 	Selector SelectorType `yaml:"selector"`
