@@ -1,0 +1,49 @@
+name: empty-input features
+testcases:
+- name: empty-input
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "name"
+          mask:
+            add: "Dorothy"
+      EOF
+  - script: |-
+      pimo --empty-input
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemoutjson ShouldContainKey name
+    - result.systemerr ShouldBeEmpty
+    testcases:
+- name: repeat empty-input
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "name"
+          mask:
+            add: "Dorothy"
+      EOF
+  - script: |-
+      pimo --empty-input --repeat=5 > result.txt
+  - script: |-
+      cat > expected.txt <<EOF
+      {"name":"Dorothy"}
+      {"name":"Dorothy"}
+      {"name":"Dorothy"}
+      {"name":"Dorothy"}
+      {"name":"Dorothy"}
+      EOF
+  - script: |-
+        diff first.txt second.txt
+    assertions:
+      - result.systemout ShouldBeEmpty
+  - script: rm -f expected.txt
+  - script: rm -f result.txt

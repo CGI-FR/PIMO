@@ -32,9 +32,10 @@ var (
 	buildDate string
 	builtBy   string
 
-	iteration int
-	skipLine  bool
-	skipField bool
+	iteration  int
+	skipLine   bool
+	skipField  bool
+	emptyInput bool
 )
 
 func main() {
@@ -61,6 +62,7 @@ func main() {
 	rootCmd.PersistentFlags().IntVarP(&iteration, "repeat", "r", 1, "number of iteration to mask each input")
 	rootCmd.PersistentFlags().BoolVar(&skipLine, "skip-line-on-error", false, "if an error occurs, skip the line")
 	rootCmd.PersistentFlags().BoolVar(&skipField, "skip-field-on-error", false, "if an error occurs, skip the field")
+	rootCmd.PersistentFlags().BoolVar(&emptyInput, "empty-input", false, "generate datas without any input, to use with repeat flag")
 
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Println(err)
@@ -76,7 +78,13 @@ func run(config model.MaskConfiguration) {
 	reader := pimo.NewJSONLineIterator(os.Stdin)
 	for {
 		i := 0
-		dic, err := reader.Next()
+		var dic model.Dictionary
+		var err error
+		if emptyInput {
+			dic = model.Dictionary{}
+		} else {
+			dic, err = reader.Next()
+		}
 		for i != iteration {
 			if (err == pimo.StopIteratorError{}) {
 				os.Exit(0)
@@ -103,6 +111,9 @@ func run(config model.MaskConfiguration) {
 			}
 			os.Stdout.Write(jsonline)
 			i++
+		}
+		if emptyInput {
+			os.Exit(0)
 		}
 	}
 }
