@@ -18,7 +18,6 @@ testcases:
     - result.code ShouldEqual 0
     - result.systemoutjson ShouldContainKey name
     - result.systemerr ShouldBeEmpty
-    testcases:
 - name: repeat empty-input
   steps:
   - script: rm -f masking.yml
@@ -31,8 +30,7 @@ testcases:
           mask:
             add: "Dorothy"
       EOF
-  - script: |-
-      pimo --empty-input --repeat=5 > result.txt
+  - script: pimo --empty-input --repeat=5 > result.txt
   - script: |-
       cat > expected.txt <<EOF
       {"name":"Dorothy"}
@@ -41,8 +39,7 @@ testcases:
       {"name":"Dorothy"}
       {"name":"Dorothy"}
       EOF
-  - script: |-
-        diff first.txt second.txt
+  - script: diff expected.txt result.txt
     assertions:
       - result.systemout ShouldBeEmpty
   - script: rm -f expected.txt

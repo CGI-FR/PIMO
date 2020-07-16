@@ -54,7 +54,13 @@ To use PIMO to mask a `data.json`, use in the following way :
 ./pimo <data.json >maskedData.json
 ```
 
-This takes the `data.json` file, masks the datas contained inside it and put the result in a `maskedData.json` file. If datas are in a tables (for exemple multiples names), then each field of this table will be masked using the given mask.
+This takes the `data.json` file, masks the datas contained inside it and put the result in a `maskedData.json` file. If datas are in a tables (for exemple multiples names), then each field of this table will be masked using the given mask. The following flags can be used:
+
+* `--repeat=N` This flag will make pimo mask every input N-times.
+* `--skip-line-on-error` This flag will totally skip a line if an error occurs masking a field.
+* `--skip-field-on-error` This flag will return output without a field if an error occurs masking this field.
+* `--empty-input` This flag will give PIMO a `{}` input, usable with `repeat` flag.
+* `--config=filename.yml` This flag allow to use another file for config that `masking.yml`.
 
 ## Exemple
 

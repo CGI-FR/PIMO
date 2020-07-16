@@ -32,10 +32,11 @@ var (
 	buildDate string
 	builtBy   string
 
-	iteration  int
-	skipLine   bool
-	skipField  bool
-	emptyInput bool
+	iteration   int
+	skipLine    bool
+	skipField   bool
+	emptyInput  bool
+	maskingFile string
 )
 
 func main() {
@@ -49,8 +50,7 @@ func main() {
 				os.Stderr.WriteString("Can't use both skipField and skipLine flags \n")
 				os.Exit(5)
 			}
-			maskingfile := "masking.yml"
-			config, err := pimo.YamlConfig(maskingfile, injectMaskFactories())
+			config, err := pimo.YamlConfig(maskingFile, injectMaskFactories())
 			if err != nil {
 				os.Stderr.WriteString("ERROR : masking.yml not working properly, " + err.Error())
 				os.Exit(1)
@@ -63,6 +63,7 @@ func main() {
 	rootCmd.PersistentFlags().BoolVar(&skipLine, "skip-line-on-error", false, "if an error occurs, skip the line")
 	rootCmd.PersistentFlags().BoolVar(&skipField, "skip-field-on-error", false, "if an error occurs, skip the field")
 	rootCmd.PersistentFlags().BoolVar(&emptyInput, "empty-input", false, "generate datas without any input, to use with repeat flag")
+	rootCmd.PersistentFlags().StringVarP(&maskingFile, "config", "c", "masking.yml", "name and location of the masking-config file")
 
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Println(err)

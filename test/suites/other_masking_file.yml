@@ -1,0 +1,50 @@
+name: other masking file feature
+testcases:
+- name: should mask
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > maskingconst.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "name"
+          mask:
+            constant: "Dorothy"
+      EOF
+  - script: |-
+      echo '{"name": "Toto"}' | pimo --config=maskingconst.yml
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemoutjson.name ShouldEqual Dorothy
+    - result.systemerr ShouldBeEmpty
+  - script: rm -f maskingconst.yml
+- name: should select the right file
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > maskingconst.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "name"
+          mask:
+            constant: "Dorothy"
+      EOF
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "name"
+          mask:
+            constant: "Benjamin"
+      EOF
+  - script: |-
+      echo '{"name": "Toto"}' | pimo --config=maskingconst.yml
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemoutjson.name ShouldEqual Dorothy
+    - result.systemoutjson.name ShouldNotEqual Benjamin
+    - result.systemerr ShouldBeEmpty
+  - script: rm -f maskingconst.yml
