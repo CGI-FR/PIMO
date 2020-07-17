@@ -4,4 +4,4 @@ masking:
   - selector:
       jsonpath: "mail"
     mask:
-      template: "{{.surname | ToLower}}.{{.name | ToLower}}@gmail.com"
+      template: "{{.surname | lower}}.{{.name | lower}}@gmail.com"

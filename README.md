@@ -251,10 +251,10 @@ The template mask can format the fields used. The following exemple will create 
   - selector:
       jsonpath: "user.mail"
     mask:
-      template: "{{.surname | NoAccent | ToLower}}.{{.name | NoAccent | ToLower}}@gmail.com"
+      template: "{{.surname | NoAccent | upper}}.{{.name | NoAccent | lower}}@gmail.com"
 ```
 
-Available formats are : NoAccent, ToLower, ToUpper.
+Available functions for templates come from <http://masterminds.github.io/sprig/>. The function NoAccent can also be used.
 
 ### Remove
 

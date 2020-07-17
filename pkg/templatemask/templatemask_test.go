@@ -75,3 +75,20 @@ func TestRegistryMaskToConfigurationShouldReturnAnErrorInWrongConfig(t *testing.
 	assert.False(t, present, "should be true")
 	assert.NotNil(t, err, "error shouldn't be nil")
 }
+
+func TestMaskingTemplateShouldFormat(t *testing.T) {
+	template := `{{"hello!" | upper | repeat 2}}`
+	tempMask, err := NewMask(template)
+	if err != nil {
+		assert.Fail(t, err.Error())
+	}
+	config := model.NewMaskConfiguration().
+		WithEntry("field", tempMask)
+	maskingEngine := model.MaskingEngineFactory(config)
+
+	data := model.Dictionary{"field": "anything"}
+	result, err := maskingEngine.Mask(data)
+	assert.Equal(t, nil, err, "error should be nil")
+	waited := model.Dictionary{"field": "HELLO!HELLO!"}
+	assert.Equal(t, waited, result, "Should create the right field")
+}

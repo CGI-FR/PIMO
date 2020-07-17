@@ -6,6 +6,7 @@ import (
 	"text/template"
 	"unicode"
 
+	"github.com/Masterminds/sprig"
 	"golang.org/x/text/runes"
 	"golang.org/x/text/transform"
 	"golang.org/x/text/unicode/norm"
@@ -32,7 +33,7 @@ func NewMask(text string) (MaskEngine, error) {
 		"ToLower":  strings.ToLower,
 		"NoAccent": rmAcc,
 	}
-	temp, err := template.New("template").Funcs(funcMap).Parse(text)
+	temp, err := template.New("template").Funcs(sprig.TxtFuncMap()).Funcs(funcMap).Parse(text)
 	return MaskEngine{temp}, err
 }
 
