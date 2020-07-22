@@ -36,6 +36,7 @@ The following types of masks can be used :
 * `hash` is to mask with a value from a list by mashing the original value, allowing to mask a value the same way every time.
 * `randDate` is to mask a date with a random date between `dateMin` and `dateMax`.
 * `duration` is to mask a date by adding or removing a certain number of days.
+* `randomDuration` is to mask a date by adding or removing a random time between `Min` and `Max`
 * `incremental` is to mask datas with incremental value starting from `start` with a step of `increment`.
 * `remplacement` is to mask a data with another data from the jsonline.
 * `template` is to mask a data with a template using other values from the jsonline.
@@ -201,6 +202,19 @@ This exemple will mask the `date` field of the input jsonlines with a random dat
 
 This exemple will mask the `last_contact` field of the input jsonlines by decreasing its value by 2 days. The duration field should match the ISO 8601 standard for durations.
 
+### randomDuration
+
+```yaml
+  - selector:
+      jsonpath: "date"
+    mask:
+      randomDuration:
+        min: "-P2D"
+        max: "-P27D"
+```
+
+This exemple will mask the `date` field of the input jsonlines by decreasing its value by a random value between 2 and 27 days. The durations should match the ISO 8601 standard.
+
 ### incremental
 
 ```yaml
@@ -276,6 +290,6 @@ This field will mask the `useless-field` of the input jsonlines by completely de
       add: "newvalue"
 ```
 
-This exemple will create the field `newField` containing the value `newvalue`. This value can be a string, a number, a boolean... 
+This exemple will create the field `newField` containing the value `newvalue`. This value can be a string, a number, a boolean...
 
 The field will be created in every input jsonline that doesn't already contains this field.

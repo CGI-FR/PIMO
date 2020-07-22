@@ -9,7 +9,7 @@ import (
 	"makeit.imfr.cgi.com/makeit2/scm/lino/pimo/pkg/model"
 )
 
-// MaskEngine is to mask a value thanks to a template
+// MaskEngine is to mask a value thanks to a duration
 type MaskEngine struct {
 	duration time.Duration
 }

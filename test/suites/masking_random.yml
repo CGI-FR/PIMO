@@ -22,7 +22,7 @@ testcases:
     - result.systemoutjson.name ShouldNotEqual Toto
     - result.systemoutjson.name ShouldBeIn Mickael Mathieu Marcel
     - result.systemerr ShouldBeEmpty
-- name: random int should not always mask the same way
+- name: randomchoice should not always mask the same way
   steps:
   - script: rm -f masking.yml
   - script: |-

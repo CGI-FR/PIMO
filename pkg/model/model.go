@@ -193,6 +193,11 @@ type WeightedChoiceType struct {
 	Weight uint  `yaml:"weight"`
 }
 
+type RandomDurationType struct {
+	Min string
+	Max string
+}
+
 type MaskType struct {
 	Add               Entry                `yaml:"add"`
 	Constant          Entry                `yaml:"constant"`
@@ -211,6 +216,7 @@ type MaskType struct {
 	Duration          string               `yaml:"duration"`
 	Remove            bool                 `yaml:"remove"`
 	RangeMask         int                  `yaml:"range"`
+	RandomDuration    RandomDurationType   `yaml:"randomDuration"`
 }
 type Masking struct {
 	Selector SelectorType `yaml:"selector"`
