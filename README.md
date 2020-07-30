@@ -109,7 +109,7 @@ This exemple will mask the `name` field of the input jsonlines with random value
   - selector:
       jsonpath: "name"
     mask:
-      randomChoiceInUri: "file://names.txt
+      randomChoiceInUri: "file://names.txt"
 ```
 
 This exemple will mask the `name` field of the input jsonlines with random values from the list contained in the name.txt file. The different URI usable with this selector are : `pimo`, `file` and `http`/`https`.
@@ -293,3 +293,14 @@ This field will mask the `useless-field` of the input jsonlines by completely de
 This exemple will create the field `newField` containing the value `newvalue`. This value can be a string, a number, a boolean...
 
 The field will be created in every input jsonline that doesn't already contains this field.
+
+### FluxURI
+
+```yaml
+  - selector:
+      jsonpath: "id"
+    mask:
+      fluxURI: "file://id.csv"
+```
+
+This exemple will create an `id` field in every output jsonline. The values will be the ones contained in the `id.csv` file in the same order as in the file. If the field already exist on the input jsonline it will be replaced and if every value of the file has already been assigned, the input jsonlines won't be modified.

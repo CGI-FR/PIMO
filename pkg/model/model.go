@@ -217,6 +217,7 @@ type MaskType struct {
 	Remove            bool                 `yaml:"remove"`
 	RangeMask         int                  `yaml:"range"`
 	RandomDuration    RandomDurationType   `yaml:"randomDuration"`
+	FluxURI           string               `yaml:"fluxUri"`
 }
 type Masking struct {
 	Selector SelectorType `yaml:"selector"`

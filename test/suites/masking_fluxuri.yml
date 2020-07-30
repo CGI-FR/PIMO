@@ -1,0 +1,32 @@
+name: fluxuri features
+testcases:
+- name: fluxuri mask
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > expected.txt <<EOF
+      {"id":1623}
+      {"id":1512}
+      {"id":905}
+      {}
+      EOF
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "id"
+          mask:
+            fluxUri: "file://../csvvalues.csv"
+      EOF
+  - script: |-
+      pimo --empty-input --repeat=4 > output.txt
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemerr ShouldBeEmpty
+  - script: |-
+      diff expected.txt output.txt
+    assertions:
+    - result.systemout ShouldBeEmpty
+  - script: rm -f expected.txt
+  - script: rm -f output.txt

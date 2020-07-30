@@ -12,7 +12,6 @@ require (
 	github.com/huandu/xstrings v1.3.2 // indirect
 	github.com/imdario/mergo v0.3.9 // indirect
 	github.com/mitchellh/copystructure v1.0.0 // indirect
-	github.com/mroth/weightedrand v0.2.1
 	github.com/smartystreets/goconvey v1.6.4 // indirect
 	github.com/spf13/cobra v1.0.0
 	github.com/stretchr/testify v1.5.1

@@ -10,6 +10,7 @@ import (
 	"makeit.imfr.cgi.com/makeit2/scm/lino/pimo/pkg/command"
 	"makeit.imfr.cgi.com/makeit2/scm/lino/pimo/pkg/constant"
 	"makeit.imfr.cgi.com/makeit2/scm/lino/pimo/pkg/duration"
+	"makeit.imfr.cgi.com/makeit2/scm/lino/pimo/pkg/fluxuri"
 	"makeit.imfr.cgi.com/makeit2/scm/lino/pimo/pkg/hash"
 	"makeit.imfr.cgi.com/makeit2/scm/lino/pimo/pkg/increment"
 	"makeit.imfr.cgi.com/makeit2/scm/lino/pimo/pkg/model"
@@ -138,5 +139,6 @@ func injectMaskFactories() []func(model.Masking, model.MaskConfiguration, int64)
 		remove.RegistryMaskToConfiguration,
 		rangemask.RegistryMaskToConfiguration,
 		randdura.RegistryMaskToConfiguration,
+		fluxuri.RegistryMaskToConfiguration,
 	}
 }

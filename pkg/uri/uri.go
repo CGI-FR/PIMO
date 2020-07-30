@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"strconv"
 
 	"makeit.imfr.cgi.com/makeit2/scm/lino/pimo/pkg/maskingdata"
 	"makeit.imfr.cgi.com/makeit2/scm/lino/pimo/pkg/model"
@@ -24,7 +25,13 @@ func Read(uri string) ([]model.Entry, error) {
 		}
 		scanner := bufio.NewScanner(file)
 		for scanner.Scan() {
-			result = append(result, scanner.Text())
+			value := scanner.Text()
+			intValue, err := strconv.Atoi(value)
+			if err == nil {
+				result = append(result, intValue)
+			} else {
+				result = append(result, scanner.Text())
+			}
 		}
 		return result, nil
 	}
@@ -37,7 +44,13 @@ func Read(uri string) ([]model.Entry, error) {
 		defer rep.Body.Close()
 		scanner := bufio.NewScanner(rep.Body)
 		for scanner.Scan() {
-			result = append(result, scanner.Text())
+			value := scanner.Text()
+			intValue, err := strconv.Atoi(value)
+			if err == nil {
+				result = append(result, intValue)
+			} else {
+				result = append(result, scanner.Text())
+			}
 		}
 		return result, nil
 	}
