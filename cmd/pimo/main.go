@@ -16,6 +16,7 @@ import (
 	"makeit.imfr.cgi.com/makeit2/scm/lino/pimo/pkg/model"
 	"makeit.imfr.cgi.com/makeit2/scm/lino/pimo/pkg/randdate"
 	"makeit.imfr.cgi.com/makeit2/scm/lino/pimo/pkg/randdura"
+	"makeit.imfr.cgi.com/makeit2/scm/lino/pimo/pkg/randomdecimal"
 	"makeit.imfr.cgi.com/makeit2/scm/lino/pimo/pkg/randomint"
 	"makeit.imfr.cgi.com/makeit2/scm/lino/pimo/pkg/randomlist"
 	"makeit.imfr.cgi.com/makeit2/scm/lino/pimo/pkg/rangemask"
@@ -140,5 +141,6 @@ func injectMaskFactories() []func(model.Masking, model.MaskConfiguration, int64)
 		rangemask.RegistryMaskToConfiguration,
 		randdura.RegistryMaskToConfiguration,
 		fluxuri.RegistryMaskToConfiguration,
+		randomdecimal.RegistryMaskToConfiguration,
 	}
 }

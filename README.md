@@ -127,6 +127,20 @@ This exemple will mask the `name` field of the input jsonlines with random value
 
 This exemple will mask the `age` field of the input jsonlines with a random number between `min` and `max` included.
 
+### randonDecimal
+
+```yaml
+  - selector:
+      jsonpath: "score"
+    mask:
+      randomDecimal:
+        min: 0
+        max: 17,23
+        precision: 2
+```
+
+This exemple will mask the `score` field of the input jsonlines with a random float between `min` and `max`, with the number of decimal chosen in the `precision` field.
+
 ### command
 
 ```yaml

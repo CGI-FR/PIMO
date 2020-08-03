@@ -198,6 +198,12 @@ type RandomDurationType struct {
 	Max string
 }
 
+type RandomDecimalType struct {
+	Min       float64
+	Max       float64
+	Precision int
+}
+
 type MaskType struct {
 	Add               Entry                `yaml:"add"`
 	Constant          Entry                `yaml:"constant"`
@@ -218,6 +224,7 @@ type MaskType struct {
 	RangeMask         int                  `yaml:"range"`
 	RandomDuration    RandomDurationType   `yaml:"randomDuration"`
 	FluxURI           string               `yaml:"fluxUri"`
+	RandomDecimal     RandomDecimalType    `yaml:"randomDecimal"`
 }
 type Masking struct {
 	Selector SelectorType `yaml:"selector"`

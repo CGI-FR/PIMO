@@ -1,0 +1,49 @@
+name: random decimal features
+testcases:
+- name: random decimal
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "amount"
+          mask:
+            randomDecimal:
+              min: 0
+              max: 9
+              precision: 3
+      EOF
+  - script: |-
+      echo '{"amount": 38}' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemoutjson.amount ShouldNotEqual 38
+    - result.systemoutjson.amount ShouldBeBetweenOrEqual 0 9
+    - result.systemerr ShouldBeEmpty
+- name: random decimal should not mask the same way
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "amount"
+          mask:
+            randomDecimal:
+              min: 0
+              max: 9
+              precision: 3
+      EOF
+  - script: |-
+      echo '{"amount": 38}' | pimo --repeat=10 > first.txt
+  - script: |-
+      echo '{"amount": 38}' | pimo --repeat=10 > second.txt
+  - script: |-
+      diff first.txt second.txt
+    assertions:
+    - result.systemout ShouldNotBeEmpty
+  - script: rm -f first.txt
+  - script: rm -f second.txt
