@@ -203,6 +203,10 @@ type RandomDecimalType struct {
 	Max       float64
 	Precision int
 }
+type DateParserType struct {
+	InputFormat  string `yaml:"inputFormat"`
+	OutputFormat string `yaml:"outputFormat"`
+}
 
 type MaskType struct {
 	Add               Entry                `yaml:"add"`
@@ -225,6 +229,7 @@ type MaskType struct {
 	RandomDuration    RandomDurationType   `yaml:"randomDuration"`
 	FluxURI           string               `yaml:"fluxUri"`
 	RandomDecimal     RandomDecimalType    `yaml:"randomDecimal"`
+	DateParser        DateParserType       `yaml:"dateParser"`
 }
 type Masking struct {
 	Selector SelectorType `yaml:"selector"`

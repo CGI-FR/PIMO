@@ -1,0 +1,52 @@
+name: dateParser features
+testcases:
+- name: changing format masking
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "date"
+          mask:
+            dateParser:
+                inputFormat: "2006-01-02"
+                outputFormat: "01/02/06"
+      EOF
+  - script: cat masking.yml
+  - script: |-
+      echo '{"date": "2020-06-08"}' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemoutjson.date ShouldEqual "06/08/20"
+    - result.systemerr ShouldBeEmpty
+- name: changing format and duration masking
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "date"
+          mask:
+            dateParser:
+                inputFormat: "2006-01-02"
+        - selector:
+            jsonpath: "date"
+          mask:
+            duration: "-P20D"
+        - selector:
+            jsonpath: "date"
+          mask:
+            dateParser:
+                outputFormat: "2006-01-02"
+      EOF
+  - script: cat masking.yml
+  - script: |-
+      echo '{"date": "2020-08-06"}' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemoutjson.date ShouldEqual "2020-07-17"
+    - result.systemerr ShouldBeEmpty

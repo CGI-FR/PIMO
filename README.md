@@ -36,6 +36,7 @@ The following types of masks can be used :
 * `hash` is to mask with a value from a list by mashing the original value, allowing to mask a value the same way every time.
 * `randDate` is to mask a date with a random date between `dateMin` and `dateMax`.
 * `duration` is to mask a date by adding or removing a certain number of days.
+* `dateParser` is to change a date format.
 * `randomDuration` is to mask a date by adding or removing a random time between `Min` and `Max`
 * `incremental` is to mask datas with incremental value starting from `start` with a step of `increment`.
 * `remplacement` is to mask a data with another data from the jsonline.
@@ -215,6 +216,19 @@ This exemple will mask the `date` field of the input jsonlines with a random dat
 ```
 
 This exemple will mask the `last_contact` field of the input jsonlines by decreasing its value by 2 days. The duration field should match the ISO 8601 standard for durations.
+
+### DateParser
+
+```yaml
+  - selector:
+      jsonpath: "date"
+    mask:
+      dateParser:
+        inputFormat: "2006-01-02"
+        outputFormat: "01/02/06"
+```
+
+This exemple will change every date from the date field from the `inputFormat` to the `outputFormat`. The format should always display the following date : `Mon Jan 2 15:04:05 -0700 MST 2006`. Either field is optional and in case a field is not informed, the default format is RFC3339, which is the base format for PIMO, needed for duration mask and given by randdate mask.
 
 ### randomDuration
 

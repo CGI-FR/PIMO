@@ -9,6 +9,7 @@ import (
 	"makeit.imfr.cgi.com/makeit2/scm/lino/pimo/pkg/add"
 	"makeit.imfr.cgi.com/makeit2/scm/lino/pimo/pkg/command"
 	"makeit.imfr.cgi.com/makeit2/scm/lino/pimo/pkg/constant"
+	"makeit.imfr.cgi.com/makeit2/scm/lino/pimo/pkg/dateparser"
 	"makeit.imfr.cgi.com/makeit2/scm/lino/pimo/pkg/duration"
 	"makeit.imfr.cgi.com/makeit2/scm/lino/pimo/pkg/fluxuri"
 	"makeit.imfr.cgi.com/makeit2/scm/lino/pimo/pkg/hash"
@@ -142,5 +143,6 @@ func injectMaskFactories() []func(model.Masking, model.MaskConfiguration, int64)
 		randdura.RegistryMaskToConfiguration,
 		fluxuri.RegistryMaskToConfiguration,
 		randomdecimal.RegistryMaskToConfiguration,
+		dateparser.RegistryMaskToConfiguration,
 	}
 }
