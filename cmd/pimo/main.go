@@ -48,7 +48,7 @@ func main() {
 		Use:     "pimo",
 		Short:   "Command line to mask data from jsonlines",
 		Long:    `Pimo is a tool to mask private data contained in jsonlines by using masking configurations`,
-		Version: fmt.Sprintf("%v (commit=%v date=%v by=%v)\n© CGI 2020 Tous droits réservés", version, commit, buildDate, builtBy),
+		Version: fmt.Sprintf("%v (commit=%v date=%v by=%v)\n© CGI Inc 2020 All rights reserved", version, commit, buildDate, builtBy),
 		Run: func(cmd *cobra.Command, args []string) {
 			if skipField && skipLine {
 				os.Stderr.WriteString("Can't use both skipField and skipLine flags \n")
