@@ -6,11 +6,17 @@ ADD cgi_ca_root.crt /usr/local/share/ca-certificates/cgi_ca_root.crt
 RUN chmod 644 /usr/local/share/ca-certificates/cgi_ca_root.crt && update-ca-certificates
 
 
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends make wget && \
+RUN echo "Acquire::http::Proxy \"${http_proxy:-false}\";" > /etc/apt/apt.conf.d/proxy.conf && \
+    echo "Acquire::https::Proxy \"${https_proxy:-false}\";" >> /etc/apt/apt.conf.d/proxy.conf && \
+    apt-get update && \
+    apt-get install -y --no-install-recommends make wget jq miller && \
     apt-get autoremove -y && \
     apt-get clean -y && \
     rm -r /var/cache/* /var/lib/apt/lists/*
+
+ENV http_proxy ${http_proxy:-}
+ENV https_proxy ${https_proxy:-}
+ENV no_proxy ${no_proxy:-}
 
 RUN go get -v github.com/ramya-rao-a/go-outline &&\
     rm -rf /go/pkg/* /go/src/* /root/.cache/go-build

@@ -12,7 +12,7 @@
     "workspaceFolder": "/workspace",
     // "overrideCommand": "",
     "remoteEnv": {
-        "PATH": "${containerEnv:PATH}:/workspace/bin/",
+        "PATH": "${containerEnv:PATH}:/workspace/bin/"
     },
     "extensions": [
         "ms-vscode.go",
