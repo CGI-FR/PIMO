@@ -5,9 +5,15 @@ USER root
 ADD cgi_ca_root.crt /usr/local/share/ca-certificates/cgi_ca_root.crt
 RUN chmod 644 /usr/local/share/ca-certificates/cgi_ca_root.crt && update-ca-certificates
 
-
 RUN echo "Acquire::http::Proxy \"${http_proxy:-false}\";" > /etc/apt/apt.conf.d/proxy.conf && \
     echo "Acquire::https::Proxy \"${https_proxy:-false}\";" >> /etc/apt/apt.conf.d/proxy.conf && \
+    echo "Acquire::http::Pipeline-Depth \"0\";" >> /etc/apt/apt.conf.d/proxy.conf && \
+    echo "Acquire::http::No-Cache \"True\";" >> /etc/apt/apt.conf.d/proxy.conf && \
+    echo "Acquire::http::BrokenProxy \"True\";" >> /etc/apt/apt.conf.d/proxy.conf && \
+    echo "Acquire::https::Pipeline-Depth \"0\";" >> /etc/apt/apt.conf.d/proxy.conf && \
+    echo "Acquire::https::No-Cache \"True\";" >> /etc/apt/apt.conf.d/proxy.conf && \
+    echo "Acquire::https::BrokenProxy \"True\";" >> /etc/apt/apt.conf.d/proxy.conf && \
+    echo "Acquire::Check-Date \"False\";" >> /etc/apt/apt.conf.d/proxy.conf && \
     apt-get update && \
     apt-get install -y --no-install-recommends make wget jq miller && \
     apt-get autoremove -y && \
