@@ -8,7 +8,7 @@ import (
 	"makeit.imfr.cgi.com/makeit2/scm/lino/pimo/pkg/uri"
 )
 
-//MaskEngine is a list of masking value for hash masking
+// MaskEngine is a list of masking value for hash masking
 type MaskEngine struct {
 	List []model.Entry
 }

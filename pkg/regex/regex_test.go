@@ -31,8 +31,6 @@ func TestRegistryMaskToConfigurationShouldCreateAMask(t *testing.T) {
 	maskingConfig := model.Masking{Mask: model.MaskType{Regex: "[A-Z]oto([a-z]){3}"}}
 	_, present, err := RegistryMaskToConfiguration(maskingConfig, model.NewMaskConfiguration(), 0)
 	assert.Nil(t, err, "error should be nil")
-	//waitedMask, _ := NewMask("[A-Z]oto([a-z]){3}", 0)
-	//assert.Equal(t, config, model.NewMaskConfiguration().WithEntry("", waitedMask))
 	assert.True(t, present, "should be true")
 	assert.Nil(t, err, "error should be nil")
 }

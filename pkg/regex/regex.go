@@ -7,7 +7,7 @@ import (
 	"makeit.imfr.cgi.com/makeit2/scm/lino/pimo/pkg/model"
 )
 
-//MaskEngine is a value that mask thanks to a regular expression
+// MaskEngine is a value that mask thanks to a regular expression
 type MaskEngine struct {
 	generator regen.Generator
 }
@@ -18,7 +18,7 @@ func NewMask(exp string, seed int64) (MaskEngine, error) {
 	return MaskEngine{generator}, err
 }
 
-//Mask returns a string thanks to a regular expression
+// Mask returns a string thanks to a regular expression
 func (rm MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Entry, error) {
 	out := rm.generator.Generate()
 	return out, nil

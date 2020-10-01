@@ -6,7 +6,7 @@ import (
 	"makeit.imfr.cgi.com/makeit2/scm/lino/pimo/pkg/model"
 )
 
-//MaskEngine is a value that always mask by replacing with a scale
+// MaskEngine is a value that always mask by replacing with a scale
 type MaskEngine struct {
 	rangeScale int
 }

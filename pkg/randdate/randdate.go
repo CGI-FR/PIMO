@@ -16,6 +16,7 @@ type MaskEngine struct {
 
 // NewMask return a MaskEngine from 2 dates
 func NewMask(min, max time.Time, seed int64) MaskEngine {
+	// nolint: gosec
 	return MaskEngine{rand.New(rand.NewSource(seed)), min, max}
 }
 

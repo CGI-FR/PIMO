@@ -34,6 +34,7 @@ func NewMask(minString, maxString string, seed int64) (MaskEngine, error) {
 	} else {
 		durMax, err = duration.ParseDuration(maxString)
 	}
+	// nolint: gosec
 	return MaskEngine{durMin, durMax, rand.New(rand.NewSource(seed))}, err
 }
 

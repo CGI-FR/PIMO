@@ -4,7 +4,7 @@ import (
 	"makeit.imfr.cgi.com/makeit2/scm/lino/pimo/pkg/model"
 )
 
-//MaskEngine is an empty mask to link to a field to remove
+// MaskEngine is an empty mask to link to a field to remove
 type MaskEngine struct {
 }
 

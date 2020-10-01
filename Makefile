@@ -91,7 +91,7 @@ release: clean info lint $(patsubst cmd/%,release-%,$(wildcard cmd/*)) ## Build 
 
 
 .PHONY: release-all
-release-all: clean info  ## Build all binaries for production
+release-all: clean info lint  ## Build all binaries for production
 	$(foreach GOOS, $(PLATFORMS),\
 	$(foreach GOARCH, $(ARCHITECTURES), $(shell export GOOS=$(GOOS); export GOARCH=$(GOARCH); GO111MODULE=on CGO_ENABLED=0 go build ${GOARGS} -ldflags "-w -s ${LDFLAGS}" -o ${BUILD_DIR}/pimo-$(GOOS)-$(GOARCH) ./cmd/pimo )))
 	mkdir -p ${BUILD_DIR}/pimo
@@ -126,7 +126,7 @@ ifeq (${RELEASE}, 1)
 endif
 
 .PHONY: venom
-venom: build ## Exec tests with venom
+venom: clean build ## Exec tests with venom
 	mkdir -p ${TEST_WS_DIR} && cd ${TEST_WS_DIR} && venom run ../suites/*yml
 
 .PHONY: license

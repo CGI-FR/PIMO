@@ -26,28 +26,28 @@ func TestMaskingShouldMaskAsExpected(t *testing.T) {
 		WithContextEntry("id", mask)
 	maskingEngine := model.MaskingEngineFactory(config)
 
-	//Creating the field
+	// Creating the field
 	firstData := model.Dictionary{"field": "thing", "field2": "thing"}
 	firstMasked, err := maskingEngine.Mask(firstData)
 	assert.Equal(t, nil, err, "error should be nil")
 	firstWaited := model.Dictionary{"id": 1623, "field": "thing", "field2": "thing"}
 	assert.Equal(t, firstMasked, firstWaited, "First id masking should be equal")
 
-	//Creating the field with the second value
+	// Creating the field with the second value
 	secondData := model.Dictionary{"field": "thing", "field2": "thing"}
 	secondMasked, err := maskingEngine.Mask(secondData)
 	assert.Equal(t, nil, err, "error should be nil")
 	secondWaited := model.Dictionary{"id": 1512, "field": "thing", "field2": "thing"}
 	assert.Equal(t, secondMasked, secondWaited, "Second id masking should be equal")
 
-	//Replacing the existing field
+	// Replacing the existing field
 	thirdData := model.Dictionary{"id": 25, "field": "thing", "field2": "thing"}
 	thirdMasked, err := maskingEngine.Mask(thirdData)
 	assert.Equal(t, nil, err, "error should be nil")
 	thirdWaited := model.Dictionary{"id": 905, "field": "thing", "field2": "thing"}
 	assert.Equal(t, thirdMasked, thirdWaited, "Third id masking should be equal")
 
-	//Not creating field if every data is used
+	// Not creating field if every data is used
 	fourthData := model.Dictionary{"field": "thing", "field2": "thing"}
 	fourthMasked, err := maskingEngine.Mask(fourthData)
 	assert.Equal(t, nil, err, "error should be nil")

@@ -16,6 +16,7 @@ type MaskEngine struct {
 
 // NewMaskSeeded create a MaskRandomList with a seed
 func NewMask(list []model.Entry, seed int64) MaskEngine {
+	// nolint: gosec
 	return MaskEngine{rand.New(rand.NewSource(seed)), list}
 }
 

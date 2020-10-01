@@ -4,7 +4,7 @@ import (
 	"makeit.imfr.cgi.com/makeit2/scm/lino/pimo/pkg/model"
 )
 
-//MaskEngine is a value that will be the initialisation of the field when it's created
+// MaskEngine is a value that will be the initialisation of the field when it's created
 type MaskEngine struct {
 	value model.Entry
 }

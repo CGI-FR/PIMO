@@ -54,7 +54,7 @@ func YamlConfig(filename string, factories []func(model.Masking, model.MaskConfi
 	return config, nil
 }
 
-//InterfaceToDictionary returns a model.Dictionary from an interface
+// InterfaceToDictionary returns a model.Dictionary from an interface
 func InterfaceToDictionary(inter interface{}) model.Dictionary {
 	dic := make(map[string]model.Entry)
 	mapint := inter.(map[string]interface{})
@@ -69,7 +69,7 @@ func InterfaceToDictionary(inter interface{}) model.Dictionary {
 	return dic
 }
 
-//JSONToDictionary return a model.Dictionary from a jsonline
+// JSONToDictionary return a model.Dictionary from a jsonline
 func JSONToDictionary(jsonline []byte) (model.Dictionary, error) {
 	var inter interface{}
 	err := json.Unmarshal(jsonline, &inter)
@@ -80,7 +80,7 @@ func JSONToDictionary(jsonline []byte) (model.Dictionary, error) {
 	return dic, nil
 }
 
-//StopIteratorError is an error for le JSONLineIterator
+// StopIteratorError is an error for le JSONLineIterator
 type StopIteratorError struct{}
 
 func (e StopIteratorError) Error() string {
@@ -106,7 +106,7 @@ func (jli *JSONLineIterator) Next() (model.Dictionary, error) {
 	return JSONToDictionary(line)
 }
 
-//DictionaryToJSON create a jsonline from a model.Dictionary
+// DictionaryToJSON create a jsonline from a model.Dictionary
 func DictionaryToJSON(dic model.Dictionary) ([]byte, error) {
 	jsonline, err := json.Marshal(dic)
 	if err != nil {

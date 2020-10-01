@@ -4,7 +4,7 @@ import (
 	"makeit.imfr.cgi.com/makeit2/scm/lino/pimo/pkg/model"
 )
 
-//MaskEngine is a value that always mask the same way
+// MaskEngine is a value that always mask the same way
 type MaskEngine struct {
 	constValue model.Entry
 }

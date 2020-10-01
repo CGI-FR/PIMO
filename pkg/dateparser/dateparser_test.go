@@ -17,8 +17,6 @@ func TestMaskingShouldReplaceDateStringByDate(t *testing.T) {
 	data := model.Dictionary{"date": "2000-01-01"}
 	result, err := maskingEngine.Mask(data)
 	assert.Equal(t, nil, err, "error should be nil")
-	//expected := model.Dictionary{"date": time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC)}
-	//assert.Equal(t, expected, result, "should return the right output")
 	resultmap := result.(map[string]model.Entry)
 	resulttime := resultmap["date"].(time.Time)
 	assert.Equal(t, time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC).Nanosecond(), resulttime.Nanosecond(), "Should return the same time")

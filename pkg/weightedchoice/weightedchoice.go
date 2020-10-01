@@ -9,13 +9,13 @@ import (
 
 // WeightedChoice adapted from github.com/mroth/weightedrand
 
-//Choice is a wrapper of item and its weight
+// Choice is a wrapper of item and its weight
 type Choice struct {
 	Item   interface{}
 	Weight uint
 }
 
-//A Chooser is to choose a Choice by weight
+// A Chooser is to choose a Choice by weight
 type Chooser struct {
 	data   []Choice
 	totals []int
@@ -34,6 +34,7 @@ func NewChooser(seed int64, cs ...Choice) Chooser {
 		runningTotal += int(c.Weight)
 		totals[i] = runningTotal
 	}
+	// nolint: gosec
 	return Chooser{data: cs, totals: totals, max: runningTotal, rand: rand.New(rand.NewSource(seed))}
 }
 

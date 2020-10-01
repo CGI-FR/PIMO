@@ -56,8 +56,6 @@ func (mmc MapMaskConfiguration) WithContextEntry(key string, engine MaskContextE
 	mainEntry := strings.SplitN(key, ".", 2)
 	if len(mainEntry) == 2 {
 		mmc.config = append(mmc.config, MaskKey{NewMaskConfiguration().WithContextEntry(mainEntry[1], engine).AsContextEngine(), mainEntry[0]})
-		//mmc.config[mainEntry[0]] = NewMaskConfiguration().WithContextEntry(mainEntry[1], engine).AsContextEngine()
-		//mmc.components = append(mmc.components, mainEntry[0])
 	} else {
 		mmc.config = append(mmc.config, MaskKey{engine, key})
 	}
@@ -85,7 +83,7 @@ func (mmc MapMaskConfiguration) AsContextEngine() MaskContextEngine {
 	return ContextWrapper{mmc.AsEngine()}
 }
 
-//Entries list every mask in mmc in order
+// Entries list every mask in mmc in order
 func (mmc MapMaskConfiguration) Entries() []MaskKey {
 	return mmc.config
 }

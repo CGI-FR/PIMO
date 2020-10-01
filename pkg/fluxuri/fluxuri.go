@@ -5,7 +5,7 @@ import (
 	"makeit.imfr.cgi.com/makeit2/scm/lino/pimo/pkg/uri"
 )
 
-//MaskEngine is a list of value to mask in order from a list
+// MaskEngine is a list of value to mask in order from a list
 type MaskEngine struct {
 	List    []model.Entry
 	LenList int

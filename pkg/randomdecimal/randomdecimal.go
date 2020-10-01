@@ -17,6 +17,7 @@ type MaskEngine struct {
 
 // NewMask create a MaskEngine with a seed
 func NewMask(min float64, max float64, precision int, seed int64) MaskEngine {
+	// nolint: gosec
 	return MaskEngine{rand.New(rand.NewSource(seed)), precision, min, max}
 }
 
