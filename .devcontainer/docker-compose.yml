@@ -5,7 +5,12 @@ services:
     # image: qmcgaw/godevcontainer
     # image: qmcgaw/godevcontainer:alpine
     image: qmcgaw/godevcontainer:debian
-    build: .
+    build: 
+      context: .
+      args:
+        http_proxy: ${http_proxy}
+        https_proxy: ${https_proxy}
+        no_proxy: ${no_proxy}
     volumes:
       - ../:/workspace
       - ~/.ssh:/home/vscode/.ssh:ro
