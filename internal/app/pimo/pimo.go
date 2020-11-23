@@ -58,14 +58,28 @@ func YamlConfig(filename string, factories []func(model.Masking, model.MaskConfi
 func InterfaceToDictionary(inter interface{}) model.Dictionary {
 	dic := make(map[string]model.Entry)
 	mapint := inter.(map[string]interface{})
+
 	for k, v := range mapint {
-		switch v.(type) {
+		switch typedValue := v.(type) {
 		case map[string]interface{}:
 			dic[k] = InterfaceToDictionary(v)
+		case []interface{}:
+			tab := []model.Entry{}
+			for _, item := range typedValue {
+				_, dico := item.(map[string]interface{})
+
+				if dico {
+					tab = append(tab, InterfaceToDictionary(item))
+				} else {
+					tab = append(tab, item)
+				}
+			}
+			dic[k] = tab
 		default:
 			dic[k] = v
 		}
 	}
+
 	return dic
 }
 

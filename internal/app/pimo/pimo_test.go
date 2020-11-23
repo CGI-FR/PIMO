@@ -232,3 +232,22 @@ func TestNextShouldUnmarshalNestedJSON(t *testing.T) {
 	waited := model.Dictionary{"personne": model.Dictionary{"name": "Benjamin", "age": float64(35)}}
 	assert.Equal(t, dic, waited, "Should create a nested model.Dictionary")
 }
+
+func TestNextShouldUnmarshalArrayJSON(t *testing.T) {
+	jsonline := []byte(`{"personne": [{"name": "Benjamin", "age" : 35}, {"name": "Nicolas", "age" : 38}]}`)
+	jsonlineIterator := NewJSONLineIterator(bytes.NewReader(jsonline))
+	dic, _ := jsonlineIterator.Next()
+	waited := model.Dictionary{"personne": []model.Entry{
+		model.Dictionary{"name": "Benjamin", "age": float64(35)},
+		model.Dictionary{"name": "Nicolas", "age": float64(38)},
+	}}
+	assert.Equal(t, waited, dic, "Should create a nested model.Dictionary")
+}
+
+func TestNextShouldUnmarshalArrayStringJSON(t *testing.T) {
+	jsonline := []byte(`{"personne": ["Benjamin", "Nicolas"]}`)
+	jsonlineIterator := NewJSONLineIterator(bytes.NewReader(jsonline))
+	dic, _ := jsonlineIterator.Next()
+	waited := model.Dictionary{"personne": []model.Entry{"Benjamin", "Nicolas"}}
+	assert.Equal(t, waited, dic, "Should create a nested model.Dictionary")
+}

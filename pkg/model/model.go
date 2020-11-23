@@ -137,7 +137,21 @@ func (cw ContextWrapper) MaskContext(context Dictionary, key string) (Dictionary
 	for k, v := range context {
 		if k == key {
 			switch j := context[k].(type) {
-			case []interface{}:
+			case []Dictionary:
+				var tab []Dictionary
+				for i := range j {
+					var e Entry
+					e, erreur := cw.engine.Mask(j[i], context)
+					if erreur != nil {
+						err = erreur
+						tab = append(tab, j[i])
+						continue
+					}
+					tab = append(tab, e.(Dictionary))
+				}
+				result[k] = tab
+
+			case []Entry:
 				var tab []Entry
 				for i := range j {
 					var e Entry
@@ -150,6 +164,7 @@ func (cw ContextWrapper) MaskContext(context Dictionary, key string) (Dictionary
 					tab = append(tab, e)
 				}
 				result[k] = tab
+
 			case Entry:
 				var e Entry
 				e, erreur := cw.engine.Mask(context[k], context)
