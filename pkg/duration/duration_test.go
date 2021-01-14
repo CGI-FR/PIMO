@@ -76,27 +76,26 @@ func TestMaskingShouldReturnAnErrorIfNotATime(t *testing.T) {
 	assert.NotNil(t, err, "err should not be nil")
 }
 
-func TestRegistryMaskToConfigurationShouldCreateAMask(t *testing.T) {
+func TestFactoryShouldCreateAMask(t *testing.T) {
 	maskingConfig := model.Masking{Mask: model.MaskType{Duration: "P2D"}}
-	config, present, err := RegistryMaskToConfiguration(maskingConfig, model.NewMaskConfiguration(), 0)
+	config, present, err := Factory(maskingConfig, 0)
 	mask, _ := NewMask("P2D")
-	waitedConfig := model.NewMaskConfiguration().WithEntry("", mask)
-	assert.Equal(t, waitedConfig, config, "should be equal")
+	assert.Equal(t, mask, config, "should be equal")
 	assert.True(t, present, "should be true")
 	assert.Nil(t, err, "error should be nil")
 }
 
-func TestRegistryMaskToConfigurationShouldNotCreateAMaskFromAnEmptyConfig(t *testing.T) {
+func TestFactoryShouldNotCreateAMaskFromAnEmptyConfig(t *testing.T) {
 	maskingConfig := model.Masking{Mask: model.MaskType{}}
-	mask, present, err := RegistryMaskToConfiguration(maskingConfig, model.NewMaskConfiguration(), 0)
+	mask, present, err := Factory(maskingConfig, 0)
 	assert.Nil(t, mask, "should be nil")
 	assert.False(t, present, "should be false")
 	assert.Nil(t, err, "error should be nil")
 }
 
-func TestRegistryMaskToConfigurationShouldReturnAnErrorInWrongConfig(t *testing.T) {
+func TestFactoryShouldReturnAnErrorInWrongConfig(t *testing.T) {
 	maskingConfig := model.Masking{Mask: model.MaskType{Duration: "NotADuration"}}
-	mask, present, err := RegistryMaskToConfiguration(maskingConfig, model.NewMaskConfiguration(), 0)
+	mask, present, err := Factory(maskingConfig, 0)
 	assert.Nil(t, mask, "should be nil")
 	assert.False(t, present, "should be true")
 	assert.NotNil(t, err, "error shouldn't be nil")

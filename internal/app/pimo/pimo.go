@@ -15,13 +15,27 @@ import (
 
 // YAMLStructure of the file
 type YAMLStructure struct {
-	Version string          `yaml:"version"`
-	Seed    int64           `yaml:"seed"`
-	Masking []model.Masking `yaml:"masking"`
+	Version string               `yaml:"version"`
+	Seed    int64                `yaml:"seed"`
+	Masking []model.Masking      `yaml:"masking"`
+	Caches  map[string]YAMLCache `yaml:"caches"`
+}
+
+type YAMLCache struct {
+	Unique bool `yaml:"unique"`
+}
+
+func buildCaches(caches map[string]YAMLCache) map[string]model.Cache {
+	result := map[string]model.Cache{}
+
+	for name := range caches {
+		result[name] = model.NewMemCache()
+	}
+	return result
 }
 
 // YamlConfig create a MaskConfiguration from a file
-func YamlConfig(filename string, factories []func(model.Masking, model.MaskConfiguration, int64) (model.MaskConfiguration, bool, error)) (model.MaskConfiguration, error) {
+func YamlConfig(filename string, maskFactories []model.MaskFactory, maskContextFactories []model.MaskContextFactory) (model.MaskConfiguration, error) {
 	source, err := ioutil.ReadFile(filename)
 	if err != nil {
 		return model.NewMaskConfiguration(), err
@@ -35,15 +49,40 @@ func YamlConfig(filename string, factories []func(model.Masking, model.MaskConfi
 		conf.Seed = time.Now().UnixNano()
 	}
 	config := model.NewMaskConfiguration()
+	caches := buildCaches(conf.Caches)
+
 	for _, v := range conf.Masking {
 		nbArg := 0
-		for _, factory := range factories {
-			newConfig, present, err := factory(v, config, conf.Seed)
+		for _, factory := range maskFactories {
+			mask, present, err := factory(v, conf.Seed)
+
+			if err != nil {
+				return nil, errors.New(err.Error() + " for " + v.Selector.Jsonpath)
+			}
+			if present && v.Cache != "" {
+				cache, ok := caches[v.Cache]
+				if !ok {
+					return nil, errors.New("cache " + v.Cache + " not found for " + v.Selector.Jsonpath)
+				}
+
+				mask = model.NewMaskCacheEngine(cache, mask)
+			}
+
+			if present {
+				config = config.WithEntry(v.Selector.Jsonpath, mask)
+
+				nbArg++
+			}
+		}
+		for _, factory := range maskContextFactories {
+			mask, present, err := factory(v, conf.Seed)
+
 			if err != nil {
 				return nil, errors.New(err.Error() + " for " + v.Selector.Jsonpath)
 			}
 			if present {
-				config = newConfig
+				config = config.WithContextEntry(v.Selector.Jsonpath, mask)
+
 				nbArg++
 			}
 		}

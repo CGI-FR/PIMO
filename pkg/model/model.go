@@ -104,17 +104,15 @@ func MaskingEngineFactory(config MaskConfiguration, root bool) FunctionMaskEngin
 		errMask = nil
 		for _, maskKey := range config.Entries() {
 			engine := maskKey.maskCont
-			if ok {
-				var err error
-				if root {
-					output, err = engine.MaskContext(output, maskKey.Key, output)
-				} else {
-					output, err = engine.MaskContext(output, maskKey.Key, contexts...)
-				}
-				if err != nil {
-					errMask = err
-					delete(output, maskKey.Key)
-				}
+			var err error
+			if root {
+				output, err = engine.MaskContext(output, maskKey.Key, output)
+			} else {
+				output, err = engine.MaskContext(output, maskKey.Key, contexts...)
+			}
+			if err != nil {
+				errMask = err
+				delete(output, maskKey.Key)
 			}
 		}
 		return output, errMask
@@ -133,6 +131,10 @@ func (fme FunctionMaskEngine) Mask(e Entry, context ...Dictionary) (Entry, error
 
 type ContextWrapper struct {
 	engine MaskEngine
+}
+
+func NewContextWrapper(engine MaskEngine) MaskContextEngine {
+	return ContextWrapper{engine}
 }
 
 func (cw ContextWrapper) MaskContext(context Dictionary, key string, contexts ...Dictionary) (Dictionary, error) {
@@ -185,6 +187,10 @@ func (cw ContextWrapper) MaskContext(context Dictionary, key string, contexts ..
 	}
 	return result, err
 }
+
+type MaskFactory func(Masking, int64) (MaskEngine, bool, error)
+
+type MaskContextFactory func(Masking, int64) (MaskContextEngine, bool, error)
 
 type SelectorType struct {
 	Jsonpath string `yaml:"jsonpath"`
@@ -248,7 +254,9 @@ type MaskType struct {
 	RandomDecimal     RandomDecimalType    `yaml:"randomDecimal"`
 	DateParser        DateParserType       `yaml:"dateParser"`
 }
+
 type Masking struct {
 	Selector SelectorType `yaml:"selector"`
 	Mask     MaskType     `yaml:"mask"`
+	Cache    string       `yaml:"cache"`
 }

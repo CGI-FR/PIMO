@@ -25,17 +25,17 @@ func TestMaskingShouldReplaceSensitiveValueByRandomNumber(t *testing.T) {
 	assert.True(t, resultmap["age"].(int) <= max, "Should be less than max")
 }
 
-func TestRegistryMaskToConfigurationShouldCreateAMask(t *testing.T) {
+func TestFactoryShouldCreateAMask(t *testing.T) {
 	maskingConfig := model.Masking{Mask: model.MaskType{RandomInt: model.RandIntType{Min: 18, Max: 25}}}
-	mask, present, err := RegistryMaskToConfiguration(maskingConfig, model.NewMaskConfiguration(), 0)
+	mask, present, err := Factory(maskingConfig, 0)
 	assert.NotNil(t, mask, "shouldn't be nil")
 	assert.True(t, present, "should be true")
 	assert.Nil(t, err, "error should be nil")
 }
 
-func TestRegistryMaskToConfigurationShouldNotCreateAMaskFromAnEmptyConfig(t *testing.T) {
+func TestFactoryShouldNotCreateAMaskFromAnEmptyConfig(t *testing.T) {
 	maskingConfig := model.Masking{Mask: model.MaskType{}}
-	mask, present, err := RegistryMaskToConfiguration(maskingConfig, model.NewMaskConfiguration(), 0)
+	mask, present, err := Factory(maskingConfig, 0)
 	assert.Nil(t, mask, "should be nil")
 	assert.False(t, present, "should be false")
 	assert.Nil(t, err, "error should be nil")

@@ -12,6 +12,7 @@ import (
 	"makeit.imfr.cgi.com/makeit2/scm/lino/pimo/pkg/constant"
 	"makeit.imfr.cgi.com/makeit2/scm/lino/pimo/pkg/duration"
 	"makeit.imfr.cgi.com/makeit2/scm/lino/pimo/pkg/hash"
+	"makeit.imfr.cgi.com/makeit2/scm/lino/pimo/pkg/increment"
 	"makeit.imfr.cgi.com/makeit2/scm/lino/pimo/pkg/model"
 	"makeit.imfr.cgi.com/makeit2/scm/lino/pimo/pkg/randdate"
 	"makeit.imfr.cgi.com/makeit2/scm/lino/pimo/pkg/randomint"
@@ -83,7 +84,11 @@ func TestWithEntryShouldBuildNestedConfigurationWhenKeyContainsDot(t *testing.T)
 
 func TestYamlConfigShouldCreateEntriesInTheYamlOrder(t *testing.T) {
 	maskingfile := "../../../test/maskingTest.yml"
-	config, err := YamlConfig(maskingfile, []func(model.Masking, model.MaskConfiguration, int64) (model.MaskConfiguration, bool, error){constant.RegistryMaskToConfiguration, command.RegistryMaskToConfiguration, regex.RegistryMaskToConfiguration})
+	config, err := YamlConfig(maskingfile, []model.MaskFactory{
+		constant.Factory,
+		command.Factory,
+		regex.Factory,
+	}, []model.MaskContextFactory{})
 	if err != nil {
 		t.Log(err)
 	}
@@ -102,20 +107,22 @@ func Must(me model.MaskEngine, err error) model.MaskEngine {
 
 func TestShouldCreateAMaskConfigurationFromAFile(t *testing.T) {
 	filename := "../../../test/masking.yml"
-	factory := []func(model.Masking, model.MaskConfiguration, int64) (model.MaskConfiguration, bool, error){
-		constant.RegistryMaskToConfiguration,
-		command.RegistryMaskToConfiguration,
-		randomlist.RegistryMaskToConfiguration,
-		randomint.RegistryMaskToConfiguration,
-		weightedchoice.RegistryMaskToConfiguration,
-		regex.RegistryMaskToConfiguration,
-		hash.RegistryMaskToConfiguration,
-		randdate.RegistryMaskToConfiguration,
-		replacement.RegistryMaskToConfiguration,
-		duration.RegistryMaskToConfiguration,
-		templatemask.RegistryMaskToConfiguration,
+	factory := []model.MaskFactory{
+		constant.Factory,
+		command.Factory,
+		randomlist.Factory,
+		randomint.Factory,
+		weightedchoice.Factory,
+		regex.Factory,
+		hash.Factory,
+		randdate.Factory,
+		replacement.Factory,
+		duration.Factory,
+		templatemask.Factory,
+
+		increment.Factory,
 	}
-	config, err := YamlConfig(filename, factory)
+	config, err := YamlConfig(filename, factory, []model.MaskContextFactory{})
 	if err != nil {
 		t.Log(err)
 	}
@@ -159,7 +166,7 @@ func TestShouldCreateAMaskConfigurationFromAFile(t *testing.T) {
 
 func TestShouldReturnAnErrorWithMultipleArguments(t *testing.T) {
 	filename := "../../../test/wrongMasking.yml"
-	conf, err := YamlConfig(filename, []func(model.Masking, model.MaskConfiguration, int64) (model.MaskConfiguration, bool, error){constant.RegistryMaskToConfiguration, command.RegistryMaskToConfiguration})
+	conf, err := YamlConfig(filename, []model.MaskFactory{increment.Factory}, []model.MaskContextFactory{})
 	t.Log(conf)
 	t.Log(err)
 	assert.NotEqual(t, err, nil, "Should not be nil")

@@ -33,10 +33,10 @@ func (me MaskEngine) MaskContext(context model.Dictionary, key string, contexts 
 }
 
 // Create a mask from a configuration
-func RegistryMaskToConfiguration(conf model.Masking, config model.MaskConfiguration, seed int64) (model.MaskConfiguration, bool, error) {
+func Factory(conf model.Masking, seed int64) (model.MaskContextEngine, bool, error) {
 	if len(conf.Mask.FluxURI) != 0 {
 		mask, err := NewMask(conf.Mask.FluxURI)
-		return config.WithContextEntry(conf.Selector.Jsonpath, mask), true, err
+		return mask, true, err
 	}
 	return nil, false, nil
 }

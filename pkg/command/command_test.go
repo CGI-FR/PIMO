@@ -36,8 +36,8 @@ func TestMaskingShouldReturnAnErrorInCaseOfWrongCommand(t *testing.T) {
 
 func TestRegistryMaskToConfigurationShouldCreateAMask(t *testing.T) {
 	maskingConfig := model.Masking{Mask: model.MaskType{Command: "echo Toto"}}
-	config, present, err := RegistryMaskToConfiguration(maskingConfig, model.NewMaskConfiguration(), 0)
-	waitedConfig := model.NewMaskConfiguration().WithEntry("", NewMask("echo Toto"))
+	config, present, err := Factory(maskingConfig, 0)
+	waitedConfig := NewMask("echo Toto")
 	assert.Equal(t, waitedConfig, config, "should be equal")
 	assert.True(t, present, "should be true")
 	assert.Nil(t, err, "error should be nil")
@@ -45,7 +45,7 @@ func TestRegistryMaskToConfigurationShouldCreateAMask(t *testing.T) {
 
 func TestRegistryMaskToConfigurationShouldNotCreateAMaskFromAnEmptyConfig(t *testing.T) {
 	maskingConfig := model.Masking{Mask: model.MaskType{}}
-	mask, present, err := RegistryMaskToConfiguration(maskingConfig, model.NewMaskConfiguration(), 0)
+	mask, present, err := Factory(maskingConfig, 0)
 	assert.Nil(t, mask, "should be nil")
 	assert.False(t, present, "should be false")
 	assert.Nil(t, err, "error should be nil")

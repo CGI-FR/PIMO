@@ -24,14 +24,14 @@ func (rm MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Ent
 	return out, nil
 }
 
-// RegistryMaskToConfiguration create a mask from a yaml config
-func RegistryMaskToConfiguration(conf model.Masking, config model.MaskConfiguration, seed int64) (model.MaskConfiguration, bool, error) {
+// Factory create a mask from a yaml config
+func Factory(conf model.Masking, seed int64) (model.MaskEngine, bool, error) {
 	if len(conf.Mask.Regex) != 0 {
 		mask, err := NewMask(conf.Mask.Regex, seed)
 		if err != nil {
 			return nil, true, err
 		}
-		return config.WithEntry(conf.Selector.Jsonpath, mask), true, err
+		return mask, true, err
 	}
 	return nil, false, nil
 }

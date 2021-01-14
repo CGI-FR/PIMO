@@ -20,10 +20,10 @@ func TestMaskingShouldReplaceSensitiveValueByRangedValue(t *testing.T) {
 	assert.Equal(t, waited, result, "should be Toto")
 }
 
-func TestRegistryMaskToConfigurationShouldCreateAMask(t *testing.T) {
+func TestFactoryShouldCreateAMask(t *testing.T) {
 	maskingConfig := model.Masking{Mask: model.MaskType{RangeMask: 15}}
-	mask, present, err := RegistryMaskToConfiguration(maskingConfig, model.NewMaskConfiguration(), 0)
-	waitedMask := model.NewMaskConfiguration().WithEntry("", NewMask(15))
+	mask, present, err := Factory(maskingConfig, 0)
+	waitedMask := NewMask(15)
 	assert.Equal(t, waitedMask, mask, "should be equal")
 	assert.True(t, present, "should be true")
 	assert.Nil(t, err, "error should be nil")

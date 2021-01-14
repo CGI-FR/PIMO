@@ -23,10 +23,10 @@ func (rm MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Ent
 	return rangedValue, nil
 }
 
-// Create a mask from a configuration
-func RegistryMaskToConfiguration(conf model.Masking, config model.MaskConfiguration, seed int64) (model.MaskConfiguration, bool, error) {
+// Factory Create a mask from a configuration
+func Factory(conf model.Masking, seed int64) (model.MaskEngine, bool, error) {
 	if conf.Mask.RangeMask != 0 {
-		return config.WithEntry(conf.Selector.Jsonpath, NewMask(conf.Mask.RangeMask)), true, nil
+		return NewMask(conf.Mask.RangeMask), true, nil
 	}
 	return nil, false, nil
 }

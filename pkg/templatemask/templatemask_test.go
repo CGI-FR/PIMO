@@ -41,36 +41,32 @@ func TestMaskingShouldReplaceSensitiveValueByTemplateInNested(t *testing.T) {
 	assert.Equal(t, waited, result, "Should create the right mail")
 }
 
-func TestRegistryMaskToConfigurationShouldCreateAMask(t *testing.T) {
+func TestFactoryShouldCreateAMask(t *testing.T) {
 	maskingConfig := model.Masking{Selector: model.SelectorType{Jsonpath: "mail"}, Mask: model.MaskType{Template: "{{.name}}.{{.surname}}@gmail.com"}}
-	config, present, err := RegistryMaskToConfiguration(maskingConfig, model.NewMaskConfiguration(), 0)
+	config, present, err := Factory(maskingConfig, 0)
 	assert.Nil(t, err, "error should be nil")
-	mask, _ := NewMask("{{.name}}.{{.surname}}@gmail.com")
-	waitedConfig := model.NewMaskConfiguration().WithEntry("mail", mask)
-	waitedType, _ := waitedConfig.GetMaskingEngine("")
-	actualType, _ := config.GetMaskingEngine("")
-	assert.IsType(t, waitedType, actualType, "should be equal")
+	maskingEngine, _ := NewMask("{{.name}}.{{.surname}}@gmail.com")
+	assert.IsType(t, maskingEngine, config, "should be equal")
 	assert.True(t, present, "should be true")
 	assert.Nil(t, err, "error should be nil")
 	data := model.Dictionary{"name": "Toto", "surname": "Tata", "mail": ""}
-	maskingEngine := model.MaskingEngineFactory(config, true)
-	result, err := maskingEngine.Mask(data)
+	result, err := maskingEngine.Mask(data, data)
 	assert.Nil(t, err, "error should be nil")
-	waitedResult := model.Dictionary{"name": "Toto", "surname": "Tata", "mail": "Toto.Tata@gmail.com"}
+	waitedResult := "Toto.Tata@gmail.com"
 	assert.Equal(t, waitedResult, result, "Should create a right mail")
 }
 
-func TestRegistryMaskToConfigurationShouldNotCreateAMaskFromAnEmptyConfig(t *testing.T) {
+func TestFactoryShouldNotCreateAMaskFromAnEmptyConfig(t *testing.T) {
 	maskingConfig := model.Masking{Mask: model.MaskType{}}
-	mask, present, err := RegistryMaskToConfiguration(maskingConfig, model.NewMaskConfiguration(), 0)
+	mask, present, err := Factory(maskingConfig, 0)
 	assert.Nil(t, mask, "should be nil")
 	assert.False(t, present, "should be false")
 	assert.Nil(t, err, "error should be nil")
 }
 
-func TestRegistryMaskToConfigurationShouldReturnAnErrorInWrongConfig(t *testing.T) {
+func TestFactoryShouldReturnAnErrorInWrongConfig(t *testing.T) {
 	maskingConfig := model.Masking{Mask: model.MaskType{Template: "{{.name}.{{.surname}}@gmail.com"}}
-	mask, present, err := RegistryMaskToConfiguration(maskingConfig, model.NewMaskConfiguration(), 0)
+	mask, present, err := Factory(maskingConfig, 0)
 	assert.Nil(t, mask, "should be nil")
 	assert.False(t, present, "should be true")
 	assert.NotNil(t, err, "error shouldn't be nil")
@@ -93,28 +89,35 @@ func TestMaskingTemplateShouldFormat(t *testing.T) {
 	assert.Equal(t, waited, result, "Should create the right field")
 }
 
-func TestRegistryMaskToConfigurationShouldCreateANestedContextMask(t *testing.T) {
+func TestRFactoryShouldCreateANestedContextMask(t *testing.T) {
 	maskingConfig := model.Masking{Selector: model.SelectorType{Jsonpath: "foo.bar"}, Mask: model.MaskType{Template: "{{.baz}}"}}
-	config, present, err := RegistryMaskToConfiguration(maskingConfig, model.NewMaskConfiguration(), 0)
+	config := model.NewMaskConfiguration()
+	maskEngine, present, err := Factory(maskingConfig, 0)
 	assert.Nil(t, err, "should be nil")
 	assert.True(t, present, "should be true")
 	data := model.Dictionary{"baz": "BAZ", "foo": model.Dictionary{"bar": "BAR"}}
 
+	config = config.WithEntry("foo.bar", maskEngine)
+
 	masked, _ := model.MaskingEngineFactory(config, true).Mask(data, data)
 
 	waited := model.Dictionary{"baz": "BAZ", "foo": model.Dictionary{"bar": "BAZ"}}
-	assert.Equal(t, masked, waited, "Should replace foo.bar with BAZ")
+	assert.Equal(t, waited, masked, "Should replace foo.bar with BAZ")
 }
 
-func TestRegistryMaskToConfigurationShouldReuseMaskedData(t *testing.T) {
+func TestFactoryShouldReuseMaskedData(t *testing.T) {
 	maskingConfig := model.Masking{Selector: model.SelectorType{Jsonpath: "foo.bar"}, Mask: model.MaskType{Template: "{{.baz}}"}}
-	partialConfig, present, err := RegistryMaskToConfiguration(maskingConfig, model.NewMaskConfiguration(), 0)
+	config := model.NewMaskConfiguration()
+
+	maskEngine, present, err := Factory(maskingConfig, 0)
+	config = config.WithEntry("foo.bar", maskEngine)
 
 	assert.Nil(t, err, "should be nil")
 	assert.True(t, present, "should be true")
 
 	maskingConfig2 := model.Masking{Selector: model.SelectorType{Jsonpath: "foo.bar"}, Mask: model.MaskType{Template: "{{.foo.bar}}"}}
-	config, present, err := RegistryMaskToConfiguration(maskingConfig2, partialConfig, 0)
+	maskEngine2, present, err := Factory(maskingConfig2, 0)
+	config = config.WithEntry("foo.bar", maskEngine2)
 
 	assert.Nil(t, err, "should be nil")
 	assert.True(t, present, "should be true")

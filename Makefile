@@ -12,7 +12,7 @@ BUILD_DATE ?= $(shell date +%FT%T%z)
 BUILD_BY ?= $(shell git config user.email)
 LDFLAGS += -X main.version=${VERSION} -X main.commit=${COMMIT_HASH} -X main.buildDate=${BUILD_DATE} -X main.builtBy=${BUILD_BY}
 
-PLATFORMS=darwin linux windows
+PLATFORMS=linux windows
 ARCHITECTURES=386 amd64
 
 # Project variables

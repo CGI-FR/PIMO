@@ -69,13 +69,13 @@ func (me MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Ent
 }
 
 // Create a mask from a configuration
-func RegistryMaskToConfiguration(conf model.Masking, config model.MaskConfiguration, seed int64) (model.MaskConfiguration, bool, error) {
+func Factory(conf model.Masking, seed int64) (model.MaskEngine, bool, error) {
 	if len(conf.Mask.RandomDuration.Min) != 0 || len(conf.Mask.RandomDuration.Max) != 0 {
 		mask, err := NewMask(conf.Mask.RandomDuration.Min, conf.Mask.RandomDuration.Max, seed)
 		if err != nil {
 			return nil, false, err
 		}
-		return config.WithEntry(conf.Selector.Jsonpath, mask), true, nil
+		return mask, true, nil
 	}
 	return nil, false, nil
 }

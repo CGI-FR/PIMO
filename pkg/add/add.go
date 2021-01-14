@@ -25,9 +25,9 @@ func (am MaskEngine) MaskContext(context model.Dictionary, key string, contexts 
 }
 
 // Create a mask from a configuration
-func RegistryMaskToConfiguration(conf model.Masking, config model.MaskConfiguration, seed int64) (model.MaskConfiguration, bool, error) {
+func Factory(conf model.Masking, seed int64) (model.MaskContextEngine, bool, error) {
 	if conf.Mask.Add != nil {
-		return config.WithContextEntry(conf.Selector.Jsonpath, NewMask(conf.Mask.Add)), true, nil
+		return NewMask(conf.Mask.Add), true, nil
 	}
 	return nil, false, nil
 }

@@ -65,28 +65,25 @@ func TestMaskingShouldReplaceDateStringByDateStringInTwoMasks(t *testing.T) {
 	assert.Equal(t, expected, result, "Should return the right time format")
 }
 
-func TestRegistryMaskToConfigurationShouldCreateAMask(t *testing.T) {
+func TestFactoryShouldCreateAMask(t *testing.T) {
 	maskingConfig := model.Masking{Mask: model.MaskType{DateParser: model.DateParserType{InputFormat: "2006-02-01", OutputFormat: "01/02/06"}}}
-	config, present, err := RegistryMaskToConfiguration(maskingConfig, model.NewMaskConfiguration(), 0)
+	config, present, err := Factory(maskingConfig, 0)
 	mask := NewMask("2006-02-01", "01/02/06")
-	waitedConfig := model.NewMaskConfiguration().WithEntry("", mask)
-	assert.Equal(t, waitedConfig, config, "should be equal")
+	assert.Equal(t, mask, config, "should be equal")
 	assert.True(t, present, "should be true")
 	assert.Nil(t, err, "error should be nil")
 
 	maskingConfig = model.Masking{Mask: model.MaskType{DateParser: model.DateParserType{InputFormat: "2006-02-01", OutputFormat: ""}}}
-	config, present, err = RegistryMaskToConfiguration(maskingConfig, model.NewMaskConfiguration(), 0)
+	config, present, err = Factory(maskingConfig, 0)
 	mask = NewMask("2006-02-01", "")
-	waitedConfig = model.NewMaskConfiguration().WithEntry("", mask)
-	assert.Equal(t, waitedConfig, config, "should be equal")
+	assert.Equal(t, mask, config, "should be equal")
 	assert.True(t, present, "should be true")
 	assert.Nil(t, err, "error should be nil")
 
 	maskingConfig = model.Masking{Mask: model.MaskType{DateParser: model.DateParserType{InputFormat: "", OutputFormat: "01/02/06"}}}
-	config, present, err = RegistryMaskToConfiguration(maskingConfig, model.NewMaskConfiguration(), 0)
+	config, present, err = Factory(maskingConfig, 0)
 	mask = NewMask("", "01/02/06")
-	waitedConfig = model.NewMaskConfiguration().WithEntry("", mask)
-	assert.Equal(t, waitedConfig, config, "should be equal")
+	assert.Equal(t, mask, config, "should be equal")
 	assert.True(t, present, "should be true")
 	assert.Nil(t, err, "error should be nil")
 }

@@ -30,10 +30,10 @@ func TestMaskingShouldReplaceSensitiveValueByRandomNumber(t *testing.T) {
 	assert.Equal(t, 4, len(strconv.FormatFloat(amount, 'f', -1, 64)), "Should be of length 4")
 }
 
-func TestRegistryMaskToConfigurationShouldCreateAMask(t *testing.T) {
+func TestFactoryShouldCreateAMask(t *testing.T) {
 	maskingConfig := model.Masking{Mask: model.MaskType{RandomDecimal: model.RandomDecimalType{Min: float64(0), Max: float64(10), Precision: 2}}}
-	conf, present, err := RegistryMaskToConfiguration(maskingConfig, model.NewMaskConfiguration(), 0)
-	waitedConf := model.NewMaskConfiguration().WithEntry("", NewMask(float64(0), float64(10), 2, 0))
+	conf, present, err := Factory(maskingConfig, 0)
+	waitedConf := NewMask(float64(0), float64(10), 2, 0)
 	assert.Equal(t, conf, waitedConf, "should be equal")
 	assert.True(t, present, "should be true")
 	assert.Nil(t, err, "error should be nil")

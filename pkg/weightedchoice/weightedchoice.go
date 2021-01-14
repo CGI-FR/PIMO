@@ -65,14 +65,14 @@ func (wml MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.En
 	return wml.cs.Pick(), nil
 }
 
-// RegistryMaskToConfiguration create a mask from a yaml config
-func RegistryMaskToConfiguration(conf model.Masking, config model.MaskConfiguration, seed int64) (model.MaskConfiguration, bool, error) {
+// Factory create a mask from a yaml config
+func Factory(conf model.Masking, seed int64) (model.MaskEngine, bool, error) {
 	if len(conf.Mask.WeightedChoice) != 0 {
 		var maskWeight []model.WeightedChoiceType
 		for _, v := range conf.Mask.WeightedChoice {
 			maskWeight = append(maskWeight, model.WeightedChoiceType{Choice: v.Choice, Weight: v.Weight})
 		}
-		return config.WithEntry(conf.Selector.Jsonpath, NewMask(maskWeight, seed)), true, nil
+		return NewMask(maskWeight, seed), true, nil
 	}
 	return nil, false, nil
 }

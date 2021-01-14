@@ -47,11 +47,11 @@ func (me MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Ent
 	return t, nil
 }
 
-// Create a mask from a configuration
-func RegistryMaskToConfiguration(conf model.Masking, config model.MaskConfiguration, seed int64) (model.MaskConfiguration, bool, error) {
+// Factory Create a mask from a configuration
+func Factory(conf model.Masking, seed int64) (model.MaskEngine, bool, error) {
 	if len(conf.Mask.DateParser.InputFormat) != 0 || len(conf.Mask.DateParser.OutputFormat) != 0 {
 		mask := NewMask(conf.Mask.DateParser.InputFormat, conf.Mask.DateParser.OutputFormat)
-		return config.WithEntry(conf.Selector.Jsonpath, mask), true, nil
+		return mask, true, nil
 	}
 	return nil, false, nil
 }

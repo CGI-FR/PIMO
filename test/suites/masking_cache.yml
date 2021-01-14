@@ -1,0 +1,87 @@
+name: cache features
+testcases:
+- name: declaring cache
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "surname"
+          mask:
+            incremental:
+                start: 5
+                increment: 2
+          cache: "surname"
+      caches:
+        "surname" : {}
+
+      EOF
+  - script: |-
+      echo '{"surname": "Toto", "name": "Benjamin"}' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemoutjson.name ShouldEqual Benjamin
+    - result.systemerr ShouldBeEmpty
+    - result.systemout ShouldNotContainSubstring Toto
+
+- name: using cache
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "id"
+          mask:
+            incremental:
+                start: 5
+                increment: 2
+          cache: "id"
+
+      caches:
+        id : {}
+
+      EOF
+  - script: |-
+      pimo <<EOF
+      {"name": "Toto", "id": 12}
+      {"name": "Dorothy", "id":3}
+      {"name": "Toto2", "id":12}
+      {"name": "Dorothy4", "id":3}
+      EOF
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldContainSubstring "id":5,"name":"Toto"
+    - result.systemout ShouldContainSubstring "id":7,"name":"Dorothy"
+    - result.systemout ShouldContainSubstring "id":5,"name":"Toto2"
+    - result.systemout ShouldContainSubstring "id":7,"name":"Dorothy4"
+    - result.systemerr ShouldBeEmpty
+
+- name: using cache
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "id"
+          mask:
+            incremental:
+                start: 5
+                increment: 2
+          cache: "not defined"
+
+      caches:
+        id : {}
+
+      EOF
+  - script: |-
+      echo '{"name": "Toto", "id": 12}\n{"name": "Dorothy", "id":3}\n{"name": "Toto2", "id":12}' | pimo
+    assertions:
+    - result.code ShouldEqual 1
+    - result.systemerr ShouldContainSubstring "masking.yml not working properly, cache not defined not found for id"
+    - result.systemout ShouldBeEmpty

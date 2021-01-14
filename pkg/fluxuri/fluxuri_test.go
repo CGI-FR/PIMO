@@ -55,13 +55,12 @@ func TestMaskingShouldMaskAsExpected(t *testing.T) {
 	assert.Equal(t, fourthMasked, fourthWaited, "Third id masking should be equal")
 }
 
-func TestRegistryMaskToConfigurationShouldCreateAMask(t *testing.T) {
+func TestFactoryShouldCreateAMask(t *testing.T) {
 	maskingConfig := model.Masking{Mask: model.MaskType{FluxURI: "file://../../test/csvvalues.csv"}}
-	conf, present, err := RegistryMaskToConfiguration(maskingConfig, model.NewMaskConfiguration(), 0)
+	conf, present, err := Factory(maskingConfig, 0)
 	assert.True(t, present, "should be true")
 	assert.Nil(t, err, "error should be nil")
 	waitedMask, err := NewMask("file://../../test/csvvalues.csv")
-	waitedConf := model.NewMaskConfiguration().WithContextEntry("", waitedMask)
-	assert.Equal(t, conf, waitedConf, "should be equal")
+	assert.Equal(t, conf, waitedMask, "should be equal")
 	assert.Nil(t, err, "error should be nil")
 }

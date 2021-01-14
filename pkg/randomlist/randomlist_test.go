@@ -43,35 +43,35 @@ func TestMaskingShouldReplaceSensitiveValueByRandomAndDifferent(t *testing.T) {
 	assert.True(t, diff >= 750, "Should be the same less than 250 times")
 }
 
-func TestRegistryMaskToConfigurationShouldCreateAMask(t *testing.T) {
+func TestFactoryShouldCreateAMask(t *testing.T) {
 	maskingConfig := model.Masking{Mask: model.MaskType{RandomChoice: []model.Entry{"Michael", "Paul", "Marc"}}}
-	config, present, err := RegistryMaskToConfiguration(maskingConfig, model.NewMaskConfiguration(), 0)
-	waitedConfig := model.NewMaskConfiguration().WithEntry("", NewMask([]model.Entry{"Michael", "Paul", "Marc"}, 0))
+	config, present, err := Factory(maskingConfig, 0)
+	waitedConfig := NewMask([]model.Entry{"Michael", "Paul", "Marc"}, 0)
 	assert.Equal(t, waitedConfig, config, "should be equal")
 	assert.True(t, present, "should be true")
 	assert.Nil(t, err, "error should be nil")
 }
 
-func TestRegistryMaskToConfigurationShouldCreateAMaskFromAList(t *testing.T) {
+func TestFactoryShouldCreateAMaskFromAList(t *testing.T) {
 	maskingConfig := model.Masking{Mask: model.MaskType{RandomChoiceInURI: "file://../../test/names.txt"}}
-	config, present, err := RegistryMaskToConfiguration(maskingConfig, model.NewMaskConfiguration(), 0)
-	waitedConfig := model.NewMaskConfiguration().WithEntry("", NewMask([]model.Entry{"Mickael", "Marc", "Benjamin"}, 0))
+	config, present, err := Factory(maskingConfig, 0)
+	waitedConfig := NewMask([]model.Entry{"Mickael", "Marc", "Benjamin"}, 0)
 	assert.Equal(t, waitedConfig, config, "should be equal")
 	assert.True(t, present, "should be true")
 	assert.Nil(t, err, "error should be nil")
 }
 
-func TestRegistryMaskToConfigurationShouldNotCreateAMaskFromAnEmptyConfig(t *testing.T) {
+func TestFactoryShouldNotCreateAMaskFromAnEmptyConfig(t *testing.T) {
 	maskingConfig := model.Masking{Mask: model.MaskType{}}
-	mask, present, err := RegistryMaskToConfiguration(maskingConfig, model.NewMaskConfiguration(), 0)
+	mask, present, err := Factory(maskingConfig, 0)
 	assert.Nil(t, mask, "should be nil")
 	assert.False(t, present, "should be false")
 	assert.Nil(t, err, "error should be nil")
 }
 
-func TestRegistryMaskToConfigurationShouldReturnErrorFromADoubleConfig(t *testing.T) {
+func TestFactoryShouldReturnErrorFromADoubleConfig(t *testing.T) {
 	maskingConfig := model.Masking{Mask: model.MaskType{RandomChoice: []model.Entry{"Michael", "Paul", "Marc"}, RandomChoiceInURI: "file://../../test/names.txt"}}
-	mask, present, err := RegistryMaskToConfiguration(maskingConfig, model.NewMaskConfiguration(), 0)
+	mask, present, err := Factory(maskingConfig, 0)
 	assert.Nil(t, mask, "should be nil")
 	assert.False(t, present, "should be false")
 	assert.NotNil(t, err, "error should be nil")

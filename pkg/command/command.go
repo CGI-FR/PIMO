@@ -31,9 +31,9 @@ func (cme MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.En
 }
 
 // Create a mask from a configuration
-func RegistryMaskToConfiguration(conf model.Masking, config model.MaskConfiguration, seed int64) (model.MaskConfiguration, bool, error) {
+func Factory(conf model.Masking, seed int64) (model.MaskEngine, bool, error) {
 	if len(conf.Mask.Command) != 0 {
-		return config.WithEntry(conf.Selector.Jsonpath, NewMask(conf.Mask.Command)), true, nil
+		return NewMask(conf.Mask.Command), true, nil
 	}
 	return nil, false, nil
 }

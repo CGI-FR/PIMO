@@ -44,14 +44,14 @@ func (tmpl MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.E
 	return output.String(), err
 }
 
-// RegistryMaskToConfiguration create a mask from a yaml config
-func RegistryMaskToConfiguration(conf model.Masking, config model.MaskConfiguration, seed int64) (model.MaskConfiguration, bool, error) {
+// Factory create a mask from a yaml config
+func Factory(conf model.Masking, seed int64) (model.MaskEngine, bool, error) {
 	if len(conf.Mask.Template) != 0 {
 		mask, err := NewMask(conf.Mask.Template)
 		if err != nil {
 			return nil, false, err
 		}
-		return config.WithEntry(conf.Selector.Jsonpath, mask), true, nil
+		return mask, true, nil
 	}
 	return nil, false, nil
 }

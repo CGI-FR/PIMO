@@ -21,18 +21,18 @@ func (hm MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Ent
 }
 
 // Create a mask from a configuration
-func RegistryMaskToConfiguration(conf model.Masking, config model.MaskConfiguration, seed int64) (model.MaskConfiguration, bool, error) {
+func Factory(conf model.Masking, seed int64) (model.MaskEngine, bool, error) {
 	if len(conf.Mask.Hash) != 0 && len(conf.Mask.HashInURI) != 0 {
 		return nil, false, fmt.Errorf("2 different hash choices")
 	}
 	if len(conf.Mask.Hash) != 0 {
 		var maskHash MaskEngine
 		maskHash.List = append(maskHash.List, conf.Mask.Hash...)
-		return config.WithEntry(conf.Selector.Jsonpath, maskHash), true, nil
+		return maskHash, true, nil
 	}
 	if len(conf.Mask.HashInURI) != 0 {
 		list, err := uri.Read(conf.Mask.HashInURI)
-		return config.WithEntry(conf.Selector.Jsonpath, MaskEngine{list}), true, err
+		return MaskEngine{list}, true, err
 	}
 	return nil, false, nil
 }

@@ -24,10 +24,10 @@ func (rim MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.En
 	return rim.rand.Intn(rim.max+1-rim.min) + rim.min, nil
 }
 
-// RegistryMaskToConfiguration create a mask from a yaml config
-func RegistryMaskToConfiguration(conf model.Masking, config model.MaskConfiguration, seed int64) (model.MaskConfiguration, bool, error) {
+// Factory create a mask from a yaml config
+func Factory(conf model.Masking, seed int64) (model.MaskEngine, bool, error) {
 	if conf.Mask.RandomInt.Min != 0 || conf.Mask.RandomInt.Max != 0 {
-		return config.WithEntry(conf.Selector.Jsonpath, NewMask(conf.Mask.RandomInt.Min, conf.Mask.RandomInt.Max, seed)), true, nil
+		return NewMask(conf.Mask.RandomInt.Min, conf.Mask.RandomInt.Max, seed), true, nil
 	}
 	return nil, false, nil
 }

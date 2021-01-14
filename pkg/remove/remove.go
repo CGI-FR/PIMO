@@ -20,10 +20,10 @@ func (rm MaskEngine) MaskContext(context model.Dictionary, key string, contexts 
 	return context, nil
 }
 
-// RegistryMaskToConfiguration create a mask from a yaml config
-func RegistryMaskToConfiguration(conf model.Masking, config model.MaskConfiguration, seed int64) (model.MaskConfiguration, bool, error) {
+// Factory create a mask from a yaml config
+func Factory(conf model.Masking, seed int64) (model.MaskContextEngine, bool, error) {
 	if conf.Mask.Remove {
-		return config.WithContextEntry(conf.Selector.Jsonpath, NewMask()), true, nil
+		return NewMask(), true, nil
 	}
 	return nil, false, nil
 }

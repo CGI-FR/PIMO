@@ -54,7 +54,7 @@ func main() {
 				os.Stderr.WriteString("Can't use both skipField and skipLine flags \n")
 				os.Exit(5)
 			}
-			config, err := pimo.YamlConfig(maskingFile, injectMaskFactories())
+			config, err := pimo.YamlConfig(maskingFile, injectMaskFactories(), injectMaskContextFactories())
 			if err != nil {
 				os.Stderr.WriteString("ERROR : masking.yml not working properly, " + err.Error())
 				os.Exit(1)
@@ -86,11 +86,12 @@ func run(config model.MaskConfiguration) {
 		var dic model.Dictionary
 		var err error
 		if emptyInput {
+			// TODO replace that if statement by an EmptyDictionaryIterator
 			dic = model.Dictionary{}
 		} else {
 			dic, err = reader.Next()
 		}
-		for i != iteration {
+		for i < iteration {
 			if (err == pimo.StopIteratorError{}) {
 				os.Exit(0)
 			}
@@ -123,26 +124,33 @@ func run(config model.MaskConfiguration) {
 	}
 }
 
-func injectMaskFactories() []func(model.Masking, model.MaskConfiguration, int64) (model.MaskConfiguration, bool, error) {
-	return []func(model.Masking, model.MaskConfiguration, int64) (model.MaskConfiguration, bool, error){
-		add.RegistryMaskToConfiguration,
-		constant.RegistryMaskToConfiguration,
-		command.RegistryMaskToConfiguration,
-		randomlist.RegistryMaskToConfiguration,
-		randomint.RegistryMaskToConfiguration,
-		weightedchoice.RegistryMaskToConfiguration,
-		regex.RegistryMaskToConfiguration,
-		hash.RegistryMaskToConfiguration,
-		randdate.RegistryMaskToConfiguration,
-		increment.RegistryMaskToConfiguration,
-		replacement.RegistryMaskToConfiguration,
-		duration.RegistryMaskToConfiguration,
-		templatemask.RegistryMaskToConfiguration,
-		remove.RegistryMaskToConfiguration,
-		rangemask.RegistryMaskToConfiguration,
-		randdura.RegistryMaskToConfiguration,
-		fluxuri.RegistryMaskToConfiguration,
-		randomdecimal.RegistryMaskToConfiguration,
-		dateparser.RegistryMaskToConfiguration,
+func injectMaskContextFactories() []model.MaskContextFactory {
+	return []model.MaskContextFactory{
+		fluxuri.Factory,
+		add.Factory,
+		remove.Factory,
+	}
+}
+
+func injectMaskFactories() []model.MaskFactory {
+	return []model.MaskFactory{
+
+		constant.Factory,
+		command.Factory,
+		randomlist.Factory,
+		randomint.Factory,
+		weightedchoice.Factory,
+		regex.Factory,
+		hash.Factory,
+		randdate.Factory,
+		increment.Factory,
+		replacement.Factory,
+		duration.Factory,
+		templatemask.Factory,
+
+		rangemask.Factory,
+		randdura.Factory,
+		randomdecimal.Factory,
+		dateparser.Factory,
 	}
 }
