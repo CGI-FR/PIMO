@@ -17,7 +17,7 @@ func TestMaskingShouldReplaceSensitiveValueByRandomNumber(t *testing.T) {
 	config := model.NewMaskConfiguration().
 		WithEntry("amount", randomMask)
 
-	maskingEngine := model.MaskingEngineFactory(config)
+	maskingEngine := model.MaskingEngineFactory(config, true)
 	data := model.Dictionary{"amount": 20}
 	result, err := maskingEngine.Mask(data)
 	assert.Equal(t, nil, err, "error should be nil")

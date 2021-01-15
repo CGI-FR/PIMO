@@ -14,7 +14,7 @@ func NewMask() MaskEngine {
 }
 
 // MaskContext remove the field
-func (rm MaskEngine) MaskContext(context model.Dictionary, key string) (model.Dictionary, error) {
+func (rm MaskEngine) MaskContext(context model.Dictionary, key string, contexts ...model.Dictionary) (model.Dictionary, error) {
 	delete(context, key)
 
 	return context, nil

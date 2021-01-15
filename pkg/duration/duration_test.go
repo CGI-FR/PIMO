@@ -34,7 +34,7 @@ func TestMaskingShouldReplaceDateByIncrement(t *testing.T) {
 	config := model.NewMaskConfiguration().
 		WithEntry("date", durationMask)
 
-	maskingEngine := model.MaskingEngineFactory(config)
+	maskingEngine := model.MaskingEngineFactory(config, true)
 	data := model.Dictionary{"date": time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC)}
 	result, err := maskingEngine.Mask(data)
 	assert.Equal(t, nil, err, "error should be nil")
@@ -48,7 +48,7 @@ func TestMaskingShouldReplaceDateByIncrement(t *testing.T) {
 	config = model.NewMaskConfiguration().
 		WithEntry("date", durationMask)
 
-	maskingEngine = model.MaskingEngineFactory(config)
+	maskingEngine = model.MaskingEngineFactory(config, true)
 	data = model.Dictionary{"date": time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC)}
 	result, err = maskingEngine.Mask(data)
 	assert.Equal(t, nil, err, "error should be nil")

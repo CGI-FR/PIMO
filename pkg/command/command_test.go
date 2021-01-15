@@ -12,7 +12,7 @@ func TestMaskingShouldReplaceSensitiveValueByCommand(t *testing.T) {
 	config := model.NewMaskConfiguration().
 		WithEntry("name", nameProgramMasking)
 
-	maskingEngine := model.MaskingEngineFactory(config)
+	maskingEngine := model.MaskingEngineFactory(config, true)
 
 	data := model.Dictionary{"name": "Benjamin"}
 	result, err := maskingEngine.Mask(data)

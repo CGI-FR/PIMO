@@ -79,7 +79,7 @@ func run(config model.MaskConfiguration) {
 	if iteration == 0 {
 		return
 	}
-	maskingEngine := model.MaskingEngineFactory(config)
+	maskingEngine := model.MaskingEngineFactory(config, true)
 	reader := pimo.NewJSONLineIterator(os.Stdin)
 	for {
 		i := 0

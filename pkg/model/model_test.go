@@ -7,14 +7,14 @@ import (
 )
 
 func TestMaskingShouldReplaceValueInArrayDictionary(t *testing.T) {
-	var nameMasking = FunctionMaskEngine{Function: func(name Entry) (Entry, error) { return "Toto", nil }}
+	var nameMasking = FunctionMaskEngine{Function: func(name Entry, contexts ...Dictionary) (Entry, error) { return "Toto", nil }}
 
 	config := NewMaskConfiguration().
 		WithEntry("customer", NewMaskConfiguration().
 			WithEntry("name", nameMasking).AsEngine(),
 		)
 
-	maskingEngine := MaskingEngineFactory(config)
+	maskingEngine := MaskingEngineFactory(config, true)
 
 	data := Dictionary{"customer": []Dictionary{{"name": "Benjamin"}}}
 	result, err := maskingEngine.Mask(data)
@@ -24,12 +24,12 @@ func TestMaskingShouldReplaceValueInArrayDictionary(t *testing.T) {
 }
 
 func TestMaskingShouldReplaceValueInArrayString(t *testing.T) {
-	var nameMasking = FunctionMaskEngine{Function: func(name Entry) (Entry, error) { return "Toto", nil }}
+	var nameMasking = FunctionMaskEngine{Function: func(name Entry, contexts ...Dictionary) (Entry, error) { return "Toto", nil }}
 
 	config := NewMaskConfiguration().
 		WithEntry("customer", nameMasking)
 
-	maskingEngine := MaskingEngineFactory(config)
+	maskingEngine := MaskingEngineFactory(config, true)
 	data := Dictionary{"customer": []Entry{"Benjamin"}}
 	result, err := maskingEngine.Mask(data)
 	assert.Equal(t, nil, err, "error should be nil")

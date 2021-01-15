@@ -13,7 +13,7 @@ func TestMaskingShouldReplaceSensitiveValueByWeightedRandom(t *testing.T) {
 	config := model.NewMaskConfiguration().
 		WithEntry("name", weightMask)
 
-	maskingEngine := model.MaskingEngineFactory(config)
+	maskingEngine := model.MaskingEngineFactory(config, true)
 
 	wait := model.Dictionary{"name": "Michel"}
 	equal := 0

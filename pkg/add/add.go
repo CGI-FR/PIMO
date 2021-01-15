@@ -15,7 +15,7 @@ func NewMask(value model.Entry) MaskEngine {
 }
 
 // MaskContext add the field
-func (am MaskEngine) MaskContext(context model.Dictionary, key string) (model.Dictionary, error) {
+func (am MaskEngine) MaskContext(context model.Dictionary, key string, contexts ...model.Dictionary) (model.Dictionary, error) {
 	_, present := context[key]
 	if !present {
 		context[key] = am.value

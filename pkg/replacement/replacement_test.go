@@ -12,7 +12,7 @@ func TestMaskingShouldReplaceSensitiveValueByAnotherField(t *testing.T) {
 	remplacement := NewMask("name1")
 	config := model.NewMaskConfiguration().
 		WithEntry("name2", remplacement)
-	maskingEngine := model.MaskingEngineFactory(config)
+	maskingEngine := model.MaskingEngineFactory(config, true)
 
 	data := model.Dictionary{"name1": "Dupont", "name2": "Dupond"}
 	result, err := maskingEngine.Mask(data)
@@ -28,7 +28,7 @@ func TestMaskingShouldReplaceSensitiveValueByAMaskedField(t *testing.T) {
 	config := model.NewMaskConfiguration().
 		WithEntry("name1", consta).
 		WithEntry("name2", remplacement)
-	maskingEngine := model.MaskingEngineFactory(config)
+	maskingEngine := model.MaskingEngineFactory(config, true)
 
 	data := model.Dictionary{"name1": "Dupont", "name2": "Dupond"}
 	result, err := maskingEngine.Mask(data)

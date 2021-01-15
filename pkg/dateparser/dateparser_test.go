@@ -13,7 +13,7 @@ func TestMaskingShouldReplaceDateStringByDate(t *testing.T) {
 	dateMask := NewMask(layoutISO, "")
 	config := model.NewMaskConfiguration().
 		WithEntry("date", dateMask)
-	maskingEngine := model.MaskingEngineFactory(config)
+	maskingEngine := model.MaskingEngineFactory(config, true)
 	data := model.Dictionary{"date": "2000-01-01"}
 	result, err := maskingEngine.Mask(data)
 	assert.Equal(t, nil, err, "error should be nil")
@@ -27,7 +27,7 @@ func TestMaskingShouldReplaceDateByDateString(t *testing.T) {
 	dateMask := NewMask("", layoutISO)
 	config := model.NewMaskConfiguration().
 		WithEntry("date", dateMask)
-	maskingEngine := model.MaskingEngineFactory(config)
+	maskingEngine := model.MaskingEngineFactory(config, true)
 	data := model.Dictionary{"date": time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC)}
 	result, err := maskingEngine.Mask(data)
 	assert.Equal(t, nil, err, "error should be nil")
@@ -41,7 +41,7 @@ func TestMaskingShouldReplaceDateStringByDateString(t *testing.T) {
 	dateMask := NewMask(layoutIn, layoutOut)
 	config := model.NewMaskConfiguration().
 		WithEntry("date", dateMask)
-	maskingEngine := model.MaskingEngineFactory(config)
+	maskingEngine := model.MaskingEngineFactory(config, true)
 	data := model.Dictionary{"date": "2000-01-01"}
 	result, err := maskingEngine.Mask(data)
 	expected := model.Dictionary{"date": "01/01/00"}
@@ -57,7 +57,7 @@ func TestMaskingShouldReplaceDateStringByDateStringInTwoMasks(t *testing.T) {
 	config := model.NewMaskConfiguration().
 		WithEntry("date", firstDateMask).
 		WithEntry("date", secondDateMask)
-	maskingEngine := model.MaskingEngineFactory(config)
+	maskingEngine := model.MaskingEngineFactory(config, true)
 	data := model.Dictionary{"date": "2000-01-01"}
 	result, err := maskingEngine.Mask(data)
 	expected := model.Dictionary{"date": "01/01/00"}

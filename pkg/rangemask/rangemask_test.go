@@ -11,7 +11,7 @@ func TestMaskingShouldReplaceSensitiveValueByRangedValue(t *testing.T) {
 	rangeMask := NewMask(10)
 	config := model.NewMaskConfiguration().
 		WithEntry("age", rangeMask)
-	maskingEngine := model.MaskingEngineFactory(config)
+	maskingEngine := model.MaskingEngineFactory(config, true)
 	data := model.Dictionary{"age": float64(25)}
 	result, err := maskingEngine.Mask(data)
 	assert.Equal(t, nil, err, "error should be nil")

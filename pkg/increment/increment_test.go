@@ -14,7 +14,7 @@ func TestMaskingShouldCreateIncrementalInt(t *testing.T) {
 		WithEntry("id1", incrementMask).
 		WithEntry("id2", secIncrMask)
 
-	maskingEngine := model.MaskingEngineFactory(config)
+	maskingEngine := model.MaskingEngineFactory(config, true)
 	firstData := model.Dictionary{"id1": 0, "id2": 0}
 	secondData := model.Dictionary{"id1": 0, "id2": 0}
 	firstMasked, err := maskingEngine.Mask(firstData)

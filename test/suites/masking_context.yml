@@ -1,0 +1,73 @@
+name: context features
+testcases:
+- name: use parent data in template mask
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "foo.bar"
+          mask:
+            template: "[[.baz]]"
+      EOF
+  - script: sed -i  "s/\[\[/\{\{/g"  masking.yml
+  - script: sed -i  "s/\]\]/\}\}/g"  masking.yml
+  - script: |-
+      echo '{"baz": "BAZ", "foo": { "bar": "BAR"}}' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemoutjson.foo.bar ShouldEqual BAZ
+    - result.systemoutjson.baz ShouldEqual BAZ
+    - result.systemerr ShouldBeEmpty
+
+- name: reuse masked data in template mask
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "foo.bar"
+          mask:
+            template: "[[.baz]]"
+
+        - selector:
+            jsonpath: "foo.bar"
+          mask:
+            template: "[[.foo.bar]]"
+      EOF
+  - script: sed -i  "s/\[\[/\{\{/g"  masking.yml
+  - script: sed -i  "s/\]\]/\}\}/g"  masking.yml
+  - script: |-
+      echo '{"baz": "BAZ", "foo": { "bar": "BAR"}}' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemoutjson.foo.bar ShouldEqual BAZ
+    - result.systemoutjson.baz ShouldEqual BAZ
+    - result.systemerr ShouldBeEmpty
+
+name: arrays context features
+testcases:
+- name: use parent data in template mask
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "foo.bar"
+          mask:
+            template: "[[.baz]]"
+      EOF
+  - script: sed -i  "s/\[\[/\{\{/g"  masking.yml
+  - script: sed -i  "s/\]\]/\}\}/g"  masking.yml
+  - script: |-
+      echo  '{"baz": "BAZ", "foo": [{ "bar": "BAR"},{ "bar": "BAR"}]}' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - 'result.systemout ShouldContainSubstring [{"bar":"BAZ"},{"bar":"BAZ"}]}'
+    - result.systemerr ShouldBeEmpty

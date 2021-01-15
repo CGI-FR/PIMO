@@ -40,12 +40,12 @@ func TestMaskingShouldNoReplaceInsensitiveValue(t *testing.T) {
 }
 
 func TestMaskingShouldReplaceSensitiveValue(t *testing.T) {
-	var nameMasking = model.FunctionMaskEngine{Function: func(name model.Entry) (model.Entry, error) { return "Toto", nil }}
+	var nameMasking = model.FunctionMaskEngine{Function: func(name model.Entry, contexts ...model.Dictionary) (model.Entry, error) { return "Toto", nil }}
 
 	config := model.NewMaskConfiguration().
 		WithEntry("name", nameMasking)
 
-	maskingEngine := model.MaskingEngineFactory(config)
+	maskingEngine := model.MaskingEngineFactory(config, true)
 
 	data := model.Dictionary{"name": "Benjamin"}
 	result, err := maskingEngine.Mask(data)
@@ -54,14 +54,14 @@ func TestMaskingShouldReplaceSensitiveValue(t *testing.T) {
 }
 
 func TestMaskingShouldReplaceValueInNestedDictionary(t *testing.T) {
-	var nameMasking = model.FunctionMaskEngine{Function: func(name model.Entry) (model.Entry, error) { return "Toto", nil }}
+	var nameMasking = model.FunctionMaskEngine{Function: func(name model.Entry, contexts ...model.Dictionary) (model.Entry, error) { return "Toto", nil }}
 
 	config := model.NewMaskConfiguration().
 		WithEntry("customer", model.NewMaskConfiguration().
 			WithEntry("name", nameMasking).AsEngine(),
 		)
 
-	maskingEngine := model.MaskingEngineFactory(config)
+	maskingEngine := model.MaskingEngineFactory(config, true)
 	data := model.Dictionary{"customer": model.Dictionary{"name": "Benjamin"}, "project": "MyProject"}
 	result, err := maskingEngine.Mask(data)
 	assert.Equal(t, nil, err, "error should be nil")
@@ -70,7 +70,7 @@ func TestMaskingShouldReplaceValueInNestedDictionary(t *testing.T) {
 }
 
 func TestWithEntryShouldBuildNestedConfigurationWhenKeyContainsDot(t *testing.T) {
-	var nameMasking = model.FunctionMaskEngine{Function: func(name model.Entry) (model.Entry, error) { return "Toto", nil }}
+	var nameMasking = model.FunctionMaskEngine{Function: func(name model.Entry, contexts ...model.Dictionary) (model.Entry, error) { return "Toto", nil }}
 
 	config := model.NewMaskConfiguration().
 		WithEntry("customer.name", nameMasking)

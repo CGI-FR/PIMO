@@ -16,7 +16,7 @@ func TestMaskingShouldReplaceDateByRandom(t *testing.T) {
 	config := model.NewMaskConfiguration().
 		WithEntry("date", dateRange)
 
-	maskingEngine := model.MaskingEngineFactory(config)
+	maskingEngine := model.MaskingEngineFactory(config, true)
 	data := model.Dictionary{"date": time.Date(2019, 3, 2, 0, 0, 0, 0, time.UTC)}
 
 	result, err := maskingEngine.Mask(data)

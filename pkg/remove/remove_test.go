@@ -11,7 +11,7 @@ func TestMaskingShouldRemoveField(t *testing.T) {
 	removeMask := NewMask()
 	config := model.NewMaskConfiguration().
 		WithContextEntry("field", removeMask)
-	maskingEngine := model.MaskingEngineFactory(config)
+	maskingEngine := model.MaskingEngineFactory(config, true)
 	data := model.Dictionary{"field": "SomeInformation", "otherfield": "SomeOtherInformation"}
 	result, err := maskingEngine.Mask(data)
 	assert.Equal(t, nil, err, "error should be nil")

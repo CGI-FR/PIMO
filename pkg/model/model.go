@@ -18,7 +18,7 @@ type MaskEngine interface {
 
 // MaskContextEngine is a masking algorithm for dictionary
 type MaskContextEngine interface {
-	MaskContext(Dictionary, string) (Dictionary, error)
+	MaskContext(Dictionary, string, ...Dictionary) (Dictionary, error)
 }
 
 // NewMaskConfiguration build new configuration
@@ -75,7 +75,7 @@ func (mmc MapMaskConfiguration) GetMaskingEngine(key string) (MaskContextEngine,
 
 // AsEngine return engine with configuration
 func (mmc MapMaskConfiguration) AsEngine() MaskEngine {
-	return MaskingEngineFactory(mmc)
+	return MaskingEngineFactory(mmc, false)
 }
 
 // AsEngine return engine with configuration
@@ -89,8 +89,8 @@ func (mmc MapMaskConfiguration) Entries() []MaskKey {
 }
 
 // MaskingEngineFactory return Masking function data without private information
-func MaskingEngineFactory(config MaskConfiguration) FunctionMaskEngine {
-	return FunctionMaskEngine{func(input Entry) (Entry, error) {
+func MaskingEngineFactory(config MaskConfiguration, root bool) FunctionMaskEngine {
+	return FunctionMaskEngine{func(input Entry, contexts ...Dictionary) (Entry, error) {
 		output := Dictionary{}
 		dico, ok := input.(Dictionary)
 		if !ok {
@@ -106,7 +106,11 @@ func MaskingEngineFactory(config MaskConfiguration) FunctionMaskEngine {
 			engine := maskKey.maskCont
 			if ok {
 				var err error
-				output, err = engine.MaskContext(output, maskKey.Key)
+				if root {
+					output, err = engine.MaskContext(output, maskKey.Key, output)
+				} else {
+					output, err = engine.MaskContext(output, maskKey.Key, contexts...)
+				}
 				if err != nil {
 					errMask = err
 					delete(output, maskKey.Key)
@@ -119,19 +123,19 @@ func MaskingEngineFactory(config MaskConfiguration) FunctionMaskEngine {
 
 // FunctionMaskEngine implements MaskEngine with a simple function
 type FunctionMaskEngine struct {
-	Function func(Entry) (Entry, error)
+	Function func(Entry, ...Dictionary) (Entry, error)
 }
 
 // Mask delegate mask algorithm to the function
 func (fme FunctionMaskEngine) Mask(e Entry, context ...Dictionary) (Entry, error) {
-	return fme.Function(e)
+	return fme.Function(e, context...)
 }
 
 type ContextWrapper struct {
 	engine MaskEngine
 }
 
-func (cw ContextWrapper) MaskContext(context Dictionary, key string) (Dictionary, error) {
+func (cw ContextWrapper) MaskContext(context Dictionary, key string, contexts ...Dictionary) (Dictionary, error) {
 	result := Dictionary{}
 	var err error
 	for k, v := range context {
@@ -141,7 +145,7 @@ func (cw ContextWrapper) MaskContext(context Dictionary, key string) (Dictionary
 				var tab []Dictionary
 				for i := range j {
 					var e Entry
-					e, erreur := cw.engine.Mask(j[i], context)
+					e, erreur := cw.engine.Mask(j[i], contexts...)
 					if erreur != nil {
 						err = erreur
 						tab = append(tab, j[i])
@@ -155,7 +159,7 @@ func (cw ContextWrapper) MaskContext(context Dictionary, key string) (Dictionary
 				var tab []Entry
 				for i := range j {
 					var e Entry
-					e, erreur := cw.engine.Mask(j[i], context)
+					e, erreur := cw.engine.Mask(j[i], contexts...)
 					if erreur != nil {
 						err = erreur
 						tab = append(tab, j[i])
@@ -167,7 +171,7 @@ func (cw ContextWrapper) MaskContext(context Dictionary, key string) (Dictionary
 
 			case Entry:
 				var e Entry
-				e, erreur := cw.engine.Mask(context[k], context)
+				e, erreur := cw.engine.Mask(context[k], contexts...)
 				if erreur != nil {
 					err = erreur
 					result[k] = v

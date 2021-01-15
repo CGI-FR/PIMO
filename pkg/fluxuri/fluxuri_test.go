@@ -24,7 +24,7 @@ func TestMaskingShouldMaskAsExpected(t *testing.T) {
 	assert.Nil(t, err, "error should be nil")
 	config := model.NewMaskConfiguration().
 		WithContextEntry("id", mask)
-	maskingEngine := model.MaskingEngineFactory(config)
+	maskingEngine := model.MaskingEngineFactory(config, true)
 
 	// Creating the field
 	firstData := model.Dictionary{"field": "thing", "field2": "thing"}

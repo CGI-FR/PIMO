@@ -16,7 +16,7 @@ func TestMaskingShouldReplaceSensitiveValueByRegex(t *testing.T) {
 	}
 	config := model.NewMaskConfiguration().
 		WithEntry("phone", regmask)
-	maskingEngine := model.MaskingEngineFactory(config)
+	maskingEngine := model.MaskingEngineFactory(config, true)
 
 	data := model.Dictionary{"phone": "00 00 00 00 00"}
 	result, err := maskingEngine.Mask(data)

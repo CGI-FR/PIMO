@@ -12,7 +12,7 @@ func TestMaskingShouldReplaceSensitiveValueByRandomInList(t *testing.T) {
 	config := model.NewMaskConfiguration().
 		WithEntry("name", NewMask(nameList, 0))
 
-	maskingEngine := model.MaskingEngineFactory(config)
+	maskingEngine := model.MaskingEngineFactory(config, true)
 
 	data := model.Dictionary{"name": "Benjamin"}
 	result, err := maskingEngine.Mask(data)
@@ -27,7 +27,7 @@ func TestMaskingShouldReplaceSensitiveValueByRandomAndDifferent(t *testing.T) {
 	nameList := []model.Entry{"Michel", "Marc", "Matthias", "Youen", "Alexis"}
 	config := model.NewMaskConfiguration().
 		WithEntry("name", NewMask(nameList, 0))
-	maskingEngine := model.MaskingEngineFactory(config)
+	maskingEngine := model.MaskingEngineFactory(config, true)
 
 	data := model.Dictionary{"name": "Benjamin"}
 	diff := 0
