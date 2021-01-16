@@ -60,7 +60,7 @@ testcases:
     - result.systemout ShouldContainSubstring "id":7,"name":"Dorothy4"
     - result.systemerr ShouldBeEmpty
 
-- name: using cache
+- name: undefined cache
   steps:
   - script: rm -f masking.yml
   - script: |-
@@ -85,3 +85,80 @@ testcases:
     - result.code ShouldEqual 1
     - result.systemerr ShouldContainSubstring "masking.yml not working properly, cache not defined not found for id"
     - result.systemout ShouldBeEmpty
+
+- name: using unique cache
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      seed: 1
+      masking:
+        - selector:
+            jsonpath: "name"
+          mask:
+            randomChoice:
+              - "Mickael"
+              - "Mathieu"
+              - "Marcel"
+          cache: "name"
+
+      caches:
+        name :
+          unique: true
+
+      EOF
+  - script: |-
+      pimo <<EOF
+      {"name": "Toto", "id": 1}
+      {"name": "Dorothy", "id":2}
+      {"name": "Toto", "id":3}
+      {"name": "Dorothy", "id":4}
+      {"name": "Justine", "id":5}
+      {"name": "Justine", "id":6}
+      EOF
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldContainSubstring "id":1,"name":"Marcel"
+    - result.systemout ShouldContainSubstring "id":2,"name":"Mickael"
+    - result.systemout ShouldContainSubstring "id":3,"name":"Marcel"
+    - result.systemout ShouldContainSubstring "id":4,"name":"Mickael"
+    - result.systemout ShouldContainSubstring "id":5,"name":"Mathieu"
+    - result.systemout ShouldContainSubstring "id":6,"name":"Mathieu"
+    - result.systemerr ShouldBeEmpty
+
+- name: error when no more value for unique cache
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      seed: 1
+      masking:
+        - selector:
+            jsonpath: "name"
+          mask:
+            randomChoice:
+              - "Mickael"
+              - "Mathieu"
+              - "Marcel"
+          cache: "name"
+
+      caches:
+        name :
+          unique: true
+
+      EOF
+  - script: |-
+      pimo <<EOF
+      {"name": "Toto", "id": 1}
+      {"name": "Dorothy", "id":2}
+      {"name": "Toto", "id":3}
+      {"name": "Dorothy", "id":4}
+      {"name": "Justine", "id":5}
+      {"name": "Justine", "id":6}
+      {"name": "NoMore", "id":7}
+      EOF
+    assertions:
+    - result.code ShouldEqual 4
+    - result.systemerr ShouldContainSubstring "Unique value not found"

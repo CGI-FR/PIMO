@@ -25,11 +25,23 @@ type YAMLCache struct {
 	Unique bool `yaml:"unique"`
 }
 
-func buildCaches(caches map[string]YAMLCache) map[string]model.Cache {
-	result := map[string]model.Cache{}
+type CachedMaskEngineFactories func(model.MaskEngine) model.MaskEngine
 
-	for name := range caches {
-		result[name] = model.NewMemCache()
+func buildCachedMaskEngineFactories(caches map[string]YAMLCache) map[string]CachedMaskEngineFactories {
+	result := map[string]CachedMaskEngineFactories{}
+
+	for name, conf := range caches {
+		if conf.Unique {
+			cache := model.NewMemCache()
+			result[name] = func(orignale model.MaskEngine) model.MaskEngine {
+				return model.NewUniqueMaskCacheEngine(cache, orignale)
+			}
+		} else {
+			cache := model.NewMemCache()
+			result[name] = func(orignale model.MaskEngine) model.MaskEngine {
+				return model.NewMaskCacheEngine(cache, orignale)
+			}
+		}
 	}
 	return result
 }
@@ -49,7 +61,7 @@ func YamlConfig(filename string, maskFactories []model.MaskFactory, maskContextF
 		conf.Seed = time.Now().UnixNano()
 	}
 	config := model.NewMaskConfiguration()
-	caches := buildCaches(conf.Caches)
+	cacheFactories := buildCachedMaskEngineFactories(conf.Caches)
 
 	for _, v := range conf.Masking {
 		nbArg := 0
@@ -60,12 +72,12 @@ func YamlConfig(filename string, maskFactories []model.MaskFactory, maskContextF
 				return nil, errors.New(err.Error() + " for " + v.Selector.Jsonpath)
 			}
 			if present && v.Cache != "" {
-				cache, ok := caches[v.Cache]
+				cacheFactory, ok := cacheFactories[v.Cache]
 				if !ok {
 					return nil, errors.New("cache " + v.Cache + " not found for " + v.Selector.Jsonpath)
 				}
 
-				mask = model.NewMaskCacheEngine(cache, mask)
+				mask = cacheFactory(mask)
 			}
 
 			if present {
