@@ -260,3 +260,225 @@ type Masking struct {
 	Mask     MaskType     `yaml:"mask"`
 	Cache    string       `yaml:"cache"`
 }
+
+/***************
+ * REFACTORING *
+ ***************/
+
+// IProcess process entry and none, one or many element
+type IProcess interface {
+	Open() error
+	ProcessEntry(Entry, ICollector) error
+}
+
+// ICollector collect entry generate by IProcess
+type ICollector interface {
+	Collect(Entry) error
+}
+
+// ISinkProcess send Entry process by Pipeline to an output
+type ISinkProcess interface {
+	Open() error
+	ProcessEntry(Entry) error
+}
+
+type IPipeline interface {
+	Process(IProcess) IPipeline
+	AddSink(ISinkProcess) ISinkedPipeline
+}
+
+type ISinkedPipeline interface {
+	Run() error
+}
+
+// ISource is an iterator over entry
+type ISource interface {
+	Next() bool
+	Value() Entry
+	Err() error
+}
+
+type Mapper = func(Entry) (Entry, error)
+
+/******************
+ * IMPLEMENTATION *
+ ******************/
+
+func NewSourceFromSlice(entries []Entry) IPipeline {
+	return Pipeline{source: &SourceFromSlice{entries: entries, offset: 0}}
+}
+
+type SourceFromSlice struct {
+	entries []Entry
+	offset  int
+}
+
+func (source *SourceFromSlice) Next() bool {
+	result := source.offset < len(source.entries)
+	source.offset++
+	return result
+}
+
+func (source *SourceFromSlice) Value() Entry {
+	return source.entries[source.offset-1]
+}
+
+func (source *SourceFromSlice) Err() error {
+	return nil
+}
+
+func NewMapProcess(mapper Mapper) IProcess {
+	return MapProcess{mapper: mapper}
+}
+
+type MapProcess struct {
+	mapper Mapper
+}
+
+func (mp MapProcess) Open() error { return nil }
+
+func (mp MapProcess) ProcessEntry(entry Entry, out ICollector) error {
+	mappedValue, err := mp.mapper(entry)
+	if err != nil {
+		return err
+	}
+	return out.Collect(mappedValue)
+}
+
+func NewSinkToSlice(entries *[]Entry) ISinkProcess {
+	return &SinkToSlice{entries}
+}
+
+type SinkToSlice struct {
+	entries *[]Entry
+}
+
+func (sink *SinkToSlice) Open() error {
+	*sink.entries = []Entry{}
+	return nil
+}
+
+func (sink *SinkToSlice) ProcessEntry(entry Entry) error {
+	*sink.entries = append(*sink.entries, entry)
+	return nil
+}
+
+type SinkedPipeline struct {
+	source ISource
+	sink   ISinkProcess
+}
+
+type Pipeline struct {
+	source ISource
+}
+
+func NewCollector() *Collector {
+	return &Collector{[]Entry{}, nil}
+}
+
+type Collector struct {
+	queue []Entry
+	value Entry
+}
+
+func (c *Collector) Collect(entry Entry) error {
+	c.queue = append(c.queue, entry)
+	return nil
+}
+
+func (c *Collector) Next() bool {
+	if len(c.queue) > 0 {
+		c.value = c.queue[0]
+		c.queue = c.queue[1:]
+		return true
+	}
+	return false
+}
+
+func (c *Collector) Value() Entry {
+	return c.value
+}
+
+func NewProcessPipeline(source ISource, process IProcess) IPipeline {
+	return ProcessPipeline{NewCollector(), source, process, nil}
+}
+
+type ProcessPipeline struct {
+	collector *Collector
+	source    ISource
+	IProcess
+	err error
+}
+
+func (p ProcessPipeline) Next() bool {
+	if p.collector.Next() {
+		return true
+	}
+	for p.source.Next() {
+		if p.source.Err() != nil {
+			return false
+		}
+		p.err = p.ProcessEntry(p.source.Value(), p.collector)
+		if p.err != nil {
+			return false
+		}
+		if p.collector.Next() {
+			return true
+		}
+	}
+	return false
+}
+
+func (p ProcessPipeline) Value() Entry {
+	return p.collector.Value()
+}
+
+func (p ProcessPipeline) Err() error {
+	return p.source.Err()
+}
+
+func (p ProcessPipeline) AddSink(sink ISinkProcess) ISinkedPipeline {
+	return SinkedPipeline{p, sink}
+}
+
+func (p ProcessPipeline) Process(process IProcess) IPipeline {
+	return NewProcessPipeline(p, process)
+}
+
+func (pipeline Pipeline) Process(process IProcess) IPipeline {
+	return NewProcessPipeline(pipeline.source, process)
+}
+
+func (pipeline Pipeline) AddSink(sink ISinkProcess) ISinkedPipeline {
+	return SinkedPipeline{pipeline, sink}
+}
+
+func (pipeline Pipeline) Next() bool {
+	return pipeline.source.Next()
+}
+
+func (pipeline Pipeline) Value() Entry {
+	return pipeline.source.Value()
+}
+
+func (pipeline Pipeline) Err() error {
+	return pipeline.source.Err()
+}
+
+func (pipeline SinkedPipeline) Run() error {
+	err := pipeline.sink.Open()
+	if err != nil {
+		return err
+	}
+
+	for pipeline.source.Next() {
+		if pipeline.source.Err() != nil {
+			return pipeline.source.Err()
+		}
+		err := pipeline.sink.ProcessEntry(pipeline.source.Value())
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}

@@ -36,3 +36,55 @@ func TestMaskingShouldReplaceValueInArrayString(t *testing.T) {
 	want := Dictionary{"customer": []Entry{"Toto"}}
 	assert.Equal(t, want, result, "should be masked")
 }
+
+func TestPipelineSource(t *testing.T) {
+	mySlice := []Entry{1, 2, 3, 4}
+	var result []Entry
+
+	pipeline := NewSourceFromSlice(mySlice).
+		AddSink(NewSinkToSlice(&result))
+	err := pipeline.Run()
+
+	assert.Nil(t, err)
+	assert.Equal(t, mySlice, result)
+}
+
+func TestPipelineWithProcessorSource(t *testing.T) {
+	mySlice := []Entry{1, 2, 3, 4}
+	var result []Entry
+
+	pipeline := NewSourceFromSlice(mySlice).
+		Process(NewMapProcess(func(e Entry) (Entry, error) {
+			value := e.(int)
+			return value + 1, nil
+		})).
+		AddSink(NewSinkToSlice(&result))
+	err := pipeline.Run()
+
+	assert.Nil(t, err)
+
+	wanted := []Entry{2, 3, 4, 5}
+	assert.Equal(t, wanted, result)
+}
+
+func TestPipelineWithChainedProcessorSource(t *testing.T) {
+	mySlice := []Entry{1, 2, 3, 4}
+	var result []Entry
+
+	pipeline := NewSourceFromSlice(mySlice).
+		Process(NewMapProcess(func(e Entry) (Entry, error) {
+			value := e.(int)
+			return value + 1, nil
+		})).
+		Process(NewMapProcess(func(e Entry) (Entry, error) {
+			value := e.(int)
+			return value * value, nil
+		})).
+		AddSink(NewSinkToSlice(&result))
+	err := pipeline.Run()
+
+	assert.Nil(t, err)
+
+	wanted := []Entry{4, 9, 16, 25}
+	assert.Equal(t, wanted, result)
+}
