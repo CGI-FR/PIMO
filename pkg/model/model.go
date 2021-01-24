@@ -265,21 +265,21 @@ type Masking struct {
  * REFACTORING *
  ***************/
 
-// IProcess process entry and none, one or many element
+// IProcess process Dictionary and none, one or many element
 type IProcess interface {
 	Open() error
-	ProcessEntry(Entry, ICollector) error
+	ProcessDictionary(Dictionary, ICollector) error
 }
 
-// ICollector collect entry generate by IProcess
+// ICollector collect Dictionary generate by IProcess
 type ICollector interface {
-	Collect(Entry) error
+	Collect(Dictionary)
 }
 
-// ISinkProcess send Entry process by Pipeline to an output
+// ISinkProcess send Dictionary process by Pipeline to an output
 type ISinkProcess interface {
 	Open() error
-	ProcessEntry(Entry) error
+	ProcessDictionary(Dictionary) error
 }
 
 type IPipeline interface {
@@ -291,39 +291,146 @@ type ISinkedPipeline interface {
 	Run() error
 }
 
-// ISource is an iterator over entry
+// ISource is an iterator over Dictionary
 type ISource interface {
+	Open() error
 	Next() bool
-	Value() Entry
+	Value() Dictionary
 	Err() error
 }
 
-type Mapper = func(Entry) (Entry, error)
+// ISelector acces to a specific data into a dictonary
+type ISelector interface {
+	Read(Dictionary) Entry
+	Write(Dictionary, Entry) Dictionary
+	Delete(Dictionary) Dictionary
+}
+
+type Mapper func(Dictionary) (Dictionary, error)
 
 /******************
  * IMPLEMENTATION *
  ******************/
 
-func NewSourceFromSlice(entries []Entry) IPipeline {
-	return Pipeline{source: &SourceFromSlice{entries: entries, offset: 0}}
+func NewSourceFromSlice(dictionaries []Dictionary) IPipeline {
+	return Pipeline{source: &SourceFromSlice{dictionaries: dictionaries, offset: 0}}
 }
 
 type SourceFromSlice struct {
-	entries []Entry
-	offset  int
+	dictionaries []Dictionary
+	offset       int
 }
 
 func (source *SourceFromSlice) Next() bool {
-	result := source.offset < len(source.entries)
+	result := source.offset < len(source.dictionaries)
 	source.offset++
 	return result
 }
 
-func (source *SourceFromSlice) Value() Entry {
-	return source.entries[source.offset-1]
+func (source *SourceFromSlice) Value() Dictionary {
+	return source.dictionaries[source.offset-1]
 }
 
 func (source *SourceFromSlice) Err() error {
+	return nil
+}
+func (source *SourceFromSlice) Open() error {
+	source.offset = 0
+	return nil
+}
+
+func NewRepeaterProcess(times int) IProcess {
+	return RepeaterProcess{times}
+}
+
+type RepeaterProcess struct {
+	times int
+}
+
+func (p RepeaterProcess) Open() error {
+	return nil
+}
+
+func (p RepeaterProcess) ProcessDictionary(dictionary Dictionary, out ICollector) error {
+	for i := 0; i < p.times; i++ {
+		out.Collect(dictionary)
+	}
+	return nil
+}
+
+func NewSimplePathSelector(path string) ISelector {
+	return SimplePathSelector{path}
+}
+
+type SimplePathSelector struct {
+	Path string
+}
+
+func (s SimplePathSelector) Read(dictionary Dictionary) Entry {
+	return dictionary[s.Path]
+}
+
+func (s SimplePathSelector) Write(dictionary Dictionary, entry Entry) Dictionary {
+	result := Dictionary{}
+
+	for k, v := range dictionary {
+		result[k] = v
+	}
+	result[s.Path] = entry
+	return result
+}
+
+func (s SimplePathSelector) Delete(dictionary Dictionary) Dictionary {
+	result := Dictionary{}
+
+	for k, v := range dictionary {
+		if k != s.Path {
+			result[k] = v
+		}
+	}
+	return result
+}
+
+func NewDeleteMaskEngineProcess(selector ISelector) IProcess {
+	return &DeleteMaskEngineProcess{selector: selector}
+}
+
+type DeleteMaskEngineProcess struct {
+	selector ISelector
+}
+
+func (dp *DeleteMaskEngineProcess) Open() (err error) {
+	return err
+}
+
+func (dp *DeleteMaskEngineProcess) ProcessDictionary(dictionary Dictionary, out ICollector) error {
+	out.Collect(dp.selector.Delete(dictionary))
+	return nil
+}
+
+func NewMaskEngineProcess(selector ISelector, mask MaskEngine) IProcess {
+	return &MaskEngineProcess{selector, mask}
+}
+
+type MaskEngineProcess struct {
+	selector ISelector
+	mask     MaskEngine
+}
+
+func (mp *MaskEngineProcess) Open() (err error) {
+	return err
+}
+
+func (mp *MaskEngineProcess) ProcessDictionary(dictionary Dictionary, out ICollector) error {
+	match := mp.selector.Read(dictionary)
+
+	masked, err := mp.mask.Mask(match, dictionary)
+	if err != nil {
+		return err
+	}
+
+	out.Collect(mp.selector.Write(dictionary, masked))
+
 	return nil
 }
 
@@ -337,29 +444,30 @@ type MapProcess struct {
 
 func (mp MapProcess) Open() error { return nil }
 
-func (mp MapProcess) ProcessEntry(entry Entry, out ICollector) error {
-	mappedValue, err := mp.mapper(entry)
+func (mp MapProcess) ProcessDictionary(dictionary Dictionary, out ICollector) error {
+	mappedValue, err := mp.mapper(dictionary)
 	if err != nil {
 		return err
 	}
-	return out.Collect(mappedValue)
-}
-
-func NewSinkToSlice(entries *[]Entry) ISinkProcess {
-	return &SinkToSlice{entries}
-}
-
-type SinkToSlice struct {
-	entries *[]Entry
-}
-
-func (sink *SinkToSlice) Open() error {
-	*sink.entries = []Entry{}
+	out.Collect(mappedValue)
 	return nil
 }
 
-func (sink *SinkToSlice) ProcessEntry(entry Entry) error {
-	*sink.entries = append(*sink.entries, entry)
+func NewSinkToSlice(dictionaries *[]Dictionary) ISinkProcess {
+	return &SinkToSlice{dictionaries}
+}
+
+type SinkToSlice struct {
+	dictionaries *[]Dictionary
+}
+
+func (sink *SinkToSlice) Open() error {
+	*sink.dictionaries = []Dictionary{}
+	return nil
+}
+
+func (sink *SinkToSlice) ProcessDictionary(dictionary Dictionary) error {
+	*sink.dictionaries = append(*sink.dictionaries, dictionary)
 	return nil
 }
 
@@ -373,17 +481,16 @@ type Pipeline struct {
 }
 
 func NewCollector() *Collector {
-	return &Collector{[]Entry{}, nil}
+	return &Collector{[]Dictionary{}, nil}
 }
 
 type Collector struct {
-	queue []Entry
-	value Entry
+	queue []Dictionary
+	value Dictionary
 }
 
-func (c *Collector) Collect(entry Entry) error {
-	c.queue = append(c.queue, entry)
-	return nil
+func (c *Collector) Collect(dictionary Dictionary) {
+	c.queue = append(c.queue, dictionary)
 }
 
 func (c *Collector) Next() bool {
@@ -395,7 +502,7 @@ func (c *Collector) Next() bool {
 	return false
 }
 
-func (c *Collector) Value() Entry {
+func (c *Collector) Value() Dictionary {
 	return c.value
 }
 
@@ -418,7 +525,7 @@ func (p ProcessPipeline) Next() bool {
 		if p.source.Err() != nil {
 			return false
 		}
-		p.err = p.ProcessEntry(p.source.Value(), p.collector)
+		p.err = p.ProcessDictionary(p.source.Value(), p.collector)
 		if p.err != nil {
 			return false
 		}
@@ -429,7 +536,7 @@ func (p ProcessPipeline) Next() bool {
 	return false
 }
 
-func (p ProcessPipeline) Value() Entry {
+func (p ProcessPipeline) Value() Dictionary {
 	return p.collector.Value()
 }
 
@@ -457,7 +564,7 @@ func (pipeline Pipeline) Next() bool {
 	return pipeline.source.Next()
 }
 
-func (pipeline Pipeline) Value() Entry {
+func (pipeline Pipeline) Value() Dictionary {
 	return pipeline.source.Value()
 }
 
@@ -465,8 +572,16 @@ func (pipeline Pipeline) Err() error {
 	return pipeline.source.Err()
 }
 
-func (pipeline SinkedPipeline) Run() error {
-	err := pipeline.sink.Open()
+func (pipeline Pipeline) Open() error {
+	return pipeline.source.Open()
+}
+
+func (pipeline SinkedPipeline) Run() (err error) {
+	err = pipeline.source.Open()
+	if err != nil {
+		return err
+	}
+	err = pipeline.sink.Open()
 	if err != nil {
 		return err
 	}
@@ -475,7 +590,7 @@ func (pipeline SinkedPipeline) Run() error {
 		if pipeline.source.Err() != nil {
 			return pipeline.source.Err()
 		}
-		err := pipeline.sink.ProcessEntry(pipeline.source.Value())
+		err := pipeline.sink.ProcessDictionary(pipeline.source.Value())
 		if err != nil {
 			return err
 		}

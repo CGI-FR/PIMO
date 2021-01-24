@@ -38,8 +38,8 @@ func TestMaskingShouldReplaceValueInArrayString(t *testing.T) {
 }
 
 func TestPipelineSource(t *testing.T) {
-	mySlice := []Entry{1, 2, 3, 4}
-	var result []Entry
+	mySlice := []Dictionary{{"v": 1}, {"v": 2}, {"v": 3}, {"v": 4}}
+	var result []Dictionary
 
 	pipeline := NewSourceFromSlice(mySlice).
 		AddSink(NewSinkToSlice(&result))
@@ -50,41 +50,128 @@ func TestPipelineSource(t *testing.T) {
 }
 
 func TestPipelineWithProcessorSource(t *testing.T) {
-	mySlice := []Entry{1, 2, 3, 4}
-	var result []Entry
+	mySlice := []Dictionary{{"v": 1}, {"v": 2}, {"v": 3}, {"v": 4}}
+	var result []Dictionary
 
 	pipeline := NewSourceFromSlice(mySlice).
-		Process(NewMapProcess(func(e Entry) (Entry, error) {
-			value := e.(int)
-			return value + 1, nil
+		Process(NewMapProcess(func(d Dictionary) (Dictionary, error) {
+			value := d["v"].(int)
+			return Dictionary{"v": value + 1}, nil
 		})).
 		AddSink(NewSinkToSlice(&result))
 	err := pipeline.Run()
 
 	assert.Nil(t, err)
 
-	wanted := []Entry{2, 3, 4, 5}
+	wanted := []Dictionary{{"v": 2}, {"v": 3}, {"v": 4}, {"v": 5}}
 	assert.Equal(t, wanted, result)
 }
 
 func TestPipelineWithChainedProcessorSource(t *testing.T) {
-	mySlice := []Entry{1, 2, 3, 4}
-	var result []Entry
+	mySlice := []Dictionary{{"v": 1}, {"v": 2}, {"v": 3}, {"v": 4}}
+	var result []Dictionary
 
 	pipeline := NewSourceFromSlice(mySlice).
-		Process(NewMapProcess(func(e Entry) (Entry, error) {
-			value := e.(int)
-			return value + 1, nil
+		Process(NewMapProcess(func(d Dictionary) (Dictionary, error) {
+			value := d["v"].(int)
+			return Dictionary{"v": value + 1}, nil
 		})).
-		Process(NewMapProcess(func(e Entry) (Entry, error) {
-			value := e.(int)
-			return value * value, nil
+		Process(NewMapProcess(func(d Dictionary) (Dictionary, error) {
+			value := d["v"].(int)
+			return Dictionary{"v": value * value}, nil
 		})).
 		AddSink(NewSinkToSlice(&result))
 	err := pipeline.Run()
 
 	assert.Nil(t, err)
 
-	wanted := []Entry{4, 9, 16, 25}
+	wanted := []Dictionary{{"v": 4}, {"v": 9}, {"v": 16}, {"v": 25}}
 	assert.Equal(t, wanted, result)
+}
+
+func TestPipelineWithRepeaterProcessor(t *testing.T) {
+	mySlice := []Dictionary{{"v": 1}, {"v": 2}, {"v": 3}, {"v": 4}}
+	var result []Dictionary
+
+	pipeline := NewSourceFromSlice(mySlice).
+		Process(NewRepeaterProcess(2)).
+		AddSink(NewSinkToSlice(&result))
+	err := pipeline.Run()
+
+	assert.Nil(t, err)
+
+	wanted := []Dictionary{{"v": 1}, {"v": 1}, {"v": 2}, {"v": 2}, {"v": 3}, {"v": 3}, {"v": 4}, {"v": 4}}
+	assert.Equal(t, wanted, result)
+}
+
+func TestPipelineWithRepeaterAndMapChainedProcessor(t *testing.T) {
+	mySlice := []Dictionary{{"v": 1}, {"v": 2}, {"v": 3}, {"v": 4}}
+	var result []Dictionary
+
+	pipeline := NewSourceFromSlice(mySlice).
+		Process(NewRepeaterProcess(2)).
+		Process(NewMapProcess(func(d Dictionary) (Dictionary, error) {
+			value := d["v"].(int)
+			return Dictionary{"v": value * value}, nil
+		})).
+		AddSink(NewSinkToSlice(&result))
+	err := pipeline.Run()
+
+	assert.Nil(t, err)
+
+	wanted := []Dictionary{{"v": 1}, {"v": 1}, {"v": 4}, {"v": 4}, {"v": 9}, {"v": 9}, {"v": 16}, {"v": 16}}
+	assert.Equal(t, wanted, result)
+}
+
+func TestPipelineWithMaskEngine(t *testing.T) {
+	var nameMasking = FunctionMaskEngine{Function: func(name Entry, contexts ...Dictionary) (Entry, error) { return "Toto", nil }}
+
+	mySlice := []Dictionary{{"name": "Bob"}}
+	var result []Dictionary
+
+	pipeline := NewSourceFromSlice(mySlice).
+		Process(NewMaskEngineProcess(NewSimplePathSelector("name"), nameMasking)).
+		AddSink(NewSinkToSlice(&result))
+	err := pipeline.Run()
+
+	assert.Nil(t, err)
+
+	wanted := []Dictionary{{"name": "Toto"}}
+	assert.Equal(t, wanted, result)
+}
+
+func TestPipelineWithAddMaskEngine(t *testing.T) {
+	var cityMasking = FunctionMaskEngine{Function: func(name Entry, contexts ...Dictionary) (Entry, error) { return "Nantes", nil }}
+
+	mySlice := []Dictionary{{"name": "Bob"}}
+	var result []Dictionary
+
+	pipeline := NewSourceFromSlice(mySlice).
+		Process(NewMaskEngineProcess(NewSimplePathSelector("city"), cityMasking)).
+		AddSink(NewSinkToSlice(&result))
+	err := pipeline.Run()
+
+	assert.Nil(t, err)
+
+	wanted := []Dictionary{{"name": "Bob", "city": "Nantes"}}
+	assert.Equal(t, wanted, result)
+
+	assert.NotEqual(t, wanted, mySlice)
+}
+
+func TestPipelineWithDeleteMaskEngine(t *testing.T) {
+	mySlice := []Dictionary{{"name": "Bob", "city": "Nantes"}}
+	var result []Dictionary
+
+	pipeline := NewSourceFromSlice(mySlice).
+		Process(NewDeleteMaskEngineProcess(NewSimplePathSelector("name"))).
+		AddSink(NewSinkToSlice(&result))
+	err := pipeline.Run()
+
+	assert.Nil(t, err)
+
+	wanted := []Dictionary{{"city": "Nantes"}}
+	assert.Equal(t, wanted, result)
+
+	assert.NotEqual(t, wanted, mySlice)
 }
