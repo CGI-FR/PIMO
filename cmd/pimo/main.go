@@ -75,6 +75,27 @@ func main() {
 	}
 }
 
+/*
+func run2(config model.MaskConfiguration) {
+	var source model.ISource
+	if emptyInput {
+		source = model.NewSourceFromSlice([]model.Dictionary{{}})
+	} else {
+		source = jsonline.NewSource(os.Stdin)
+	}
+	pipeline := model.NewPipepline(source).
+		Process(model.NewRepeaterProcess(iteration))
+
+	err := pipeline.AddSink(jsonline.NewSink(os.Stdout)).Run()
+
+	if err != nil {
+		os.Stderr.WriteString(err.Error() + "\n")
+		os.Exit(1)
+	}
+	os.Exit(0)
+}
+*/
+
 func run(config model.MaskConfiguration) {
 	if iteration == 0 {
 		return

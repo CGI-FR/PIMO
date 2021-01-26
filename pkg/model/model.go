@@ -312,8 +312,12 @@ type Mapper func(Dictionary) (Dictionary, error)
  * IMPLEMENTATION *
  ******************/
 
-func NewSourceFromSlice(dictionaries []Dictionary) IPipeline {
+func NewPipelineFromSlice(dictionaries []Dictionary) IPipeline {
 	return Pipeline{source: &SourceFromSlice{dictionaries: dictionaries, offset: 0}}
+}
+
+func NewSourceFromSlice(dictionaries []Dictionary) ISource {
+	return &SourceFromSlice{dictionaries: dictionaries, offset: 0}
 }
 
 type SourceFromSlice struct {
@@ -480,6 +484,34 @@ type Pipeline struct {
 	source ISource
 }
 
+func NewPipepline(source ISource) IPipeline {
+	return Pipeline{source: source}
+}
+
+func (pipeline Pipeline) Process(process IProcess) IPipeline {
+	return NewProcessPipeline(pipeline.source, process)
+}
+
+func (pipeline Pipeline) AddSink(sink ISinkProcess) ISinkedPipeline {
+	return SinkedPipeline{pipeline, sink}
+}
+
+func (pipeline Pipeline) Next() bool {
+	return pipeline.source.Next()
+}
+
+func (pipeline Pipeline) Value() Dictionary {
+	return pipeline.source.Value()
+}
+
+func (pipeline Pipeline) Err() error {
+	return pipeline.source.Err()
+}
+
+func (pipeline Pipeline) Open() error {
+	return pipeline.source.Open()
+}
+
 func NewCollector() *Collector {
 	return &Collector{[]Dictionary{}, nil}
 }
@@ -552,30 +584,6 @@ func (p ProcessPipeline) Process(process IProcess) IPipeline {
 	return NewProcessPipeline(p, process)
 }
 
-func (pipeline Pipeline) Process(process IProcess) IPipeline {
-	return NewProcessPipeline(pipeline.source, process)
-}
-
-func (pipeline Pipeline) AddSink(sink ISinkProcess) ISinkedPipeline {
-	return SinkedPipeline{pipeline, sink}
-}
-
-func (pipeline Pipeline) Next() bool {
-	return pipeline.source.Next()
-}
-
-func (pipeline Pipeline) Value() Dictionary {
-	return pipeline.source.Value()
-}
-
-func (pipeline Pipeline) Err() error {
-	return pipeline.source.Err()
-}
-
-func (pipeline Pipeline) Open() error {
-	return pipeline.source.Open()
-}
-
 func (pipeline SinkedPipeline) Run() (err error) {
 	err = pipeline.source.Open()
 	if err != nil {
@@ -595,5 +603,34 @@ func (pipeline SinkedPipeline) Run() (err error) {
 			return err
 		}
 	}
-	return nil
+	return pipeline.source.Err()
+}
+
+// InterfaceToDictionary returns a model.Dictionary from an interface
+func InterfaceToDictionary(inter interface{}) Dictionary {
+	dic := make(map[string]Entry)
+	mapint := inter.(map[string]interface{})
+
+	for k, v := range mapint {
+		switch typedValue := v.(type) {
+		case map[string]interface{}:
+			dic[k] = InterfaceToDictionary(v)
+		case []interface{}:
+			tab := []Entry{}
+			for _, item := range typedValue {
+				_, dico := item.(map[string]interface{})
+
+				if dico {
+					tab = append(tab, InterfaceToDictionary(item))
+				} else {
+					tab = append(tab, item)
+				}
+			}
+			dic[k] = tab
+		default:
+			dic[k] = v
+		}
+	}
+
+	return dic
 }

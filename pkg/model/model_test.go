@@ -41,7 +41,7 @@ func TestPipelineSource(t *testing.T) {
 	mySlice := []Dictionary{{"v": 1}, {"v": 2}, {"v": 3}, {"v": 4}}
 	var result []Dictionary
 
-	pipeline := NewSourceFromSlice(mySlice).
+	pipeline := NewPipelineFromSlice(mySlice).
 		AddSink(NewSinkToSlice(&result))
 	err := pipeline.Run()
 
@@ -53,7 +53,7 @@ func TestPipelineWithProcessorSource(t *testing.T) {
 	mySlice := []Dictionary{{"v": 1}, {"v": 2}, {"v": 3}, {"v": 4}}
 	var result []Dictionary
 
-	pipeline := NewSourceFromSlice(mySlice).
+	pipeline := NewPipelineFromSlice(mySlice).
 		Process(NewMapProcess(func(d Dictionary) (Dictionary, error) {
 			value := d["v"].(int)
 			return Dictionary{"v": value + 1}, nil
@@ -71,7 +71,7 @@ func TestPipelineWithChainedProcessorSource(t *testing.T) {
 	mySlice := []Dictionary{{"v": 1}, {"v": 2}, {"v": 3}, {"v": 4}}
 	var result []Dictionary
 
-	pipeline := NewSourceFromSlice(mySlice).
+	pipeline := NewPipelineFromSlice(mySlice).
 		Process(NewMapProcess(func(d Dictionary) (Dictionary, error) {
 			value := d["v"].(int)
 			return Dictionary{"v": value + 1}, nil
@@ -93,7 +93,7 @@ func TestPipelineWithRepeaterProcessor(t *testing.T) {
 	mySlice := []Dictionary{{"v": 1}, {"v": 2}, {"v": 3}, {"v": 4}}
 	var result []Dictionary
 
-	pipeline := NewSourceFromSlice(mySlice).
+	pipeline := NewPipelineFromSlice(mySlice).
 		Process(NewRepeaterProcess(2)).
 		AddSink(NewSinkToSlice(&result))
 	err := pipeline.Run()
@@ -108,7 +108,7 @@ func TestPipelineWithRepeaterAndMapChainedProcessor(t *testing.T) {
 	mySlice := []Dictionary{{"v": 1}, {"v": 2}, {"v": 3}, {"v": 4}}
 	var result []Dictionary
 
-	pipeline := NewSourceFromSlice(mySlice).
+	pipeline := NewPipelineFromSlice(mySlice).
 		Process(NewRepeaterProcess(2)).
 		Process(NewMapProcess(func(d Dictionary) (Dictionary, error) {
 			value := d["v"].(int)
@@ -129,7 +129,7 @@ func TestPipelineWithMaskEngine(t *testing.T) {
 	mySlice := []Dictionary{{"name": "Bob"}}
 	var result []Dictionary
 
-	pipeline := NewSourceFromSlice(mySlice).
+	pipeline := NewPipelineFromSlice(mySlice).
 		Process(NewMaskEngineProcess(NewSimplePathSelector("name"), nameMasking)).
 		AddSink(NewSinkToSlice(&result))
 	err := pipeline.Run()
@@ -146,7 +146,7 @@ func TestPipelineWithAddMaskEngine(t *testing.T) {
 	mySlice := []Dictionary{{"name": "Bob"}}
 	var result []Dictionary
 
-	pipeline := NewSourceFromSlice(mySlice).
+	pipeline := NewPipelineFromSlice(mySlice).
 		Process(NewMaskEngineProcess(NewSimplePathSelector("city"), cityMasking)).
 		AddSink(NewSinkToSlice(&result))
 	err := pipeline.Run()
@@ -163,7 +163,7 @@ func TestPipelineWithDeleteMaskEngine(t *testing.T) {
 	mySlice := []Dictionary{{"name": "Bob", "city": "Nantes"}}
 	var result []Dictionary
 
-	pipeline := NewSourceFromSlice(mySlice).
+	pipeline := NewPipelineFromSlice(mySlice).
 		Process(NewDeleteMaskEngineProcess(NewSimplePathSelector("name"))).
 		AddSink(NewSinkToSlice(&result))
 	err := pipeline.Run()
