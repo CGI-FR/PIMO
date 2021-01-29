@@ -14,6 +14,7 @@ import (
 	"makeit.imfr.cgi.com/makeit2/scm/lino/pimo/pkg/fluxuri"
 	"makeit.imfr.cgi.com/makeit2/scm/lino/pimo/pkg/hash"
 	"makeit.imfr.cgi.com/makeit2/scm/lino/pimo/pkg/increment"
+	"makeit.imfr.cgi.com/makeit2/scm/lino/pimo/pkg/jsonline"
 	"makeit.imfr.cgi.com/makeit2/scm/lino/pimo/pkg/model"
 	"makeit.imfr.cgi.com/makeit2/scm/lino/pimo/pkg/randdate"
 	"makeit.imfr.cgi.com/makeit2/scm/lino/pimo/pkg/randdura"
@@ -37,8 +38,6 @@ var (
 	builtBy   string
 
 	iteration   int
-	skipLine    bool
-	skipField   bool
 	emptyInput  bool
 	maskingFile string
 )
@@ -50,22 +49,20 @@ func main() {
 		Long:    `Pimo is a tool to mask private data contained in jsonlines by using masking configurations`,
 		Version: fmt.Sprintf("%v (commit=%v date=%v by=%v)\n© CGI Inc 2020 All rights reserved", version, commit, buildDate, builtBy),
 		Run: func(cmd *cobra.Command, args []string) {
-			if skipField && skipLine {
-				os.Stderr.WriteString("Can't use both skipField and skipLine flags \n")
-				os.Exit(5)
-			}
-			config, err := pimo.YamlConfig(maskingFile, injectMaskFactories(), injectMaskContextFactories())
-			if err != nil {
-				os.Stderr.WriteString("ERROR : masking.yml not working properly, " + err.Error())
-				os.Exit(1)
-			}
-			run(config)
+			/*
+				config, err := pimo.YamlConfig(maskingFile, injectMaskFactories(), injectMaskContextFactories())
+				if err != nil {
+					os.Stderr.WriteString("ERROR : masking.yml not working properly, " + err.Error())
+					os.Exit(1)
+				}
+
+				run(config)
+			*/
+			run2()
 		},
 	}
 
 	rootCmd.PersistentFlags().IntVarP(&iteration, "repeat", "r", 1, "number of iteration to mask each input")
-	rootCmd.PersistentFlags().BoolVar(&skipLine, "skip-line-on-error", false, "if an error occurs, skip the line")
-	rootCmd.PersistentFlags().BoolVar(&skipField, "skip-field-on-error", false, "if an error occurs, skip the field")
 	rootCmd.PersistentFlags().BoolVar(&emptyInput, "empty-input", false, "generate datas without any input, to use with repeat flag")
 	rootCmd.PersistentFlags().StringVarP(&maskingFile, "config", "c", "masking.yml", "name and location of the masking-config file")
 
@@ -75,27 +72,35 @@ func main() {
 	}
 }
 
-/*
-func run2(config model.MaskConfiguration) {
+func run2() {
 	var source model.ISource
 	if emptyInput {
 		source = model.NewSourceFromSlice([]model.Dictionary{{}})
 	} else {
 		source = jsonline.NewSource(os.Stdin)
 	}
-	pipeline := model.NewPipepline(source).
+	pipeline := model.NewPipeline(source).
 		Process(model.NewRepeaterProcess(iteration))
 
-	err := pipeline.AddSink(jsonline.NewSink(os.Stdout)).Run()
+	var err error
+
+	pipeline, err = pimo.YamlPipeline(pipeline, maskingFile, injectMaskFactories(), injectMaskContextFactories())
 
 	if err != nil {
 		os.Stderr.WriteString(err.Error() + "\n")
 		os.Exit(1)
 	}
+
+	err = pipeline.AddSink(jsonline.NewSink(os.Stdout)).Run()
+
+	if err != nil {
+		os.Stderr.WriteString(err.Error() + "\n")
+		os.Exit(4)
+	}
 	os.Exit(0)
 }
-*/
 
+/*
 func run(config model.MaskConfiguration) {
 	if iteration == 0 {
 		return
@@ -144,6 +149,7 @@ func run(config model.MaskConfiguration) {
 		}
 	}
 }
+*/
 
 func injectMaskContextFactories() []model.MaskContextFactory {
 	return []model.MaskContextFactory{

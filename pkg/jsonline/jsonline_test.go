@@ -10,7 +10,7 @@ import (
 
 func TestSourceReturnDictionary(t *testing.T) {
 	jsonline := []byte(`{"personne": [{"name": "Benjamin", "age" : 35}, {"name": "Nicolas", "age" : 38}]}`)
-	pipeline := model.NewPipepline(NewSource(bytes.NewReader(jsonline)))
+	pipeline := model.NewPipeline(NewSource(bytes.NewReader(jsonline)))
 	var result []model.Dictionary
 	err := pipeline.AddSink(model.NewSinkToSlice(&result)).Run()
 	assert.Nil(t, err)
@@ -24,7 +24,7 @@ func TestSourceReturnDictionary(t *testing.T) {
 
 func TestSourceReturnError(t *testing.T) {
 	jsonline := []byte(`{"personne" [{"name": "Benjamin", "age" : 35}, {"name": "Nicolas", "age" : 38}]}`)
-	pipeline := model.NewPipepline(NewSource(bytes.NewReader(jsonline)))
+	pipeline := model.NewPipeline(NewSource(bytes.NewReader(jsonline)))
 	var result []model.Dictionary
 	err := pipeline.AddSink(model.NewSinkToSlice(&result)).Run()
 	assert.NotNil(t, err)

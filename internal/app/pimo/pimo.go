@@ -21,6 +21,23 @@ type YAMLStructure struct {
 	Caches  map[string]YAMLCache `yaml:"caches"`
 }
 
+type MaskingV2 struct {
+	Selector SelectorTypeV2         `yaml:"selector"`
+	Mask     map[string]interface{} `yaml:"mask"`
+	Cache    string                 `yaml:"cache"`
+}
+
+type SelectorTypeV2 struct {
+	JsonPath string `yaml:"jsonpath"`
+}
+
+type YAMLStructureV2 struct {
+	Version string               `yaml:"version"`
+	Seed    int64                `yaml:"seed"`
+	Masking []MaskingV2          `yaml:"masking"`
+	Caches  map[string]YAMLCache `yaml:"caches"`
+}
+
 type YAMLCache struct {
 	Unique bool `yaml:"unique"`
 }
@@ -44,6 +61,58 @@ func buildCachedMaskEngineFactories(caches map[string]YAMLCache) map[string]Cach
 		}
 	}
 	return result
+}
+
+// YamlConfig create a MaskConfiguration from a file
+func YamlPipeline(pipeline model.IPipeline, filename string, maskFactories []model.MaskFactory, maskContextFactories []model.MaskContextFactory) (model.IPipeline, error) {
+	conf, err := ParseYAML(filename)
+	if err != nil {
+		return nil, err
+	}
+	for _, v := range conf.Masking {
+		nbArg := 0
+		for _, factory := range maskFactories {
+			mask, present, err := factory(v, conf.Seed)
+			if err != nil {
+				return nil, errors.New(err.Error() + " for " + v.Selector.Jsonpath)
+			}
+			if present {
+				pipeline = pipeline.Process(model.NewMaskEngineProcess(model.NewPathSelector(v.Selector.Jsonpath), mask))
+				nbArg++
+			}
+		}
+
+		for _, factory := range maskContextFactories {
+			mask, present, err := factory(v, conf.Seed)
+			if err != nil {
+				return nil, errors.New(err.Error() + " for " + v.Selector.Jsonpath)
+			}
+			if present {
+				pipeline = pipeline.Process(model.NewMaskContextEngineProcess(model.NewPathSelector(v.Selector.Jsonpath), mask))
+				nbArg++
+			}
+		}
+		if nbArg != 1 {
+			return pipeline, errors.New("Not the right number of argument for " + v.Selector.Jsonpath + ". There should be 1 and there is " + strconv.Itoa(nbArg))
+		}
+	}
+	return pipeline, nil
+}
+
+func ParseYAML(filename string) (YAMLStructure, error) {
+	source, err := ioutil.ReadFile(filename)
+	if err != nil {
+		return YAMLStructure{}, err
+	}
+	var conf YAMLStructure
+	err = yaml.Unmarshal(source, &conf)
+	if err != nil {
+		return conf, err
+	}
+	if conf.Seed == 0 {
+		conf.Seed = time.Now().UnixNano()
+	}
+	return conf, nil
 }
 
 // YamlConfig create a MaskConfiguration from a file

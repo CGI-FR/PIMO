@@ -13,6 +13,6 @@ testcases:
   - script: cp ../masking.yml masking.yml
   - script: echo "{}\n { "| pimo
     assertions:
-    - result.code  ShouldEqual 2
+    - result.code  ShouldEqual 4
     - result.systemout ShouldEqual {}
     - result.systemerr ShouldContainSubstring unexpected end of JSON input

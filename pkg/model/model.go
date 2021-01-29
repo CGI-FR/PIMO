@@ -301,9 +301,11 @@ type ISource interface {
 
 // ISelector acces to a specific data into a dictonary
 type ISelector interface {
-	Read(Dictionary) Entry
+	Read(Dictionary) (Entry, bool)
 	Write(Dictionary, Entry) Dictionary
 	Delete(Dictionary) Dictionary
+	ReadContext(Dictionary) (Dictionary, string, bool)
+	WriteContext(Dictionary, Entry) Dictionary
 }
 
 type Mapper func(Dictionary) (Dictionary, error)
@@ -362,6 +364,98 @@ func (p RepeaterProcess) ProcessDictionary(dictionary Dictionary, out ICollector
 	return nil
 }
 
+func NewPathSelector(path string) ISelector {
+	mainEntry := strings.SplitN(path, ".", 2)
+	if len(mainEntry) == 2 {
+		return ComplexePathSelector{mainEntry[0], NewPathSelector(mainEntry[1])}
+	} else {
+		return NewSimplePathSelector(mainEntry[0])
+	}
+}
+
+type ComplexePathSelector struct {
+	path        string
+	subSelector ISelector
+}
+
+func (s ComplexePathSelector) Read(dictionary Dictionary) (entry Entry, ok bool) {
+	entry, ok = dictionary[s.path]
+	if !ok {
+		return
+	}
+
+	switch typedMatch := entry.(type) {
+	case []Entry:
+		entry = []Entry{}
+		for _, subEntry := range typedMatch {
+			var subResult Entry
+			subResult, ok = s.subSelector.Read(subEntry.(Dictionary))
+			if !ok {
+				return
+			}
+
+			entry = append(entry.([]Entry), subResult.(Entry))
+		}
+		return
+	case Dictionary:
+		return s.subSelector.Read(typedMatch)
+	default:
+		return nil, false
+	}
+}
+
+func (s ComplexePathSelector) ReadContext(dictionary Dictionary) (Dictionary, string, bool) {
+	entry, ok := dictionary[s.path]
+	if !ok {
+		return dictionary, "", false
+	}
+	subEntry, ok := entry.(Dictionary)
+	if !ok {
+		return dictionary, "", false
+	}
+	return s.subSelector.ReadContext(subEntry)
+}
+
+func (s ComplexePathSelector) Write(dictionary Dictionary, entry Entry) Dictionary {
+	result := Dictionary{}
+
+	for k, v := range dictionary {
+		result[k] = v
+	}
+	switch typedMatch := entry.(type) {
+	case []Entry:
+		subTargetArray, isArray := result[s.path].([]Entry)
+		if !isArray {
+			result[s.path] = s.subSelector.Write(result[s.path].(Dictionary), entry)
+		} else {
+			subArray := []Dictionary{}
+			for i, subEntry := range typedMatch {
+				subArray = append(subArray, s.subSelector.Write(subTargetArray[i].(Dictionary), subEntry))
+			}
+			result[s.path] = subArray
+		}
+
+	default:
+		result[s.path] = s.subSelector.Write(result[s.path].(Dictionary), entry)
+	}
+	return result
+}
+
+func (s ComplexePathSelector) WriteContext(dictionary Dictionary, entry Entry) Dictionary {
+	return dictionary
+}
+
+func (s ComplexePathSelector) Delete(dictionary Dictionary) Dictionary {
+	result := Dictionary{}
+
+	for k, v := range dictionary {
+		if k == s.path {
+			result[k] = s.subSelector.Delete(v.(Dictionary))
+		}
+	}
+	return result
+}
+
 func NewSimplePathSelector(path string) ISelector {
 	return SimplePathSelector{path}
 }
@@ -370,18 +464,26 @@ type SimplePathSelector struct {
 	Path string
 }
 
-func (s SimplePathSelector) Read(dictionary Dictionary) Entry {
-	return dictionary[s.Path]
+func (s SimplePathSelector) Read(dictionary Dictionary) (entry Entry, ok bool) {
+	entry, ok = dictionary[s.Path]
+	return
+}
+
+func (s SimplePathSelector) ReadContext(dictionary Dictionary) (Dictionary, string, bool) {
+	return dictionary, s.Path, true
 }
 
 func (s SimplePathSelector) Write(dictionary Dictionary, entry Entry) Dictionary {
 	result := Dictionary{}
-
 	for k, v := range dictionary {
 		result[k] = v
 	}
 	result[s.Path] = entry
 	return result
+}
+
+func (s SimplePathSelector) WriteContext(dictionary Dictionary, entry Entry) Dictionary {
+	return dictionary
 }
 
 func (s SimplePathSelector) Delete(dictionary Dictionary) Dictionary {
@@ -412,6 +514,37 @@ func (dp *DeleteMaskEngineProcess) ProcessDictionary(dictionary Dictionary, out 
 	return nil
 }
 
+func NewMaskContextEngineProcess(selector ISelector, mask MaskContextEngine) IProcess {
+	return &MaskContextEngineProcess{selector, mask}
+}
+
+type MaskContextEngineProcess struct {
+	selector ISelector
+	mask     MaskContextEngine
+}
+
+func (mp *MaskContextEngineProcess) Open() (err error) {
+	return err
+}
+
+func (mp *MaskContextEngineProcess) ProcessDictionary(dictionary Dictionary, out ICollector) error {
+	subDictionary, key, ok := mp.selector.ReadContext(dictionary)
+	if !ok {
+		out.Collect(dictionary)
+
+		return nil
+	}
+
+	masked, err := mp.mask.MaskContext(subDictionary, key, dictionary)
+	if err != nil {
+		return err
+	}
+
+	out.Collect(mp.selector.WriteContext(dictionary, masked))
+
+	return nil
+}
+
 func NewMaskEngineProcess(selector ISelector, mask MaskEngine) IProcess {
 	return &MaskEngineProcess{selector, mask}
 }
@@ -426,11 +559,33 @@ func (mp *MaskEngineProcess) Open() (err error) {
 }
 
 func (mp *MaskEngineProcess) ProcessDictionary(dictionary Dictionary, out ICollector) error {
-	match := mp.selector.Read(dictionary)
+	match, ok := mp.selector.Read(dictionary)
+	if !ok {
+		out.Collect(dictionary)
 
-	masked, err := mp.mask.Mask(match, dictionary)
-	if err != nil {
-		return err
+		return nil
+	}
+
+	var masked Entry
+	var err error
+
+	switch typedMatch := match.(type) {
+	case []Entry:
+		masked = []Entry{}
+		var maskedEntry Entry
+
+		for matchEntry := range typedMatch {
+			maskedEntry, err = mp.mask.Mask(matchEntry, dictionary)
+			if err != nil {
+				return err
+			}
+			masked = append(masked.([]Entry), maskedEntry)
+		}
+	default:
+		masked, err = mp.mask.Mask(typedMatch, dictionary)
+		if err != nil {
+			return err
+		}
 	}
 
 	out.Collect(mp.selector.Write(dictionary, masked))
@@ -484,7 +639,7 @@ type Pipeline struct {
 	source ISource
 }
 
-func NewPipepline(source ISource) IPipeline {
+func NewPipeline(source ISource) IPipeline {
 	return Pipeline{source: source}
 }
 
@@ -539,7 +694,7 @@ func (c *Collector) Value() Dictionary {
 }
 
 func NewProcessPipeline(source ISource, process IProcess) IPipeline {
-	return ProcessPipeline{NewCollector(), source, process, nil}
+	return &ProcessPipeline{NewCollector(), source, process, nil}
 }
 
 type ProcessPipeline struct {
@@ -549,14 +704,11 @@ type ProcessPipeline struct {
 	err error
 }
 
-func (p ProcessPipeline) Next() bool {
+func (p *ProcessPipeline) Next() bool {
 	if p.collector.Next() {
 		return true
 	}
 	for p.source.Next() {
-		if p.source.Err() != nil {
-			return false
-		}
 		p.err = p.ProcessDictionary(p.source.Value(), p.collector)
 		if p.err != nil {
 			return false
@@ -565,22 +717,27 @@ func (p ProcessPipeline) Next() bool {
 			return true
 		}
 	}
+	p.err = p.source.Err()
 	return false
 }
 
-func (p ProcessPipeline) Value() Dictionary {
-	return p.collector.Value()
+func (p *ProcessPipeline) Value() Dictionary {
+	result := Dictionary{}
+	for k, v := range p.collector.Value() {
+		result[k] = v
+	}
+	return result
 }
 
-func (p ProcessPipeline) Err() error {
-	return p.source.Err()
+func (p *ProcessPipeline) Err() error {
+	return p.err
 }
 
-func (p ProcessPipeline) AddSink(sink ISinkProcess) ISinkedPipeline {
+func (p *ProcessPipeline) AddSink(sink ISinkProcess) ISinkedPipeline {
 	return SinkedPipeline{p, sink}
 }
 
-func (p ProcessPipeline) Process(process IProcess) IPipeline {
+func (p *ProcessPipeline) Process(process IProcess) IPipeline {
 	return NewProcessPipeline(p, process)
 }
 
@@ -595,9 +752,6 @@ func (pipeline SinkedPipeline) Run() (err error) {
 	}
 
 	for pipeline.source.Next() {
-		if pipeline.source.Err() != nil {
-			return pipeline.source.Err()
-		}
 		err := pipeline.sink.ProcessDictionary(pipeline.source.Value())
 		if err != nil {
 			return err
