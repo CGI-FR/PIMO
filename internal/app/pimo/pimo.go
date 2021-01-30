@@ -66,6 +66,8 @@ func buildCachedMaskEngineFactories(caches map[string]YAMLCache) map[string]Cach
 // YamlConfig create a MaskConfiguration from a file
 func YamlPipeline(pipeline model.IPipeline, filename string, maskFactories []model.MaskFactory, maskContextFactories []model.MaskContextFactory) (model.IPipeline, error) {
 	conf, err := ParseYAML(filename)
+	cacheFactories := buildCachedMaskEngineFactories(conf.Caches)
+
 	if err != nil {
 		return nil, err
 	}
@@ -77,6 +79,14 @@ func YamlPipeline(pipeline model.IPipeline, filename string, maskFactories []mod
 				return nil, errors.New(err.Error() + " for " + v.Selector.Jsonpath)
 			}
 			if present {
+				if v.Cache != "" {
+					cacheFactory, ok := cacheFactories[v.Cache]
+					if !ok {
+						return nil, errors.New("Cache '" + v.Cache + "' not found for '" + v.Selector.Jsonpath + "'")
+					}
+					mask = cacheFactory(mask)
+				}
+
 				pipeline = pipeline.Process(model.NewMaskEngineProcess(model.NewPathSelector(v.Selector.Jsonpath), mask))
 				nbArg++
 			}

@@ -357,3 +357,28 @@ func TestPipelineShouldReturnErrorFromSource(t *testing.T) {
 
 	assert.NotNil(t, err)
 }
+
+func TestCacheShouldProvide(t *testing.T) {
+	i := 0
+
+	var errorMasking = FunctionMaskEngine{Function: func(name Entry, contexts ...Dictionary) (Entry, error) {
+		i++
+		return fmt.Sprintf("%s - %d", name, i), nil
+	}}
+
+	cache := NewMemCache()
+
+	mySlice := []Dictionary{{"city": "Nantes"}, {"city": "Grenoble"}, {"city": "Nantes"}}
+	var result []Dictionary
+
+	pipeline := NewPipelineFromSlice(mySlice).
+		Process(NewMaskEngineProcess(NewSimplePathSelector("city"), NewMaskCacheEngine(cache, errorMasking))).
+		AddSink(NewSinkToSlice(&result))
+	err := pipeline.Run()
+
+	assert.Nil(t, err)
+
+	wanted := []Dictionary{{"city": "Nantes - 1"}, {"city": "Grenoble - 2"}, {"city": "Nantes - 1"}}
+
+	assert.Equal(t, wanted, result)
+}

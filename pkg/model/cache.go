@@ -4,7 +4,7 @@ import (
 	"fmt"
 )
 
-type Cache interface {
+type ICache interface {
 	get(key Entry) (Entry, bool)
 	put(key Entry, value Entry)
 	putUnique(key Entry, value Entry) bool
@@ -41,12 +41,12 @@ func NewMemCache() MemCache {
 
 // MaskCacheEngine is a struct to create a cahed mask
 type MaskCacheEngine struct {
-	Cache          Cache
+	Cache          ICache
 	OriginalEngine MaskEngine
 }
 
 // NewMaskCacheEngine create an MaskCacheEngine
-func NewMaskCacheEngine(cache Cache, original MaskEngine) MaskCacheEngine {
+func NewMaskCacheEngine(cache ICache, original MaskEngine) MaskCacheEngine {
 	return MaskCacheEngine{cache, original}
 }
 
@@ -68,7 +68,7 @@ type UniqueMaskCacheEngine struct {
 	maxRetries int
 }
 
-func NewUniqueMaskCacheEngine(cache Cache, original MaskEngine) UniqueMaskCacheEngine {
+func NewUniqueMaskCacheEngine(cache ICache, original MaskEngine) UniqueMaskCacheEngine {
 	return UniqueMaskCacheEngine{MaskCacheEngine{cache, original}, 1000}
 }
 
