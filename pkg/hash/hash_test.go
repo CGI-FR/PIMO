@@ -9,15 +9,12 @@ import (
 
 func TestMaskingShouldReplaceSensitiveValueByHashing(t *testing.T) {
 	nameList := []model.Entry{"Michel", "Marc", "Matthias", "Youen", "Alexis"}
-	config := model.NewMaskConfiguration().
-		WithEntry("name", MaskEngine{nameList})
+	mask := MaskEngine{nameList}
 
-	maskingEngine := model.MaskingEngineFactory(config, true)
-
-	data := model.Dictionary{"name": "Alexis"}
-	result, err := maskingEngine.Mask(data)
+	data := "Alexis"
+	result, err := mask.Mask(data)
 	assert.Equal(t, nil, err, "error should be nil")
-	resultBis, err := maskingEngine.Mask(data)
+	resultBis, err := mask.Mask(data)
 	assert.Equal(t, nil, err, "error should be nil")
 
 	assert.Equal(t, result, resultBis, "Should be hashed the same way")

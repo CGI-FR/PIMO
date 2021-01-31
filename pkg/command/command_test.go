@@ -9,17 +9,10 @@ import (
 
 func TestMaskingShouldReplaceSensitiveValueByCommand(t *testing.T) {
 	nameProgramMasking := NewMask("echo Toto")
-	config := model.NewMaskConfiguration().
-		WithEntry("name", nameProgramMasking)
-
-	maskingEngine := model.MaskingEngineFactory(config, true)
-
-	data := model.Dictionary{"name": "Benjamin"}
-	result, err := maskingEngine.Mask(data)
-
+	data := "Benjamin"
+	result, err := nameProgramMasking.Mask(data)
 	assert.Equal(t, nil, err, "error should be nil")
-
-	waited := model.Dictionary{"name": "Toto"}
+	waited := "Toto"
 	assert.NotEqual(t, data, result, "should be masked")
 	assert.Equal(t, waited, result, "should be Toto")
 }

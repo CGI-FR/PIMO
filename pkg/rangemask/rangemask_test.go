@@ -9,15 +9,11 @@ import (
 
 func TestMaskingShouldReplaceSensitiveValueByRangedValue(t *testing.T) {
 	rangeMask := NewMask(10)
-	config := model.NewMaskConfiguration().
-		WithEntry("age", rangeMask)
-	maskingEngine := model.MaskingEngineFactory(config, true)
-	data := model.Dictionary{"age": float64(25)}
-	result, err := maskingEngine.Mask(data)
+	result, err := rangeMask.Mask(float64(25))
 	assert.Equal(t, nil, err, "error should be nil")
-	waited := model.Dictionary{"age": "[20;29]"}
-	assert.NotEqual(t, data, result, "should be masked")
-	assert.Equal(t, waited, result, "should be Toto")
+	waited := "[20;29]"
+	assert.NotEqual(t, float64(25), result, "should be masked")
+	assert.Equal(t, waited, result, "should be [20;29]")
 }
 
 func TestFactoryShouldCreateAMask(t *testing.T) {

@@ -10,7 +10,10 @@ import (
 
 // NewSource creates a new Source.
 func NewSource(file io.Reader) model.ISource {
-	return &Source{bufio.NewScanner(file), nil, nil}
+	scanner := bufio.NewScanner(file)
+	buf := make([]byte, 0, 64*1024)
+	scanner.Buffer(buf, 1024*1024*100) // increase buffer up to 100 MB
+	return &Source{scanner, nil, nil}
 }
 
 // Source export line to JSON format.

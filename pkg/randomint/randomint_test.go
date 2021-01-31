@@ -11,18 +11,13 @@ func TestMaskingShouldReplaceSensitiveValueByRandomNumber(t *testing.T) {
 	min := 7
 	max := 77
 	ageMask := NewMask(min, max, 0)
-	config := model.NewMaskConfiguration().
-		WithEntry("age", ageMask)
 
-	maskingEngine := model.MaskingEngineFactory(config, true)
-	data := model.Dictionary{"age": 83}
-	result, err := maskingEngine.Mask(data)
+	result, err := ageMask.Mask(83)
 	assert.Equal(t, nil, err, "error should be nil")
-	resultmap := result.(map[string]model.Entry)
 
-	assert.NotEqual(t, data, result, "Should be masked")
-	assert.True(t, resultmap["age"].(int) >= min, "Should be more than min")
-	assert.True(t, resultmap["age"].(int) <= max, "Should be less than max")
+	assert.NotEqual(t, 83, result, "Should be masked")
+	assert.True(t, result.(int) >= min, "Should be more than min")
+	assert.True(t, result.(int) <= max, "Should be less than max")
 }
 
 func TestFactoryShouldCreateAMask(t *testing.T) {

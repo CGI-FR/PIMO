@@ -31,28 +31,20 @@ func TestMaskingShouldReplaceDateByIncrement(t *testing.T) {
 
 	assert.Equal(t, nil, err, "error is not nil")
 
-	config := model.NewMaskConfiguration().
-		WithEntry("date", durationMask)
-
-	maskingEngine := model.MaskingEngineFactory(config, true)
-	data := model.Dictionary{"date": time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC)}
-	result, err := maskingEngine.Mask(data)
+	data := time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC)
+	result, err := durationMask.Mask(data)
 	assert.Equal(t, nil, err, "error should be nil")
-	waited := model.Dictionary{"date": time.Date(2020, 3, 1, 0, 0, 0, 0, time.UTC)}
+	waited := time.Date(2020, 3, 1, 0, 0, 0, 0, time.UTC)
 	assert.Equal(t, result, waited, "Should change the date according to mask")
 	duration = "-P60D"
 	durationMask, err = NewMask(duration)
 
 	assert.Equal(t, nil, err, "error is not nil")
 
-	config = model.NewMaskConfiguration().
-		WithEntry("date", durationMask)
-
-	maskingEngine = model.MaskingEngineFactory(config, true)
-	data = model.Dictionary{"date": time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC)}
-	result, err = maskingEngine.Mask(data)
+	data = time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC)
+	result, err = durationMask.Mask(data)
 	assert.Equal(t, nil, err, "error should be nil")
-	waited = model.Dictionary{"date": time.Date(2019, 11, 2, 0, 0, 0, 0, time.UTC)}
+	waited = time.Date(2019, 11, 2, 0, 0, 0, 0, time.UTC)
 	assert.Equal(t, result, waited, "Should change the date according to mask")
 }
 

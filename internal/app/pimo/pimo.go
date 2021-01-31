@@ -1,15 +1,15 @@
 package pimo
 
 import (
-	"bufio"
-	"encoding/json"
 	"errors"
-	"io"
+	"fmt"
 	"io/ioutil"
+	"os"
 	"strconv"
 	"time"
 
 	"github.com/goccy/go-yaml"
+	"makeit.imfr.cgi.com/makeit2/scm/lino/pimo/pkg/jsonline"
 	"makeit.imfr.cgi.com/makeit2/scm/lino/pimo/pkg/model"
 )
 
@@ -44,49 +44,57 @@ type YAMLCache struct {
 
 type CachedMaskEngineFactories func(model.MaskEngine) model.MaskEngine
 
-func buildCachedMaskEngineFactories(caches map[string]YAMLCache) map[string]CachedMaskEngineFactories {
-	result := map[string]CachedMaskEngineFactories{}
+func buildCache(caches map[string]YAMLCache) map[string]model.ICache {
+	result := map[string]model.ICache{}
 
 	for name, conf := range caches {
 		if conf.Unique {
-			cache := model.NewMemCache()
-			result[name] = func(orignale model.MaskEngine) model.MaskEngine {
-				return model.NewUniqueMaskCacheEngine(cache, orignale)
-			}
+			result[name] = model.NewUniqueMemCache()
 		} else {
-			cache := model.NewMemCache()
-			result[name] = func(orignale model.MaskEngine) model.MaskEngine {
-				return model.NewMaskCacheEngine(cache, orignale)
-			}
+			result[name] = model.NewMemCache()
 		}
 	}
 	return result
 }
 
 // YamlConfig create a MaskConfiguration from a file
-func YamlPipeline(pipeline model.IPipeline, filename string, maskFactories []model.MaskFactory, maskContextFactories []model.MaskContextFactory) (model.IPipeline, error) {
+func YamlPipeline(pipeline model.IPipeline, filename string, maskFactories []model.MaskFactory, maskContextFactories []model.MaskContextFactory) (model.IPipeline, map[string]model.ICache, error) {
 	conf, err := ParseYAML(filename)
-	cacheFactories := buildCachedMaskEngineFactories(conf.Caches)
+	caches := buildCache(conf.Caches)
 
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	for _, v := range conf.Masking {
 		nbArg := 0
+
+		if v.Mask.FromCache != "" {
+			cache, ok := caches[v.Mask.FromCache]
+			if !ok {
+				return nil, nil, errors.New("Cache '" + v.Cache + "' not found for '" + v.Selector.Jsonpath + "'")
+			}
+			pipeline = pipeline.Process(model.NewFromCacheProcess(model.NewPathSelector(v.Selector.Jsonpath), cache))
+			nbArg++
+		}
+
 		for _, factory := range maskFactories {
 			mask, present, err := factory(v, conf.Seed)
 			if err != nil {
-				return nil, errors.New(err.Error() + " for " + v.Selector.Jsonpath)
+				return nil, nil, errors.New(err.Error() + " for " + v.Selector.Jsonpath)
 			}
 			if present {
 				if v.Cache != "" {
-					cacheFactory, ok := cacheFactories[v.Cache]
+					cache, ok := caches[v.Cache]
 					if !ok {
-						return nil, errors.New("Cache '" + v.Cache + "' not found for '" + v.Selector.Jsonpath + "'")
+						return nil, nil, errors.New("Cache '" + v.Cache + "' not found for '" + v.Selector.Jsonpath + "'")
 					}
-					mask = cacheFactory(mask)
+					switch typedCache := cache.(type) {
+					case model.IUniqueCache:
+						mask = model.NewUniqueMaskCacheEngine(typedCache, mask)
+					default:
+						mask = model.NewMaskCacheEngine(typedCache, mask)
+					}
 				}
-
 				pipeline = pipeline.Process(model.NewMaskEngineProcess(model.NewPathSelector(v.Selector.Jsonpath), mask))
 				nbArg++
 			}
@@ -95,7 +103,7 @@ func YamlPipeline(pipeline model.IPipeline, filename string, maskFactories []mod
 		for _, factory := range maskContextFactories {
 			mask, present, err := factory(v, conf.Seed)
 			if err != nil {
-				return nil, errors.New(err.Error() + " for " + v.Selector.Jsonpath)
+				return nil, nil, errors.New(err.Error() + " for " + v.Selector.Jsonpath)
 			}
 			if present {
 				pipeline = pipeline.Process(model.NewMaskContextEngineProcess(model.NewPathSelector(v.Selector.Jsonpath), mask))
@@ -103,10 +111,10 @@ func YamlPipeline(pipeline model.IPipeline, filename string, maskFactories []mod
 			}
 		}
 		if nbArg != 1 {
-			return pipeline, errors.New("Not the right number of argument for " + v.Selector.Jsonpath + ". There should be 1 and there is " + strconv.Itoa(nbArg))
+			return pipeline, nil, errors.New("Not the right number of argument for " + v.Selector.Jsonpath + ". There should be 1 and there is " + strconv.Itoa(nbArg))
 		}
 	}
-	return pipeline, nil
+	return pipeline, caches, nil
 }
 
 func ParseYAML(filename string) (YAMLStructure, error) {
@@ -125,137 +133,30 @@ func ParseYAML(filename string) (YAMLStructure, error) {
 	return conf, nil
 }
 
-// YamlConfig create a MaskConfiguration from a file
-func YamlConfig(filename string, maskFactories []model.MaskFactory, maskContextFactories []model.MaskContextFactory) (model.MaskConfiguration, error) {
-	source, err := ioutil.ReadFile(filename)
+func DumpCache(name string, cache model.ICache, path string) error {
+	file, err := os.Create(path)
 	if err != nil {
-		return model.NewMaskConfiguration(), err
+		return fmt.Errorf("Cache %s not dump : %s", name, err.Error())
 	}
-	var conf YAMLStructure
-	err = yaml.Unmarshal(source, &conf)
+
+	defer file.Close()
+	err = model.NewPipeline(cache.Iterate()).AddSink(jsonline.NewSink(file)).Run()
 	if err != nil {
-		return model.NewMaskConfiguration(), err
+		return fmt.Errorf("Cache %s not dump : %s", name, err.Error())
 	}
-	if conf.Seed == 0 {
-		conf.Seed = time.Now().UnixNano()
-	}
-	config := model.NewMaskConfiguration()
-	cacheFactories := buildCachedMaskEngineFactories(conf.Caches)
 
-	for _, v := range conf.Masking {
-		nbArg := 0
-		for _, factory := range maskFactories {
-			mask, present, err := factory(v, conf.Seed)
-
-			if err != nil {
-				return nil, errors.New(err.Error() + " for " + v.Selector.Jsonpath)
-			}
-			if present && v.Cache != "" {
-				cacheFactory, ok := cacheFactories[v.Cache]
-				if !ok {
-					return nil, errors.New("cache " + v.Cache + " not found for " + v.Selector.Jsonpath)
-				}
-
-				mask = cacheFactory(mask)
-			}
-
-			if present {
-				config = config.WithEntry(v.Selector.Jsonpath, mask)
-
-				nbArg++
-			}
-		}
-		for _, factory := range maskContextFactories {
-			mask, present, err := factory(v, conf.Seed)
-
-			if err != nil {
-				return nil, errors.New(err.Error() + " for " + v.Selector.Jsonpath)
-			}
-			if present {
-				config = config.WithContextEntry(v.Selector.Jsonpath, mask)
-
-				nbArg++
-			}
-		}
-		if nbArg != 1 {
-			return config, errors.New("Not the right number of argument for " + v.Selector.Jsonpath + ". There should be 1 and there is " + strconv.Itoa(nbArg))
-		}
-	}
-	return config, nil
+	return nil
 }
 
-// InterfaceToDictionary returns a model.Dictionary from an interface
-func InterfaceToDictionary(inter interface{}) model.Dictionary {
-	dic := make(map[string]model.Entry)
-	mapint := inter.(map[string]interface{})
-
-	for k, v := range mapint {
-		switch typedValue := v.(type) {
-		case map[string]interface{}:
-			dic[k] = InterfaceToDictionary(v)
-		case []interface{}:
-			tab := []model.Entry{}
-			for _, item := range typedValue {
-				_, dico := item.(map[string]interface{})
-
-				if dico {
-					tab = append(tab, InterfaceToDictionary(item))
-				} else {
-					tab = append(tab, item)
-				}
-			}
-			dic[k] = tab
-		default:
-			dic[k] = v
-		}
-	}
-
-	return dic
-}
-
-// JSONToDictionary return a model.Dictionary from a jsonline
-func JSONToDictionary(jsonline []byte) (model.Dictionary, error) {
-	var inter interface{}
-	err := json.Unmarshal(jsonline, &inter)
+func LoadCache(name string, cache model.ICache, path string) error {
+	file, err := os.Open(path)
 	if err != nil {
-		return nil, err
+		return fmt.Errorf("Cache %s not loaded : %s", name, err.Error())
 	}
-	dic := InterfaceToDictionary(inter)
-	return dic, nil
-}
-
-// StopIteratorError is an error for le JSONLineIterator
-type StopIteratorError struct{}
-
-func (e StopIteratorError) Error() string {
-	return "Iterator couldn't find any value"
-}
-
-// JSONLineIterator export line to JSON format.
-type JSONLineIterator struct {
-	fscanner *bufio.Scanner
-}
-
-// NewJSONLineIterator creates a new JSONLineIterator.
-func NewJSONLineIterator(file io.Reader) JSONLineIterator {
-	return JSONLineIterator{bufio.NewScanner(file)}
-}
-
-// Next convert next line to model.Dictionary
-func (jli *JSONLineIterator) Next() (model.Dictionary, error) {
-	if !jli.fscanner.Scan() {
-		return nil, StopIteratorError{}
-	}
-	line := jli.fscanner.Bytes()
-	return JSONToDictionary(line)
-}
-
-// DictionaryToJSON create a jsonline from a model.Dictionary
-func DictionaryToJSON(dic model.Dictionary) ([]byte, error) {
-	jsonline, err := json.Marshal(dic)
+	defer file.Close()
+	err = model.NewPipeline(jsonline.NewSource(file)).AddSink(model.NewSinkToCache(cache)).Run()
 	if err != nil {
-		return nil, err
+		return fmt.Errorf("Cache %s not loaded : %s", name, err.Error())
 	}
-	jsonline = append(jsonline, "\n"...)
-	return jsonline, nil
+	return nil
 }

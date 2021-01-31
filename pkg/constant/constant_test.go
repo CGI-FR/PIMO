@@ -10,14 +10,9 @@ import (
 func TestMaskingShouldReplaceSensitiveValueByConstantValue(t *testing.T) {
 	maskingConstant := "Toto"
 	constMask := NewMask(maskingConstant)
-	config := model.NewMaskConfiguration().
-		WithEntry("name", constMask)
-	maskingEngine := model.MaskingEngineFactory(config, true)
-	data := model.Dictionary{"name": "Benjamin"}
-	result, err := maskingEngine.Mask(data)
+	result, err := constMask.Mask("Benjamin")
 	assert.Equal(t, nil, err, "error should be nil")
-	waited := model.Dictionary{"name": "Toto"}
-	assert.NotEqual(t, data, result, "should be masked")
+	waited := "Toto"
 	assert.Equal(t, waited, result, "should be Toto")
 }
 

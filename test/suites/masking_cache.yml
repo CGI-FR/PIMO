@@ -26,6 +26,90 @@ testcases:
     - result.systemerr ShouldBeEmpty
     - result.systemout ShouldNotContainSubstring Toto
 
+- name: save cache
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "id"
+          mask:
+            incremental:
+                start: 5
+                increment: 2
+          cache: "id"
+        - selector:
+            jsonpath: "id"
+          mask:
+            replacement: "id"
+          cache: "name"
+      caches:
+        id : {}
+        name : {}
+
+      EOF
+  - script: |-
+      pimo --dump-cache id=./id.jsonl <<EOF
+      {"name": "Toto", "id": 12}
+      {"name": "Dorothy", "id":3}
+      {"name": "Toto2", "id":12}
+      {"name": "Dorothy4", "id":3}
+      EOF
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldContainSubstring "id":5,"name":"Toto"
+    - result.systemout ShouldContainSubstring "id":7,"name":"Dorothy"
+    - result.systemout ShouldContainSubstring "id":5,"name":"Toto2"
+    - result.systemout ShouldContainSubstring "id":7,"name":"Dorothy4"
+    - result.systemerr ShouldBeEmpty
+  - script: cat id.jsonl
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldContainSubstring {"key":12,"value":5}
+    - result.systemout ShouldContainSubstring {"key":3,"value":7}
+
+- name: Load cache
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "id"
+          mask:
+            incremental:
+                start: 5
+                increment: 2
+          cache: "id"
+
+      caches:
+        id : {}
+
+      EOF
+  - script: |-
+      cat > id.jsonl <<EOF
+      {"key": 12, "value": 21}
+      {"key": 3, "value":8}
+      {"key": 4, "value":10}
+      EOF
+  - script: |-
+      pimo --load-cache id=./id.jsonl <<EOF
+      {"name": "Toto", "id": 12}
+      {"name": "Dorothy", "id":3}
+      {"name": "Toto2", "id":12}
+      {"name": "Dorothy4", "id":3}
+      EOF
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldContainSubstring "id":21,"name":"Toto"
+    - result.systemout ShouldContainSubstring "id":8,"name":"Dorothy"
+    - result.systemout ShouldContainSubstring "id":21,"name":"Toto2"
+    - result.systemout ShouldContainSubstring "id":8,"name":"Dorothy4"
+    - result.systemerr ShouldBeEmpty
+
 - name: using cache
   steps:
   - script: rm -f masking.yml
@@ -127,6 +211,41 @@ testcases:
     - result.systemout ShouldContainSubstring "id":6,"name":"Mathieu"
     - result.systemerr ShouldBeEmpty
 
+- name: no error when no more value for cache
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      seed: 1
+      masking:
+        - selector:
+            jsonpath: "name"
+          mask:
+            randomChoice:
+              - "Mickael"
+              - "Mathieu"
+              - "Marcel"
+          cache: "name"
+
+      caches:
+        name :
+
+      EOF
+  - script: |-
+      pimo <<EOF
+      {"name": "Toto", "id": 1}
+      {"name": "Dorothy", "id":2}
+      {"name": "Toto", "id":3}
+      {"name": "Dorothy", "id":4}
+      {"name": "Justine", "id":5}
+      {"name": "Justine", "id":6}
+      {"name": "NoMore", "id":7}
+      EOF
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemerr ShouldBeEmpty
+
 - name: error when no more value for unique cache
   steps:
   - script: rm -f masking.yml
@@ -162,3 +281,43 @@ testcases:
     assertions:
     - result.code ShouldEqual 4
     - result.systemerr ShouldContainSubstring "Unique value not found"
+
+- name: masking with value from cache
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      seed: 1
+      masking:
+        - selector:
+            jsonpath: "name"
+          mask:
+            randomChoice:
+              - "Mickael"
+              - "Mathieu"
+              - "Marcel"
+          cache: "name"
+        - selector:
+            jsonpath: "supervisor"
+          mask:
+            fromCache: "name"
+      caches:
+        name :
+          unique: true
+
+      EOF
+  - script: sed -i  "s/\[\[/\{\{/g"  masking.yml
+  - script: sed -i  "s/\]\]/\}\}/g"  masking.yml
+  - script: |-
+      pimo <<EOF
+      {"name": "Toto", "id": 1, "supervisor" : "Dorothy" }
+      {"name": "Justine", "id":5, "supervisor" : "Justine"}
+      {"name": "Dorothy", "id":2, "supervisor" : "Justine"}
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldContainSubstring '{"id":1,"name":"Marcel","supervisor":"Mathieu"}'
+    - result.systemout ShouldContainSubstring '{"id":5,"name":"Mickael","supervisor":"Mickael"}'
+    - result.systemout ShouldContainSubstring '{"id":2,"name":"Mathieu","supervisor":"Mickael"}'
+    
+    - result.systemerr ShouldBeEmpty

@@ -37,9 +37,11 @@ var (
 	buildDate string
 	builtBy   string
 
-	iteration   int
-	emptyInput  bool
-	maskingFile string
+	iteration    int
+	emptyInput   bool
+	maskingFile  string
+	cachesToDump map[string]string
+	cachesToLoad map[string]string
 )
 
 func main() {
@@ -49,22 +51,15 @@ func main() {
 		Long:    `Pimo is a tool to mask private data contained in jsonlines by using masking configurations`,
 		Version: fmt.Sprintf("%v (commit=%v date=%v by=%v)\n© CGI Inc 2020 All rights reserved", version, commit, buildDate, builtBy),
 		Run: func(cmd *cobra.Command, args []string) {
-			/*
-				config, err := pimo.YamlConfig(maskingFile, injectMaskFactories(), injectMaskContextFactories())
-				if err != nil {
-					os.Stderr.WriteString("ERROR : masking.yml not working properly, " + err.Error())
-					os.Exit(1)
-				}
-
-				run(config)
-			*/
-			run2()
+			run()
 		},
 	}
 
 	rootCmd.PersistentFlags().IntVarP(&iteration, "repeat", "r", 1, "number of iteration to mask each input")
 	rootCmd.PersistentFlags().BoolVar(&emptyInput, "empty-input", false, "generate datas without any input, to use with repeat flag")
 	rootCmd.PersistentFlags().StringVarP(&maskingFile, "config", "c", "masking.yml", "name and location of the masking-config file")
+	rootCmd.PersistentFlags().StringToStringVar(&cachesToDump, "dump-cache", map[string]string{}, "path for dumping cache into file")
+	rootCmd.PersistentFlags().StringToStringVar(&cachesToLoad, "load-cache", map[string]string{}, "path for loading cache from file")
 
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Println(err)
@@ -72,7 +67,7 @@ func main() {
 	}
 }
 
-func run2() {
+func run() {
 	var source model.ISource
 	if emptyInput {
 		source = model.NewSourceFromSlice([]model.Dictionary{{}})
@@ -82,13 +77,29 @@ func run2() {
 	pipeline := model.NewPipeline(source).
 		Process(model.NewRepeaterProcess(iteration))
 
-	var err error
+	var (
+		err    error
+		caches map[string]model.ICache
+	)
 
-	pipeline, err = pimo.YamlPipeline(pipeline, maskingFile, injectMaskFactories(), injectMaskContextFactories())
+	pipeline, caches, err = pimo.YamlPipeline(pipeline, maskingFile, injectMaskFactories(), injectMaskContextFactories())
 
 	if err != nil {
 		os.Stderr.WriteString(err.Error() + "\n")
 		os.Exit(1)
+	}
+
+	for name, path := range cachesToLoad {
+		cache, ok := caches[name]
+		if !ok {
+			fmt.Fprintf(os.Stderr, "Cache %s not found", name)
+			os.Exit(2)
+		}
+		err = pimo.LoadCache(name, cache, path)
+		if err != nil {
+			fmt.Fprint(os.Stderr, err.Error())
+			os.Exit(3)
+		}
 	}
 
 	err = pipeline.AddSink(jsonline.NewSink(os.Stdout)).Run()
@@ -97,59 +108,22 @@ func run2() {
 		os.Stderr.WriteString(err.Error() + "\n")
 		os.Exit(4)
 	}
+
+	for name, path := range cachesToDump {
+		cache, ok := caches[name]
+		if !ok {
+			fmt.Fprintf(os.Stderr, "Cache %s not found", name)
+			os.Exit(2)
+		}
+		err = pimo.DumpCache(name, cache, path)
+		if err != nil {
+			fmt.Fprint(os.Stderr, err.Error())
+			os.Exit(3)
+		}
+	}
+
 	os.Exit(0)
 }
-
-/*
-func run(config model.MaskConfiguration) {
-	if iteration == 0 {
-		return
-	}
-	maskingEngine := model.MaskingEngineFactory(config, true)
-	reader := pimo.NewJSONLineIterator(os.Stdin)
-	for {
-		i := 0
-		var dic model.Dictionary
-		var err error
-		if emptyInput {
-			// TODO replace that if statement by an EmptyDictionaryIterator
-			dic = model.Dictionary{}
-		} else {
-			dic, err = reader.Next()
-		}
-		for i < iteration {
-			if (err == pimo.StopIteratorError{}) {
-				os.Exit(0)
-			}
-			if err != nil {
-				os.Stderr.WriteString(err.Error() + "\n")
-				os.Exit(2)
-			}
-			masked, err := maskingEngine.Mask(dic)
-			if err != nil {
-				os.Stderr.WriteString(err.Error() + "\n")
-				if skipLine {
-					break
-				}
-				if !skipField {
-					os.Exit(4)
-				}
-			}
-			maskedmap := masked.(map[string]model.Entry)
-			jsonline, err := pimo.DictionaryToJSON(maskedmap)
-			if err != nil {
-				os.Stderr.WriteString(err.Error() + "\n")
-				os.Exit(3)
-			}
-			os.Stdout.Write(jsonline)
-			i++
-		}
-		if emptyInput {
-			os.Exit(0)
-		}
-	}
-}
-*/
 
 func injectMaskContextFactories() []model.MaskContextFactory {
 	return []model.MaskContextFactory{

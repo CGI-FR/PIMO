@@ -9,34 +9,27 @@ import (
 
 func TestMaskingShouldReplaceSensitiveValueByRandomInList(t *testing.T) {
 	nameList := []model.Entry{"Michel", "Marc", "Matthias", "Youen", "Alexis"}
-	config := model.NewMaskConfiguration().
-		WithEntry("name", NewMask(nameList, 0))
-
-	maskingEngine := model.MaskingEngineFactory(config, true)
 
 	data := model.Dictionary{"name": "Benjamin"}
-	result, err := maskingEngine.Mask(data)
+	result, err := NewMask(nameList, 0).Mask(data)
 	assert.Equal(t, nil, err, "error should be nil")
 	assert.NotEqual(t, data, result, "should be masked")
 
-	namemap := result.(map[string]model.Entry)
-	assert.Contains(t, nameList, namemap["name"], "Should be in the list")
+	assert.Contains(t, nameList, result, "Should be in the list")
 }
 
 func TestMaskingShouldReplaceSensitiveValueByRandomAndDifferent(t *testing.T) {
 	nameList := []model.Entry{"Michel", "Marc", "Matthias", "Youen", "Alexis"}
-	config := model.NewMaskConfiguration().
-		WithEntry("name", NewMask(nameList, 0))
-	maskingEngine := model.MaskingEngineFactory(config, true)
 
-	data := model.Dictionary{"name": "Benjamin"}
+	mask := NewMask(nameList, 0)
+
 	diff := 0
 	for i := 0; i < 1000; i++ {
-		result, err := maskingEngine.Mask(data)
+		result, err := mask.Mask("Benjamin")
 		assert.Equal(t, nil, err, "error should be nil")
-		resultBis, err := maskingEngine.Mask(data)
+		resultBis, err := mask.Mask("Benjamin")
 		assert.Equal(t, nil, err, "error should be nil")
-		if result.(map[string]model.Entry)["name"] != resultBis.(map[string]model.Entry)["name"] {
+		if result != resultBis {
 			diff++
 		}
 	}

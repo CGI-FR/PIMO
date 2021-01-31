@@ -14,17 +14,11 @@ func TestMaskingShouldReplaceSensitiveValueByRandomNumber(t *testing.T) {
 	max := float64(10)
 	precision := 2
 	randomMask := NewMask(min, max, precision, time.Now().UnixNano())
-	config := model.NewMaskConfiguration().
-		WithEntry("amount", randomMask)
 
-	maskingEngine := model.MaskingEngineFactory(config, true)
-	data := model.Dictionary{"amount": 20}
-	result, err := maskingEngine.Mask(data)
+	result, err := randomMask.Mask(20)
 	assert.Equal(t, nil, err, "error should be nil")
-	resultmap := result.(map[string]model.Entry)
-	amount := resultmap["amount"].(float64)
-
-	assert.NotEqual(t, data, result, "Should be masked")
+	amount := result.(float64)
+	assert.NotEqual(t, 20, amount, "Should be masked")
 	assert.True(t, amount >= min, "Should be more than min")
 	assert.True(t, amount <= max, "Should be less than max")
 	assert.Equal(t, 4, len(strconv.FormatFloat(amount, 'f', -1, 64)), "Should be of length 4")

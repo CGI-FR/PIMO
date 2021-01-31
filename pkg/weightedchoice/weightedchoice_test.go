@@ -10,19 +10,14 @@ import (
 func TestMaskingShouldReplaceSensitiveValueByWeightedRandom(t *testing.T) {
 	NameWeighted := []model.WeightedChoiceType{{Choice: "Michel", Weight: 4}, {Choice: "Marc", Weight: 1}}
 	weightMask := NewMask(NameWeighted, 0)
-	config := model.NewMaskConfiguration().
-		WithEntry("name", weightMask)
 
-	maskingEngine := model.MaskingEngineFactory(config, true)
-
-	wait := model.Dictionary{"name": "Michel"}
+	wait := "Michel"
 	equal := 0
-	data := model.Dictionary{"name": "Benjamin"}
+	data := "Benjamin"
 	for i := 0; i < 1000; i++ {
-		result, err := maskingEngine.Mask(data)
-		resultmap := result.(map[string]model.Entry)
+		result, err := weightMask.Mask(data)
 		assert.Equal(t, nil, err, "error should be nil")
-		if resultmap["name"].(string) == wait["name"] {
+		if result == wait {
 			equal++
 		}
 	}

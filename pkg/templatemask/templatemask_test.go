@@ -13,14 +13,11 @@ func TestMaskingShouldReplaceSensitiveValueByTemplate(t *testing.T) {
 	if err != nil {
 		assert.Fail(t, err.Error())
 	}
-	config := model.NewMaskConfiguration().
-		WithEntry("mail", tempMask)
-	maskingEngine := model.MaskingEngineFactory(config, true)
 
 	data := model.Dictionary{"name": "Jean", "surname": "Bonbeur", "mail": "jean44@outlook.com"}
-	result, err := maskingEngine.Mask(data)
+	result, err := tempMask.Mask("jean44@outlook.com", data)
 	assert.Equal(t, nil, err, "error should be nil")
-	waited := model.Dictionary{"name": "Jean", "surname": "Bonbeur", "mail": "Jean.Bonbeur@gmail.com"}
+	waited := "Jean.Bonbeur@gmail.com"
 	assert.Equal(t, waited, result, "Should create the right mail")
 }
 
@@ -30,14 +27,11 @@ func TestMaskingShouldReplaceSensitiveValueByTemplateInNested(t *testing.T) {
 	if err != nil {
 		assert.Fail(t, err.Error())
 	}
-	config := model.NewMaskConfiguration().
-		WithEntry("mail", tempMask)
-	maskingEngine := model.MaskingEngineFactory(config, true)
 
 	data := model.Dictionary{"customer": model.Dictionary{"identity": model.Dictionary{"name": "Jean", "surname": "Bonbeur"}}, "mail": "jean44@outlook.com"}
-	result, err := maskingEngine.Mask(data)
+	result, err := tempMask.Mask("jean44@outlook.com", data)
 	assert.Equal(t, nil, err, "error should be nil")
-	waited := model.Dictionary{"customer": model.Dictionary{"identity": model.Dictionary{"name": "Jean", "surname": "Bonbeur"}}, "mail": "Jean.Bonbeur@gmail.com"}
+	waited := "Jean.Bonbeur@gmail.com"
 	assert.Equal(t, waited, result, "Should create the right mail")
 }
 
@@ -78,54 +72,23 @@ func TestMaskingTemplateShouldFormat(t *testing.T) {
 	if err != nil {
 		assert.Fail(t, err.Error())
 	}
-	config := model.NewMaskConfiguration().
-		WithEntry("field", tempMask)
-	maskingEngine := model.MaskingEngineFactory(config, true)
 
 	data := model.Dictionary{"field": "anything"}
-	result, err := maskingEngine.Mask(data)
+	result, err := tempMask.Mask("anything", data)
 	assert.Equal(t, nil, err, "error should be nil")
-	waited := model.Dictionary{"field": "HELLO!HELLO!"}
+	waited := "HELLO!HELLO!"
 	assert.Equal(t, waited, result, "Should create the right field")
 }
 
 func TestRFactoryShouldCreateANestedContextMask(t *testing.T) {
 	maskingConfig := model.Masking{Selector: model.SelectorType{Jsonpath: "foo.bar"}, Mask: model.MaskType{Template: "{{.baz}}"}}
-	config := model.NewMaskConfiguration()
 	maskEngine, present, err := Factory(maskingConfig, 0)
 	assert.Nil(t, err, "should be nil")
 	assert.True(t, present, "should be true")
 	data := model.Dictionary{"baz": "BAZ", "foo": model.Dictionary{"bar": "BAR"}}
 
-	config = config.WithEntry("foo.bar", maskEngine)
+	masked, _ := maskEngine.Mask("bar", data)
 
-	masked, _ := model.MaskingEngineFactory(config, true).Mask(data, data)
-
-	waited := model.Dictionary{"baz": "BAZ", "foo": model.Dictionary{"bar": "BAZ"}}
-	assert.Equal(t, waited, masked, "Should replace foo.bar with BAZ")
-}
-
-func TestFactoryShouldReuseMaskedData(t *testing.T) {
-	maskingConfig := model.Masking{Selector: model.SelectorType{Jsonpath: "foo.bar"}, Mask: model.MaskType{Template: "{{.baz}}"}}
-	config := model.NewMaskConfiguration()
-
-	maskEngine, present, err := Factory(maskingConfig, 0)
-	config = config.WithEntry("foo.bar", maskEngine)
-
-	assert.Nil(t, err, "should be nil")
-	assert.True(t, present, "should be true")
-
-	maskingConfig2 := model.Masking{Selector: model.SelectorType{Jsonpath: "foo.bar"}, Mask: model.MaskType{Template: "{{.foo.bar}}"}}
-	maskEngine2, present, err := Factory(maskingConfig2, 0)
-	config = config.WithEntry("foo.bar", maskEngine2)
-
-	assert.Nil(t, err, "should be nil")
-	assert.True(t, present, "should be true")
-
-	data := model.Dictionary{"baz": "BAZ", "foo": model.Dictionary{"bar": "BAR"}}
-
-	masked, _ := model.MaskingEngineFactory(config, true).Mask(data, data)
-
-	waited := model.Dictionary{"baz": "BAZ", "foo": model.Dictionary{"bar": "BAZ"}}
+	waited := "BAZ"
 	assert.Equal(t, waited, masked, "Should replace foo.bar with BAZ")
 }

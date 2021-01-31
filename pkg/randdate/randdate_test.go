@@ -13,28 +13,22 @@ func TestMaskingShouldReplaceDateByRandom(t *testing.T) {
 	dateMax := time.Date(2000, 1, 1, 0, 0, 0, 0, time.UTC)
 	dateRange := NewMask(dateMin, dateMax, 0)
 
-	config := model.NewMaskConfiguration().
-		WithEntry("date", dateRange)
+	data := time.Date(2019, 3, 2, 0, 0, 0, 0, time.UTC)
 
-	maskingEngine := model.MaskingEngineFactory(config, true)
-	data := model.Dictionary{"date": time.Date(2019, 3, 2, 0, 0, 0, 0, time.UTC)}
-
-	result, err := maskingEngine.Mask(data)
+	result, err := dateRange.Mask(data)
 	assert.Equal(t, nil, err, "error should be nil")
-	resultmap := result.(map[string]model.Entry)
 
-	assert.Greater(t, dateMax.Sub(resultmap["date"].(time.Time)).Microseconds(), int64(0),
-		"%v should be before max date %v", resultmap["date"].(time.Time), dateMax)
+	assert.Greater(t, dateMax.Sub(result.(time.Time)).Microseconds(), int64(0),
+		"%v should be before max date %v", result.(time.Time), dateMax)
 
-	assert.Less(t, dateMin.Sub(resultmap["date"].(time.Time)).Microseconds(), int64(0),
-		"%v should be after min date %v", resultmap["date"].(time.Time), dateMin)
+	assert.Less(t, dateMin.Sub(result.(time.Time)).Microseconds(), int64(0),
+		"%v should be after min date %v", result.(time.Time), dateMin)
 
 	equal := 0
 	for i := 0; i < 1000; i++ {
-		result, err := maskingEngine.Mask(data)
+		result, err := dateRange.Mask(data)
 		assert.Equal(t, nil, err, "error should be nil")
-		resultmap := result.(map[string]model.Entry)
-		if resultmap["date"] == data["date"] {
+		if result == data {
 			equal++
 		}
 	}

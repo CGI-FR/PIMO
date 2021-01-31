@@ -9,22 +9,24 @@ import (
 
 func TestMaskingShouldCreateIncrementalInt(t *testing.T) {
 	incrementMask := NewMask(1, 1)
-	secIncrMask := NewMask(5, 2)
-	config := model.NewMaskConfiguration().
-		WithEntry("id1", incrementMask).
-		WithEntry("id2", secIncrMask)
 
-	maskingEngine := model.MaskingEngineFactory(config, true)
-	firstData := model.Dictionary{"id1": 0, "id2": 0}
-	secondData := model.Dictionary{"id1": 0, "id2": 0}
-	firstMasked, err := maskingEngine.Mask(firstData)
+	firstMasked, err := incrementMask.Mask(0)
 	assert.Equal(t, nil, err, "error should be nil")
-	firstWaited := model.Dictionary{"id1": 1, "id2": 5}
-	assert.Equal(t, firstMasked, firstWaited, "First  id masking should be equal")
-	secondMasked, err := maskingEngine.Mask(secondData)
+	assert.Equal(t, firstMasked, 1, "First  id masking should be equal")
+	secondMasked, err := incrementMask.Mask(0)
 	assert.Equal(t, nil, err, "error should be nil")
-	secondWaited := model.Dictionary{"id1": 2, "id2": 7}
-	assert.Equal(t, secondMasked, secondWaited, "Second id masking should be equal")
+	assert.Equal(t, secondMasked, 2, "Second id masking should be equal")
+}
+
+func TestMaskingShouldCreateIncrementalIntwithOffset(t *testing.T) {
+	incrementMask := NewMask(5, 2)
+
+	firstMasked, err := incrementMask.Mask(0)
+	assert.Equal(t, nil, err, "error should be nil")
+	assert.Equal(t, firstMasked, 5, "First  id masking should be equal")
+	secondMasked, err := incrementMask.Mask(0)
+	assert.Equal(t, nil, err, "error should be nil")
+	assert.Equal(t, secondMasked, 7, "Second id masking should be equal")
 }
 
 func TestRegistryMaskToConfigurationShouldCreateAMask(t *testing.T) {

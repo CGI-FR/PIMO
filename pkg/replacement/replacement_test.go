@@ -4,37 +4,18 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"makeit.imfr.cgi.com/makeit2/scm/lino/pimo/pkg/constant"
 	"makeit.imfr.cgi.com/makeit2/scm/lino/pimo/pkg/model"
 )
 
 func TestMaskingShouldReplaceSensitiveValueByAnotherField(t *testing.T) {
 	remplacement := NewMask("name1")
-	config := model.NewMaskConfiguration().
-		WithEntry("name2", remplacement)
-	maskingEngine := model.MaskingEngineFactory(config, true)
 
 	data := model.Dictionary{"name1": "Dupont", "name2": "Dupond"}
-	result, err := maskingEngine.Mask(data)
+	result, err := remplacement.Mask("Dupond", data)
 	assert.Equal(t, nil, err, "error should be nil")
-	waited := model.Dictionary{"name1": "Dupont", "name2": "Dupont"}
+	waited := "Dupont"
 	assert.NotEqual(t, result, data, "Should be different")
 	assert.Equal(t, waited, result, "Should be masked with the other value")
-}
-
-func TestMaskingShouldReplaceSensitiveValueByAMaskedField(t *testing.T) {
-	remplacement := NewMask("name1")
-	consta := constant.NewMask("Toto")
-	config := model.NewMaskConfiguration().
-		WithEntry("name1", consta).
-		WithEntry("name2", remplacement)
-	maskingEngine := model.MaskingEngineFactory(config, true)
-
-	data := model.Dictionary{"name1": "Dupont", "name2": "Dupond"}
-	result, err := maskingEngine.Mask(data)
-	assert.Equal(t, nil, err, "error should be nil")
-	waited := model.Dictionary{"name1": "Toto", "name2": "Toto"}
-	assert.Equal(t, waited, result, "Should be masked with the constant value")
 }
 
 func TestFactoryShouldCreateAMask(t *testing.T) {

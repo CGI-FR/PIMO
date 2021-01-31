@@ -14,15 +14,11 @@ func TestMaskingShouldReplaceSensitiveValueByRegex(t *testing.T) {
 	if err != nil {
 		assert.Fail(t, "could not initialise regexep")
 	}
-	config := model.NewMaskConfiguration().
-		WithEntry("phone", regmask)
-	maskingEngine := model.MaskingEngineFactory(config, true)
 
-	data := model.Dictionary{"phone": "00 00 00 00 00"}
-	result, err := maskingEngine.Mask(data)
+	data := "00 00 00 00 00"
+	result, err := regmask.Mask(data)
 	assert.Equal(t, nil, err, "error should be nil")
-	resultmap := result.(model.Dictionary)
-	match, _ := regexp.MatchString(regex, resultmap["phone"].(string))
+	match, _ := regexp.MatchString(regex, result.(string))
 	assert.NotEqual(t, data, result, "should be masked")
 	assert.True(t, match, "should match the regexp")
 }

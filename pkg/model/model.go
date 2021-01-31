@@ -21,104 +21,6 @@ type MaskContextEngine interface {
 	MaskContext(Dictionary, string, ...Dictionary) (Dictionary, error)
 }
 
-// NewMaskConfiguration build new configuration
-func NewMaskConfiguration() MaskConfiguration {
-	return MapMaskConfiguration{[]MaskKey{}}
-}
-
-// MaskConfiguration is a configuration to mask dictionaries content
-type MaskConfiguration interface {
-	GetMaskingEngine(string) (MaskContextEngine, bool)
-	WithEntry(string, MaskEngine) MaskConfiguration
-	WithContextEntry(string, MaskContextEngine) MaskConfiguration
-	AsEngine() MaskEngine
-	AsContextEngine() MaskContextEngine
-	Entries() []MaskKey
-}
-
-// MaskKeyStruct is a structure containing a maskengine and the key which need the mask
-type MaskKey struct {
-	maskCont MaskContextEngine
-	Key      string
-}
-
-// MapMaskConfiguration Implements MaskConfiguration with a map
-type MapMaskConfiguration struct {
-	config []MaskKey
-}
-
-// WithEntry append engine for entry in the configuration and return modified configuration
-func (mmc MapMaskConfiguration) WithEntry(key string, engine MaskEngine) MaskConfiguration {
-	return mmc.WithContextEntry(key, ContextWrapper{engine})
-}
-
-func (mmc MapMaskConfiguration) WithContextEntry(key string, engine MaskContextEngine) MaskConfiguration {
-	mainEntry := strings.SplitN(key, ".", 2)
-	if len(mainEntry) == 2 {
-		mmc.config = append(mmc.config, MaskKey{NewMaskConfiguration().WithContextEntry(mainEntry[1], engine).AsContextEngine(), mainEntry[0]})
-	} else {
-		mmc.config = append(mmc.config, MaskKey{engine, key})
-	}
-
-	return mmc
-}
-
-// GetMaskingEngine return the MaskEngine configured for that string
-func (mmc MapMaskConfiguration) GetMaskingEngine(key string) (MaskContextEngine, bool) {
-	for _, k := range mmc.config {
-		if k.Key == key {
-			return k.maskCont, true
-		}
-	}
-	return nil, false
-}
-
-// AsEngine return engine with configuration
-func (mmc MapMaskConfiguration) AsEngine() MaskEngine {
-	return MaskingEngineFactory(mmc, false)
-}
-
-// AsEngine return engine with configuration
-func (mmc MapMaskConfiguration) AsContextEngine() MaskContextEngine {
-	return ContextWrapper{mmc.AsEngine()}
-}
-
-// Entries list every mask in mmc in order
-func (mmc MapMaskConfiguration) Entries() []MaskKey {
-	return mmc.config
-}
-
-// MaskingEngineFactory return Masking function data without private information
-func MaskingEngineFactory(config MaskConfiguration, root bool) FunctionMaskEngine {
-	return FunctionMaskEngine{func(input Entry, contexts ...Dictionary) (Entry, error) {
-		output := Dictionary{}
-		dico, ok := input.(Dictionary)
-		if !ok {
-			return input, nil
-		}
-
-		for k, v := range dico {
-			output[k] = v
-		}
-		var errMask error
-		errMask = nil
-		for _, maskKey := range config.Entries() {
-			engine := maskKey.maskCont
-			var err error
-			if root {
-				output, err = engine.MaskContext(output, maskKey.Key, output)
-			} else {
-				output, err = engine.MaskContext(output, maskKey.Key, contexts...)
-			}
-			if err != nil {
-				errMask = err
-				delete(output, maskKey.Key)
-			}
-		}
-		return output, errMask
-	}}
-}
-
 // FunctionMaskEngine implements MaskEngine with a simple function
 type FunctionMaskEngine struct {
 	Function func(Entry, ...Dictionary) (Entry, error)
@@ -127,65 +29,6 @@ type FunctionMaskEngine struct {
 // Mask delegate mask algorithm to the function
 func (fme FunctionMaskEngine) Mask(e Entry, context ...Dictionary) (Entry, error) {
 	return fme.Function(e, context...)
-}
-
-type ContextWrapper struct {
-	engine MaskEngine
-}
-
-func NewContextWrapper(engine MaskEngine) MaskContextEngine {
-	return ContextWrapper{engine}
-}
-
-func (cw ContextWrapper) MaskContext(context Dictionary, key string, contexts ...Dictionary) (Dictionary, error) {
-	result := Dictionary{}
-	var err error
-	for k, v := range context {
-		if k == key {
-			switch j := context[k].(type) {
-			case []Dictionary:
-				var tab []Dictionary
-				for i := range j {
-					var e Entry
-					e, erreur := cw.engine.Mask(j[i], contexts...)
-					if erreur != nil {
-						err = erreur
-						tab = append(tab, j[i])
-						continue
-					}
-					tab = append(tab, e.(Dictionary))
-				}
-				result[k] = tab
-
-			case []Entry:
-				var tab []Entry
-				for i := range j {
-					var e Entry
-					e, erreur := cw.engine.Mask(j[i], contexts...)
-					if erreur != nil {
-						err = erreur
-						tab = append(tab, j[i])
-						continue
-					}
-					tab = append(tab, e)
-				}
-				result[k] = tab
-
-			case Entry:
-				var e Entry
-				e, erreur := cw.engine.Mask(context[k], contexts...)
-				if erreur != nil {
-					err = erreur
-					result[k] = v
-					continue
-				}
-				result[k] = e
-			}
-		} else {
-			result[k] = v
-		}
-	}
-	return result, err
 }
 
 type MaskFactory func(Masking, int64) (MaskEngine, bool, error)
@@ -253,6 +96,7 @@ type MaskType struct {
 	FluxURI           string               `yaml:"fluxUri"`
 	RandomDecimal     RandomDecimalType    `yaml:"randomDecimal"`
 	DateParser        DateParserType       `yaml:"dateParser"`
+	FromCache         string               `yaml:"fromCache"`
 }
 
 type Masking struct {
@@ -630,6 +474,23 @@ func (sink *SinkToSlice) ProcessDictionary(dictionary Dictionary) error {
 	return nil
 }
 
+func NewSinkToCache(cache ICache) ISinkProcess {
+	return &SinkToCache{cache}
+}
+
+type SinkToCache struct {
+	cache ICache
+}
+
+func (sink *SinkToCache) Open() error {
+	return nil
+}
+
+func (sink *SinkToCache) ProcessDictionary(dictionary Dictionary) error {
+	sink.cache.Put(dictionary["key"], dictionary["value"])
+	return nil
+}
+
 type SinkedPipeline struct {
 	source ISource
 	sink   ISinkProcess
@@ -674,6 +535,14 @@ func NewCollector() *Collector {
 type Collector struct {
 	queue []Dictionary
 	value Dictionary
+}
+
+func (c *Collector) Err() error {
+	return nil
+}
+
+func (c *Collector) Open() error {
+	return nil
 }
 
 func (c *Collector) Collect(dictionary Dictionary) {
