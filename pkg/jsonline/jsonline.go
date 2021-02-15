@@ -9,7 +9,7 @@ import (
 )
 
 // NewSource creates a new Source.
-func NewSource(file io.Reader) model.ISource {
+func NewSource(file io.Reader) model.Source {
 	scanner := bufio.NewScanner(file)
 	buf := make([]byte, 0, 64*1024)
 	scanner.Buffer(buf, 1024*1024*100) // increase buffer up to 100 MB
@@ -58,7 +58,7 @@ func (s *Source) Err() error {
 }
 
 // NewSink creates a new Sink.
-func NewSink(file io.Writer) model.ISinkProcess {
+func NewSink(file io.Writer) model.SinkProcess {
 	return Sink{file}
 }
 

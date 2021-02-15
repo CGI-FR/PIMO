@@ -4,29 +4,29 @@ import (
 	"fmt"
 )
 
-type ICache interface {
+type Cache interface {
 	Get(key Entry) (Entry, bool)
 	Put(key Entry, value Entry)
-	Subscribe(key Entry, observer IObserver)
-	Iterate() ISource
+	Subscribe(key Entry, observer Observer)
+	Iterate() Source
 }
 
-type IUniqueCache interface {
-	ICache
+type UniqueCache interface {
+	Cache
 	PutUnique(key Entry, value Entry) bool
 }
 
-type IObserver interface {
+type Observer interface {
 	Notify(key Entry, value Entry)
 }
 
 // MemCache is a cache in memory
 type MemCache struct {
 	cache     map[Entry]Entry
-	observers map[Entry][]IObserver
+	observers map[Entry][]Observer
 }
 
-func (mc *MemCache) Iterate() ISource {
+func (mc *MemCache) Iterate() Source {
 	collector := NewCollector()
 	for k, v := range mc.cache {
 		collector.Collect(Dictionary{"key": k, "value": v})
@@ -49,16 +49,16 @@ func (mc *MemCache) Put(key Entry, value Entry) {
 	mc.cache[key] = value
 }
 
-func (mc *MemCache) Subscribe(key Entry, observer IObserver) {
+func (mc *MemCache) Subscribe(key Entry, observer Observer) {
 	observers, ok := mc.observers[key]
 	if !ok {
-		observers = []IObserver{}
+		observers = []Observer{}
 	}
 	mc.observers[key] = append(observers, observer)
 }
 
-func NewUniqueMemCache() IUniqueCache {
-	return &UniqueMemCache{MemCache{map[Entry]Entry{}, map[Entry][]IObserver{}}, map[Entry]struct{}{}}
+func NewUniqueMemCache() UniqueCache {
+	return &UniqueMemCache{MemCache{map[Entry]Entry{}, map[Entry][]Observer{}}, map[Entry]struct{}{}}
 }
 
 type UniqueMemCache struct {
@@ -78,18 +78,18 @@ func (mc *UniqueMemCache) PutUnique(key Entry, value Entry) bool {
 	return true
 }
 
-func NewMemCache() ICache {
-	return &MemCache{map[Entry]Entry{}, map[Entry][]IObserver{}}
+func NewMemCache() Cache {
+	return &MemCache{map[Entry]Entry{}, map[Entry][]Observer{}}
 }
 
 // MaskCacheEngine is a struct to create a cahed mask
 type MaskCacheEngine struct {
-	Cache          ICache
+	Cache          Cache
 	OriginalEngine MaskEngine
 }
 
 // NewMaskCacheEngine create an MaskCacheEngine
-func NewMaskCacheEngine(cache ICache, original MaskEngine) MaskCacheEngine {
+func NewMaskCacheEngine(cache Cache, original MaskEngine) MaskCacheEngine {
 	return MaskCacheEngine{cache, original}
 }
 
@@ -107,12 +107,12 @@ func (mce MaskCacheEngine) Mask(e Entry, context ...Dictionary) (Entry, error) {
 }
 
 type UniqueMaskCacheEngine struct {
-	cache          IUniqueCache
+	cache          UniqueCache
 	originalEngine MaskEngine
 	maxRetries     int
 }
 
-func NewUniqueMaskCacheEngine(cache IUniqueCache, original MaskEngine) UniqueMaskCacheEngine {
+func NewUniqueMaskCacheEngine(cache UniqueCache, original MaskEngine) UniqueMaskCacheEngine {
 	return UniqueMaskCacheEngine{cache, original, 1000}
 }
 
@@ -136,22 +136,22 @@ func (umce UniqueMaskCacheEngine) Mask(e Entry, context ...Dictionary) (Entry, e
 	return nil, fmt.Errorf("Unique value not found")
 }
 
-func NewFromCacheProcess(selector ISelector, cache ICache) IProcess {
-	return &FromCacheProcess{selector, cache, &Collector{}, map[Entry]*Collector{}}
+func NewFromCacheProcess(selector Selector, cache Cache) Processor {
+	return &FromCacheProcess{selector, cache, &QueueCollector{}, map[Entry]*QueueCollector{}}
 }
 
 type FromCacheProcess struct {
-	selector  ISelector
-	cache     ICache
-	readiness *Collector
-	waiting   map[Entry]*Collector
+	selector  Selector
+	cache     Cache
+	readiness *QueueCollector
+	waiting   map[Entry]*QueueCollector
 }
 
 func (p *FromCacheProcess) Open() error {
 	return nil
 }
 
-func (p *FromCacheProcess) ProcessDictionary(dictionary Dictionary, out ICollector) error {
+func (p *FromCacheProcess) ProcessDictionary(dictionary Dictionary, out Collector) error {
 	for p.readiness.Next() {
 		p.processDictionary(p.readiness.Value(), out)
 	}
@@ -160,7 +160,7 @@ func (p *FromCacheProcess) ProcessDictionary(dictionary Dictionary, out ICollect
 	return nil
 }
 
-func (p *FromCacheProcess) processDictionary(dictionary Dictionary, out ICollector) {
+func (p *FromCacheProcess) processDictionary(dictionary Dictionary, out Collector) {
 	key, ok := p.selector.Read(dictionary)
 	if !ok {
 		return
@@ -172,7 +172,7 @@ func (p *FromCacheProcess) processDictionary(dictionary Dictionary, out ICollect
 	} else {
 		collector, exist := p.waiting[key]
 		if !exist {
-			collector = &Collector{}
+			collector = &QueueCollector{}
 			p.waiting[key] = collector
 		}
 		collector.Collect(dictionary)

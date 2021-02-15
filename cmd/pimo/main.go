@@ -68,7 +68,7 @@ func main() {
 }
 
 func run() {
-	var source model.ISource
+	var source model.Source
 	if emptyInput {
 		source = model.NewSourceFromSlice([]model.Dictionary{{}})
 	} else {
@@ -79,7 +79,7 @@ func run() {
 
 	var (
 		err    error
-		caches map[string]model.ICache
+		caches map[string]model.Cache
 	)
 
 	pipeline, caches, err = pimo.YamlPipeline(pipeline, maskingFile, injectMaskFactories(), injectMaskContextFactories())

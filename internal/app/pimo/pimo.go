@@ -44,8 +44,8 @@ type YAMLCache struct {
 
 type CachedMaskEngineFactories func(model.MaskEngine) model.MaskEngine
 
-func buildCache(caches map[string]YAMLCache) map[string]model.ICache {
-	result := map[string]model.ICache{}
+func buildCache(caches map[string]YAMLCache) map[string]model.Cache {
+	result := map[string]model.Cache{}
 
 	for name, conf := range caches {
 		if conf.Unique {
@@ -58,7 +58,7 @@ func buildCache(caches map[string]YAMLCache) map[string]model.ICache {
 }
 
 // YamlConfig create a MaskConfiguration from a file
-func YamlPipeline(pipeline model.IPipeline, filename string, maskFactories []model.MaskFactory, maskContextFactories []model.MaskContextFactory) (model.IPipeline, map[string]model.ICache, error) {
+func YamlPipeline(pipeline model.Pipeline, filename string, maskFactories []model.MaskFactory, maskContextFactories []model.MaskContextFactory) (model.Pipeline, map[string]model.Cache, error) {
 	conf, err := ParseYAML(filename)
 	caches := buildCache(conf.Caches)
 
@@ -89,7 +89,7 @@ func YamlPipeline(pipeline model.IPipeline, filename string, maskFactories []mod
 						return nil, nil, errors.New("Cache '" + v.Cache + "' not found for '" + v.Selector.Jsonpath + "'")
 					}
 					switch typedCache := cache.(type) {
-					case model.IUniqueCache:
+					case model.UniqueCache:
 						mask = model.NewUniqueMaskCacheEngine(typedCache, mask)
 					default:
 						mask = model.NewMaskCacheEngine(typedCache, mask)
@@ -133,7 +133,7 @@ func ParseYAML(filename string) (YAMLStructure, error) {
 	return conf, nil
 }
 
-func DumpCache(name string, cache model.ICache, path string) error {
+func DumpCache(name string, cache model.Cache, path string) error {
 	file, err := os.Create(path)
 	if err != nil {
 		return fmt.Errorf("Cache %s not dump : %s", name, err.Error())
@@ -148,7 +148,7 @@ func DumpCache(name string, cache model.ICache, path string) error {
 	return nil
 }
 
-func LoadCache(name string, cache model.ICache, path string) error {
+func LoadCache(name string, cache model.Cache, path string) error {
 	file, err := os.Open(path)
 	if err != nil {
 		return fmt.Errorf("Cache %s not loaded : %s", name, err.Error())

@@ -109,42 +109,42 @@ type Masking struct {
  * REFACTORING *
  ***************/
 
-// IProcess process Dictionary and none, one or many element
-type IProcess interface {
+// Processor process Dictionary and none, one or many element
+type Processor interface {
 	Open() error
-	ProcessDictionary(Dictionary, ICollector) error
+	ProcessDictionary(Dictionary, Collector) error
 }
 
-// ICollector collect Dictionary generate by IProcess
-type ICollector interface {
+// Collector collect Dictionary generate by Process
+type Collector interface {
 	Collect(Dictionary)
 }
 
-// ISinkProcess send Dictionary process by Pipeline to an output
-type ISinkProcess interface {
+// SinkProcess send Dictionary process by Pipeline to an output
+type SinkProcess interface {
 	Open() error
 	ProcessDictionary(Dictionary) error
 }
 
-type IPipeline interface {
-	Process(IProcess) IPipeline
-	AddSink(ISinkProcess) ISinkedPipeline
+type Pipeline interface {
+	Process(Processor) Pipeline
+	AddSink(SinkProcess) SinkedPipeline
 }
 
-type ISinkedPipeline interface {
+type SinkedPipeline interface {
 	Run() error
 }
 
-// ISource is an iterator over Dictionary
-type ISource interface {
+// Source is an iterator over Dictionary
+type Source interface {
 	Open() error
 	Next() bool
 	Value() Dictionary
 	Err() error
 }
 
-// ISelector acces to a specific data into a dictonary
-type ISelector interface {
+// Selector acces to a specific data into a dictonary
+type Selector interface {
 	Read(Dictionary) (Entry, bool)
 	Write(Dictionary, Entry) Dictionary
 	Delete(Dictionary) Dictionary
@@ -158,11 +158,11 @@ type Mapper func(Dictionary) (Dictionary, error)
  * IMPLEMENTATION *
  ******************/
 
-func NewPipelineFromSlice(dictionaries []Dictionary) IPipeline {
-	return Pipeline{source: &SourceFromSlice{dictionaries: dictionaries, offset: 0}}
+func NewPipelineFromSlice(dictionaries []Dictionary) Pipeline {
+	return SimplePipeline{source: &SourceFromSlice{dictionaries: dictionaries, offset: 0}}
 }
 
-func NewSourceFromSlice(dictionaries []Dictionary) ISource {
+func NewSourceFromSlice(dictionaries []Dictionary) Source {
 	return &SourceFromSlice{dictionaries: dictionaries, offset: 0}
 }
 
@@ -189,7 +189,7 @@ func (source *SourceFromSlice) Open() error {
 	return nil
 }
 
-func NewRepeaterProcess(times int) IProcess {
+func NewRepeaterProcess(times int) Processor {
 	return RepeaterProcess{times}
 }
 
@@ -201,14 +201,14 @@ func (p RepeaterProcess) Open() error {
 	return nil
 }
 
-func (p RepeaterProcess) ProcessDictionary(dictionary Dictionary, out ICollector) error {
+func (p RepeaterProcess) ProcessDictionary(dictionary Dictionary, out Collector) error {
 	for i := 0; i < p.times; i++ {
 		out.Collect(dictionary)
 	}
 	return nil
 }
 
-func NewPathSelector(path string) ISelector {
+func NewPathSelector(path string) Selector {
 	mainEntry := strings.SplitN(path, ".", 2)
 	if len(mainEntry) == 2 {
 		return ComplexePathSelector{mainEntry[0], NewPathSelector(mainEntry[1])}
@@ -219,7 +219,7 @@ func NewPathSelector(path string) ISelector {
 
 type ComplexePathSelector struct {
 	path        string
-	subSelector ISelector
+	subSelector Selector
 }
 
 func (s ComplexePathSelector) Read(dictionary Dictionary) (entry Entry, ok bool) {
@@ -300,7 +300,7 @@ func (s ComplexePathSelector) Delete(dictionary Dictionary) Dictionary {
 	return result
 }
 
-func NewSimplePathSelector(path string) ISelector {
+func NewSimplePathSelector(path string) Selector {
 	return SimplePathSelector{path}
 }
 
@@ -341,29 +341,29 @@ func (s SimplePathSelector) Delete(dictionary Dictionary) Dictionary {
 	return result
 }
 
-func NewDeleteMaskEngineProcess(selector ISelector) IProcess {
+func NewDeleteMaskEngineProcess(selector Selector) Processor {
 	return &DeleteMaskEngineProcess{selector: selector}
 }
 
 type DeleteMaskEngineProcess struct {
-	selector ISelector
+	selector Selector
 }
 
 func (dp *DeleteMaskEngineProcess) Open() (err error) {
 	return err
 }
 
-func (dp *DeleteMaskEngineProcess) ProcessDictionary(dictionary Dictionary, out ICollector) error {
+func (dp *DeleteMaskEngineProcess) ProcessDictionary(dictionary Dictionary, out Collector) error {
 	out.Collect(dp.selector.Delete(dictionary))
 	return nil
 }
 
-func NewMaskContextEngineProcess(selector ISelector, mask MaskContextEngine) IProcess {
+func NewMaskContextEngineProcess(selector Selector, mask MaskContextEngine) Processor {
 	return &MaskContextEngineProcess{selector, mask}
 }
 
 type MaskContextEngineProcess struct {
-	selector ISelector
+	selector Selector
 	mask     MaskContextEngine
 }
 
@@ -371,7 +371,7 @@ func (mp *MaskContextEngineProcess) Open() (err error) {
 	return err
 }
 
-func (mp *MaskContextEngineProcess) ProcessDictionary(dictionary Dictionary, out ICollector) error {
+func (mp *MaskContextEngineProcess) ProcessDictionary(dictionary Dictionary, out Collector) error {
 	subDictionary, key, ok := mp.selector.ReadContext(dictionary)
 	if !ok {
 		out.Collect(dictionary)
@@ -389,12 +389,12 @@ func (mp *MaskContextEngineProcess) ProcessDictionary(dictionary Dictionary, out
 	return nil
 }
 
-func NewMaskEngineProcess(selector ISelector, mask MaskEngine) IProcess {
+func NewMaskEngineProcess(selector Selector, mask MaskEngine) Processor {
 	return &MaskEngineProcess{selector, mask}
 }
 
 type MaskEngineProcess struct {
-	selector ISelector
+	selector Selector
 	mask     MaskEngine
 }
 
@@ -402,7 +402,7 @@ func (mp *MaskEngineProcess) Open() (err error) {
 	return err
 }
 
-func (mp *MaskEngineProcess) ProcessDictionary(dictionary Dictionary, out ICollector) error {
+func (mp *MaskEngineProcess) ProcessDictionary(dictionary Dictionary, out Collector) error {
 	match, ok := mp.selector.Read(dictionary)
 	if !ok {
 		out.Collect(dictionary)
@@ -437,7 +437,7 @@ func (mp *MaskEngineProcess) ProcessDictionary(dictionary Dictionary, out IColle
 	return nil
 }
 
-func NewMapProcess(mapper Mapper) IProcess {
+func NewMapProcess(mapper Mapper) Processor {
 	return MapProcess{mapper: mapper}
 }
 
@@ -447,7 +447,7 @@ type MapProcess struct {
 
 func (mp MapProcess) Open() error { return nil }
 
-func (mp MapProcess) ProcessDictionary(dictionary Dictionary, out ICollector) error {
+func (mp MapProcess) ProcessDictionary(dictionary Dictionary, out Collector) error {
 	mappedValue, err := mp.mapper(dictionary)
 	if err != nil {
 		return err
@@ -456,7 +456,7 @@ func (mp MapProcess) ProcessDictionary(dictionary Dictionary, out ICollector) er
 	return nil
 }
 
-func NewSinkToSlice(dictionaries *[]Dictionary) ISinkProcess {
+func NewSinkToSlice(dictionaries *[]Dictionary) SinkProcess {
 	return &SinkToSlice{dictionaries}
 }
 
@@ -474,12 +474,12 @@ func (sink *SinkToSlice) ProcessDictionary(dictionary Dictionary) error {
 	return nil
 }
 
-func NewSinkToCache(cache ICache) ISinkProcess {
+func NewSinkToCache(cache Cache) SinkProcess {
 	return &SinkToCache{cache}
 }
 
 type SinkToCache struct {
-	cache ICache
+	cache Cache
 }
 
 func (sink *SinkToCache) Open() error {
@@ -491,65 +491,65 @@ func (sink *SinkToCache) ProcessDictionary(dictionary Dictionary) error {
 	return nil
 }
 
-type SinkedPipeline struct {
-	source ISource
-	sink   ISinkProcess
+type SimpleSinkedPipeline struct {
+	source Source
+	sink   SinkProcess
 }
 
-type Pipeline struct {
-	source ISource
+type SimplePipeline struct {
+	source Source
 }
 
-func NewPipeline(source ISource) IPipeline {
-	return Pipeline{source: source}
+func NewPipeline(source Source) Pipeline {
+	return SimplePipeline{source: source}
 }
 
-func (pipeline Pipeline) Process(process IProcess) IPipeline {
+func (pipeline SimplePipeline) Process(process Processor) Pipeline {
 	return NewProcessPipeline(pipeline.source, process)
 }
 
-func (pipeline Pipeline) AddSink(sink ISinkProcess) ISinkedPipeline {
-	return SinkedPipeline{pipeline, sink}
+func (pipeline SimplePipeline) AddSink(sink SinkProcess) SinkedPipeline {
+	return SimpleSinkedPipeline{pipeline, sink}
 }
 
-func (pipeline Pipeline) Next() bool {
+func (pipeline SimplePipeline) Next() bool {
 	return pipeline.source.Next()
 }
 
-func (pipeline Pipeline) Value() Dictionary {
+func (pipeline SimplePipeline) Value() Dictionary {
 	return pipeline.source.Value()
 }
 
-func (pipeline Pipeline) Err() error {
+func (pipeline SimplePipeline) Err() error {
 	return pipeline.source.Err()
 }
 
-func (pipeline Pipeline) Open() error {
+func (pipeline SimplePipeline) Open() error {
 	return pipeline.source.Open()
 }
 
-func NewCollector() *Collector {
-	return &Collector{[]Dictionary{}, nil}
+func NewCollector() *QueueCollector {
+	return &QueueCollector{[]Dictionary{}, nil}
 }
 
-type Collector struct {
+type QueueCollector struct {
 	queue []Dictionary
 	value Dictionary
 }
 
-func (c *Collector) Err() error {
+func (c *QueueCollector) Err() error {
 	return nil
 }
 
-func (c *Collector) Open() error {
+func (c *QueueCollector) Open() error {
 	return nil
 }
 
-func (c *Collector) Collect(dictionary Dictionary) {
+func (c *QueueCollector) Collect(dictionary Dictionary) {
 	c.queue = append(c.queue, dictionary)
 }
 
-func (c *Collector) Next() bool {
+func (c *QueueCollector) Next() bool {
 	if len(c.queue) > 0 {
 		c.value = c.queue[0]
 		c.queue = c.queue[1:]
@@ -558,18 +558,18 @@ func (c *Collector) Next() bool {
 	return false
 }
 
-func (c *Collector) Value() Dictionary {
+func (c *QueueCollector) Value() Dictionary {
 	return c.value
 }
 
-func NewProcessPipeline(source ISource, process IProcess) IPipeline {
+func NewProcessPipeline(source Source, process Processor) Pipeline {
 	return &ProcessPipeline{NewCollector(), source, process, nil}
 }
 
 type ProcessPipeline struct {
-	collector *Collector
-	source    ISource
-	IProcess
+	collector *QueueCollector
+	source    Source
+	Processor
 	err error
 }
 
@@ -602,15 +602,15 @@ func (p *ProcessPipeline) Err() error {
 	return p.err
 }
 
-func (p *ProcessPipeline) AddSink(sink ISinkProcess) ISinkedPipeline {
-	return SinkedPipeline{p, sink}
+func (p *ProcessPipeline) AddSink(sink SinkProcess) SinkedPipeline {
+	return SimpleSinkedPipeline{p, sink}
 }
 
-func (p *ProcessPipeline) Process(process IProcess) IPipeline {
+func (p *ProcessPipeline) Process(process Processor) Pipeline {
 	return NewProcessPipeline(p, process)
 }
 
-func (pipeline SinkedPipeline) Run() (err error) {
+func (pipeline SimpleSinkedPipeline) Run() (err error) {
 	err = pipeline.source.Open()
 	if err != nil {
 		return err

@@ -321,3 +321,97 @@ testcases:
     - result.systemout ShouldContainSubstring '{"id":2,"name":"Mathieu","supervisor":"Mickael"}'
     
     - result.systemerr ShouldBeEmpty
+
+- name: masking with other key
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      seed: 1
+      masking:
+        - selector:
+            jsonpath: "name"
+          mask:
+            replacement: "id"
+        - selector:
+            jsonpath: "name"
+          mask:
+            randomChoice:
+              - "Mickael"
+              - "Mathieu"
+              - "Marcel"
+          cache: "name"
+      caches:
+        name :
+          unique: true
+
+      EOF
+  - script: sed -i  "s/\[\[/\{\{/g"  masking.yml
+  - script: sed -i  "s/\]\]/\}\}/g"  masking.yml
+  - script: |-
+      pimo --dump-cache name=name.jsonl <<EOF
+      {"name": "Toto", "id": 1 }
+      {"name": "Justine", "id":5}
+      {"name": "Dorothy", "id":2}
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldContainSubstring '{"id":1,"name":"Marcel"}'
+    - result.systemout ShouldContainSubstring '{"id":5,"name":"Mickael"}'
+    - result.systemout ShouldContainSubstring '{"id":2,"name":"Mathieu"}'
+    
+    - result.systemerr ShouldBeEmpty
+  - script: cat name.jsonl
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldContainSubstring {"key":1,"value":"Marcel"}
+    - result.systemout ShouldContainSubstring {"key":5,"value":"Mickael"}
+    - result.systemout ShouldContainSubstring {"key":2,"value":"Mathieu"}
+
+- name: masking with other key
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      seed: 1
+      masking:
+        - selector:
+            jsonpath: "PRENOM"
+          mask:
+            add: ""
+        - selector:
+            jsonpath: "PRENOM"
+          mask:
+            replacement: "MATRI"
+        - selector:
+            jsonpath: "PRENOM"
+          mask:
+            randomChoice:
+              - "Mickael"
+              - "Mathieu"
+              - "Marcel"
+          cache: "name"
+      caches:
+        name :
+          unique: true
+
+      EOF
+  - script: |-
+      pimo --dump-cache name=name.jsonl <<EOF
+      {"MATRI": "FTTO4452" }
+      {"MATRI":"FJUS4442"}
+      {"MATRI":"FDDO8965"}
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldContainSubstring {"MATRI":"FTTO4452","PRENOM":"Marcel"}
+    - result.systemout ShouldContainSubstring {"MATRI":"FJUS4442","PRENOM":"Mickael"}
+    - result.systemout ShouldContainSubstring {"MATRI":"FDDO8965","PRENOM":"Mathieu"}
+    
+    - result.systemerr ShouldBeEmpty
+  - script: cat name.jsonl
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldContainSubstring {"key":"FDDO8965","value":"Mathieu"}
+    - result.systemout ShouldContainSubstring {"key":"FTTO4452","value":"Marcel"}
+    - result.systemout ShouldContainSubstring {"key":"FJUS4442","value":"Mickael"}
