@@ -123,7 +123,7 @@ func run(config model.MaskConfiguration) {
 	}
 }
 
-func injectMaskFactories() []func(model.Masking, model.MaskConfiguration, int64) (model.MaskConfiguration, bool, error) {
+func injectMaskFactories() []func(m model.Masking, mc model.MaskConfiguration, i int64) (model.MaskConfiguration, bool, error) {
 	return []func(model.Masking, model.MaskConfiguration, int64) (model.MaskConfiguration, bool, error){
 		add.RegistryMaskToConfiguration,
 		constant.RegistryMaskToConfiguration,
@@ -144,5 +144,6 @@ func injectMaskFactories() []func(model.Masking, model.MaskConfiguration, int64)
 		fluxuri.RegistryMaskToConfiguration,
 		randomdecimal.RegistryMaskToConfiguration,
 		dateparser.RegistryMaskToConfiguration,
+		// ff1.Factory(m, i),
 	}
 }

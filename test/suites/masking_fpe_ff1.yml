@@ -1,0 +1,30 @@
+name: fpe features
+testcases:
+- name: ff1 mask
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "tweak"
+          mask:
+            add: "mytweak"
+        - selector:
+            jsonpath: "name"
+          mask:
+            ff1:
+              radix: 34
+              key: "70NZ2NWAqk9/A21vBPxqlA=="
+              tweak-field: "tweak"
+      EOF
+
+  - script: |-
+      echo '{"name": "Toto"}' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemoutjson.name ShouldNotEqual Toto
+#    - result.systemoutjson.name ShouldEqual test
+    - result.systemoutjson ShouldContainKey tweak
+    - result.systemerr ShouldBeEmpty

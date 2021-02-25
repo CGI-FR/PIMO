@@ -1,0 +1,566 @@
+{
+    "identifiant": "100000000",
+    "elementsProfessionnel": [
+        {
+            "idOcfi": 100000000000,
+            "cdOblig": "IS",
+            "numExtOcfi": "IS1",
+            "dtMaj": "2018-08-22 09:20:53.000",
+            "roles": [
+                {
+                    "cdRoleElem": "TIT",
+                    "cdRoleMet": "COT",
+                    "dtDebVldt": "",
+                    "dtFinVldt": "",
+                    "dtInvalid": "",
+                    "dtMaj": "2018-08-22 09:20:53.000",
+                    "idOcfi": 100000000000
+                },
+                {
+                    "cdRoleElem": "RED",
+                    "cdRoleMet": "COT",
+                    "dtDebVldt": "2018-08-02 22:00:00.000",
+                    "dtFinVldt": "",
+                    "dtInvalid": "",
+                    "dtMaj": "2018-08-22 09:20:53.000",
+                    "idOcfi": 100000000000
+                }
+            ],
+            "etatsOcfis": [
+                {
+                    "cdType": "O",
+                    "dtEffet": "2018-08-02 22:00:00.000",
+                    "dtFinEffet": "",
+                    "dtInvalid": "",
+                    "dtMaj": "2018-08-22 09:20:53.000",
+                    "idOcfi": 100000000000
+                }
+            ],
+            "modalites": [
+                {
+                    "cdModalite": "FOR#2065##A#",
+                    "dtDebVldt": "2018-08-02 22:00:00.000",
+                    "dtFinVldt": "",
+                    "dtInvalid": "",
+                    "dtMaj": "2018-08-22 09:20:53.000",
+                    "idOcfi": 100000000000
+                },
+                {
+                    "cdModalite": "REG#RSI###",
+                    "dtDebVldt": "2018-08-02 22:00:00.000",
+                    "dtFinVldt": "",
+                    "dtInvalid": "",
+                    "dtMaj": "2018-08-22 09:20:53.000",
+                    "idOcfi": 100000000000
+                }
+            ],
+            "adrFiscales": [
+                {
+                    "boitePost": "",
+                    "burDistrib": "",
+                    "cdCommune": "027",
+                    "cdDept": "06",
+                    "cdIndRep": "",
+                    "cdLigneDest": "",
+                    "cdPays": "99100",
+                    "cdPost": "06800",
+                    "cdRegion": "",
+                    "cdTom": "",
+                    "cdVoie": "0570",
+                    "cplmtPointRemise": "",
+                    "lbBatiment": "",
+                    "lbCommune": "",
+                    "lbCplmtAdr": "",
+                    "lbEscalier": "",
+                    "lbResidence": "",
+                    "lbVoie": "",
+                    "natureVoie": "CHE",
+                    "noAppt": "",
+                    "noCedex": "",
+                    "noEtage": "",
+                    "noVoirie": "67",
+                    "secteurPost": "",
+                    "cdOrigine": "",
+                    "cdPiloteCreateur": "",
+                    "dtEffet": "2018-08-02 22:00:00.000",
+                    "dtFinEffet": "",
+                    "dtInvalid": "",
+                    "dtMaj": "2018-09-12 08:55:57.000",
+                    "dtMajAppliSource": "2018-09-12 08:55:57.000",
+                    "idOcfi": 100000000000
+                }
+            ]
+        },
+        {
+            "idOcfi": 200000000000,
+            "cdOblig": "RCM",
+            "numExtOcfi": "RCM1",
+            "dtMaj": "2018-08-22 09:20:53.000",
+            "roles": [
+                {
+                    "cdRoleElem": "TIT",
+                    "cdRoleMet": "COT",
+                    "dtDebVldt": "",
+                    "dtFinVldt": "",
+                    "dtInvalid": "",
+                    "dtMaj": "2018-08-22 09:20:53.000",
+                    "idOcfi": 200000000000
+                },
+                {
+                    "cdRoleElem": "RED",
+                    "cdRoleMet": "COT",
+                    "dtDebVldt": "2018-08-02 22:00:00.000",
+                    "dtFinVldt": "",
+                    "dtInvalid": "",
+                    "dtMaj": "2018-08-22 09:20:53.000",
+                    "idOcfi": 200000000000
+                }
+            ],
+            "etatsOcfis": [
+                {
+                    "cdType": "O",
+                    "dtEffet": "2018-08-02 22:00:00.000",
+                    "dtFinEffet": "",
+                    "dtInvalid": "",
+                    "dtMaj": "2018-08-22 09:20:53.000",
+                    "idOcfi": 200000000000
+                }
+            ],
+            "modalites": [
+                {
+                    "cdModalite": "FOR#2777D##M#",
+                    "dtDebVldt": "2018-08-02 22:00:00.000",
+                    "dtFinVldt": "2018-08-30 22:00:00.000",
+                    "dtInvalid": "",
+                    "dtMaj": "2018-08-22 09:20:53.000",
+                    "idOcfi": 200000000000
+                },
+                {
+                    "cdModalite": "FOR#2777##M#",
+                    "dtDebVldt": "2018-08-31 22:00:00.000",
+                    "dtFinVldt": "",
+                    "dtInvalid": "",
+                    "dtMaj": "2018-10-30 15:35:12.000",
+                    "idOcfi": 200000000000
+                }
+            ],
+            "adrFiscales": [
+                {
+                    "boitePost": "",
+                    "burDistrib": "",
+                    "cdCommune": "027",
+                    "cdDept": "06",
+                    "cdIndRep": "",
+                    "cdLigneDest": "",
+                    "cdPays": "99100",
+                    "cdPost": "06800",
+                    "cdRegion": "",
+                    "cdTom": "",
+                    "cdVoie": "0570",
+                    "cplmtPointRemise": "",
+                    "lbBatiment": "",
+                    "lbCommune": "",
+                    "lbCplmtAdr": "",
+                    "lbEscalier": "",
+                    "lbResidence": "",
+                    "lbVoie": "",
+                    "natureVoie": "CHE",
+                    "noAppt": "",
+                    "noCedex": "",
+                    "noEtage": "",
+                    "noVoirie": "67",
+                    "secteurPost": "",
+                    "cdOrigine": "",
+                    "cdPiloteCreateur": "",
+                    "dtEffet": "2018-08-02 22:00:00.000",
+                    "dtFinEffet": "",
+                    "dtInvalid": "",
+                    "dtMaj": "2018-09-12 08:55:57.000",
+                    "dtMajAppliSource": "2018-09-12 08:55:57.000",
+                    "idOcfi": 200000000000
+                }
+            ]
+        },
+        {
+            "idOcfi": 300000000000,
+            "cdOblig": "CVAE",
+            "numExtOcfi": "CVAE1",
+            "dtMaj": "2018-08-22 09:20:53.000",
+            "roles": [
+                {
+                    "cdRoleElem": "TIT",
+                    "cdRoleMet": "COT",
+                    "dtDebVldt": "",
+                    "dtFinVldt": "",
+                    "dtInvalid": "",
+                    "dtMaj": "2018-08-22 09:20:53.000",
+                    "idOcfi": 300000000000
+                },
+                {
+                    "cdRoleElem": "RED",
+                    "cdRoleMet": "COT",
+                    "dtDebVldt": "2018-08-02 22:00:00.000",
+                    "dtFinVldt": "",
+                    "dtInvalid": "",
+                    "dtMaj": "2018-08-22 09:20:53.000",
+                    "idOcfi": 300000000000
+                }
+            ],
+            "etatsOcfis": [
+                {
+                    "cdType": "O",
+                    "dtEffet": "2018-08-02 22:00:00.000",
+                    "dtFinEffet": "",
+                    "dtInvalid": "",
+                    "dtMaj": "2018-08-22 09:20:53.000",
+                    "idOcfi": 300000000000
+                }
+            ],
+            "modalites": [
+                {
+                    "cdModalite": "REG#REGDECLA###",
+                    "dtDebVldt": "2018-08-02 22:00:00.000",
+                    "dtFinVldt": "",
+                    "dtInvalid": "",
+                    "dtMaj": "2018-08-22 09:20:53.000",
+                    "idOcfi": 300000000000
+                }
+            ],
+            "adrFiscales": [
+                {
+                    "boitePost": "",
+                    "burDistrib": "",
+                    "cdCommune": "027",
+                    "cdDept": "06",
+                    "cdIndRep": "",
+                    "cdLigneDest": "",
+                    "cdPays": "99100",
+                    "cdPost": "06800",
+                    "cdRegion": "",
+                    "cdTom": "",
+                    "cdVoie": "0570",
+                    "cplmtPointRemise": "",
+                    "lbBatiment": "",
+                    "lbCommune": "",
+                    "lbCplmtAdr": "",
+                    "lbEscalier": "",
+                    "lbResidence": "",
+                    "lbVoie": "",
+                    "natureVoie": "CHE",
+                    "noAppt": "",
+                    "noCedex": "",
+                    "noEtage": "",
+                    "noVoirie": "67",
+                    "secteurPost": "",
+                    "cdOrigine": "",
+                    "cdPiloteCreateur": "",
+                    "dtEffet": "2018-08-02 22:00:00.000",
+                    "dtFinEffet": "",
+                    "dtInvalid": "",
+                    "dtMaj": "2018-09-12 08:55:57.000",
+                    "dtMajAppliSource": "2018-09-12 08:55:57.000",
+                    "idOcfi": 300000000000
+                }
+            ]
+        },
+        {
+            "idOcfi": 500000000000,
+            "cdOblig": "TVA",
+            "numExtOcfi": "TVA1",
+            "dtMaj": "2018-08-22 09:20:53.000",
+            "roles": [
+                {
+                    "cdRoleElem": "TIT",
+                    "cdRoleMet": "ASS",
+                    "dtDebVldt": "",
+                    "dtFinVldt": "",
+                    "dtInvalid": "",
+                    "dtMaj": "2018-08-22 09:20:53.000",
+                    "idOcfi": 500000000000
+                },
+                {
+                    "cdRoleElem": "RED",
+                    "cdRoleMet": "ASS",
+                    "dtDebVldt": "2018-08-02 22:00:00.000",
+                    "dtFinVldt": "",
+                    "dtInvalid": "",
+                    "dtMaj": "2018-08-22 09:20:53.000",
+                    "idOcfi": 500000000000
+                }
+            ],
+            "etatsOcfis": [
+                {
+                    "cdType": "O",
+                    "dtEffet": "2018-08-02 22:00:00.000",
+                    "dtFinEffet": "",
+                    "dtInvalid": "",
+                    "dtMaj": "2018-08-22 09:20:53.000",
+                    "idOcfi": 500000000000
+                }
+            ],
+            "modalites": [
+                {
+                    "cdModalite": "FOR#3514##SEM#",
+                    "dtDebVldt": "2018-08-02 22:00:00.000",
+                    "dtFinVldt": "",
+                    "dtInvalid": "",
+                    "dtMaj": "2018-08-22 09:20:53.000",
+                    "idOcfi": 500000000000
+                },
+                {
+                    "cdModalite": "FOR#3517S##A#",
+                    "dtDebVldt": "2018-08-02 22:00:00.000",
+                    "dtFinVldt": "",
+                    "dtInvalid": "",
+                    "dtMaj": "2018-08-22 09:20:53.000",
+                    "idOcfi": 500000000000
+                },
+                {
+                    "cdModalite": "REG#RSI###",
+                    "dtDebVldt": "2018-08-02 22:00:00.000",
+                    "dtFinVldt": "",
+                    "dtInvalid": "",
+                    "dtMaj": "2018-08-22 09:20:53.000",
+                    "idOcfi": 500000000000
+                }
+            ],
+            "adrFiscales": [
+                {
+                    "boitePost": "",
+                    "burDistrib": "",
+                    "cdCommune": "027",
+                    "cdDept": "06",
+                    "cdIndRep": "",
+                    "cdLigneDest": "",
+                    "cdPays": "99100",
+                    "cdPost": "06800",
+                    "cdRegion": "",
+                    "cdTom": "",
+                    "cdVoie": "0570",
+                    "cplmtPointRemise": "",
+                    "lbBatiment": "",
+                    "lbCommune": "",
+                    "lbCplmtAdr": "",
+                    "lbEscalier": "",
+                    "lbResidence": "",
+                    "lbVoie": "",
+                    "natureVoie": "CHE",
+                    "noAppt": "",
+                    "noCedex": "",
+                    "noEtage": "",
+                    "noVoirie": "67",
+                    "secteurPost": "",
+                    "cdOrigine": "",
+                    "cdPiloteCreateur": "",
+                    "dtEffet": "2018-08-02 22:00:00.000",
+                    "dtFinEffet": "",
+                    "dtInvalid": "",
+                    "dtMaj": "2018-09-12 08:55:57.000",
+                    "dtMajAppliSource": "2018-09-12 08:55:57.000",
+                    "idOcfi": 500000000000
+                }
+            ]
+        },
+        {
+            "idOcfi": 600000000000,
+            "cdOblig": "PAS",
+            "numExtOcfi": "PAS1",
+            "dtMaj": "2019-04-05 02:17:46.000",
+            "roles": [
+                {
+                    "cdRoleElem": "TIT",
+                    "cdRoleMet": "COT",
+                    "dtDebVldt": "",
+                    "dtFinVldt": "",
+                    "dtInvalid": "",
+                    "dtMaj": "2019-04-05 02:17:46.000",
+                    "idOcfi": 600000000000
+                },
+                {
+                    "cdRoleElem": "RED",
+                    "cdRoleMet": "COT",
+                    "dtDebVldt": "2018-08-02 22:00:00.000",
+                    "dtFinVldt": "",
+                    "dtInvalid": "",
+                    "dtMaj": "2019-04-05 02:17:46.000",
+                    "idOcfi": 600000000000
+                }
+            ],
+            "etatsOcfis": [
+                {
+                    "cdType": "O",
+                    "dtEffet": "2018-08-02 22:00:00.000",
+                    "dtFinEffet": "",
+                    "dtInvalid": "",
+                    "dtMaj": "2019-04-05 02:17:46.000",
+                    "idOcfi": 600000000000
+                }
+            ],
+            "modalites": [
+                {
+                    "cdModalite": "MIM#M###",
+                    "dtDebVldt": "2018-08-02 22:00:00.000",
+                    "dtFinVldt": "",
+                    "dtInvalid": "",
+                    "dtMaj": "2019-04-05 02:17:46.000",
+                    "idOcfi": 600000000000
+                }
+            ],
+            "adrFiscales": [
+                {
+                    "boitePost": "",
+                    "burDistrib": "",
+                    "cdCommune": "027",
+                    "cdDept": "06",
+                    "cdIndRep": "",
+                    "cdLigneDest": "",
+                    "cdPays": "99100",
+                    "cdPost": "06800",
+                    "cdRegion": "",
+                    "cdTom": "",
+                    "cdVoie": "0570",
+                    "cplmtPointRemise": "",
+                    "lbBatiment": "",
+                    "lbCommune": "",
+                    "lbCplmtAdr": "",
+                    "lbEscalier": "",
+                    "lbResidence": "",
+                    "lbVoie": "",
+                    "natureVoie": "CHE",
+                    "noAppt": "",
+                    "noCedex": "",
+                    "noEtage": "",
+                    "noVoirie": "67",
+                    "secteurPost": "",
+                    "cdOrigine": "",
+                    "cdPiloteCreateur": "",
+                    "dtEffet": "2018-08-02 22:00:00.000",
+                    "dtFinEffet": "",
+                    "dtInvalid": "",
+                    "dtMaj": "2019-04-05 02:17:46.000",
+                    "dtMajAppliSource": "2019-04-05 02:17:46.000",
+                    "idOcfi": 600000000000
+                }
+            ]
+        }
+    ],
+    "info": {
+        "cdService": 0,
+        "lbMessage": "",
+        "lbParametresRetournes": "",
+        "motifs": [
+            {
+                "code": 3320,
+                "libelle": "il n'existe aucune exploitation valide pour l'OCFI 100000000000"
+            },
+            {
+                "code": 3320,
+                "libelle": "il n'existe aucune exploitation valide pour l'OCFI 200000000000"
+            },
+            {
+                "code": 3320,
+                "libelle": "il n'existe aucune exploitation valide pour l'OCFI 300000000000"
+            },
+            {
+                "code": 3320,
+                "libelle": "il n'existe aucune exploitation valide pour l'OCFI 500000000000"
+            },
+            {
+                "code": 3320,
+                "libelle": "il n'existe aucune exploitation valide pour l'OCFI 600000000000"
+            },
+            {
+                "code": 3323,
+                "libelle": "il n'existe aucune modalité valide, pour le type de modalite IMP pour l'OCFI 100000000000"
+            },
+            {
+                "code": 3323,
+                "libelle": "il n'existe aucune modalité valide, pour le type de modalite EVE pour l'OCFI 100000000000"
+            },
+            {
+                "code": 3323,
+                "libelle": "il n'existe aucune modalité valide, pour le type de modalite MIM pour l'OCFI 100000000000"
+            },
+            {
+                "code": 3323,
+                "libelle": "il n'existe aucune modalité valide, pour le type de modalite NPM pour l'OCFI 100000000000"
+            },
+            {
+                "code": 3323,
+                "libelle": "il n'existe aucune modalité valide, pour le type de modalite IMP pour l'OCFI 200000000000"
+            },
+            {
+                "code": 3323,
+                "libelle": "il n'existe aucune modalité valide, pour le type de modalite EVE pour l'OCFI 200000000000"
+            },
+            {
+                "code": 3323,
+                "libelle": "il n'existe aucune modalité valide, pour le type de modalite MIM pour l'OCFI 200000000000"
+            },
+            {
+                "code": 3323,
+                "libelle": "il n'existe aucune modalité valide, pour le type de modalite NPM pour l'OCFI 200000000000"
+            },
+            {
+                "code": 3323,
+                "libelle": "il n'existe aucune modalité valide, pour le type de modalite REG pour l'OCFI 200000000000"
+            },
+            {
+                "code": 3323,
+                "libelle": "il n'existe aucune modalité valide, pour le type de modalite IMP pour l'OCFI 300000000000"
+            },
+            {
+                "code": 3323,
+                "libelle": "il n'existe aucune modalité valide, pour le type de modalite FOR pour l'OCFI 300000000000"
+            },
+            {
+                "code": 3323,
+                "libelle": "il n'existe aucune modalité valide, pour le type de modalite EVE pour l'OCFI 300000000000"
+            },
+            {
+                "code": 3323,
+                "libelle": "il n'existe aucune modalité valide, pour le type de modalite MIM pour l'OCFI 300000000000"
+            },
+            {
+                "code": 3323,
+                "libelle": "il n'existe aucune modalité valide, pour le type de modalite NPM pour l'OCFI 300000000000"
+            },
+            {
+                "code": 3323,
+                "libelle": "il n'existe aucune modalité valide, pour le type de modalite IMP pour l'OCFI 500000000000"
+            },
+            {
+                "code": 3323,
+                "libelle": "il n'existe aucune modalité valide, pour le type de modalite EVE pour l'OCFI 500000000000"
+            },
+            {
+                "code": 3323,
+                "libelle": "il n'existe aucune modalité valide, pour le type de modalite MIM pour l'OCFI 500000000000"
+            },
+            {
+                "code": 3323,
+                "libelle": "il n'existe aucune modalité valide, pour le type de modalite NPM pour l'OCFI 500000000000"
+            },
+            {
+                "code": 3323,
+                "libelle": "il n'existe aucune modalité valide, pour le type de modalite IMP pour l'OCFI 600000000000"
+            },
+            {
+                "code": 3323,
+                "libelle": "il n'existe aucune modalité valide, pour le type de modalite FOR pour l'OCFI 600000000000"
+            },
+            {
+                "code": 3323,
+                "libelle": "il n'existe aucune modalité valide, pour le type de modalite EVE pour l'OCFI 600000000000"
+            },
+            {
+                "code": 3323,
+                "libelle": "il n'existe aucune modalité valide, pour le type de modalite NPM pour l'OCFI 600000000000"
+            },
+            {
+                "code": 3323,
+                "libelle": "il n'existe aucune modalité valide, pour le type de modalite REG pour l'OCFI 600000000000"
+            }
+        ]
+    }
+}
