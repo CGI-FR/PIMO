@@ -28,6 +28,7 @@ import (
 	"makeit.imfr.cgi.com/makeit2/scm/lino/pimo/pkg/constant"
 	"makeit.imfr.cgi.com/makeit2/scm/lino/pimo/pkg/dateparser"
 	"makeit.imfr.cgi.com/makeit2/scm/lino/pimo/pkg/duration"
+	"makeit.imfr.cgi.com/makeit2/scm/lino/pimo/pkg/ff1"
 	"makeit.imfr.cgi.com/makeit2/scm/lino/pimo/pkg/fluxuri"
 	"makeit.imfr.cgi.com/makeit2/scm/lino/pimo/pkg/hash"
 	"makeit.imfr.cgi.com/makeit2/scm/lino/pimo/pkg/increment"
@@ -174,5 +175,6 @@ func injectMaskFactories() []model.MaskFactory {
 		randdura.Factory,
 		randomdecimal.Factory,
 		dateparser.Factory,
+		ff1.Factory,
 	}
 }
