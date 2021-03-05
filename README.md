@@ -14,14 +14,21 @@ masking:
       jsonpath: "exemple.exemple"
     mask:
       type: "argument"
+    # Optional cache
+    cache: "cacheName"
+caches:
+  cacheName:
+    # Optional bijectif cache
+    unique: true
 ```
 
 `version` is the version of the masking file.  
 `seed` is to give every random mask the same seed, it is optional and in case it is not informed, the seed is chosen with the time to look more random.  
-`masking` is used to define the masks that are going to be used by pimo.  
+`masking` is used to define the pipeline of masks that are going to be used by pimo.
 `selector` is made of a jsonpath and a mask.  
 `jsonpath` defines the path of the entry that has to be masked in the json file.  
-`mask` defines the mask that will be used for the entry defined by `selector`.  
+`mask` defines the mask that will be used for the entry defined by `selector`.
+An optional `cache` can be declare. if the current entry is already in the cache as key the associate value is retrurn without executing the mask. Else the mask is executed and a new entry is added in the cache with the orignal content as `key` and the masked result as `value`. The cache have to be declared in the `caches` section.
 
 ## Possible masks
 
@@ -43,6 +50,7 @@ The following types of masks can be used :
 * `template` is to mask a data with a template using other values from the jsonline.
 * `remove` is to mask a field by completely removing it.
 * `add` is a mask to add a field to the jsonline.
+* `fromCache` is a mask to get content from a cache.
 
 A full `masking.yml` file exemple, using every kind of mask, is given with the source code.
 
@@ -63,8 +71,11 @@ This takes the `data.json` file, masks the datas contained inside it and put the
 * `--skip-field-on-error` This flag will return output without a field if an error occurs masking this field.
 * `--empty-input` This flag will give PIMO a `{}` input, usable with `repeat` flag.
 * `--config=filename.yml` This flag allow to use another file for config that `masking.yml`.
+* `--load-cache cacheName=filename.json` This flag load initial cache content from a file (json line format `{"key":"a", "value":"b"}`).
+* `--dump-cache cacheName=filename.json` This flag dump final cache content to a file (json line format `{"key":"a", "value":"b"}`).
 
-## Exemple
+
+## Exemples
 
 This section will give exemples for every type of masking.
 
@@ -332,3 +343,20 @@ The field will be created in every input jsonline that doesn't already contains 
 ```
 
 This exemple will create an `id` field in every output jsonline. The values will be the ones contained in the `id.csv` file in the same order as in the file. If the field already exist on the input jsonline it will be replaced and if every value of the file has already been assigned, the input jsonlines won't be modified.
+
+
+### FromCache
+
+```yaml
+  - selector:
+      jsonpath: "id"
+    mask:
+      fromCache: "fakeId"
+  caches:
+    fakeId :
+      unique: true
+```
+
+This exemple will replace the content of `id` field by the mathing content in the cache `fakeId`. Cache have to be declared in the `caches` section.
+Cache content can be loaded from jsonfile with the `--load-cache fakeId=fakeId.jsonl` option or by the `chache` option on other field.
+If no matching is found in the cache, `fromCache` block the current line and the next lines are processing until a matching content go into the cache.
