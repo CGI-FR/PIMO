@@ -360,3 +360,26 @@ This exemple will create an `id` field in every output jsonline. The values will
 This exemple will replace the content of `id` field by the mathing content in the cache `fakeId`. Cache have to be declared in the `caches` section.
 Cache content can be loaded from jsonfile with the `--load-cache fakeId=fakeId.jsonl` option or by the `chache` option on other field.
 If no matching is found in the cache, `fromCache` block the current line and the next lines are processing until a matching content go into the cache.
+
+## Contributors
+
+* CGI France
+* Pole Emploi
+
+## Licence
+
+Copyright (C) 2021 CGI France
+
+PIMO is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+PIMO is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+ along with PIMO.  If not, see <http://www.gnu.org/licenses/>.
+
