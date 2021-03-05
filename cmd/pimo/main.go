@@ -63,10 +63,14 @@ var (
 
 func main() {
 	var rootCmd = &cobra.Command{
-		Use:     "pimo",
-		Short:   "Command line to mask data from jsonlines",
-		Long:    `Pimo is a tool to mask private data contained in jsonlines by using masking configurations`,
-		Version: fmt.Sprintf("%v (commit=%v date=%v by=%v)\n© CGI Inc 2020 All rights reserved", version, commit, buildDate, builtBy),
+		Use:   "pimo",
+		Short: "Command line to mask data from jsonlines",
+		Long:  `Pimo is a tool to mask private data contained in jsonlines by using masking configurations`,
+		Version: fmt.Sprintf(`%v (commit=%v date=%v by=%v)
+Copyright (C) 2021 CGI France
+License GPLv3: GNU GPL version 3 <https://gnu.org/licenses/gpl.html>.
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDate, builtBy),
 		Run: func(cmd *cobra.Command, args []string) {
 			run()
 		},
