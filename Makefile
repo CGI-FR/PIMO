@@ -155,3 +155,9 @@ license: mkdir docker ## Scan dependencies and licenses
 	tar xvf ${BUILD_DIR}/pimo.tar -C ${BUILD_DIR}/pimo-license
 	golicense ${BUILD_DIR}/pimo-license/pimo
 	#depth ./cmd/pimo
+
+.PHONY: publish
+publish:  ## Publish binaries
+	BUILD_DATE=${BUILD_DATE} VERSION=${VERSION} \
+		goreleaser release --rm-dist
+	GO111MODULE=on go mod tidy

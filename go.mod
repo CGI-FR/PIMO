@@ -17,5 +17,4 @@ require (
 	github.com/stretchr/testify v1.5.1
 	github.com/zach-klippenstein/goregen v0.0.0-20160303162051-795b5e3961ea
 	golang.org/x/text v0.3.2
-	gopkg.in/go-playground/assert.v1 v1.2.1
 )
