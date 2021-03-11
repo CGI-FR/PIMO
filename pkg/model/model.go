@@ -222,8 +222,8 @@ type DateParserType struct {
 }
 
 type FF1Type struct {
-	KeyFromEnv string `yaml:"key-from-env"`
-	TweakField string `yaml:"tweak-field"`
+	KeyFromEnv string `yaml:"keyFromEnv"`
+	TweakField string `yaml:"tweakField"`
 	Radix      uint
 	Decrypt    bool
 }
