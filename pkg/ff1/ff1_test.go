@@ -1,7 +1,23 @@
+// Copyright (C) 2021 CGI France
+//
+// This file is part of PIMO.
+//
+// PIMO is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// PIMO is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with PIMO.  If not, see <http://www.gnu.org/licenses/>.
+
 package ff1
 
 import (
-	"fmt"
 	"os"
 	"testing"
 
@@ -59,11 +75,9 @@ func TestMaskingShouldDecryptStringWithoutTweak(t *testing.T) {
 	assert.Equal(t, "Toto", result, "Should be equal")
 }
 
-func TestDecodingKeyShouldReturnErrorOnWrongKeyLength(t *testing.T) {
-	expectedError := fmt.Errorf("Encryption Key's length not valid (accepted: 16, 24, 32); actual length is %d", 64)
-	decodedKey, err := decodingKey("aHR0cDovL21hc3Rlcm1pbmRzLmdpdGh1Yi5pby9zcHJpZy8=")
-	assert.Equal(t, err, expectedError, "Should be equal")
-	assert.Nil(t, decodedKey, "Should be nil")
+func TestDecodingKeyShouldNotReturnErrorOnWrongKeyLength(t *testing.T) {
+	_, err := decodingKey("aHR0cDovL21hc3Rlcm1pbmRzLmdpdGh1Yi5pby9zcHJpZy8=")
+	assert.Nil(t, err, "Should be nil")
 }
 
 func TestDecodingKeyShouldWork(t *testing.T) {
@@ -77,14 +91,14 @@ func TestFactoryShouldReturnNilOnEmptyConfig(t *testing.T) {
 	maskingConfig := model.Masking{Mask: model.MaskType{}}
 	mask, present, err := Factory(maskingConfig, 0)
 	assert.Nil(t, mask, "should be nil")
-	assert.False(t, present, "should be true")
+	assert.False(t, present, "should be false")
 	assert.Nil(t, err, "should be nil")
 }
 
-func TestFactoryShouldReturnNilOnWrongConfig(t *testing.T) {
+func TestFactoryShouldReturnErrorOnWrongConfig(t *testing.T) {
 	maskingConfig := model.Masking{Mask: model.MaskType{FF1: model.FF1Type{KeyFromEnv: "XXXXXX", Radix: 0, TweakField: "tweak"}}}
 	mask, present, err := Factory(maskingConfig, 0)
 	assert.Nil(t, mask, "should be nil")
-	assert.False(t, present, "should be true")
-	assert.Nil(t, err, "should be nil")
+	assert.True(t, present, "should be true")
+	assert.EqualErrorf(t, err, "radix attribut is not optional", "should be nil")
 }

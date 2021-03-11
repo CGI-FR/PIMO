@@ -12,8 +12,8 @@ testcases:
           mask:
             ff1:
               radix: 62
-              key-from-env: "FF1_ENCRYPTION_KEY"
-              tweak-field: "tweak"
+              keyFromEnv: "FF1_ENCRYPTION_KEY"
+              tweakField: "tweak"
       EOF
   - script: |-
       echo '{"name": "Toto", "tweak": "mytweak"}' | FF1_ENCRYPTION_KEY="70NZ2NWAqk9/A21vBPxqlA==" pimo
@@ -35,8 +35,8 @@ testcases:
           mask:
             ff1:
               radix: 62
-              key-from-env: "FF1_ENCRYPTION_KEY"
-              tweak-field: "tweak"
+              keyFromEnv: "FF1_ENCRYPTION_KEY"
+              tweakField: "tweak"
       EOF
   - script: |-
       echo '{"name": "Toto"}' | FF1_ENCRYPTION_KEY="70NZ2NWAqk9/A21vBPxqlA==" pimo
@@ -57,8 +57,8 @@ testcases:
           mask:
             ff1:
               radix: 62
-              key-from-env: "FF1_ENCRYPTION_KEY"
-              tweak-field: "tweak"
+              keyFromEnv: "FF1_ENCRYPTION_KEY"
+              tweakField: "tweak"
       EOF
   - script: |-
       echo '{"name": "Toto", "tweak": ""}' | FF1_ENCRYPTION_KEY="70NZ2NWAqk9/A21vBPxqlA==" pimo
@@ -80,8 +80,8 @@ testcases:
           mask:
             ff1:
               radix: 62
-              key-from-env: "FF1_ENCRYPTION_KEY"
-              tweak-field: "tweak"
+              keyFromEnv: "FF1_ENCRYPTION_KEY"
+              tweakField: "tweak"
               decrypt: true
       EOF
   - script: |-
@@ -104,8 +104,8 @@ testcases:
           mask:
             ff1:
               radix: 62
-              key-from-env: "FF1_ENCRYPTION_KEY"
-              tweak-field: "tweak"
+              keyFromEnv: "FF1_ENCRYPTION_KEY"
+              tweakField: "tweak"
               decrypt: true
       EOF
   - script: |-
@@ -127,14 +127,15 @@ testcases:
           mask:
             ff1:
               radix: 62
-              key-from-env: "FF1_ENCRYPTION_KEY"
-              tweak-field: "tweak"
+              keyFromEnv: "FF1_ENCRYPTION_KEY"
+              tweakField: "tweak"
       EOF
   - script: |-
       echo '{"name": "Toto", "tweak": "mytweak"}' | FF1_ENCRYPTION_KEY="" pimo
     assertions:
     - result.code ShouldEqual 4
-    - result.systemerr ShouldEqual "Environment variable named FF1_ENCRYPTION_KEY should be defined"
+    - |-
+      result.systemerr ShouldEqual "Environment variable named 'FF1_ENCRYPTION_KEY' should be defined"
 
 - name: ff1 mask encrypt with no encryption key
   steps:
@@ -148,14 +149,15 @@ testcases:
           mask:
             ff1:
               radix: 62
-              key-from-env: "FF1_ENCRYPTION_KEY"
-              tweak-field: "tweak"
+              keyFromEnv: "FF1_ENCRYPTION_KEY"
+              tweakField: "tweak"
       EOF
   - script: |-
       echo '{"name": "Toto", "tweak": "mytweak"}' | pimo
     assertions:
     - result.code ShouldEqual 4
-    - result.systemerr ShouldEqual "Environment variable named FF1_ENCRYPTION_KEY should be defined"
+    - |-
+      result.systemerr ShouldEqual "Environment variable named 'FF1_ENCRYPTION_KEY' should be defined"
 
 - name: ff1 mask encrypt with encryption key not valid
   steps:
@@ -169,11 +171,12 @@ testcases:
           mask:
             ff1:
               radix: 62
-              key-from-env: "FF1_ENCRYPTION_KEY"
-              tweak-field: "tweak"
+              keyFromEnv: "FF1_ENCRYPTION_KEY"
+              tweakField: "tweak"
       EOF
   - script: |-
       echo '{"name": "Toto", "tweak": "mytweak"}' | FF1_ENCRYPTION_KEY="aHR0cDovL21hc3Rlcm1pbmRzLmdpdGh1Yi5pby9zcHJpZy8=" pimo
     assertions:
     - result.code ShouldEqual 4
-    - 'result.systemerr ShouldEqual "Encryption Key\'s length not valid (accepted: 16, 24, 32); actual length is 64"'
+    - |-
+      result.systemerr ShouldEqual "key length must be 128, 192, or 256 bits"
