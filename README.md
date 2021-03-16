@@ -11,7 +11,7 @@ version: "1"
 seed: 42
 masking:
   - selector:
-      jsonpath: "exemple.exemple"
+      jsonpath: "example.example"
     mask:
       type: "argument"
     # Optional cache (coherence preservation)
@@ -23,7 +23,7 @@ caches:
 ```
 
 `version` is the version of the masking file.  
-`seed` is to give every random mask the same seed, it is optional and in case it is not defined, the seed is derived from the current time to increase randomness.  
+`seed` is to give every random mask the same seed, it is optional and if it is not defined, the seed is derived from the current time to increase randomness.  
 `masking` is used to define the pipeline of masks that is going to be applied.
 `selector` is made of a jsonpath and a mask.  
 `jsonpath` defines the path of the entry that has to be masked in the json file.  
@@ -77,9 +77,9 @@ To use PIMO to mask a `data.json`, use in the following way :
 ./pimo <data.json >maskedData.json
 ```
 
-This takes the `data.json` file, masks the data contained inside it and put the result in a `maskedData.json` file. If data are in a table (for exemple multiple names), then each field of this table will be masked using the given mask. The following flags can be used:
+This takes the `data.json` file, masks the data contained inside it and put the result in a `maskedData.json` file. If data are in a table (for example multiple names), then each field of this table will be masked using the given mask. The following flags can be used:
 
-* `--repeat=N` This flag will make pimo mask every input N-times (usefull for dataset generation).
+* `--repeat=N` This flag will make pimo mask every input N-times (useful for dataset generation).
 * `--skip-line-on-error` This flag will totally skip a line if an error occurs masking a field.
 * `--skip-field-on-error` This flag will return output without a field if an error occurs masking this field.
 * `--empty-input` This flag will give PIMO a `{}` input, usable with `--repeat` flag.
@@ -89,7 +89,7 @@ This takes the `data.json` file, masks the data contained inside it and put the 
 
 ## Examples
 
-This section will give exemples for every types of mask.
+This section will give examples for every types of mask.
 
 Please check the [demo folder](demo) for more advanced examples.
 
@@ -102,7 +102,7 @@ Please check the [demo folder](demo) for more advanced examples.
       regex: "0[1-7]( ([0-9]){2}){4}"
 ```
 
-This exemple will mask the `phone` field of the input jsonlines with a random string respecting the regular expression.
+This example will mask the `phone` field of the input jsonlines with a random string respecting the regular expression.
 
 [Return to list of masks](#possible-masks)
 
@@ -115,7 +115,7 @@ This exemple will mask the `phone` field of the input jsonlines with a random st
       constant: "Bill"
 ```
 
-This exemple will mask the `name` field of the input jsonlines with the value of the `constant` field.
+This example will mask the `name` field of the input jsonlines with the value of the `constant` field.
 
 [Return to list of masks](#possible-masks)
 
@@ -131,7 +131,7 @@ This exemple will mask the `name` field of the input jsonlines with the value of
        - "Marcelle"
 ```
 
-This exemple will mask the `name` field of the input jsonlines with random values from the `randomChoice` list.
+This example will mask the `name` field of the input jsonlines with random values from the `randomChoice` list.
 
 [Return to list of masks](#possible-masks)
 
@@ -144,7 +144,7 @@ This exemple will mask the `name` field of the input jsonlines with random value
       randomChoiceInUri: "file://names.txt"
 ```
 
-This exemple will mask the `name` field of the input jsonlines with random values from the list contained in the name.txt file. The different URI usable with this selector are : `pimo`, `file` and `http`/`https`.
+This example will mask the `name` field of the input jsonlines with random values from the list contained in the name.txt file. The different URI usable with this selector are : `pimo`, `file` and `http`/`https`.
 
 [Return to list of masks](#possible-masks)
 
@@ -159,7 +159,7 @@ This exemple will mask the `name` field of the input jsonlines with random value
         max: 32
 ```
 
-This exemple will mask the `age` field of the input jsonlines with a random number between `min` and `max` included.
+This example will mask the `age` field of the input jsonlines with a random number between `min` and `max` included.
 
 [Return to list of masks](#possible-masks)
 
@@ -175,7 +175,7 @@ This exemple will mask the `age` field of the input jsonlines with a random numb
         precision: 2
 ```
 
-This exemple will mask the `score` field of the input jsonlines with a random float between `min` and `max`, with the number of decimal chosen in the `precision` field.
+This example will mask the `score` field of the input jsonlines with a random float between `min` and `max`, with the number of decimal chosen in the `precision` field.
 
 [Return to list of masks](#possible-masks)
 
@@ -188,7 +188,7 @@ This exemple will mask the `score` field of the input jsonlines with a random fl
       command: "echo -n Dorothy"
 ```
 
-This exemple will mask the `name` field of the input jsonlines with the output of the given command. In this case, `Dorothy`.
+This example will mask the `name` field of the input jsonlines with the output of the given command. In this case, `Dorothy`.
 
 [Return to list of masks](#possible-masks)
 
@@ -205,7 +205,7 @@ This exemple will mask the `name` field of the input jsonlines with the output o
           weight: 1
 ```
 
-This exemple will mask the `surname` field of the input jsonlines with a random value in the `weightedChoice` list with a probability proportional at the `weight` field.
+This example will mask the `surname` field of the input jsonlines with a random value in the `weightedChoice` list with a probability proportional at the `weight` field.
 
 [Return to list of masks](#possible-masks)
 
@@ -234,7 +234,7 @@ This example will mask the `town` field of the input jsonlines with a value from
       hashInUri: "pimo://nameFR
 ```
 
-This exemple will mask the `name` field of the input jsonlines with a value from the list nameFR contained in pimo, the same way as for `hash` mask. The different URI usable with this selector are : `pimo`, `file` and `http`/`https`.
+This example will mask the `name` field of the input jsonlines with a value from the list nameFR contained in pimo, the same way as for `hash` mask. The different URI usable with this selector are : `pimo`, `file` and `http`/`https`.
 
 [Return to list of masks](#possible-masks)
 
@@ -249,7 +249,7 @@ This exemple will mask the `name` field of the input jsonlines with a value from
         dateMax: "2020-01-01T00:00:00Z"
 ```
 
-This exemple will mask the `date` field of the input jsonlines with a random date between `dateMin` and `dateMax`. In this case the date will be between the 1st January 1970 and the 1st January 2020.
+This example will mask the `date` field of the input jsonlines with a random date between `dateMin` and `dateMax`. In this case the date will be between the 1st January 1970 and the 1st January 2020.
 
 [Return to list of masks](#possible-masks)
 
@@ -262,7 +262,7 @@ This exemple will mask the `date` field of the input jsonlines with a random dat
       duration: "-P2D"
 ```
 
-This exemple will mask the `last_contact` field of the input jsonlines by decreasing its value by 2 days. The duration field should match the ISO 8601 standard for durations.
+This example will mask the `last_contact` field of the input jsonlines by decreasing its value by 2 days. The duration field should match the ISO 8601 standard for durations.
 
 [Return to list of masks](#possible-masks)
 
@@ -277,7 +277,7 @@ This exemple will mask the `last_contact` field of the input jsonlines by decrea
         outputFormat: "01/02/06"
 ```
 
-This exemple will change every date from the date field from the `inputFormat` to the `outputFormat`. The format should always display the following date : `Mon Jan 2 15:04:05 -0700 MST 2006`. Either field is optional and in case a field is not defined, the default format is RFC3339, which is the base format for PIMO, needed for `duration` mask and given by `randDate` mask.
+This example will change every date from the date field from the `inputFormat` to the `outputFormat`. The format should always display the following date : `Mon Jan 2 15:04:05 -0700 MST 2006`. Either field is optional and in case a field is not defined, the default format is RFC3339, which is the base format for PIMO, needed for `duration` mask and given by `randDate` mask.
 
 [Return to list of masks](#possible-masks)
 
@@ -292,7 +292,7 @@ This exemple will change every date from the date field from the `inputFormat` t
         max: "-P27D"
 ```
 
-This exemple will mask the `date` field of the input jsonlines by decreasing its value by a random value between 2 and 27 days. The durations should match the ISO 8601 standard.
+This example will mask the `date` field of the input jsonlines by decreasing its value by a random value between 2 and 27 days. The durations should match the ISO 8601 standard.
 
 [Return to list of masks](#possible-masks)
 
@@ -307,7 +307,7 @@ This exemple will mask the `date` field of the input jsonlines by decreasing its
         increment: 1
 ```
 
-This exemple will mask the `id` field of the input jsonlines with incremental values. The first jsonline's `id` will be masked by 1, the second's by 2, etc...
+This example will mask the `id` field of the input jsonlines with incremental values. The first jsonline's `id` will be masked by 1, the second's by 2, etc...
 
 [Return to list of masks](#possible-masks)
 
@@ -320,7 +320,7 @@ This exemple will mask the `id` field of the input jsonlines with incremental va
       replacement: "name"
 ```
 
-This exemple will mask the `name4` field of the input jsonlines with the field `name` of the jsonline. This selector must be placed after the `name` selector to be masked with the new value and it must be placed before the `name` selector to be masked by the previous value.
+This example will mask the `name4` field of the input jsonlines with the field `name` of the jsonline. This selector must be placed after the `name` selector to be masked with the new value and it must be placed before the `name` selector to be masked by the previous value.
 
 [Return to list of masks](#possible-masks)
 
@@ -333,7 +333,7 @@ This exemple will mask the `name4` field of the input jsonlines with the field `
       template: "{{.surname}}.{{.name}}@gmail.com"
 ```
 
-This exemple will mask the `mail` field of the input jsonlines respecting the given template. In the `masking.yml` config file, this selector must be placed after the fields contained in the template to mask with the new values and before the other fields to be masked with the old values. In the case of a nested json, the template must respect the following exemple :
+This example will mask the `mail` field of the input jsonlines respecting the given template. In the `masking.yml` config file, this selector must be placed after the fields contained in the template to mask with the new values and before the other fields to be masked with the old values. In the case of a nested json, the template must respect the following example :
 
 ```yaml
   - selector:
@@ -344,7 +344,7 @@ This exemple will mask the `mail` field of the input jsonlines respecting the gi
 
 The format for the template should respect the `text/template` package : <https://golang.org/pkg/text/template/>
 
-The template mask can format the fields used. The following exemple will create a mail address without accent or upper case:
+The template mask can format the fields used. The following example will create a mail address without accent or upper case:
 
 ```yaml
   - selector:
@@ -379,7 +379,7 @@ This field will mask the `useless-field` of the input jsonlines by completely de
       add: "newvalue"
 ```
 
-This exemple will create the field `newField` containing the value `newvalue`. This value can be a string, a number, a boolean...
+This example will create the field `newField` containing the value `newvalue`. This value can be a string, a number, a boolean...
 
 The field will be created in every input jsonline that doesn't already contains this field.
 
@@ -394,7 +394,7 @@ The field will be created in every input jsonline that doesn't already contains 
       fluxURI: "file://id.csv"
 ```
 
-This exemple will create an `id` field in every output jsonline. The values will be the ones contained in the `id.csv` file in the same order as in the file. If the field already exist on the input jsonline it will be replaced and if every value of the file has already been assigned, the input jsonlines won't be modified.
+This example will create an `id` field in every output jsonline. The values will be the ones contained in the `id.csv` file in the same order as in the file. If the field already exist on the input jsonline it will be replaced and if every value of the file has already been assigned, the input jsonlines won't be modified.
 
 [Return to list of masks](#possible-masks)
 
@@ -410,7 +410,7 @@ This exemple will create an `id` field in every output jsonline. The values will
       unique: true
 ```
 
-This exemple will replace the content of `id` field by the matching content in the cache `fakeId`. Cache have to be declared in the `caches` section.
+This example will replace the content of `id` field by the matching content in the cache `fakeId`. Cache have to be declared in the `caches` section.
 Cache content can be loaded from jsonfile with the `--load-cache fakeId=fakeId.jsonl` option or by the `cache` option on another field.
 If no matching is found in the cache, `fromCache` block the current line and the next lines are processing until a matching content go into the cache.
 
@@ -442,7 +442,7 @@ Be sure to check [the full FPE demo](demo/demo7) to get more details about this 
       range: 5
 ```
 
-This mask will replace a integer value `{"age": 27}` with a range like this `{"age": "[25;29]"}`.
+This mask will replace an integer value `{"age": 27}` with a range like this `{"age": "[25;29]"}`.
 
 [Return to list of masks](#possible-masks)
 
