@@ -50,6 +50,7 @@ The following types of masks can be used :
   * `hash` is to mask with a value from a list by matching the original value, allowing to mask a value the same way every time.
   * `hashInUri` is to mask with a value from an external resource, by matching the original value, allowing to mask a value the same way every time.
   * `fromCache` is a mask to obtain a value from a cache.
+  * `ff1` mask allows the use of <abbr title="Format Preserving Encryption">FPE</abbr> which enable private-key based re-identification.
 * Formatting
   * `dateParser` is to change a date format.
   * `template` is to mask a data with a template using other values from the jsonline.
@@ -357,7 +358,6 @@ The field will be created in every input jsonline that doesn't already contains 
 
 This exemple will create an `id` field in every output jsonline. The values will be the ones contained in the `id.csv` file in the same order as in the file. If the field already exist on the input jsonline it will be replaced and if every value of the file has already been assigned, the input jsonlines won't be modified.
 
-
 ### FromCache
 
 ```yaml
@@ -373,6 +373,21 @@ This exemple will create an `id` field in every output jsonline. The values will
 This exemple will replace the content of `id` field by the matching content in the cache `fakeId`. Cache have to be declared in the `caches` section.
 Cache content can be loaded from jsonfile with the `--load-cache fakeId=fakeId.jsonl` option or by the `cache` option on another field.
 If no matching is found in the cache, `fromCache` block the current line and the next lines are processing until a matching content go into the cache.
+
+### FF1
+
+```yaml
+  - selector:
+      jsonpath: "siret"
+    mask:
+      ff1:
+        radix: 10
+        keyFromEnv: "FF1_ENCRYPTION_KEY"
+```
+
+This example will encrypt the `siret` column with the private key base64-encoded in the FF1_ENCRYPTION_KEY environment variable. Use the same mask with the option `decrypt: true` to re-identify the unmasked value.
+
+Be sure to check [the full FPE demo](demo/demo7) to get more details about this mask.
 
 ## Contributors
 
