@@ -2,7 +2,7 @@
 
 This folder contains the first demo of PIMO.
 
-This demo shows how to use PIMO to mask simple datas contained in a file. Data that will be used in this demo are contained in the `data.jsonl` file, the 5 lines from this file are identical ( `{"age": 28, "name":"Toto", "surname":"Martin", "town": "Nantes"}` ) to see effects of the different masks.
+This demo shows how to use PIMO to mask simple data contained in a file. Data that will be used in this demo are contained in the `data.jsonl` file, the 5 lines from this file are identical ( `{"age": 28, "name":"Toto", "surname":"Martin", "town": "Nantes"}` ) to see effects of the different masks.
 
 #### **`data.jsonl`**
 ```json
@@ -59,4 +59,4 @@ All command lines are listed in [demo.sh](demo.sh).
 
 ---
 
-Masked datas are written in the new file `dataout.jsonl`. This exemple show the use of some masks (constant, hash, randomInt and randomChoice), but the `masking.yml` file can be changed to test other features (changing masks, removing or changing the seed, etc...). It is recommended to change the seed first (or to remove it) to see its effect. Launching PIMO multiple time with the same seed should keep the same results every time but removing the seed should change the results of every use of PIMO. After that you can change the town field on some of the input json to see the effects of the hash on different values.
+Masked data are written in the new file `dataout.jsonl`. This exemple show the use of some masks (constant, hash, randomInt and randomChoice), but the `masking.yml` file can be changed to test other features (changing masks, removing or changing the seed, etc...). It is recommended to change the seed first (or to remove it) to see its effect. Launching PIMO multiple time with the same seed should keep the same results every time but removing the seed should change the results of every use of PIMO. After that you can change the town field on some of the input json to see the effects of the hash on different values.

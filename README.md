@@ -59,7 +59,7 @@ The following types of masks can be used :
 * Others
   * `constant` is to mask the value by a constant value given in argument.
   * `command` is to mask with the output of a console command given in argument.
-  * `incremental` is to mask datas with incremental value starting from `start` with a step of `increment`.
+  * `incremental` is to mask data with incremental value starting from `start` with a step of `increment`.
   * `fluxUri` is to replace by a sequence of values defined in an external resource.
   * `replacement` is to mask a data with another data from the jsonline.
 fluxUri

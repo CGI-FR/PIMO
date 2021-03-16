@@ -1,6 +1,6 @@
-# Third demo - Masking Tables of datas
+# Third demo - Masking Tables of data
 
-This folder contains files for the third demo. This demo shows how PIMO masks data contained in tables, you can see those different datas configurations in the `data.jsonl` file.
+This folder contains files for the third demo. This demo shows how PIMO masks data contained in tables, you can see those different data configurations in the `data.jsonl` file.
 
 #### **`data.jsonl`**
 ```json

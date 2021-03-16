@@ -1,6 +1,6 @@
-# Fourth demo - Using other datas in mask
+# Fourth demo - Using other data in mask
 
-This folder contains files for the fourth demo. This demo shows how PIMO masks datas thanks to datas contained in other fields by replacing or creating new values.
+This folder contains files for the fourth demo. This demo shows how PIMO masks data thanks to values contained in other fields by replacing or creating new values.
 
 #### **`data.jsonl`**
 ```json
@@ -13,7 +13,7 @@ This folder contains files for the fourth demo. This demo shows how PIMO masks d
 The `masking.yml` file contains the following configuration :
 
 * A replacement mask that replace the `fieldToReplace` field with the `replacement` field.
-* A template mask that replace the `compositeField` with the expression `{{.field1}}+{{.field2}}`, this expression will replace the original data with a created data containing the datas from `field1` and `field2` fields separated by a + sign.
+* A template mask that replace the `compositeField` with the expression `{{.field1}}+{{.field2}}`, this expression will replace the original data with a created data containing the data from `field1` and `field2` fields separated by a + sign.
 
 #### **`masking.yml`**
 ```yaml

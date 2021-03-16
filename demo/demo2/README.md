@@ -1,8 +1,8 @@
-# Second demo - Masking nested datas
+# Second demo - Masking nested data
 
 This folder contains the second demo of PIMO.
 
-This demo shows how to use PIMO to mask datas in nested json. Those data are contained in the `data.jsonl` file. They are composed of the following fields : a field `town`, and a field `identity` that contains 3 fields : `age`, `name` and `surname`.
+This demo shows how to use PIMO to mask data in nested json. Those data are contained in the `data.jsonl` file. They are composed of the following fields : a field `town`, and a field `identity` that contains 3 fields : `age`, `name` and `surname`.
 
 #### **`data.jsonl`**
 ```json
