@@ -1,0 +1,9 @@
+version: "1"
+masking:
+  - selector:
+      jsonpath: "siret"
+    mask:
+      ff1:
+        radix: 10
+        keyFromEnv: "FF1_ENCRYPTION_KEY"
+        decrypt: true
