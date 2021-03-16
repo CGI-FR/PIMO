@@ -14,11 +14,11 @@ masking:
       jsonpath: "exemple.exemple"
     mask:
       type: "argument"
-    # Optional cache
+    # Optional cache (coherence preservation)
     cache: "cacheName"
 caches:
   cacheName:
-    # Optional bijectif cache
+    # Optional bijective cache (enable re-identification if the cache is dumped on disk)
     unique: true
 ```
 
@@ -89,6 +89,8 @@ This takes the `data.json` file, masks the data contained inside it and put the 
 ## Examples
 
 This section will give exemples for every types of mask.
+
+Please check the [demo folder](demo) for more advanced examples.
 
 ### regex
 
