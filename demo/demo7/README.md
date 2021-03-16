@@ -70,7 +70,7 @@ Therefore, the value of `radix` must less or equal than 62. Also a value of 1 or
 
 ## Decryption example
 
-To re-indentify original data, use the same mask defined in the encryption example, but enable the `decrypt` option :
+To re-identify original data, use the same mask defined in the encryption example, but enable the `decrypt` option :
 
 #### **`masking-decrypt.yml`**
 ```yaml
