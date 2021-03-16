@@ -3,6 +3,9 @@ masking:
   - selector:
       jsonpath: "siret"
     mask:
+      # use of the FF1 mask
       ff1:
+        # radix 10 specify that only the 10 digits are used in the output format
         radix: 10
+        # name of the environment variable containing the base64-encoded secret key (note: key length must be 128, 192, or 256 bits)
         keyFromEnv: "FF1_ENCRYPTION_KEY"
