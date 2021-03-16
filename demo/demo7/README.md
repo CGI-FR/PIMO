@@ -66,7 +66,7 @@ FF1 uses a fixed domain definition (list of all allowed characters in an output 
 
 The `radix` parameter determine which part of the domain definition will actually be used. For example, a radix of 10 will produce values containing only digits (the 10 first characters of the full domain definition).
 
-Therefore, the value of `radix` must less or equal than 36. Also a value of 1 or 0 is invalid.
+Therefore, the value of `radix` must less or equal than 62. Also a value of 1 or 0 is invalid.
 
 ## Decryption example
 
