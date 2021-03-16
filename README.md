@@ -35,34 +35,34 @@ caches:
 The following types of masks can be used :
 
 * Pure randomization masks
-  * `regex` is to mask using a regular expression given in argument.
-  * `randomInt` is to mask with a random int from a range with arguments min and max.
-  * `randomDecimal` is to mask with a random decimal from a range with arguments min, max and precision.
-  * `randDate` is to mask a date with a random date between `dateMin` and `dateMax`.
-  * `randomDuration` is to mask a date by adding or removing a random time between `Min` and `Max`.
-  * `randomChoice` is to mask with a random value from a list in argument.
-  * `weightedChoice` is to mask with a random value from a list with probability, both given with the arguments `choice` and `weight`.
-  * `randomChoiceInUri` is to mask with a random value from an external resource.
+  * [`regex`](#regex) is to mask using a regular expression given in argument.
+  * [`randomInt`](#randomInt) is to mask with a random int from a range with arguments min and max.
+  * [`randomDecimal`](#randomDecimal) is to mask with a random decimal from a range with arguments min, max and precision.
+  * [`randDate`](#randDate) is to mask a date with a random date between `dateMin` and `dateMax`.
+  * [`randomDuration`](#randomDuration) is to mask a date by adding or removing a random time between `Min` and `Max`.
+  * [`randomChoice`](#randomChoice) is to mask with a random value from a list in argument.
+  * [`weightedChoice`](#weightedChoice) is to mask with a random value from a list with probability, both given with the arguments `choice` and `weight`.
+  * [`randomChoiceInUri`](#randomChoiceInUri) is to mask with a random value from an external resource.
 * K-Anonymization
-  * `range` is to mask a integer value by a range of value (e.g. replace `5` by `[0,10]`).
-  * `duration` is to mask a date by adding or removing a certain number of days.
+  * [`range`](#range) is to mask a integer value by a range of value (e.g. replace `5` by `[0,10]`).
+  * [`duration`](#duration) is to mask a date by adding or removing a certain number of days.
 * Re-identification and coherence preservation
-  * `hash` is to mask with a value from a list by matching the original value, allowing to mask a value the same way every time.
-  * `hashInUri` is to mask with a value from an external resource, by matching the original value, allowing to mask a value the same way every time.
-  * `fromCache` is a mask to obtain a value from a cache.
-  * `ff1` mask allows the use of <abbr title="Format Preserving Encryption">FPE</abbr> which enable private-key based re-identification.
+  * [`hash`](#hash) is to mask with a value from a list by matching the original value, allowing to mask a value the same way every time.
+  * [`hashInUri`](#hashInUri) is to mask with a value from an external resource, by matching the original value, allowing to mask a value the same way every time.
+  * [`fromCache`](#fromCache) is a mask to obtain a value from a cache.
+  * [`ff1`](#ff1) mask allows the use of <abbr title="Format Preserving Encryption">FPE</abbr> which enable private-key based re-identification.
 * Formatting
-  * `dateParser` is to change a date format.
-  * `template` is to mask a data with a template using other values from the jsonline.
-* Stream structure manipulation
-  * `remove` is to mask a field by completely removing it.
-  * `add` is a mask to add a field to the jsonline.
+  * [`dateParser`](#dateParser) is to change a date format.
+  * [`template`](#template) is to mask a data with a template using other values from the jsonline.
+* Data structure manipulation
+  * [`remove`](#remove) is to mask a field by completely removing it.
+  * [`add`](#add) is a mask to add a field to the jsonline.
 * Others
-  * `constant` is to mask the value by a constant value given in argument.
-  * `command` is to mask with the output of a console command given in argument.
-  * `incremental` is to mask data with incremental value starting from `start` with a step of `increment`.
-  * `fluxUri` is to replace by a sequence of values defined in an external resource.
-  * `replacement` is to mask a data with another data from the jsonline.
+  * [`constant`](#constant) is to mask the value by a constant value given in argument.
+  * [`command`](#command) is to mask with the output of a console command given in argument.
+  * [`incremental`](#incremental) is to mask data with incremental value starting from `start` with a step of `increment`.
+  * [`fluxUri`](#fluxUri) is to replace by a sequence of values defined in an external resource.
+  * [`replacement`](#replacement) is to mask a data with another data from the jsonline.
 fluxUri
 
 A full `masking.yml` file example, using every kind of mask, is given with the source code.
@@ -93,7 +93,7 @@ This section will give exemples for every types of mask.
 
 Please check the [demo folder](demo) for more advanced examples.
 
-### regex
+### Regex
 
 ```yaml
   - selector:
@@ -104,7 +104,9 @@ Please check the [demo folder](demo) for more advanced examples.
 
 This exemple will mask the `phone` field of the input jsonlines with a random string respecting the regular expression.
 
-### constant
+[Return to list of masks](#possible-masks)
+
+### Constant
 
 ```yaml
   - selector:
@@ -115,7 +117,9 @@ This exemple will mask the `phone` field of the input jsonlines with a random st
 
 This exemple will mask the `name` field of the input jsonlines with the value of the `constant` field.
 
-### randomChoice
+[Return to list of masks](#possible-masks)
+
+### RandomChoice
 
 ```yaml
   - selector:
@@ -129,7 +133,9 @@ This exemple will mask the `name` field of the input jsonlines with the value of
 
 This exemple will mask the `name` field of the input jsonlines with random values from the `randomChoice` list.
 
-### randomChoiceInUri
+[Return to list of masks](#possible-masks)
+
+### RandomChoiceInUri
 
 ```yaml
   - selector:
@@ -140,7 +146,9 @@ This exemple will mask the `name` field of the input jsonlines with random value
 
 This exemple will mask the `name` field of the input jsonlines with random values from the list contained in the name.txt file. The different URI usable with this selector are : `pimo`, `file` and `http`/`https`.
 
-### randomInt
+[Return to list of masks](#possible-masks)
+
+### RandomInt
 
 ```yaml
   - selector:
@@ -153,7 +161,9 @@ This exemple will mask the `name` field of the input jsonlines with random value
 
 This exemple will mask the `age` field of the input jsonlines with a random number between `min` and `max` included.
 
-### randomDecimal
+[Return to list of masks](#possible-masks)
+
+### RandomDecimal
 
 ```yaml
   - selector:
@@ -167,7 +177,9 @@ This exemple will mask the `age` field of the input jsonlines with a random numb
 
 This exemple will mask the `score` field of the input jsonlines with a random float between `min` and `max`, with the number of decimal chosen in the `precision` field.
 
-### command
+[Return to list of masks](#possible-masks)
+
+### Command
 
 ```yaml
   - selector:
@@ -178,7 +190,9 @@ This exemple will mask the `score` field of the input jsonlines with a random fl
 
 This exemple will mask the `name` field of the input jsonlines with the output of the given command. In this case, `Dorothy`.
 
-### weightedChoice
+[Return to list of masks](#possible-masks)
+
+### WeightedChoice
 
 ```yaml
   - selector:
@@ -193,7 +207,9 @@ This exemple will mask the `name` field of the input jsonlines with the output o
 
 This exemple will mask the `surname` field of the input jsonlines with a random value in the `weightedChoice` list with a probability proportional at the `weight` field.
 
-### hash
+[Return to list of masks](#possible-masks)
+
+### Hash
 
 ```yaml
   - selector:
@@ -207,7 +223,9 @@ This exemple will mask the `surname` field of the input jsonlines with a random 
 
 This example will mask the `town` field of the input jsonlines with a value from the `hash` list. The value will be chosen thanks to a hashing of the original value, allowing the output to be always the same in case of identical inputs.
 
-### hashInUri
+[Return to list of masks](#possible-masks)
+
+### HashInUri
 
 ```yaml
   - selector:
@@ -218,7 +236,9 @@ This example will mask the `town` field of the input jsonlines with a value from
 
 This exemple will mask the `name` field of the input jsonlines with a value from the list nameFR contained in pimo, the same way as for `hash` mask. The different URI usable with this selector are : `pimo`, `file` and `http`/`https`.
 
-### randDate
+[Return to list of masks](#possible-masks)
+
+### RandDate
 
 ```yaml
   - selector:
@@ -231,7 +251,9 @@ This exemple will mask the `name` field of the input jsonlines with a value from
 
 This exemple will mask the `date` field of the input jsonlines with a random date between `dateMin` and `dateMax`. In this case the date will be between the 1st January 1970 and the 1st January 2020.
 
-### duration
+[Return to list of masks](#possible-masks)
+
+### Duration
 
 ```yaml
   - selector:
@@ -241,6 +263,8 @@ This exemple will mask the `date` field of the input jsonlines with a random dat
 ```
 
 This exemple will mask the `last_contact` field of the input jsonlines by decreasing its value by 2 days. The duration field should match the ISO 8601 standard for durations.
+
+[Return to list of masks](#possible-masks)
 
 ### DateParser
 
@@ -255,7 +279,9 @@ This exemple will mask the `last_contact` field of the input jsonlines by decrea
 
 This exemple will change every date from the date field from the `inputFormat` to the `outputFormat`. The format should always display the following date : `Mon Jan 2 15:04:05 -0700 MST 2006`. Either field is optional and in case a field is not defined, the default format is RFC3339, which is the base format for PIMO, needed for `duration` mask and given by `randDate` mask.
 
-### randomDuration
+[Return to list of masks](#possible-masks)
+
+### RandomDuration
 
 ```yaml
   - selector:
@@ -268,7 +294,9 @@ This exemple will change every date from the date field from the `inputFormat` t
 
 This exemple will mask the `date` field of the input jsonlines by decreasing its value by a random value between 2 and 27 days. The durations should match the ISO 8601 standard.
 
-### incremental
+[Return to list of masks](#possible-masks)
+
+### Incremental
 
 ```yaml
   - selector:
@@ -281,7 +309,9 @@ This exemple will mask the `date` field of the input jsonlines by decreasing its
 
 This exemple will mask the `id` field of the input jsonlines with incremental values. The first jsonline's `id` will be masked by 1, the second's by 2, etc...
 
-### replacement
+[Return to list of masks](#possible-masks)
+
+### Replacement
 
 ```yaml
   - selector:
@@ -292,7 +322,9 @@ This exemple will mask the `id` field of the input jsonlines with incremental va
 
 This exemple will mask the `name4` field of the input jsonlines with the field `name` of the jsonline. This selector must be placed after the `name` selector to be masked with the new value and it must be placed before the `name` selector to be masked by the previous value.
 
-### template
+[Return to list of masks](#possible-masks)
+
+### Template
 
 ```yaml
   - selector:
@@ -323,6 +355,8 @@ The template mask can format the fields used. The following exemple will create 
 
 Available functions for templates come from <http://masterminds.github.io/sprig/>.
 
+[Return to list of masks](#possible-masks)
+
 ### Remove
 
 ```yaml
@@ -333,6 +367,8 @@ Available functions for templates come from <http://masterminds.github.io/sprig/
 ```
 
 This field will mask the `useless-field` of the input jsonlines by completely deleting it.
+
+[Return to list of masks](#possible-masks)
 
 ### Add
 
@@ -347,6 +383,8 @@ This exemple will create the field `newField` containing the value `newvalue`. T
 
 The field will be created in every input jsonline that doesn't already contains this field.
 
+[Return to list of masks](#possible-masks)
+
 ### FluxURI
 
 ```yaml
@@ -357,6 +395,8 @@ The field will be created in every input jsonline that doesn't already contains 
 ```
 
 This exemple will create an `id` field in every output jsonline. The values will be the ones contained in the `id.csv` file in the same order as in the file. If the field already exist on the input jsonline it will be replaced and if every value of the file has already been assigned, the input jsonlines won't be modified.
+
+[Return to list of masks](#possible-masks)
 
 ### FromCache
 
@@ -374,6 +414,8 @@ This exemple will replace the content of `id` field by the matching content in t
 Cache content can be loaded from jsonfile with the `--load-cache fakeId=fakeId.jsonl` option or by the `cache` option on another field.
 If no matching is found in the cache, `fromCache` block the current line and the next lines are processing until a matching content go into the cache.
 
+[Return to list of masks](#possible-masks)
+
 ### FF1
 
 ```yaml
@@ -388,6 +430,21 @@ If no matching is found in the cache, `fromCache` block the current line and the
 This example will encrypt the `siret` column with the private key base64-encoded in the FF1_ENCRYPTION_KEY environment variable. Use the same mask with the option `decrypt: true` to re-identify the unmasked value.
 
 Be sure to check [the full FPE demo](demo/demo7) to get more details about this mask.
+
+[Return to list of masks](#possible-masks)
+
+### Range
+
+```yaml
+  - selector:
+      jsonpath: "age"
+    mask:
+      range: 5
+```
+
+This mask will replace a integer value `{"age": 27}` with a range like this `{"age": "[25;29]"}`.
+
+[Return to list of masks](#possible-masks)
 
 ## Contributors
 
