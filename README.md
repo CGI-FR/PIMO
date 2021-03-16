@@ -1,10 +1,10 @@
-# Pimo : Private Input, Masked Output
+# PIMO : Private Input, Masked Output
 
-PIMO is a tool for data masking. It can mask datas from JSONline and return other JSONline thanks to a masking configuration contained in a yaml file.
+PIMO is a tool for data masking. It can mask data from a JSONline stream and return another JSONline stream thanks to a masking configuration contained in a yaml file.
 
 ## Configuration file needed
 
-Pimo requires a yaml configuration file to works. This file must be named `masking.yml` and be placed in the working directory. The file must respect the following format :
+PIMO requires a yaml configuration file to works. By default, the file is named `masking.yml` and is placed in the working directory. The file must respect the following format :
 
 ```yaml
 version: "1"
@@ -23,38 +23,50 @@ caches:
 ```
 
 `version` is the version of the masking file.  
-`seed` is to give every random mask the same seed, it is optional and in case it is not informed, the seed is chosen with the time to look more random.  
-`masking` is used to define the pipeline of masks that are going to be used by pimo.
+`seed` is to give every random mask the same seed, it is optional and in case it is not defined, the seed is derived from the current time to increase randomness.  
+`masking` is used to define the pipeline of masks that is going to be applied.
 `selector` is made of a jsonpath and a mask.  
 `jsonpath` defines the path of the entry that has to be masked in the json file.  
 `mask` defines the mask that will be used for the entry defined by `selector`.
-An optional `cache` can be declare. if the current entry is already in the cache as key the associate value is retrurn without executing the mask. Else the mask is executed and a new entry is added in the cache with the orignal content as `key` and the masked result as `value`. The cache have to be declared in the `caches` section.
+`cache` is optional, if the current entry is already in the cache as key the associated value is returned without executing the mask. Otherwise the mask is executed and a new entry is added in the cache with the orignal content as `key` and the masked result as `value`. The cache have to be declared in the `caches` section of the YAML file.
 
 ## Possible masks
 
 The following types of masks can be used :
 
-* `regex` is to mask using a regular expression given in argument.
-* `constant` is to mask the value by a constant value given in argument.
-* `randomChoice` is to mask with a random value from a list in argument.
-* `randomInt` is to mask with a random int from a range with arguments min and max.
-* `command` is to mask with the output of a console command given in argument.
-* `weightedChoice` is to mask with a random value from a list with probability, both given with the arguments `choice` and `weight`.
-* `hash` is to mask with a value from a list by mashing the original value, allowing to mask a value the same way every time.
-* `randDate` is to mask a date with a random date between `dateMin` and `dateMax`.
-* `duration` is to mask a date by adding or removing a certain number of days.
-* `dateParser` is to change a date format.
-* `randomDuration` is to mask a date by adding or removing a random time between `Min` and `Max`
-* `incremental` is to mask datas with incremental value starting from `start` with a step of `increment`.
-* `remplacement` is to mask a data with another data from the jsonline.
-* `template` is to mask a data with a template using other values from the jsonline.
-* `remove` is to mask a field by completely removing it.
-* `add` is a mask to add a field to the jsonline.
-* `fromCache` is a mask to get content from a cache.
+* Pure randomization masks
+  * `regex` is to mask using a regular expression given in argument.
+  * `randomInt` is to mask with a random int from a range with arguments min and max.
+  * `randomDecimal` is to mask with a random decimal from a range with arguments min, max and precision.
+  * `randDate` is to mask a date with a random date between `dateMin` and `dateMax`.
+  * `randomDuration` is to mask a date by adding or removing a random time between `Min` and `Max`.
+  * `randomChoice` is to mask with a random value from a list in argument.
+  * `weightedChoice` is to mask with a random value from a list with probability, both given with the arguments `choice` and `weight`.
+  * `randomChoiceInUri` is to mask with a random value from an external resource.
+* K-Anonymization
+  * `range` is to mask a integer value by a range of value (e.g. replace `5` by `[0,10]`).
+  * `duration` is to mask a date by adding or removing a certain number of days.
+* Re-identification and coherence preservation
+  * `hash` is to mask with a value from a list by matching the original value, allowing to mask a value the same way every time.
+  * `hashInUri` is to mask with a value from an external resource, by matching the original value, allowing to mask a value the same way every time.
+  * `fromCache` is a mask to obtain a value from a cache.
+* Formatting
+  * `dateParser` is to change a date format.
+  * `template` is to mask a data with a template using other values from the jsonline.
+* Stream structure manipulation
+  * `remove` is to mask a field by completely removing it.
+  * `add` is a mask to add a field to the jsonline.
+* Others
+  * `constant` is to mask the value by a constant value given in argument.
+  * `command` is to mask with the output of a console command given in argument.
+  * `incremental` is to mask datas with incremental value starting from `start` with a step of `increment`.
+  * `fluxUri` is to replace by a sequence of values defined in an external resource.
+  * `replacement` is to mask a data with another data from the jsonline.
+fluxUri
 
-A full `masking.yml` file exemple, using every kind of mask, is given with the source code.
+A full `masking.yml` file example, using every kind of mask, is given with the source code.
 
-In case two types of mask are entered in the same selector, the program can't extract the masking configuration and will return an error. The file `wrongMasking.yml` provided with the source illustrate that error.
+In case two types of mask are entered with the same selector, the program can't extract the masking configuration and will return an error. The file `wrongMasking.yml` provided with the source illustrate that error.
 
 ## Usage
 
@@ -64,20 +76,19 @@ To use PIMO to mask a `data.json`, use in the following way :
 ./pimo <data.json >maskedData.json
 ```
 
-This takes the `data.json` file, masks the datas contained inside it and put the result in a `maskedData.json` file. If datas are in a tables (for exemple multiples names), then each field of this table will be masked using the given mask. The following flags can be used:
+This takes the `data.json` file, masks the data contained inside it and put the result in a `maskedData.json` file. If data are in a table (for exemple multiple names), then each field of this table will be masked using the given mask. The following flags can be used:
 
-* `--repeat=N` This flag will make pimo mask every input N-times.
+* `--repeat=N` This flag will make pimo mask every input N-times (usefull for dataset generation).
 * `--skip-line-on-error` This flag will totally skip a line if an error occurs masking a field.
 * `--skip-field-on-error` This flag will return output without a field if an error occurs masking this field.
-* `--empty-input` This flag will give PIMO a `{}` input, usable with `repeat` flag.
-* `--config=filename.yml` This flag allow to use another file for config that `masking.yml`.
-* `--load-cache cacheName=filename.json` This flag load initial cache content from a file (json line format `{"key":"a", "value":"b"}`).
+* `--empty-input` This flag will give PIMO a `{}` input, usable with `--repeat` flag.
+* `--config=filename.yml` This flag allow to use another file for config than the default `masking.yml`.
+* `--load-cache cacheName=filename.json` This flag load an initial cache content from a file (json line format `{"key":"a", "value":"b"}`).
 * `--dump-cache cacheName=filename.json` This flag dump final cache content to a file (json line format `{"key":"a", "value":"b"}`).
 
+## Examples
 
-## Exemples
-
-This section will give exemples for every type of masking.
+This section will give exemples for every types of mask.
 
 ### regex
 
@@ -126,7 +137,7 @@ This exemple will mask the `name` field of the input jsonlines with random value
 
 This exemple will mask the `name` field of the input jsonlines with random values from the list contained in the name.txt file. The different URI usable with this selector are : `pimo`, `file` and `http`/`https`.
 
-### randonInt
+### randomInt
 
 ```yaml
   - selector:
@@ -139,7 +150,7 @@ This exemple will mask the `name` field of the input jsonlines with random value
 
 This exemple will mask the `age` field of the input jsonlines with a random number between `min` and `max` included.
 
-### randonDecimal
+### randomDecimal
 
 ```yaml
   - selector:
@@ -147,7 +158,7 @@ This exemple will mask the `age` field of the input jsonlines with a random numb
     mask:
       randomDecimal:
         min: 0
-        max: 17,23
+        max: 17.23
         precision: 2
 ```
 
@@ -159,10 +170,10 @@ This exemple will mask the `score` field of the input jsonlines with a random fl
   - selector:
       jsonpath: "name"
     mask:
-      command: "echo Dorothy"
+      command: "echo -n Dorothy"
 ```
 
-This exemple will mask the `name` field of the input jsonlines with the output of the given commande. In this case, `Dorothy`.
+This exemple will mask the `name` field of the input jsonlines with the output of the given command. In this case, `Dorothy`.
 
 ### weightedChoice
 
@@ -191,7 +202,7 @@ This exemple will mask the `surname` field of the input jsonlines with a random 
         - "Sapphire City"
 ```
 
-This exemple will mask the `town` field of the input jsonlines with a value from the `hash` list. The value will be chosen thanks to a hashing of the original value, allowing the output to be always the same in case of identical inputs.
+This example will mask the `town` field of the input jsonlines with a value from the `hash` list. The value will be chosen thanks to a hashing of the original value, allowing the output to be always the same in case of identical inputs.
 
 ### hashInUri
 
@@ -239,7 +250,7 @@ This exemple will mask the `last_contact` field of the input jsonlines by decrea
         outputFormat: "01/02/06"
 ```
 
-This exemple will change every date from the date field from the `inputFormat` to the `outputFormat`. The format should always display the following date : `Mon Jan 2 15:04:05 -0700 MST 2006`. Either field is optional and in case a field is not informed, the default format is RFC3339, which is the base format for PIMO, needed for duration mask and given by randdate mask.
+This exemple will change every date from the date field from the `inputFormat` to the `outputFormat`. The format should always display the following date : `Mon Jan 2 15:04:05 -0700 MST 2006`. Either field is optional and in case a field is not defined, the default format is RFC3339, which is the base format for PIMO, needed for `duration` mask and given by `randDate` mask.
 
 ### randomDuration
 
@@ -287,7 +298,7 @@ This exemple will mask the `name4` field of the input jsonlines with the field `
       template: "{{.surname}}.{{.name}}@gmail.com"
 ```
 
-This exemple will mask the `mail` field of the input jsonlines respecting the given template. In the `masking.yml` config fil, this selector must be placed after the fields contained in the template to mask with the new values and  before the other fields to be masked with the old values. In the case of a nested json, the template must respect the following exemple :
+This exemple will mask the `mail` field of the input jsonlines respecting the given template. In the `masking.yml` config file, this selector must be placed after the fields contained in the template to mask with the new values and before the other fields to be masked with the old values. In the case of a nested json, the template must respect the following exemple :
 
 ```yaml
   - selector:
@@ -307,7 +318,7 @@ The template mask can format the fields used. The following exemple will create 
       template: "{{.surname | NoAccent | upper}}.{{.name | NoAccent | lower}}@gmail.com"
 ```
 
-Available functions for templates come from <http://masterminds.github.io/sprig/>. The function NoAccent can also be used.
+Available functions for templates come from <http://masterminds.github.io/sprig/>.
 
 ### Remove
 
@@ -357,8 +368,8 @@ This exemple will create an `id` field in every output jsonline. The values will
       unique: true
 ```
 
-This exemple will replace the content of `id` field by the mathing content in the cache `fakeId`. Cache have to be declared in the `caches` section.
-Cache content can be loaded from jsonfile with the `--load-cache fakeId=fakeId.jsonl` option or by the `chache` option on other field.
+This exemple will replace the content of `id` field by the matching content in the cache `fakeId`. Cache have to be declared in the `caches` section.
+Cache content can be loaded from jsonfile with the `--load-cache fakeId=fakeId.jsonl` option or by the `cache` option on another field.
 If no matching is found in the cache, `fromCache` block the current line and the next lines are processing until a matching content go into the cache.
 
 ## Contributors
