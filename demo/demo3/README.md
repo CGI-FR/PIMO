@@ -4,8 +4,8 @@ This folder contains files for the third demo. This demo shows how PIMO masks da
 
 #### **`data.jsonl`**
 ```json
-{"name":["Benjamin", "Toto", "Louis"], "surname": ["Martin", "Bernard"]}
-{"name":["Benjamin", "Toto", "Louis"], "surname": "Martin"}
+{"name":["Benjamin", "Jean", "Louis"], "surname": ["Martin", "Bernard"]}
+{"name":["Benjamin", "Jean", "Louis"], "surname": "Martin"}
 {"name":"Benjamin", "surname": ["Martin", "Bernard"]}
 {"name":"Benjamin", "surname": "Martin"}
 {"identity":{"name":["Jeanne", "Louise"]}}
@@ -13,7 +13,7 @@ This folder contains files for the third demo. This demo shows how PIMO masks da
 
 The `masking.yml` file contains the following configuration of masks:
 
-* A randomChoice mask for the field `name`, choosing between Mickael, Toto and Benjamin.
+* A randomChoice mask for the field `name`, choosing between Mickael, Jean and Benjamin.
 * A regex mask for the field `surname`, respecting the regex "(Mar|Ber)t(rand|in)". This command is use to show an exemple of regex mask.
 * A randomChoiceInUri mask for the field `identity.name`. This mask is used the same way a randomChoice mask does but allows to use an external list. All usable lists are shown in the global README.
 
@@ -27,7 +27,7 @@ masking:
     mask:
       randomChoice:
         - Mickael
-        - Toto
+        - Jean
         - Benjamin
   - selector:
       jsonpath: "surname"

@@ -6,10 +6,10 @@ This demo shows how to use PIMO to mask data in nested json. Those data are cont
 
 #### **`data.jsonl`**
 ```json
-{"town": "Nantes", "identity": {"age": 27, "name":"Toto", "surname": "Bertrand"}}
+{"town": "Nantes", "identity": {"age": 27, "name":"Jean", "surname": "Bertrand"}}
 {"town": "Nantes", "identity": {"age": 58, "name":"Benjamin", "surname": "Martin"}}
 {"town": "Rennes", "identity": {"age": 35, "name":"Benjamin", "surname": "Bertrand"}}
-{"town": "Rennes", "identity": {"age": 28, "name":"Toto", "surname": "Martin"}}
+{"town": "Rennes", "identity": {"age": 28, "name":"Jean", "surname": "Martin"}}
 ```
 
 The `masking.yml` file contains the following configuration :

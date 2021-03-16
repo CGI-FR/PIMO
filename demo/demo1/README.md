@@ -2,15 +2,15 @@
 
 This folder contains the first demo of PIMO.
 
-This demo shows how to use PIMO to mask simple data contained in a file. Data that will be used in this demo are contained in the `data.jsonl` file, the 5 lines from this file are identical ( `{"age": 28, "name":"Toto", "surname":"Martin", "town": "Nantes"}` ) to see effects of the different masks.
+This demo shows how to use PIMO to mask simple data contained in a file. Data that will be used in this demo are contained in the `data.jsonl` file, the 5 lines from this file are identical ( `{"age": 28, "name":"Dupont", "surname":"Martin", "town": "Nantes"}` ) to see effects of the different masks.
 
 #### **`data.jsonl`**
 ```json
-{"age": 28, "name":"Toto", "surname":"Martin", "town": "Nantes"}
-{"age": 28, "name":"Toto", "surname":"Martin", "town": "Nantes"}
-{"age": 28, "name":"Toto", "surname":"Martin", "town": "Nantes"}
-{"age": 28, "name":"Toto", "surname":"Martin", "town": "Nantes"}
-{"age": 28, "name":"Toto", "surname":"Martin", "town": "Nantes"}
+{"age": 28, "name":"Dupont", "surname":"Martin", "town": "Nantes"}
+{"age": 28, "name":"Dupont", "surname":"Martin", "town": "Nantes"}
+{"age": 28, "name":"Dupont", "surname":"Martin", "town": "Nantes"}
+{"age": 28, "name":"Dupont", "surname":"Martin", "town": "Nantes"}
+{"age": 28, "name":"Dupont", "surname":"Martin", "town": "Nantes"}
 ```
 
 The `masking.yml` file contains the following configuration:

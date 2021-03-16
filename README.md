@@ -109,7 +109,7 @@ This exemple will mask the `phone` field of the input jsonlines with a random st
   - selector:
       jsonpath: "name"
     mask:
-      constant: "Toto"
+      constant: "Bill"
 ```
 
 This exemple will mask the `name` field of the input jsonlines with the value of the `constant` field.

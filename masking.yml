@@ -8,7 +8,7 @@ masking:
   - selector:
       jsonpath: "name"
     mask:
-      constant: "Toto"
+      constant: "Bill"
   - selector:
       jsonpath: "name2"
     mask:
