@@ -63,7 +63,6 @@ The following types of masks can be used :
   * [`incremental`](#incremental) is to mask data with incremental value starting from `start` with a step of `increment`.
   * [`fluxUri`](#fluxUri) is to replace by a sequence of values defined in an external resource.
   * [`replacement`](#replacement) is to mask a data with another data from the jsonline.
-fluxUri
 
 A full `masking.yml` file example, using every kind of mask, is given with the source code.
 
