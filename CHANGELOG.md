@@ -16,7 +16,11 @@ Types of changes
 
 ## [Unreleased]
 
-Nothing in the backlog !
+- `Changed` improve masking.yml readability and conciceness (possible solutions: merge frequent mask combination into single use e.g. add with template=>add with template syntax support ; include external yaml to deduplcate, parameterized masks, ...).
+
+## [1.3.0 (Unreleased)]
+
+- `Added` ff1 mask to meet the requirement of re-identification from a single secret key.
 
 ## [1.2.1]
 

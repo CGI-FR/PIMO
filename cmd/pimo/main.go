@@ -28,6 +28,7 @@ import (
 	"makeit.imfr.cgi.com/makeit2/scm/lino/pimo/pkg/constant"
 	"makeit.imfr.cgi.com/makeit2/scm/lino/pimo/pkg/dateparser"
 	"makeit.imfr.cgi.com/makeit2/scm/lino/pimo/pkg/duration"
+	"makeit.imfr.cgi.com/makeit2/scm/lino/pimo/pkg/ff1"
 	"makeit.imfr.cgi.com/makeit2/scm/lino/pimo/pkg/fluxuri"
 	"makeit.imfr.cgi.com/makeit2/scm/lino/pimo/pkg/hash"
 	"makeit.imfr.cgi.com/makeit2/scm/lino/pimo/pkg/increment"
@@ -77,7 +78,7 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 	}
 
 	rootCmd.PersistentFlags().IntVarP(&iteration, "repeat", "r", 1, "number of iteration to mask each input")
-	rootCmd.PersistentFlags().BoolVar(&emptyInput, "empty-input", false, "generate datas without any input, to use with repeat flag")
+	rootCmd.PersistentFlags().BoolVar(&emptyInput, "empty-input", false, "generate data without any input, to use with repeat flag")
 	rootCmd.PersistentFlags().StringVarP(&maskingFile, "config", "c", "masking.yml", "name and location of the masking-config file")
 	rootCmd.PersistentFlags().StringToStringVar(&cachesToDump, "dump-cache", map[string]string{}, "path for dumping cache into file")
 	rootCmd.PersistentFlags().StringToStringVar(&cachesToLoad, "load-cache", map[string]string{}, "path for loading cache from file")
@@ -174,5 +175,6 @@ func injectMaskFactories() []model.MaskFactory {
 		randdura.Factory,
 		randomdecimal.Factory,
 		dateparser.Factory,
+		ff1.Factory,
 	}
 }

@@ -1,0 +1,13 @@
+version: "1"
+masking:
+  - selector:
+      jsonpath: "siret"
+    mask:
+      # use of the FF1 mask
+      ff1:
+        # important: use the same radix parameter as for encryption (values will be decrypted incorrectly if 11 is used for example)
+        radix: 10
+        # use the same secret key as for encryption
+        keyFromEnv: "FF1_ENCRYPTION_KEY"
+        # activate decryption
+        decrypt: true

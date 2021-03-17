@@ -6,7 +6,7 @@ masking:
     mask:
       randomChoice:
         - Mickael
-        - Toto
+        - Jean
         - Benjamin
   - selector:
       jsonpath: "surname"

@@ -91,6 +91,13 @@ type DateParserType struct {
 	OutputFormat string `yaml:"outputFormat"`
 }
 
+type FF1Type struct {
+	KeyFromEnv string `yaml:"keyFromEnv"`
+	TweakField string `yaml:"tweakField"`
+	Radix      uint
+	Decrypt    bool
+}
+
 type MaskType struct {
 	Add               Entry                `yaml:"add"`
 	Constant          Entry                `yaml:"constant"`
@@ -114,6 +121,7 @@ type MaskType struct {
 	RandomDecimal     RandomDecimalType    `yaml:"randomDecimal"`
 	DateParser        DateParserType       `yaml:"dateParser"`
 	FromCache         string               `yaml:"fromCache"`
+	FF1               FF1Type              `yaml:"ff1"`
 }
 
 type Masking struct {

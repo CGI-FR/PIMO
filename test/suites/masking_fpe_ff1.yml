@@ -1,0 +1,182 @@
+name: fpe features
+testcases:
+- name: ff1 mask encrypt with tweak
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "name"
+          mask:
+            ff1:
+              radix: 62
+              keyFromEnv: "FF1_ENCRYPTION_KEY"
+              tweakField: "tweak"
+      EOF
+  - script: |-
+      echo '{"name": "Toto", "tweak": "mytweak"}' | FF1_ENCRYPTION_KEY="70NZ2NWAqk9/A21vBPxqlA==" pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemoutjson.name ShouldEqual nhIy
+    - result.systemoutjson ShouldContainKey tweak
+    - result.systemerr ShouldBeEmpty
+
+- name: ff1 mask encrypt without tweak
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "name"
+          mask:
+            ff1:
+              radix: 62
+              keyFromEnv: "FF1_ENCRYPTION_KEY"
+              tweakField: "tweak"
+      EOF
+  - script: |-
+      echo '{"name": "Toto"}' | FF1_ENCRYPTION_KEY="70NZ2NWAqk9/A21vBPxqlA==" pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemoutjson.name ShouldEqual Uaow
+    - result.systemerr ShouldBeEmpty
+
+- name: ff1 mask encrypt with empty tweak
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "name"
+          mask:
+            ff1:
+              radix: 62
+              keyFromEnv: "FF1_ENCRYPTION_KEY"
+              tweakField: "tweak"
+      EOF
+  - script: |-
+      echo '{"name": "Toto", "tweak": ""}' | FF1_ENCRYPTION_KEY="70NZ2NWAqk9/A21vBPxqlA==" pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemoutjson.name ShouldEqual Uaow
+    - result.systemoutjson ShouldContainKey tweak
+    - result.systemerr ShouldBeEmpty
+
+- name: ff1 mask decrypt with tweak
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "name"
+          mask:
+            ff1:
+              radix: 62
+              keyFromEnv: "FF1_ENCRYPTION_KEY"
+              tweakField: "tweak"
+              decrypt: true
+      EOF
+  - script: |-
+      echo '{"name": "nhIy", "tweak": "mytweak"}' | FF1_ENCRYPTION_KEY="70NZ2NWAqk9/A21vBPxqlA==" pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemoutjson.name ShouldEqual Toto
+    - result.systemoutjson ShouldContainKey tweak
+    - result.systemerr ShouldBeEmpty
+
+- name: ff1 mask decrypt without tweak
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "name"
+          mask:
+            ff1:
+              radix: 62
+              keyFromEnv: "FF1_ENCRYPTION_KEY"
+              tweakField: "tweak"
+              decrypt: true
+      EOF
+  - script: |-
+      echo '{"name": "Uaow"}' | FF1_ENCRYPTION_KEY="70NZ2NWAqk9/A21vBPxqlA==" pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemoutjson.name ShouldEqual Toto
+    - result.systemerr ShouldBeEmpty
+
+- name: ff1 mask encrypt with empty encryption key
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "name"
+          mask:
+            ff1:
+              radix: 62
+              keyFromEnv: "FF1_ENCRYPTION_KEY"
+              tweakField: "tweak"
+      EOF
+  - script: |-
+      echo '{"name": "Toto", "tweak": "mytweak"}' | FF1_ENCRYPTION_KEY="" pimo
+    assertions:
+    - result.code ShouldEqual 4
+    - |-
+      result.systemerr ShouldEqual "Environment variable named 'FF1_ENCRYPTION_KEY' should be defined"
+
+- name: ff1 mask encrypt with no encryption key
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "name"
+          mask:
+            ff1:
+              radix: 62
+              keyFromEnv: "FF1_ENCRYPTION_KEY"
+              tweakField: "tweak"
+      EOF
+  - script: |-
+      echo '{"name": "Toto", "tweak": "mytweak"}' | pimo
+    assertions:
+    - result.code ShouldEqual 4
+    - |-
+      result.systemerr ShouldEqual "Environment variable named 'FF1_ENCRYPTION_KEY' should be defined"
+
+- name: ff1 mask encrypt with encryption key not valid
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "name"
+          mask:
+            ff1:
+              radix: 62
+              keyFromEnv: "FF1_ENCRYPTION_KEY"
+              tweakField: "tweak"
+      EOF
+  - script: |-
+      echo '{"name": "Toto", "tweak": "mytweak"}' | FF1_ENCRYPTION_KEY="aHR0cDovL21hc3Rlcm1pbmRzLmdpdGh1Yi5pby9zcHJpZy8=" pimo
+    assertions:
+    - result.code ShouldEqual 4
+    - |-
+      result.systemerr ShouldEqual "key length must be 128, 192, or 256 bits"
