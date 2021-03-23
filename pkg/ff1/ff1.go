@@ -99,3 +99,17 @@ func Factory(conf model.Masking, seed int64) (model.MaskEngine, bool, error) {
 	}
 	return nil, false, nil
 }
+
+// Create a mask from a configuration
+func RegistryMaskToConfiguration(conf model.Masking, config model.MaskConfiguration, seed int64) (model.MaskConfiguration, bool, error) {
+	if conf.Mask.FF1.KeyFromEnv != "" || conf.Mask.FF1.Radix > 0 {
+		if conf.Mask.FF1.KeyFromEnv == "" {
+			return nil, true, fmt.Errorf("keyFromEnv attribut is not optional")
+		}
+		if conf.Mask.FF1.Radix == 0 {
+			return nil, true, fmt.Errorf("radix attribut is not optional")
+		}
+		return config.WithEntry(conf.Selector.Jsonpath, NewMask(conf.Mask.FF1.KeyFromEnv, conf.Mask.FF1.TweakField, conf.Mask.FF1.Radix, conf.Mask.FF1.Decrypt)), true, nil
+	}
+	return nil, false, nil
+}
