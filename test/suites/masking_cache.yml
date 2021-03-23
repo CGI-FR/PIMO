@@ -182,9 +182,9 @@ testcases:
             jsonpath: "name"
           mask:
             randomChoice:
+              - "Marcel"
               - "Mickael"
               - "Mathieu"
-              - "Marcel"
           cache: "name"
 
       caches:
@@ -294,9 +294,9 @@ testcases:
             jsonpath: "name"
           mask:
             randomChoice:
+              - "Marcel"
               - "Mickael"
               - "Mathieu"
-              - "Marcel"
           cache: "name"
         - selector:
             jsonpath: "supervisor"
@@ -307,8 +307,6 @@ testcases:
           unique: true
 
       EOF
-  - script: sed -i  "s/\[\[/\{\{/g"  masking.yml
-  - script: sed -i  "s/\]\]/\}\}/g"  masking.yml
   - script: |-
       pimo <<EOF
       {"name": "Toto", "id": 1, "supervisor" : "Dorothy" }
@@ -338,9 +336,9 @@ testcases:
             jsonpath: "name"
           mask:
             randomChoice:
+              - "Marcel"
               - "Mickael"
               - "Mathieu"
-              - "Marcel"
           cache: "name"
       caches:
         name :

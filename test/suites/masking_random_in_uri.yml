@@ -19,3 +19,29 @@ testcases:
     - result.systemoutjson.name ShouldNotEqual Toto
     - result.systemoutjson.name ShouldBeIn Mickael Marc Benjamin
     - result.systemerr ShouldBeEmpty
+
+- name: muliple random in uri with same source mask
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      seed: 3
+      masking:
+        - selector:
+            jsonpath: "name"
+          mask:
+            randomChoiceInUri: "file://../names.txt"
+        - selector:
+            jsonpath: "name2"
+          mask:
+            randomChoiceInUri: "file://../names.txt"
+      EOF
+  - script: |-
+      echo '{"name": "Toto", "name2": ""}' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemoutjson.name ShouldNotEqual Toto
+    - result.systemoutjson.name ShouldEqual Mickael
+    - result.systemoutjson.name2 ShouldEqual Marc
+    - result.systemerr ShouldBeEmpty

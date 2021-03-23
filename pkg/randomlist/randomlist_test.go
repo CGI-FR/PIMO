@@ -55,19 +55,18 @@ func TestMaskingShouldReplaceSensitiveValueByRandomAndDifferent(t *testing.T) {
 
 func TestFactoryShouldCreateAMask(t *testing.T) {
 	maskingConfig := model.Masking{Mask: model.MaskType{RandomChoice: []model.Entry{"Michael", "Paul", "Marc"}}}
-	config, present, err := Factory(maskingConfig, 0)
-	waitedConfig := NewMask([]model.Entry{"Michael", "Paul", "Marc"}, 0)
-	assert.Equal(t, waitedConfig, config, "should be equal")
+	_, present, err := Factory(maskingConfig, 0)
 	assert.True(t, present, "should be true")
 	assert.Nil(t, err, "error should be nil")
 }
 
 func TestFactoryShouldCreateAMaskFromAList(t *testing.T) {
 	maskingConfig := model.Masking{Mask: model.MaskType{RandomChoiceInURI: "file://../../test/names.txt"}}
-	config, present, err := Factory(maskingConfig, 0)
-	waitedConfig := NewMask([]model.Entry{"Mickael", "Marc", "Benjamin"}, 0)
-	assert.Equal(t, waitedConfig, config, "should be equal")
+	mask, present, err := Factory(maskingConfig, 0)
+	assert.Nil(t, err, "error should be nil")
 	assert.True(t, present, "should be true")
+	masked, err := mask.Mask("")
+	assert.Equal(t, masked, "Mickael", "should be equal")
 	assert.Nil(t, err, "error should be nil")
 }
 
