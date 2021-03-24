@@ -288,13 +288,18 @@ func TestMaskEngineShouldMaskNestedArray(t *testing.T) {
 	assert.Equal(t, wanted, result)
 }
 
-func jsonlineToDictionaries(js string) ([]Dictionary, error) {
-	var inter interface{}
-	err := json.Unmarshal(([]byte)(js), &inter)
-	if err != nil {
-		return nil, err
+func jsonlineToDictionaries(jsl string) []Dictionary {
+	result := []Dictionary{}
+	jsons := strings.Split(jsl, "\n")
+	for _, js := range jsons {
+		var inter interface{}
+		err := json.Unmarshal(([]byte)(js), &inter)
+		if err != nil {
+			return nil
+		}
+		result = append(result, InterfaceToDictionary(inter))
 	}
-	return []Dictionary{InterfaceToDictionary(inter)}, nil
+	return result
 }
 
 func dictionariesToJSONLine(dictionaries []Dictionary) string {
@@ -311,21 +316,26 @@ func TestMaskEngineShouldMaskNestedArrays(t *testing.T) {
 	var i = 0
 	var nameMasking = FunctionMaskEngine{Function: func(name Entry, contexts ...Dictionary) (Entry, error) { i++; return fmt.Sprintf("%d", i), nil }}
 
-	mySlice, err := jsonlineToDictionaries(`{"persons":[{"phonenumber":"027123456"},{"phonenumber":"028123456"}]}`)
-	assert.Nil(t, err)
+	iput := `{"persons":[{"phonenumber":"027123456"},{"phonenumber":"028123456"}]}
+			 {"persons":[{"phonenumber":"027123456"}]}
+			 {"persons":[]}`
+	oput := `{"persons":[{"phonenumber":"1"},{"phonenumber":"2"}]}
+			 {"persons":[{"phonenumber":"3"}]}
+			 {"persons":[]}`
+
+	mySlice := jsonlineToDictionaries(iput)
 
 	var result []Dictionary
 
 	pipeline := NewPipelineFromSlice(mySlice).
 		Process(NewMaskEngineProcess(NewPathSelector("persons.phonenumber"), nameMasking)).
 		AddSink(NewSinkToSlice(&result))
-	err = pipeline.Run()
+	err := pipeline.Run()
 
 	assert.Nil(t, err)
 
-	expected := `{"persons":[{"phonenumber":"1"},{"phonenumber":"2"}]}`
-	actual := fmt.Sprint(dictionariesToJSONLine(result))
-
+	expected := dictionariesToJSONLine(jsonlineToDictionaries(oput))
+	actual := dictionariesToJSONLine(result)
 	assert.Equal(t, expected, actual)
 }
 
@@ -333,21 +343,22 @@ func TestMaskEngineShouldMaskNestedNestedArrays(t *testing.T) {
 	var i = 0
 	var nameMasking = FunctionMaskEngine{Function: func(name Entry, contexts ...Dictionary) (Entry, error) { i++; return fmt.Sprintf("%d", i), nil }}
 
-	mySlice, err := jsonlineToDictionaries(`{"elements":[{"persons":[{"phonenumber":"027123456"},{"phonenumber":"028123456"}]}]}`)
-	assert.Nil(t, err)
+	iput := `{"elements":[{"persons":[{"phonenumber":"027123456"},{"phonenumber":"028123456"}]}]}`
+	oput := `{"elements":[{"persons":[{"phonenumber":"1"},{"phonenumber":"2"}]}]}`
+
+	mySlice := jsonlineToDictionaries(iput)
 
 	var result []Dictionary
 
 	pipeline := NewPipelineFromSlice(mySlice).
-		Process(NewMaskEngineProcess(NewPathSelector("elements.persons.phonenumber"), nameMasking)).
+		Process(NewMaskEngineProcess(NewPathSelector("persons.phonenumber"), nameMasking)).
 		AddSink(NewSinkToSlice(&result))
-	err = pipeline.Run()
+	err := pipeline.Run()
 
 	assert.Nil(t, err)
 
-	expected := `{"elements":[{"persons":[{"phonenumber":"1"},{"phonenumber":"2"}]}]}`
-	actual := fmt.Sprint(dictionariesToJSONLine(result))
-
+	expected := dictionariesToJSONLine(jsonlineToDictionaries(oput))
+	actual := dictionariesToJSONLine(result)
 	assert.Equal(t, expected, actual)
 }
 
