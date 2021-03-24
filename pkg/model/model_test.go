@@ -343,15 +343,15 @@ func TestMaskEngineShouldMaskNestedNestedArrays(t *testing.T) {
 	var i = 0
 	var nameMasking = FunctionMaskEngine{Function: func(name Entry, contexts ...Dictionary) (Entry, error) { i++; return fmt.Sprintf("%d", i), nil }}
 
-	iput := `{"elements":[{"persons":[{"phonenumber":"027123456"},{"phonenumber":"028123456"}]}]}`
-	oput := `{"elements":[{"persons":[{"phonenumber":"1"},{"phonenumber":"2"}]}]}`
+	iput := `{"elements":[{"persons":[{"phonenumber":"027123456"},{"phonenumber":"028123456"}]},{"persons":[{"phonenumber":"029123456"},{"phonenumber":"020123456"}]}]}`
+	oput := `{"elements":[{"persons":[{"phonenumber":"1"},{"phonenumber":"2"}]},{"persons":[{"phonenumber":"3"},{"phonenumber":"4"}]}]}`
 
 	mySlice := jsonlineToDictionaries(iput)
 
 	var result []Dictionary
 
 	pipeline := NewPipelineFromSlice(mySlice).
-		Process(NewMaskEngineProcess(NewPathSelector("persons.phonenumber"), nameMasking)).
+		Process(NewMaskEngineProcess(NewPathSelector("elements.persons.phonenumber"), nameMasking)).
 		AddSink(NewSinkToSlice(&result))
 	err := pipeline.Run()
 
