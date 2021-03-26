@@ -286,12 +286,7 @@ func (s ComplexePathSelector) ReadContext(dictionary Dictionary) (Dictionary, st
 	return s.subSelector.ReadContext(subEntry)
 }
 
-var deep int = 0
-
 func (s ComplexePathSelector) Write(dictionary Dictionary, entry Entry) Dictionary {
-	deep++
-	defer func() { deep-- }()
-
 	result := Dictionary{}
 
 	for k, v := range dictionary {
