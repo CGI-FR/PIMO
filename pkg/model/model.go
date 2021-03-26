@@ -18,7 +18,6 @@
 package model
 
 import (
-	"log"
 	"reflect"
 	"strings"
 	"time"
@@ -295,17 +294,13 @@ func (s ComplexePathSelector) Write(dictionary Dictionary, entry Entry) Dictiona
 
 	result := Dictionary{}
 
-	log.Println(deep, "Write(", dictionary, ",", entry, "(", reflect.TypeOf(entry), ")")
-
 	for k, v := range dictionary {
 		result[k] = v
 	}
-	log.Println(deep, "result=", result, "(", reflect.TypeOf(result), ")")
+
 	v := reflect.ValueOf(entry)
-	log.Println(deep, "entry is", v.Kind())
 	switch v.Kind() {
 	case reflect.Slice:
-		log.Println(deep, "case: entry is a slice")
 		subTargetArray, isArray := result[s.path].([]Entry)
 		if !isArray {
 			result[s.path] = s.subSelector.Write(result[s.path].(Dictionary), entry)
@@ -318,7 +313,6 @@ func (s ComplexePathSelector) Write(dictionary Dictionary, entry Entry) Dictiona
 		}
 
 	default:
-		log.Println(deep, "case: entry is something else")
 		result[s.path] = s.subSelector.Write(result[s.path].(Dictionary), entry)
 	}
 
@@ -443,15 +437,11 @@ func (mp *MaskEngineProcess) Open() (err error) {
 }
 
 func (mp *MaskEngineProcess) ProcessDictionary(dictionary Dictionary, out Collector) error {
-	log.Println("ProcessDictionary(", dictionary, ")")
 	match, ok := mp.selector.Read(dictionary)
 	if !ok {
-		log.Println("mp.selector.Read returned no match")
 		out.Collect(dictionary)
 		return nil
 	}
-
-	log.Println("mp.selector.Read returned", match, "(", reflect.TypeOf(match), ")")
 
 	var masked Entry
 	var err error
@@ -469,8 +459,6 @@ func (mp *MaskEngineProcess) ProcessDictionary(dictionary Dictionary, out Collec
 			return err
 		}
 	}
-
-	log.Println("masking produced", masked, "(", reflect.TypeOf(masked), ")")
 
 	out.Collect(mp.selector.Write(dictionary, masked))
 
@@ -659,10 +647,6 @@ func (pipeline SimpleSinkedPipeline) Run() (err error) {
 	if err != nil {
 		return err
 	}
-
-	log.Println("==============================================")
-	log.Println("BEGIN PROCESSING OF PIPELINE")
-	log.Println("==============================================")
 
 	for pipeline.source.Next() {
 		err := pipeline.sink.ProcessDictionary(pipeline.source.Value())
