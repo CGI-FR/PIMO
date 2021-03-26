@@ -18,6 +18,8 @@
 package model
 
 import (
+	"log"
+	"reflect"
 	"strings"
 	"time"
 )
@@ -285,28 +287,40 @@ func (s ComplexePathSelector) ReadContext(dictionary Dictionary) (Dictionary, st
 	return s.subSelector.ReadContext(subEntry)
 }
 
+var deep int = 0
+
 func (s ComplexePathSelector) Write(dictionary Dictionary, entry Entry) Dictionary {
+	defer func() { deep++ }()
 	result := Dictionary{}
+
+	deep++
+	log.Println(deep, "Write(", dictionary, ",", entry, "(", reflect.TypeOf(entry), ")")
 
 	for k, v := range dictionary {
 		result[k] = v
 	}
-	switch typedMatch := entry.(type) {
-	case []Entry:
+	log.Println(deep, "result=", result, "(", reflect.TypeOf(result), ")")
+	v := reflect.ValueOf(entry)
+	log.Println(deep, "entry is", v.Kind())
+	switch v.Kind() {
+	case reflect.Slice:
+		log.Println(deep, "case: entry is a slice")
 		subTargetArray, isArray := result[s.path].([]Entry)
 		if !isArray {
 			result[s.path] = s.subSelector.Write(result[s.path].(Dictionary), entry)
 		} else {
 			subArray := []Dictionary{}
-			for i, subEntry := range typedMatch {
-				subArray = append(subArray, s.subSelector.Write(subTargetArray[i].(Dictionary), subEntry))
+			for i := 0; i < v.Len(); i++ {
+				subArray = append(subArray, s.subSelector.Write(subTargetArray[i].(Dictionary), v.Index(i).Interface()))
 			}
 			result[s.path] = subArray
 		}
 
 	default:
+		log.Println(deep, "case: entry is something else")
 		result[s.path] = s.subSelector.Write(result[s.path].(Dictionary), entry)
 	}
+
 	return result
 }
 
@@ -428,12 +442,15 @@ func (mp *MaskEngineProcess) Open() (err error) {
 }
 
 func (mp *MaskEngineProcess) ProcessDictionary(dictionary Dictionary, out Collector) error {
+	log.Println("ProcessDictionary(", dictionary, ")")
 	match, ok := mp.selector.Read(dictionary)
 	if !ok {
+		log.Println("mp.selector.Read returned no match")
 		out.Collect(dictionary)
-
 		return nil
 	}
+
+	log.Println("mp.selector.Read returned", match, "(", reflect.TypeOf(match), ")")
 
 	var masked Entry
 	var err error
@@ -443,19 +460,27 @@ func (mp *MaskEngineProcess) ProcessDictionary(dictionary Dictionary, out Collec
 		masked = []Entry{}
 		var maskedEntry Entry
 
-		for matchEntry := range typedMatch {
+		for _, matchEntry := range typedMatch {
 			maskedEntry, err = mp.mask.Mask(matchEntry, dictionary)
 			if err != nil {
 				return err
 			}
 			masked = append(masked.([]Entry), maskedEntry)
 		}
+
 	default:
 		masked, err = mp.mask.Mask(typedMatch, dictionary)
 		if err != nil {
 			return err
 		}
 	}
+
+	log.Println("masking produced", masked, "(", reflect.TypeOf(masked), ")")
+	// log.Println("!!! replacing with correct value [[1 2][3 4]] !!!")
+	// masked = [][]Entry{
+	// 	{"1", "2"},
+	// 	{"3", "4"},
+	// }
 
 	out.Collect(mp.selector.Write(dictionary, masked))
 
@@ -644,6 +669,10 @@ func (pipeline SimpleSinkedPipeline) Run() (err error) {
 	if err != nil {
 		return err
 	}
+
+	log.Println("==============================================")
+	log.Println("BEGIN PROCESSING OF PIPELINE")
+	log.Println("==============================================")
 
 	for pipeline.source.Next() {
 		err := pipeline.sink.ProcessDictionary(pipeline.source.Value())
