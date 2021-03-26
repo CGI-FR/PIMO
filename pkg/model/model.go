@@ -290,10 +290,11 @@ func (s ComplexePathSelector) ReadContext(dictionary Dictionary) (Dictionary, st
 var deep int = 0
 
 func (s ComplexePathSelector) Write(dictionary Dictionary, entry Entry) Dictionary {
-	defer func() { deep++ }()
+	deep++
+	defer func() { deep-- }()
+
 	result := Dictionary{}
 
-	deep++
 	log.Println(deep, "Write(", dictionary, ",", entry, "(", reflect.TypeOf(entry), ")")
 
 	for k, v := range dictionary {
@@ -457,15 +458,9 @@ func (mp *MaskEngineProcess) ProcessDictionary(dictionary Dictionary, out Collec
 
 	switch typedMatch := match.(type) {
 	case []Entry:
-		masked = []Entry{}
-		var maskedEntry Entry
-
-		for _, matchEntry := range typedMatch {
-			maskedEntry, err = mp.mask.Mask(matchEntry, dictionary)
-			if err != nil {
-				return err
-			}
-			masked = append(masked.([]Entry), maskedEntry)
+		masked, err = deepmask(mp.mask, typedMatch, dictionary)
+		if err != nil {
+			return err
 		}
 
 	default:
@@ -476,11 +471,6 @@ func (mp *MaskEngineProcess) ProcessDictionary(dictionary Dictionary, out Collec
 	}
 
 	log.Println("masking produced", masked, "(", reflect.TypeOf(masked), ")")
-	// log.Println("!!! replacing with correct value [[1 2][3 4]] !!!")
-	// masked = [][]Entry{
-	// 	{"1", "2"},
-	// 	{"3", "4"},
-	// }
 
 	out.Collect(mp.selector.Write(dictionary, masked))
 
