@@ -19,6 +19,7 @@ package randdura
 
 import (
 	"fmt"
+	"hash/fnv"
 	"math/rand"
 	"time"
 
@@ -87,7 +88,10 @@ func (me MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Ent
 
 // Create a mask from a configuration
 func Factory(conf model.Masking, seed int64) (model.MaskEngine, bool, error) {
-	if len(conf.Mask.RandomDuration.Min) != 0 || len(conf.Mask.RandomDuration.Max) != 0 {
+	if len(conf.Mask.RandomDuration.Min) != 0 || len(conf.Mask.RandomDuration.Max) != 0 { // set differents seeds for differents jsonpath
+		h := fnv.New64a()
+		h.Write([]byte(conf.Selector.Jsonpath))
+		seed += int64(h.Sum64())
 		mask, err := NewMask(conf.Mask.RandomDuration.Min, conf.Mask.RandomDuration.Max, seed)
 		if err != nil {
 			return nil, false, err

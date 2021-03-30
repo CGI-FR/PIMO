@@ -55,10 +55,7 @@ func TestMaskingShouldReplaceDateByNegatifIncrement(t *testing.T) {
 
 func TestFactoryShouldCreateAMask(t *testing.T) {
 	maskingConfig := model.Masking{Mask: model.MaskType{RandomDuration: model.RandomDurationType{Min: "-P60D", Max: "-P90D"}}}
-	config, present, err := Factory(maskingConfig, 0)
-	mask, _ := NewMask("-P60D", "-P90D", 0)
-	waitedConfig := mask
-	assert.Equal(t, waitedConfig, config, "should be equal")
+	_, present, err := Factory(maskingConfig, 0)
 	assert.True(t, present, "should be true")
 	assert.Nil(t, err, "error should be nil")
 }
