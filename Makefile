@@ -156,6 +156,11 @@ license: mkdir docker ## Scan dependencies and licenses
 	golicense ${BUILD_DIR}/pimo-license/pimo
 	#depth ./cmd/pimo
 
+.PHONY: tag
+tag:  ## Create and push a new tag version (use : `make tag 1.2.3`)
+	git tag $(tag)
+	git push --tags
+
 .PHONY: publish
 publish:  ## Publish binaries
 	BUILD_DATE=${BUILD_DATE} VERSION=${VERSION} \
