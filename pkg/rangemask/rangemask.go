@@ -20,7 +20,7 @@ package rangemask
 import (
 	"strconv"
 
-	"makeit.imfr.cgi.com/makeit2/scm/lino/pimo/pkg/model"
+	"github.com/cgi-fr/pimo/pkg/model"
 )
 
 // MaskEngine is a value that always mask by replacing with a scale

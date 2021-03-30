@@ -18,7 +18,7 @@
 package add
 
 import (
-	"makeit.imfr.cgi.com/makeit2/scm/lino/pimo/pkg/model"
+	"github.com/cgi-fr/pimo/pkg/model"
 )
 
 // MaskEngine is a value that will be the initialisation of the field when it's created

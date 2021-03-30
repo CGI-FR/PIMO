@@ -21,8 +21,8 @@ import (
 	"hash/fnv"
 	"math/rand"
 
+	"github.com/cgi-fr/pimo/pkg/model"
 	regen "github.com/zach-klippenstein/goregen"
-	"makeit.imfr.cgi.com/makeit2/scm/lino/pimo/pkg/model"
 )
 
 // MaskEngine is a value that mask thanks to a regular expression

@@ -24,10 +24,10 @@ import (
 	"unicode"
 
 	"github.com/Masterminds/sprig"
+	"github.com/cgi-fr/pimo/pkg/model"
 	"golang.org/x/text/runes"
 	"golang.org/x/text/transform"
 	"golang.org/x/text/unicode/norm"
-	"makeit.imfr.cgi.com/makeit2/scm/lino/pimo/pkg/model"
 )
 
 // MaskEngine is to mask a value thanks to a template

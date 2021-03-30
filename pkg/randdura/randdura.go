@@ -23,8 +23,8 @@ import (
 	"math/rand"
 	"time"
 
-	"makeit.imfr.cgi.com/makeit2/scm/lino/pimo/pkg/duration"
-	"makeit.imfr.cgi.com/makeit2/scm/lino/pimo/pkg/model"
+	"github.com/cgi-fr/pimo/pkg/duration"
+	"github.com/cgi-fr/pimo/pkg/model"
 )
 
 // MaskEngine is to mask a value thanks to 2 durations
