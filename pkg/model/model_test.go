@@ -362,6 +362,35 @@ func TestMaskEngineShouldMaskNestedNestedArrays(t *testing.T) {
 	assert.Equal(t, expected, actual)
 }
 
+func TestMaskEngineShouldMaskMultipleNestedNestedArrays(t *testing.T) {
+	var i = 0
+	var j = 0
+	var nameMasking = FunctionMaskEngine{Function: func(name Entry, contexts ...Dictionary) (Entry, error) { i++; return fmt.Sprintf("%d", i), nil }}
+	var emailMasking = FunctionMaskEngine{Function: func(name Entry, contexts ...Dictionary) (Entry, error) {
+		j++
+		return fmt.Sprintf("email.%d@company.com", j), nil
+	}}
+
+	iput := `{"elements":[{"persons":[{"phonenumber":"027123456","email":"person1@company.com"},{"phonenumber":"028123456","email":"person2@company.com"}]},{"persons":[{"phonenumber":"029123456","email":"person3@company.com"},{"phonenumber":"020123456","email":"person4@company.com"}]}]}`
+	oput := `{"elements":[{"persons":[{"phonenumber":"1","email":"email.1@company.com"},{"phonenumber":"2","email":"email.2@company.com"}]},{"persons":[{"phonenumber":"3","email":"email.3@company.com"},{"phonenumber":"4","email":"email.4@company.com"}]}]}`
+
+	mySlice := jsonlineToDictionaries(iput)
+
+	var result []Dictionary
+
+	pipeline := NewPipelineFromSlice(mySlice).
+		Process(NewMaskEngineProcess(NewPathSelector("elements.persons.phonenumber"), nameMasking)).
+		Process(NewMaskEngineProcess(NewPathSelector("elements.persons.email"), emailMasking)).
+		AddSink(NewSinkToSlice(&result))
+	err := pipeline.Run()
+
+	assert.Nil(t, err)
+
+	expected := dictionariesToJSONLine(jsonlineToDictionaries(oput))
+	actual := dictionariesToJSONLine(result)
+	assert.Equal(t, expected, actual)
+}
+
 func TestMaskEngineShouldReturnError(t *testing.T) {
 	var errorMasking = FunctionMaskEngine{Function: func(name Entry, contexts ...Dictionary) (Entry, error) { return "", fmt.Errorf("Test error") }}
 
