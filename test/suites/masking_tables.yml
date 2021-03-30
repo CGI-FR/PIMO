@@ -57,3 +57,23 @@ testcases:
     - >
       result.systemout ShouldContainSubstring {"client":[{"name":"Dorothy"},{"name":"Dorothy"}]}
     - result.systemerr ShouldBeEmpty
+
+- name: nested arrays
+  steps:
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      seed: 42
+      masking:
+        - selector:
+            jsonpath: "elements.persons.phonenumber"
+          mask:
+            regex: "0[1-7]( ([0-9]){2}){4}"
+      EOF
+  - script: |-
+      echo '{"elements":[{"persons": [{"phonenumber": "027"}]}]}' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - >
+      result.systemout ShouldContainSubstring {"elements":[{"persons":[{"phonenumber":"05 30 85 92 14"}]}]}
+    - result.systemerr ShouldBeEmpty
