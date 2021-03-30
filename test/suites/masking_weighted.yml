@@ -48,3 +48,36 @@ testcases:
     - result.systemout ShouldNotBeEmpty
   - script: rm -f first.txt
   - script: rm -f second.txt
+
+- name: muliple weighted choice with same source mask
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      seed: 13
+      masking:
+        - selector:
+            jsonpath: "name"
+          mask:
+            weightedChoice:
+              - choice: "Dupont"
+                weight: 8
+              - choice: "Dupond"
+                weight: 2
+        - selector:
+            jsonpath: "name2"
+          mask:
+            weightedChoice:
+              - choice: "Dupont"
+                weight: 8
+              - choice: "Dupond"
+                weight: 2
+      EOF
+  - script: |-
+      echo '{"name": "Toto", "name2": ""}' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemoutjson.name ShouldEqual Dupond
+    - result.systemoutjson.name2 ShouldEqual Dupont
+    - result.systemerr ShouldBeEmpty 

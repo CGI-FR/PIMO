@@ -19,6 +19,7 @@ package randomlist
 
 import (
 	"fmt"
+	"hash/fnv"
 	"math/rand"
 
 	"makeit.imfr.cgi.com/makeit2/scm/lino/pimo/pkg/model"
@@ -47,6 +48,12 @@ func Factory(conf model.Masking, seed int64) (model.MaskEngine, bool, error) {
 	if len(conf.Mask.RandomChoice) != 0 && len(conf.Mask.RandomChoiceInURI) != 0 {
 		return nil, false, fmt.Errorf("2 different random choices")
 	}
+
+	// set differents seeds for differents jsonpath
+	h := fnv.New64a()
+	h.Write([]byte(conf.Selector.Jsonpath))
+	seed += int64(h.Sum64())
+
 	if len(conf.Mask.RandomChoice) != 0 {
 		return NewMask(conf.Mask.RandomChoice, seed), true, nil
 	}

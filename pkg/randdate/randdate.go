@@ -18,6 +18,7 @@
 package randdate
 
 import (
+	"hash/fnv"
 	"math/rand"
 	"time"
 
@@ -47,6 +48,10 @@ func (dateRange MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (mo
 // Create a mask from a configuration
 func Factory(conf model.Masking, seed int64) (model.MaskEngine, bool, error) {
 	if conf.Mask.RandDate.DateMin != conf.Mask.RandDate.DateMax {
+		// set differents seeds for differents jsonpath
+		h := fnv.New64a()
+		h.Write([]byte(conf.Selector.Jsonpath))
+		seed += int64(h.Sum64())
 		return NewMask(conf.Mask.RandDate.DateMin, conf.Mask.RandDate.DateMax, seed), true, nil
 	}
 	return nil, false, nil

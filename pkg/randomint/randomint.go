@@ -18,6 +18,7 @@
 package randomint
 
 import (
+	"hash/fnv"
 	"math/rand"
 
 	"makeit.imfr.cgi.com/makeit2/scm/lino/pimo/pkg/model"
@@ -44,6 +45,10 @@ func (rim MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.En
 // Factory create a mask from a yaml config
 func Factory(conf model.Masking, seed int64) (model.MaskEngine, bool, error) {
 	if conf.Mask.RandomInt.Min != 0 || conf.Mask.RandomInt.Max != 0 {
+		// set differents seeds for differents jsonpath
+		h := fnv.New64a()
+		h.Write([]byte(conf.Selector.Jsonpath))
+		seed += int64(h.Sum64())
 		return NewMask(conf.Mask.RandomInt.Min, conf.Mask.RandomInt.Max, seed), true, nil
 	}
 	return nil, false, nil

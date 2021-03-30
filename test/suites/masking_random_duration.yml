@@ -45,3 +45,34 @@ testcases:
     - result.systemout ShouldNotBeEmpty
   - script: rm -f first.txt
   - script: rm -f second.txt
+
+- name: muliple random duration with same source mask
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      seed: 3
+      masking:
+        - selector:
+            jsonpath: "date1"
+          mask:
+            randomDuration:
+              min: "-P2D"
+              max: "-P27D"
+        - selector:
+            jsonpath: "date2"
+          mask:
+            randomDuration:
+              min: "-P2D"
+              max: "-P27D"
+      EOF
+  - script: |-
+      echo '{"date1": "2020-01-01T00:00:00Z", "date2": "2020-01-01T00:00:00Z"}' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemoutjson.date1 ShouldNotEqual 2019-12-20T09:59:45.225942139Z
+    - result.systemoutjson.date1 ShouldEqual 2019-12-26T21:14:09.785075601Z
+    - result.systemoutjson.date2 ShouldNotEqual 2019-12-20T09:59:45.225942139Z
+    - result.systemoutjson.date2 ShouldEqual 2019-12-08T10:06:24.935401158Z
+    - result.systemerr ShouldBeEmpty 

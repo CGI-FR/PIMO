@@ -46,9 +46,7 @@ func TestMaskingShouldReplaceSensitiveValueByWeightedRandom(t *testing.T) {
 func TestFactoryShouldCreateAMask(t *testing.T) {
 	maskingChoice := []model.WeightedChoiceType{{Choice: "Dupont", Weight: 9}, {Choice: "Dupond", Weight: 1}}
 	maskingConfig := model.Masking{Mask: model.MaskType{WeightedChoice: maskingChoice}}
-	config, present, err := Factory(maskingConfig, 0)
-	waitedConfig := NewMask(maskingChoice, 0)
-	assert.Equal(t, waitedConfig, config, "should be equal")
+	_, present, err := Factory(maskingConfig, 0)
 	assert.True(t, present, "should be true")
 	assert.Nil(t, err, "error should be nil")
 }

@@ -18,6 +18,7 @@
 package weightedchoice
 
 import (
+	"hash/fnv"
 	"math/rand"
 	"sort"
 
@@ -89,6 +90,11 @@ func Factory(conf model.Masking, seed int64) (model.MaskEngine, bool, error) {
 		for _, v := range conf.Mask.WeightedChoice {
 			maskWeight = append(maskWeight, model.WeightedChoiceType{Choice: v.Choice, Weight: v.Weight})
 		}
+
+		// set differents seeds for differents jsonpath
+		h := fnv.New64a()
+		h.Write([]byte(conf.Selector.Jsonpath))
+		seed += int64(h.Sum64())
 		return NewMask(maskWeight, seed), true, nil
 	}
 	return nil, false, nil
