@@ -248,10 +248,10 @@ func TestMaskEngineShouldMaskNestedDictionariesArray(t *testing.T) {
 	assert.Nil(t, err)
 
 	wanted := []Dictionary{
-		{"address": []Dictionary{
-			{"city": "Paris"},
-			{"city": "Paris"},
-			{"city": "Paris"},
+		{"address": []Entry{
+			Dictionary{"city": "Paris"},
+			Dictionary{"city": "Paris"},
+			Dictionary{"city": "Paris"},
 		}},
 	}
 	assert.Equal(t, wanted, result)
@@ -362,6 +362,34 @@ func TestMaskEngineShouldMaskNestedNestedArrays(t *testing.T) {
 	assert.Equal(t, expected, actual)
 }
 
+func TestInOutFormat1(t *testing.T) {
+	var masking = FunctionMaskEngine{Function: func(name Entry, contexts ...Dictionary) (Entry, error) { return "mask", nil }}
+	var odict []Dictionary
+	iput := `{"key": ["mask"]}`
+	idict := jsonlineToDictionaries(iput)
+	pipeline := NewPipelineFromSlice(idict).
+		Process(NewMaskEngineProcess(NewPathSelector("key"), masking)).
+		AddSink(NewSinkToSlice(&odict))
+	err := pipeline.Run()
+
+	assert.Nil(t, err)
+	assert.Equal(t, fmt.Sprintf("%#v\n", idict), fmt.Sprintf("%#v\n", odict))
+}
+
+func TestInOutFormat2(t *testing.T) {
+	var masking = FunctionMaskEngine{Function: func(name Entry, contexts ...Dictionary) (Entry, error) { return "mask", nil }}
+	var odict []Dictionary
+	iput := `{"key1": [{"key2": "mask"}]}`
+	idict := jsonlineToDictionaries(iput)
+	pipeline := NewPipelineFromSlice(idict).
+		Process(NewMaskEngineProcess(NewPathSelector("key1.key2"), masking)).
+		AddSink(NewSinkToSlice(&odict))
+	err := pipeline.Run()
+
+	assert.Nil(t, err)
+	assert.Equal(t, fmt.Sprintf("%#v\n", idict), fmt.Sprintf("%#v\n", odict))
+}
+
 func TestMaskEngineShouldMaskMultipleNestedNestedArrays(t *testing.T) {
 	var i = 0
 	var j = 0
@@ -379,8 +407,8 @@ func TestMaskEngineShouldMaskMultipleNestedNestedArrays(t *testing.T) {
 	var result []Dictionary
 
 	pipeline := NewPipelineFromSlice(mySlice).
-		Process(NewMaskEngineProcess(NewPathSelector("elements.persons.phonenumber"), nameMasking)).
 		Process(NewMaskEngineProcess(NewPathSelector("elements.persons.email"), emailMasking)).
+		Process(NewMaskEngineProcess(NewPathSelector("elements.persons.phonenumber"), nameMasking)).
 		AddSink(NewSinkToSlice(&result))
 	err := pipeline.Run()
 
