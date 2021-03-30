@@ -40,3 +40,30 @@ testcases:
     - result.systemout ShouldNotBeEmpty
   - script: rm -f first.txt
   - script: rm -f second.txt
+
+- name: muliple regex with same source mask
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      seed: 3
+      masking:
+        - selector:
+            jsonpath: "name"
+          mask:
+            regex: "[a-z]{10}"
+        - selector:
+            jsonpath: "name2"
+          mask:
+            regex: "[a-z]{10}"
+      EOF
+  - script: |-
+      echo '{"name": "Toto", "name2": ""}' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemoutjson.name ShouldNotEqual eueewuiylx
+    - result.systemoutjson.name ShouldEqual asxepgqubb
+    - result.systemoutjson.name2 ShouldNotEqual eueewuiylx
+    - result.systemoutjson.name2 ShouldEqual axfmifkszn
+    - result.systemerr ShouldBeEmpty 
