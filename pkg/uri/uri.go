@@ -25,8 +25,8 @@ import (
 	"os"
 	"strconv"
 
-	"makeit.imfr.cgi.com/makeit2/scm/lino/pimo/pkg/maskingdata"
-	"makeit.imfr.cgi.com/makeit2/scm/lino/pimo/pkg/model"
+	"github.com/cgi-fr/pimo/pkg/maskingdata"
+	"github.com/cgi-fr/pimo/pkg/model"
 )
 
 func Read(uri string) ([]model.Entry, error) {

@@ -21,7 +21,7 @@ import (
 	"os/exec"
 	"strings"
 
-	"makeit.imfr.cgi.com/makeit2/scm/lino/pimo/pkg/model"
+	"github.com/cgi-fr/pimo/pkg/model"
 )
 
 // MaskEngine implements MaskEngine with a console command

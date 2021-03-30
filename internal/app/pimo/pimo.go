@@ -25,9 +25,9 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/cgi-fr/pimo/pkg/jsonline"
+	"github.com/cgi-fr/pimo/pkg/model"
 	"github.com/goccy/go-yaml"
-	"makeit.imfr.cgi.com/makeit2/scm/lino/pimo/pkg/jsonline"
-	"makeit.imfr.cgi.com/makeit2/scm/lino/pimo/pkg/model"
 )
 
 // YAMLStructure of the file

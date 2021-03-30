@@ -23,7 +23,7 @@ import (
 	"os"
 
 	"github.com/capitalone/fpe/ff1"
-	"makeit.imfr.cgi.com/makeit2/scm/lino/pimo/pkg/model"
+	"github.com/cgi-fr/pimo/pkg/model"
 )
 
 // MaskEngine is a value that always mask the same way

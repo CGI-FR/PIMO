@@ -21,8 +21,8 @@ import (
 	"fmt"
 	"math/rand"
 
-	"makeit.imfr.cgi.com/makeit2/scm/lino/pimo/pkg/model"
-	"makeit.imfr.cgi.com/makeit2/scm/lino/pimo/pkg/uri"
+	"github.com/cgi-fr/pimo/pkg/model"
+	"github.com/cgi-fr/pimo/pkg/uri"
 )
 
 // MaskEngine is a list of masking value and a rand init to mask

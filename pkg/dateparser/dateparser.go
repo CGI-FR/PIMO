@@ -21,7 +21,7 @@ import (
 	"fmt"
 	"time"
 
-	"makeit.imfr.cgi.com/makeit2/scm/lino/pimo/pkg/model"
+	"github.com/cgi-fr/pimo/pkg/model"
 )
 
 // MaskEngine is a type to change a date format

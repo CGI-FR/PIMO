@@ -20,7 +20,7 @@ package randomint
 import (
 	"math/rand"
 
-	"makeit.imfr.cgi.com/makeit2/scm/lino/pimo/pkg/model"
+	"github.com/cgi-fr/pimo/pkg/model"
 )
 
 // MaskEngine is a list of number to mask randomly

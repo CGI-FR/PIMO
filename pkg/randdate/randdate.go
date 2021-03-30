@@ -21,7 +21,7 @@ import (
 	"math/rand"
 	"time"
 
-	"makeit.imfr.cgi.com/makeit2/scm/lino/pimo/pkg/model"
+	"github.com/cgi-fr/pimo/pkg/model"
 )
 
 // MaskEngine is a struct to mask the date

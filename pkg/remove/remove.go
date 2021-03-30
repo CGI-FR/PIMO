@@ -18,7 +18,7 @@
 package remove
 
 import (
-	"makeit.imfr.cgi.com/makeit2/scm/lino/pimo/pkg/model"
+	"github.com/cgi-fr/pimo/pkg/model"
 )
 
 // MaskEngine is an empty mask to link to a field to remove

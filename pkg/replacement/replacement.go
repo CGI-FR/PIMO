@@ -18,7 +18,7 @@
 package replacement
 
 import (
-	"makeit.imfr.cgi.com/makeit2/scm/lino/pimo/pkg/model"
+	"github.com/cgi-fr/pimo/pkg/model"
 )
 
 // ReplacementMask is to mask with a value from another field

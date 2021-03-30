@@ -21,8 +21,8 @@ import (
 	"os"
 	"testing"
 
+	"github.com/cgi-fr/pimo/pkg/model"
 	"github.com/stretchr/testify/assert"
-	"makeit.imfr.cgi.com/makeit2/scm/lino/pimo/pkg/model"
 )
 
 func TestMaskingShouldEncryptStringWithTweak(t *testing.T) {

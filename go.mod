@@ -1,4 +1,4 @@
-module makeit.imfr.cgi.com/makeit2/scm/lino/pimo
+module github.com/cgi-fr/pimo
 
 go 1.13
 
