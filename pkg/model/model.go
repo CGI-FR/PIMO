@@ -300,7 +300,7 @@ func (s ComplexePathSelector) Write(dictionary Dictionary, entry Entry) Dictiona
 		if !isArray {
 			result[s.path] = s.subSelector.Write(result[s.path].(Dictionary), entry)
 		} else {
-			subArray := []Dictionary{}
+			subArray := []Entry{}
 			for i := 0; i < v.Len(); i++ {
 				subArray = append(subArray, s.subSelector.Write(subTargetArray[i].(Dictionary), v.Index(i).Interface()))
 			}

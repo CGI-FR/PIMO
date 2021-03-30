@@ -75,5 +75,29 @@ testcases:
     assertions:
     - result.code ShouldEqual 0
     - >
-      result.systemout ShouldContainSubstring {"elements":[{"persons":[{"phonenumber":"05 30 85 92 14"}]}]}
+      result.systemout ShouldContainSubstring {"elements":[{"persons":[{"phonenumber":"04 87 48 09 96"}]}]}
+    - result.systemerr ShouldBeEmpty
+
+- name: multiple nested arrays
+  steps:
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      seed: 42
+      masking:
+        - selector:
+            jsonpath: "elements.persons.phonenumber"
+          mask:
+            regex: "0[1-7]( ([0-9]){2}){4}"
+        - selector:
+            jsonpath: "elements.persons.email"
+          mask:
+            regex: "[a-z]{10}@company\.com"
+      EOF
+  - script: |-
+      echo '{"elements":[{"persons": [{"phonenumber": "027","email": "person@company.com"}]}]}' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - >
+      result.systemout ShouldContainSubstring {"elements":[{"persons":[{"email":"agcarobxcc@company.com","phonenumber":"04 87 48 09 96"}]}]}
     - result.systemerr ShouldBeEmpty
