@@ -20,10 +20,21 @@ jobs:
         with:
           go-version: 1.16
       -
+        name: Set current date as env variable
+        run: echo "BUILD_DATE=$(date +'%Y-%m-%dT%H:%M:%S')" >> $GITHUB_ENV
+      -
+        name: Set current tag as env variable
+        run: echo "VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+      -
         name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v2
         with:
           version: latest
-          args: release --rm-dist --skip-publish
+          args: release --rm-dist
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ env.VERSION }}
+          BUILD_DATE: ${{ env.BUILD_DATE }}
+      -
+        name: Test version
+        run: ./dist/pimo_linux_amd64/pimo --version
