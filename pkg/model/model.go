@@ -18,6 +18,7 @@
 package model
 
 import (
+	"reflect"
 	"strings"
 	"time"
 )
@@ -291,15 +292,17 @@ func (s ComplexePathSelector) Write(dictionary Dictionary, entry Entry) Dictiona
 	for k, v := range dictionary {
 		result[k] = v
 	}
-	switch typedMatch := entry.(type) {
-	case []Entry:
+
+	v := reflect.ValueOf(entry)
+	switch v.Kind() {
+	case reflect.Slice:
 		subTargetArray, isArray := result[s.path].([]Entry)
 		if !isArray {
 			result[s.path] = s.subSelector.Write(result[s.path].(Dictionary), entry)
 		} else {
 			subArray := []Dictionary{}
-			for i, subEntry := range typedMatch {
-				subArray = append(subArray, s.subSelector.Write(subTargetArray[i].(Dictionary), subEntry))
+			for i := 0; i < v.Len(); i++ {
+				subArray = append(subArray, s.subSelector.Write(subTargetArray[i].(Dictionary), v.Index(i).Interface()))
 			}
 			result[s.path] = subArray
 		}
@@ -307,6 +310,7 @@ func (s ComplexePathSelector) Write(dictionary Dictionary, entry Entry) Dictiona
 	default:
 		result[s.path] = s.subSelector.Write(result[s.path].(Dictionary), entry)
 	}
+
 	return result
 }
 
@@ -431,7 +435,6 @@ func (mp *MaskEngineProcess) ProcessDictionary(dictionary Dictionary, out Collec
 	match, ok := mp.selector.Read(dictionary)
 	if !ok {
 		out.Collect(dictionary)
-
 		return nil
 	}
 
@@ -440,16 +443,11 @@ func (mp *MaskEngineProcess) ProcessDictionary(dictionary Dictionary, out Collec
 
 	switch typedMatch := match.(type) {
 	case []Entry:
-		masked = []Entry{}
-		var maskedEntry Entry
-
-		for matchEntry := range typedMatch {
-			maskedEntry, err = mp.mask.Mask(matchEntry, dictionary)
-			if err != nil {
-				return err
-			}
-			masked = append(masked.([]Entry), maskedEntry)
+		masked, err = deepmask(mp.mask, typedMatch, dictionary)
+		if err != nil {
+			return err
 		}
+
 	default:
 		masked, err = mp.mask.Mask(typedMatch, dictionary)
 		if err != nil {

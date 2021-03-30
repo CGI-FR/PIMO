@@ -21,7 +21,8 @@ Types of changes
 ## [1.3.0 (Unreleased)]
 
 - `Added` ff1 mask to meet the requirement of re-identification from a single secret key.
-- `Fixed` Use differents seeds for differents random mask field.
+- `Fixed` use same random mask on different path produce the same value.
+- `Fixed` masking values in nested arrays generate panic error.
 
 ## [1.2.1]
 

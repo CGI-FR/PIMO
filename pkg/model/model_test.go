@@ -18,7 +18,9 @@
 package model
 
 import (
+	"encoding/json"
 	"fmt"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -284,6 +286,80 @@ func TestMaskEngineShouldMaskNestedArray(t *testing.T) {
 		},
 	}
 	assert.Equal(t, wanted, result)
+}
+
+func jsonlineToDictionaries(jsl string) []Dictionary {
+	result := []Dictionary{}
+	jsons := strings.Split(jsl, "\n")
+	for _, js := range jsons {
+		var inter interface{}
+		err := json.Unmarshal(([]byte)(js), &inter)
+		if err != nil {
+			return nil
+		}
+		result = append(result, InterfaceToDictionary(inter))
+	}
+	return result
+}
+
+func dictionariesToJSONLine(dictionaries []Dictionary) string {
+	var jsonline []byte
+	for _, dictionary := range dictionaries {
+		result, _ := json.Marshal(dictionary)
+		jsonline = append(jsonline, result...)
+		jsonline = append(jsonline, "\n"...)
+	}
+	return strings.TrimSuffix(string(jsonline), "\n")
+}
+
+func TestMaskEngineShouldMaskNestedArrays(t *testing.T) {
+	var i = 0
+	var nameMasking = FunctionMaskEngine{Function: func(name Entry, contexts ...Dictionary) (Entry, error) { i++; return fmt.Sprintf("%d", i), nil }}
+
+	iput := `{"persons":[{"phonenumber":"027123456"},{"phonenumber":"028123456"}]}
+			 {"persons":[{"phonenumber":"027123456"}]}
+			 {"persons":[]}`
+	oput := `{"persons":[{"phonenumber":"1"},{"phonenumber":"2"}]}
+			 {"persons":[{"phonenumber":"3"}]}
+			 {"persons":[]}`
+
+	mySlice := jsonlineToDictionaries(iput)
+
+	var result []Dictionary
+
+	pipeline := NewPipelineFromSlice(mySlice).
+		Process(NewMaskEngineProcess(NewPathSelector("persons.phonenumber"), nameMasking)).
+		AddSink(NewSinkToSlice(&result))
+	err := pipeline.Run()
+
+	assert.Nil(t, err)
+
+	expected := dictionariesToJSONLine(jsonlineToDictionaries(oput))
+	actual := dictionariesToJSONLine(result)
+	assert.Equal(t, expected, actual)
+}
+
+func TestMaskEngineShouldMaskNestedNestedArrays(t *testing.T) {
+	var i = 0
+	var nameMasking = FunctionMaskEngine{Function: func(name Entry, contexts ...Dictionary) (Entry, error) { i++; return fmt.Sprintf("%d", i), nil }}
+
+	iput := `{"elements":[{"persons":[{"phonenumber":"027123456"},{"phonenumber":"028123456"}]},{"persons":[{"phonenumber":"029123456"},{"phonenumber":"020123456"}]}]}`
+	oput := `{"elements":[{"persons":[{"phonenumber":"1"},{"phonenumber":"2"}]},{"persons":[{"phonenumber":"3"},{"phonenumber":"4"}]}]}`
+
+	mySlice := jsonlineToDictionaries(iput)
+
+	var result []Dictionary
+
+	pipeline := NewPipelineFromSlice(mySlice).
+		Process(NewMaskEngineProcess(NewPathSelector("elements.persons.phonenumber"), nameMasking)).
+		AddSink(NewSinkToSlice(&result))
+	err := pipeline.Run()
+
+	assert.Nil(t, err)
+
+	expected := dictionariesToJSONLine(jsonlineToDictionaries(oput))
+	actual := dictionariesToJSONLine(result)
+	assert.Equal(t, expected, actual)
 }
 
 func TestMaskEngineShouldReturnError(t *testing.T) {
