@@ -18,6 +18,7 @@
 package randomdecimal
 
 import (
+	"hash/fnv"
 	"math"
 	"math/rand"
 
@@ -51,6 +52,10 @@ func (me MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Ent
 // Factory create a mask from a yaml config
 func Factory(conf model.Masking, seed int64) (model.MaskEngine, bool, error) {
 	if conf.Mask.RandomDecimal.Precision != 0 {
+		// set differents seeds for differents jsonpath
+		h := fnv.New64a()
+		h.Write([]byte(conf.Selector.Jsonpath))
+		seed += int64(h.Sum64())
 		return NewMask(conf.Mask.RandomDecimal.Min, conf.Mask.RandomDecimal.Max, conf.Mask.RandomDecimal.Precision, seed), true, nil
 	}
 	return nil, false, nil
