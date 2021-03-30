@@ -156,9 +156,19 @@ license: mkdir docker ## Scan dependencies and licenses
 	golicense ${BUILD_DIR}/pimo-license/pimo
 	#depth ./cmd/pimo
 
-.PHONY: tag
-tag:  ## Create and push a new tag version (use : `make tag 1.2.3`)
-	git tag $(tag)
+.PHONY: tag-patch
+tag-patch:  ## Create and push a new patch tag version (1.2.3 -> 1.2.4)
+	git tag $$(svu patch)
+	git push --tags
+
+.PHONY: tag-minor
+tag-minor:  ## Create and push a new minor tag version (1.2.3 -> 1.3.0)
+	git tag $$(svu minor)
+	git push --tags
+
+.PHONY: tag-major
+tag-major:  ## Create and push a new major tag version (1.2.3 -> 2.0.0)
+	git tag $$(svu major)
 	git push --tags
 
 .PHONY: publish

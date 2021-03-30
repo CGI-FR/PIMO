@@ -29,6 +29,7 @@ RUN go get -v github.com/ramya-rao-a/go-outline &&\
 
 RUN wget -O- -nv https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b /bin -d ${GOLANGCI_LINT_VERSION}
 RUN wget -O- -nv https://install.goreleaser.com/github.com/goreleaser/goreleaser.sh | sh
+RUN wget -O- -nv https://install.goreleaser.com/github.com/caarlos0/svu.sh | bash -s -- -b /usr/local/bin
 
 ADD https://github.com/ovh/venom/releases/download/v0.27.0/venom.linux-amd64 /bin/venom
 
