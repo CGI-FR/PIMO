@@ -32,3 +32,14 @@ testcases:
     - result.systemoutjson.mail ShouldEqual noel.lea@gmail.com
     - result.systemoutjson.mail ShouldNotEqual Noël.Léa@gmail.com
     - result.systemerr ShouldBeEmpty
+- name: template with nested arrays context
+  steps:
+  - script: rm -f masking.yml
+  - script: cp ../masking_template_nested_arrays.yml masking.yml
+  - script: |-
+      echo '{"elements":[{"persons":[{"name":"bob"}]}]}' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - >
+      result.systemout ShouldContainSubstring {"elements":[{"persons":[{"name":"BOB"}]}]}
+    - result.systemerr ShouldBeEmpty

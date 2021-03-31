@@ -1,0 +1,7 @@
+version: "1"
+seed: 42
+masking:
+  - selector:
+      jsonpath: "elements.persons.name"
+    mask:
+      template: "{{ upper .CURRENT }}"

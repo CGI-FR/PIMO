@@ -112,11 +112,11 @@ func TestRFactoryShouldCreateANestedContextMask(t *testing.T) {
 }
 
 func TestAccessToNestedArraysInContext(t *testing.T) {
-	maskingConfig := model.Masking{Selector: model.SelectorType{Jsonpath: "foo.bar.baz"}, Mask: model.MaskType{Template: "{{upper .foo.bar.baz}}"}}
+	maskingConfig := model.Masking{Selector: model.SelectorType{Jsonpath: "foo.bar.baz"}, Mask: model.MaskType{Template: "{{upper .CURRENT}}"}}
 	maskEngine, present, err := Factory(maskingConfig, 0)
 	assert.Nil(t, err, "should be nil")
 	assert.True(t, present, "should be true")
-	data := jsonToDictionary(`{"foo":[{"bar": [{"baz": "a"}]}]}`)
+	data := jsonToDictionary(`{"foo":[{"bar": [{"baz": "a"}]}], "CURRENT":"a"}`)
 
 	masked, err := maskEngine.Mask("a", data)
 	if err != nil {
