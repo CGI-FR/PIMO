@@ -19,7 +19,6 @@ package templatemask
 
 import (
 	"encoding/json"
-	"strings"
 	"testing"
 
 	"github.com/cgi-fr/pimo/pkg/model"
@@ -117,9 +116,9 @@ func TestAccessToNestedArraysInContext(t *testing.T) {
 	maskEngine, present, err := Factory(maskingConfig, 0)
 	assert.Nil(t, err, "should be nil")
 	assert.True(t, present, "should be true")
-	data := jsonlineToDictionaries(`{"foo":[{"bar": [{"baz": "a"}]}]}`)
+	data := jsonToDictionary(`{"foo":[{"bar": [{"baz": "a"}]}]}`)
 
-	masked, err := maskEngine.Mask("a", data[0])
+	masked, err := maskEngine.Mask("a", data)
 	if err != nil {
 		assert.Fail(t, err.Error())
 	}
@@ -127,16 +126,11 @@ func TestAccessToNestedArraysInContext(t *testing.T) {
 	assert.Equal(t, "A", masked)
 }
 
-func jsonlineToDictionaries(jsl string) []model.Dictionary {
-	result := []model.Dictionary{}
-	jsons := strings.Split(jsl, "\n")
-	for _, js := range jsons {
-		var inter interface{}
-		err := json.Unmarshal(([]byte)(js), &inter)
-		if err != nil {
-			return nil
-		}
-		result = append(result, model.InterfaceToDictionary(inter))
+func jsonToDictionary(js string) model.Dictionary {
+	var inter model.Dictionary
+	err := json.Unmarshal(([]byte)(js), &inter)
+	if err != nil {
+		return nil
 	}
-	return result
+	return inter
 }
