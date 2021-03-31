@@ -18,6 +18,8 @@
 package templatemask
 
 import (
+	"encoding/json"
+	"strings"
 	"testing"
 
 	"github.com/cgi-fr/pimo/pkg/model"
@@ -108,4 +110,33 @@ func TestRFactoryShouldCreateANestedContextMask(t *testing.T) {
 
 	waited := "BAZ"
 	assert.Equal(t, waited, masked, "Should replace foo.bar with BAZ")
+}
+
+func TestAccessToNestedArraysInContext(t *testing.T) {
+	maskingConfig := model.Masking{Selector: model.SelectorType{Jsonpath: "foo.bar.baz"}, Mask: model.MaskType{Template: "{{upper .foo.bar.baz}}"}}
+	maskEngine, present, err := Factory(maskingConfig, 0)
+	assert.Nil(t, err, "should be nil")
+	assert.True(t, present, "should be true")
+	data := jsonlineToDictionaries(`{"foo":[{"bar": [{"baz": "a"}]}]}`)
+
+	masked, err := maskEngine.Mask("a", data[0])
+	if err != nil {
+		assert.Fail(t, err.Error())
+	}
+
+	assert.Equal(t, "A", masked)
+}
+
+func jsonlineToDictionaries(jsl string) []model.Dictionary {
+	result := []model.Dictionary{}
+	jsons := strings.Split(jsl, "\n")
+	for _, js := range jsons {
+		var inter interface{}
+		err := json.Unmarshal(([]byte)(js), &inter)
+		if err != nil {
+			return nil
+		}
+		result = append(result, model.InterfaceToDictionary(inter))
+	}
+	return result
 }
