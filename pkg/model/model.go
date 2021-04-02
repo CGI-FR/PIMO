@@ -99,6 +99,11 @@ type FF1Type struct {
 	Decrypt    bool
 }
 
+type PipeType struct {
+	Masking      []Masking
+	InjectParent string
+}
+
 type MaskType struct {
 	Add               Entry                `yaml:"add"`
 	Constant          Entry                `yaml:"constant"`
@@ -123,6 +128,7 @@ type MaskType struct {
 	DateParser        DateParserType       `yaml:"dateParser"`
 	FromCache         string               `yaml:"fromCache"`
 	FF1               FF1Type              `yaml:"ff1"`
+	Pipe              PipeType             `yaml:"pipe"`
 }
 
 type Masking struct {

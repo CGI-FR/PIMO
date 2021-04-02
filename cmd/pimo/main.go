@@ -33,6 +33,7 @@ import (
 	"github.com/cgi-fr/pimo/pkg/increment"
 	"github.com/cgi-fr/pimo/pkg/jsonline"
 	"github.com/cgi-fr/pimo/pkg/model"
+	"github.com/cgi-fr/pimo/pkg/pipe"
 	"github.com/cgi-fr/pimo/pkg/randdate"
 	"github.com/cgi-fr/pimo/pkg/randdura"
 	"github.com/cgi-fr/pimo/pkg/randomdecimal"
@@ -176,5 +177,6 @@ func injectMaskFactories() []model.MaskFactory {
 		randomdecimal.Factory,
 		dateparser.Factory,
 		ff1.Factory,
+		pipe.Factory,
 	}
 }
