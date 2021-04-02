@@ -1,0 +1,21 @@
+version: "1"
+seed: 42
+masking:
+  - selector:
+      jsonpath: "organizations.persons"
+    mask:
+      pipe:
+        inject-parent: "_"
+        masking:
+          - selector:
+              jsonpath: "name"
+            mask:
+              template: "{{ title .name }}"
+          - selector:
+              jsonpath: "surname"
+            mask:
+              template: "{{ title .surname }}"
+          - selector:
+              jsonpath: "email"
+            mask:
+              template: "{{ lower .name }}.{{ lower .surname }}@{{ ._.domain }}"

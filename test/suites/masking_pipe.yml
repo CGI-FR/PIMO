@@ -1,0 +1,13 @@
+name: pipe mask
+testcases:
+- name: pipe example
+  steps:
+  - script: rm -f masking.yml
+  - script: cp ../masking_pipe.yml masking.yml
+  - script: |-
+      echo '{"organizations":[{"domain":"company.com","persons":[{"name":"leona","surname":"miller","email":""},{"name":"joe","surname":"davis","email":""}]}]}' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - >
+      result.systemout ShouldEqual {"organizations":[{"domain":"company.com","persons":[{"name":"Leona","surname":"Miller","email":"leona.miller@company.com"},{"name":"Joe","surname":"Davis","email":"joe.davis@company.com"}]}]}
+    - result.systemerr ShouldBeEmpty
