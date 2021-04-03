@@ -121,7 +121,7 @@ func TestNotFound(t *testing.T) {
 
 	dictionary := getExampleAsDictionary()
 
-	found := sut.Apply(dictionary, func(rootContext, parentContext selector.Dictionary, value selector.Entry) (selector.Action, selector.Entry) {
+	found := sut.Apply(dictionary, func(rootContext, parentContext selector.Dictionary, key string, value selector.Entry) (selector.Action, selector.Entry) {
 		assert.Fail(t, "this should not be called")
 		return selector.NOTHING, nil
 	})
@@ -133,9 +133,10 @@ func TestReadSingle(t *testing.T) {
 
 	dictionary := getExampleAsDictionary()
 
-	found := sut.Apply(dictionary, func(rootContext, parentContext selector.Dictionary, value selector.Entry) (selector.Action, selector.Entry) {
+	found := sut.Apply(dictionary, func(rootContext, parentContext selector.Dictionary, key string, value selector.Entry) (selector.Action, selector.Entry) {
 		assert.Equal(t, dictionary, rootContext)
 		assert.Equal(t, dictionary, parentContext)
+		assert.Equal(t, "id", key)
 		assert.Equal(t, "123456789", value)
 		return selector.NOTHING, nil
 	})
@@ -147,7 +148,7 @@ func TestWriteSingle(t *testing.T) {
 
 	dictionary := getExampleAsDictionary()
 
-	found := sut.Apply(dictionary, func(rootContext, parentContext selector.Dictionary, value selector.Entry) (selector.Action, selector.Entry) {
+	found := sut.Apply(dictionary, func(rootContext, parentContext selector.Dictionary, key string, value selector.Entry) (selector.Action, selector.Entry) {
 		assert.Equal(t, dictionary, rootContext)
 		assert.Equal(t, dictionary, parentContext)
 		assert.Equal(t, "123456789", value)
@@ -162,7 +163,7 @@ func TestDeleteSingle(t *testing.T) {
 
 	dictionary := getExampleAsDictionary()
 
-	found := sut.Apply(dictionary, func(rootContext, parentContext selector.Dictionary, value selector.Entry) (selector.Action, selector.Entry) {
+	found := sut.Apply(dictionary, func(rootContext, parentContext selector.Dictionary, key string, value selector.Entry) (selector.Action, selector.Entry) {
 		assert.Equal(t, dictionary, rootContext)
 		assert.Equal(t, dictionary, parentContext)
 		assert.Equal(t, "123456789", value)
@@ -177,9 +178,10 @@ func TestReadSub(t *testing.T) {
 
 	dictionary := getExampleAsDictionary()
 
-	found := sut.Apply(dictionary, func(rootContext, parentContext selector.Dictionary, value selector.Entry) (selector.Action, selector.Entry) {
+	found := sut.Apply(dictionary, func(rootContext, parentContext selector.Dictionary, key string, value selector.Entry) (selector.Action, selector.Entry) {
 		assert.Equal(t, dictionary, rootContext)
 		assert.Equal(t, dictionary["summary"], parentContext)
+		assert.Equal(t, "name", key)
 		assert.Equal(t, "test", value)
 		return selector.NOTHING, nil
 	})
@@ -191,7 +193,7 @@ func TestWriteSub(t *testing.T) {
 
 	dictionary := getExampleAsDictionary()
 
-	found := sut.Apply(dictionary, func(rootContext, parentContext selector.Dictionary, value selector.Entry) (selector.Action, selector.Entry) {
+	found := sut.Apply(dictionary, func(rootContext, parentContext selector.Dictionary, key string, value selector.Entry) (selector.Action, selector.Entry) {
 		assert.Equal(t, dictionary, rootContext)
 		assert.Equal(t, dictionary["summary"], parentContext)
 		assert.Equal(t, "test", value)
@@ -206,7 +208,7 @@ func TestDeleteSub(t *testing.T) {
 
 	dictionary := getExampleAsDictionary()
 
-	found := sut.Apply(dictionary, func(rootContext, parentContext selector.Dictionary, value selector.Entry) (selector.Action, selector.Entry) {
+	found := sut.Apply(dictionary, func(rootContext, parentContext selector.Dictionary, key string, value selector.Entry) (selector.Action, selector.Entry) {
 		assert.Equal(t, dictionary, rootContext)
 		assert.Equal(t, dictionary["summary"], parentContext)
 		assert.Equal(t, "test", value)
@@ -222,13 +224,14 @@ func TestReadSimpleArray(t *testing.T) {
 	dictionary := getExampleAsDictionary()
 
 	collect := []selector.Entry{}
-	found := sut.Apply(dictionary, func(rootContext, parentContext selector.Dictionary, value selector.Entry) (selector.Action, selector.Entry) {
+	found := sut.Apply(dictionary, func(rootContext, parentContext selector.Dictionary, key string, value selector.Entry) (selector.Action, selector.Entry) {
 		assert.Equal(t, dictionary, rootContext)
 		assert.Equal(t, selector.Dictionary{
 			"name": "test",
 			"date": "2012-04-23T18:25:43.511Z",
 			"tags": []selector.Entry{"red", "blue", "yellow"},
 		}, parentContext)
+		assert.Equal(t, "tags", key)
 		collect = append(collect, value)
 		return selector.NOTHING, nil
 	})
@@ -243,7 +246,7 @@ func TestWriteSimpleArray(t *testing.T) {
 
 	cnt := 0
 	collect := []selector.Entry{}
-	found := sut.Apply(dictionary, func(rootContext, parentContext selector.Dictionary, value selector.Entry) (selector.Action, selector.Entry) {
+	found := sut.Apply(dictionary, func(rootContext, parentContext selector.Dictionary, key string, value selector.Entry) (selector.Action, selector.Entry) {
 		assert.Equal(t, dictionary, rootContext)
 		assert.Equal(t, selector.Dictionary{
 			"name": "test",
@@ -265,7 +268,7 @@ func TestDeleteSimpleArray(t *testing.T) {
 	dictionary := getExampleAsDictionary()
 
 	collect := []selector.Entry{}
-	found := sut.Apply(dictionary, func(rootContext, parentContext selector.Dictionary, value selector.Entry) (selector.Action, selector.Entry) {
+	found := sut.Apply(dictionary, func(rootContext, parentContext selector.Dictionary, key string, value selector.Entry) (selector.Action, selector.Entry) {
 		assert.Equal(t, dictionary, rootContext)
 		assert.Equal(t, selector.Dictionary{
 			"name": "test",
@@ -289,7 +292,7 @@ func TestReadComplexArray(t *testing.T) {
 	dictionary := getExampleAsDictionary()
 
 	collect := []selector.Entry{}
-	found := sut.Apply(dictionary, func(rootContext, parentContext selector.Dictionary, value selector.Entry) (selector.Action, selector.Entry) {
+	found := sut.Apply(dictionary, func(rootContext, parentContext selector.Dictionary, key string, value selector.Entry) (selector.Action, selector.Entry) {
 		assert.Equal(t, dictionary, rootContext)
 		assert.Equal(t, dictionary, parentContext)
 		collect = append(collect, value)
@@ -305,7 +308,7 @@ func TestWriteComplexArray(t *testing.T) {
 	dictionary := getExampleAsDictionary()
 
 	collect := []selector.Entry{}
-	found := sut.Apply(dictionary, func(rootContext, parentContext selector.Dictionary, value selector.Entry) (selector.Action, selector.Entry) {
+	found := sut.Apply(dictionary, func(rootContext, parentContext selector.Dictionary, key string, value selector.Entry) (selector.Action, selector.Entry) {
 		assert.Equal(t, dictionary, rootContext)
 		assert.Equal(t, dictionary, parentContext)
 		collect = append(collect, value)
@@ -320,7 +323,7 @@ func TestDeleteComplexArray(t *testing.T) {
 
 	dictionary := getExampleAsDictionary()
 
-	found := sut.Apply(dictionary, func(rootContext, parentContext selector.Dictionary, value selector.Entry) (selector.Action, selector.Entry) {
+	found := sut.Apply(dictionary, func(rootContext, parentContext selector.Dictionary, key string, value selector.Entry) (selector.Action, selector.Entry) {
 		v := reflect.ValueOf(value)
 		if v.MapIndex(reflect.ValueOf("domain")).Interface() == "company.com" {
 			return selector.DELETE, nil
@@ -338,7 +341,7 @@ func TestReadComplexNestedArray(t *testing.T) {
 
 	collectParents := []selector.Entry{}
 	collectValues := []selector.Entry{}
-	found := sut.Apply(dictionary, func(rootContext, parentContext selector.Dictionary, value selector.Entry) (selector.Action, selector.Entry) {
+	found := sut.Apply(dictionary, func(rootContext, parentContext selector.Dictionary, key string, value selector.Entry) (selector.Action, selector.Entry) {
 		collectParents = append(collectParents, parentContext)
 		collectValues = append(collectValues, value)
 		return selector.NOTHING, nil
@@ -384,7 +387,7 @@ func TestWriteComplexNestedArray(t *testing.T) {
 
 	dictionary := getExampleAsDictionary()
 
-	found := sut.Apply(dictionary, func(rootContext, parentContext selector.Dictionary, value selector.Entry) (selector.Action, selector.Entry) {
+	found := sut.Apply(dictionary, func(rootContext, parentContext selector.Dictionary, key string, value selector.Entry) (selector.Action, selector.Entry) {
 		return selector.WRITE, selector.Dictionary{"email": "", "name": "rick", "surname": "roll"}
 	})
 	assert.True(t, found)
@@ -404,7 +407,7 @@ func TestDeleteComplexNestedArray(t *testing.T) {
 
 	dictionary := getExampleAsDictionary()
 
-	found := sut.Apply(dictionary, func(rootContext, parentContext selector.Dictionary, value selector.Entry) (selector.Action, selector.Entry) {
+	found := sut.Apply(dictionary, func(rootContext, parentContext selector.Dictionary, key string, value selector.Entry) (selector.Action, selector.Entry) {
 		v := reflect.ValueOf(value)
 		if v.MapIndex(reflect.ValueOf("name")).Interface() == "leona" {
 			return selector.DELETE, nil

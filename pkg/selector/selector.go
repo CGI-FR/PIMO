@@ -16,7 +16,7 @@ const (
 	DELETE         = iota
 )
 
-type Applier func(rootContext Dictionary, parentContext Dictionary, value Entry) (Action, Entry)
+type Applier func(rootContext Dictionary, parentContext Dictionary, key string, value Entry) (Action, Entry)
 
 type Selector interface {
 	Apply(Dictionary, ...Applier) bool
@@ -75,7 +75,7 @@ func (s selector) ApplyWithContext(root Dictionary, current Dictionary, appliers
 
 func (s selector) apply(root Dictionary, current Dictionary, entry Entry, appliers []Applier) {
 	for _, applier := range appliers {
-		action, entry := applier(root, current, entry)
+		action, entry := applier(root, current, s.path, entry)
 		switch action {
 		case WRITE:
 			current[s.path] = entry
@@ -89,7 +89,7 @@ func (s selector) applySlice(root Dictionary, current Dictionary, entries []Entr
 	for _, applier := range appliers {
 		result := []Entry{}
 		for _, entry := range entries {
-			action, modEntry := applier(root, current, entry)
+			action, modEntry := applier(root, current, s.path, entry)
 			switch action {
 			case WRITE:
 				result = append(result, modEntry)
