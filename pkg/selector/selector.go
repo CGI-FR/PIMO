@@ -21,6 +21,13 @@ type Applier func(rootContext Dictionary, parentContext Dictionary, key string, 
 type Selector interface {
 	Apply(Dictionary, ...Applier) bool
 	ApplyWithContext(Dictionary, Dictionary, ...Applier) bool
+
+	// old interface
+	Delete(Dictionary) Dictionary
+	ReadContext(Dictionary) (Dictionary, string, bool)
+	WriteContext(Dictionary, Entry) Dictionary
+	Read(Dictionary) (Entry, bool)
+	Write(Dictionary, Entry) Dictionary
 }
 
 type selector struct {
@@ -32,9 +39,8 @@ func NewSelector(path string) Selector {
 	paths := strings.SplitN(path, ".", 2)
 	if len(paths) == 2 {
 		return selector{paths[0], NewSelector(paths[1])}
-	} else {
-		return selector{paths[0], nil}
 	}
+	return selector{paths[0], nil}
 }
 
 func (s selector) Apply(root Dictionary, appliers ...Applier) bool {
@@ -44,6 +50,10 @@ func (s selector) Apply(root Dictionary, appliers ...Applier) bool {
 func (s selector) ApplyWithContext(root Dictionary, current Dictionary, appliers ...Applier) bool {
 	entry, ok := current[s.path]
 	if !ok {
+		if s.sub != nil {
+			// apply with nil value
+			s.apply(root, current, nil, appliers)
+		}
 		return false
 	}
 	v := reflect.ValueOf(entry)
@@ -51,7 +61,6 @@ func (s selector) ApplyWithContext(root Dictionary, current Dictionary, appliers
 	if s.sub != nil {
 		switch kind {
 		case reflect.Slice:
-
 			for i := 0; i < v.Len(); i++ {
 				s.sub.ApplyWithContext(root, v.Index(i).Interface().(Dictionary), appliers...)
 			}
@@ -101,6 +110,46 @@ func (s selector) applySlice(root Dictionary, current Dictionary, entries []Entr
 	}
 }
 
+func (s selector) Delete(dictionary Dictionary) Dictionary {
+	s.Apply(dictionary, func(rootContext, parentContext Dictionary, key string, value Entry) (Action, Entry) {
+		return DELETE, nil
+	})
+	return dictionary
+}
+
+func (s selector) ReadContext(dictionary Dictionary) (sub Dictionary, subkey string, found bool) {
+	s.Apply(dictionary, func(rootContext, parentContext Dictionary, key string, value Entry) (Action, Entry) {
+		sub = parentContext
+		subkey = key
+		found = value != nil
+		return NOTHING, nil
+	})
+	return
+}
+
+func (s selector) WriteContext(dictionary Dictionary, masked Entry) Dictionary {
+	s.Apply(dictionary, func(rootContext, parentContext Dictionary, key string, value Entry) (Action, Entry) {
+		return WRITE, masked
+	})
+	return dictionary
+}
+
+func (s selector) Read(dictionary Dictionary) (match Entry, found bool) {
+	s.Apply(dictionary, func(rootContext, parentContext Dictionary, key string, value Entry) (Action, Entry) {
+		match = value
+		found = value != nil
+		return NOTHING, nil
+	})
+	return
+}
+
+func (s selector) Write(dictionary Dictionary, masked Entry) Dictionary {
+	s.Apply(dictionary, func(rootContext, parentContext Dictionary, key string, value Entry) (Action, Entry) {
+		return WRITE, masked
+	})
+	return dictionary
+}
+
 // InterfaceToMap returns a Dictionary from an interface
 func InterfaceToDictionary(inter interface{}) Dictionary {
 	dic := make(map[string]Entry)
@@ -126,6 +175,5 @@ func InterfaceToDictionary(inter interface{}) Dictionary {
 			dic[k] = v
 		}
 	}
-
 	return dic
 }

@@ -86,7 +86,7 @@ func Factory(conf model.Masking, seed int64, caches map[string]model.Cache) (mod
 // InterfaceToDictionary returns a model.Dictionary from an interface
 func InterfaceToDictionaryEntry(inter interface{}) model.Dictionary {
 	dic := make(map[string]model.Entry)
-	mapint := inter.(map[string]model.Entry)
+	mapint := inter.(model.Dictionary)
 
 	for k, v := range mapint {
 		switch typedValue := v.(type) {
