@@ -9,5 +9,5 @@ testcases:
     assertions:
     - result.code ShouldEqual 0
     - >
-      result.systemout ShouldEqual {"organizations":[{"domain":"company.com","persons":[{"name":"Leona","surname":"Miller","email":"leona.miller@company.com"},{"name":"Joe","surname":"Davis","email":"joe.davis@company.com"}]}]}
+      result.systemout ShouldEqual {"organizations":[{"domain":"company.com","persons":[{"email":"leona.miller@company.com","name":"Leona","surname":"Miller"},{"email":"joe.davis@company.com","name":"Joe","surname":"Davis"}]}]}
     - result.systemerr ShouldBeEmpty

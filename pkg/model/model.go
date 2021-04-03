@@ -137,6 +137,17 @@ type Masking struct {
 	Cache    string       `yaml:"cache"`
 }
 
+type CacheDefinition struct {
+	Unique bool `yaml:"unique"`
+}
+
+type Definition struct {
+	Version string                     `yaml:"version"`
+	Seed    int64                      `yaml:"seed"`
+	Masking []Masking                  `yaml:"masking"`
+	Caches  map[string]CacheDefinition `yaml:"caches"`
+}
+
 /***************
  * REFACTORING *
  ***************/

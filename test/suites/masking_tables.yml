@@ -92,7 +92,7 @@ testcases:
         - selector:
             jsonpath: "elements.persons.email"
           mask:
-            regex: "[a-z]{10}@company\.com"
+            regex: '[a-z]{10}@company\.com'
       EOF
   - script: |-
       echo '{"elements":[{"persons": [{"phonenumber": "027","email": "person@company.com"}]}]}' | pimo

@@ -105,7 +105,15 @@ func run() {
 		caches map[string]model.Cache
 	)
 
-	pipeline, caches, err = pimo.YamlPipeline(pipeline, maskingFile, injectMaskFactories(), injectMaskContextFactories())
+	model.InjectMaskContextFactories(injectMaskContextFactories())
+	model.InjectMaskFactories(injectMaskFactories())
+	pdef, err := model.LoadPipelineDefinitionFromYAML(maskingFile)
+	if err != nil {
+		os.Stderr.WriteString(err.Error() + "\n")
+		os.Exit(1)
+	}
+
+	pipeline, caches, err = model.BuildPipeline(pipeline, pdef)
 
 	if err != nil {
 		os.Stderr.WriteString(err.Error() + "\n")
