@@ -378,3 +378,53 @@ func TestReadComplexNestedArray(t *testing.T) {
 		selector.Dictionary{"email": "", "name": "paul", "surname": "crouzeau"},
 	}, collectValues)
 }
+
+func TestWriteComplexNestedArray(t *testing.T) {
+	sut := selector.NewSelector("organizations.persons")
+
+	dictionary := getExampleAsDictionary()
+
+	found := sut.Apply(dictionary, func(rootContext, parentContext selector.Dictionary, value selector.Entry) (selector.Action, selector.Entry) {
+		return selector.WRITE, selector.Dictionary{"email": "", "name": "rick", "surname": "roll"}
+	})
+	assert.True(t, found)
+	assert.Equal(t, []selector.Entry{
+		selector.Dictionary{"domain": "company.com", "persons": []selector.Entry{
+			selector.Dictionary{"email": "", "name": "rick", "surname": "roll"},
+			selector.Dictionary{"email": "", "name": "rick", "surname": "roll"},
+		}},
+		selector.Dictionary{"domain": "company.fr", "persons": []selector.Entry{
+			selector.Dictionary{"email": "", "name": "rick", "surname": "roll"},
+			selector.Dictionary{"email": "", "name": "rick", "surname": "roll"},
+		}}}, dictionary["organizations"])
+}
+
+func TestDeleteComplexNestedArray(t *testing.T) {
+	sut := selector.NewSelector("organizations.persons")
+
+	dictionary := getExampleAsDictionary()
+
+	found := sut.Apply(dictionary, func(rootContext, parentContext selector.Dictionary, value selector.Entry) (selector.Action, selector.Entry) {
+		v := reflect.ValueOf(value)
+		if v.MapIndex(reflect.ValueOf("name")).Interface() == "leona" {
+			return selector.DELETE, nil
+		}
+		return selector.NOTHING, nil
+	})
+	assert.True(t, found)
+	assert.Equal(t, []selector.Entry{
+		selector.Dictionary{
+			"domain": "company.com",
+			"persons": []selector.Entry{
+				// leona is missing
+				selector.Dictionary{"email": "", "name": "joe", "surname": "davis"},
+			},
+		},
+		selector.Dictionary{
+			"domain": "company.fr",
+			"persons": []selector.Entry{
+				selector.Dictionary{"email": "", "name": "jean-baptiste", "surname": "renet"},
+				selector.Dictionary{"email": "", "name": "paul", "surname": "crouzeau"},
+			},
+		}}, dictionary["organizations"])
+}
