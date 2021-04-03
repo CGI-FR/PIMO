@@ -51,6 +51,11 @@ func (s selector) ApplyWithContext(root Dictionary, current Dictionary, appliers
 	if s.sub != nil {
 		switch kind {
 		case reflect.Slice:
+
+			for i := 0; i < v.Len(); i++ {
+				s.sub.ApplyWithContext(root, v.Index(i).Interface().(Dictionary), appliers...)
+			}
+			return true
 		default:
 			return s.sub.ApplyWithContext(root, entry.(Dictionary), appliers...)
 		}
