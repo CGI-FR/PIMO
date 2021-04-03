@@ -57,9 +57,11 @@ func (s selector) ApplyWithContext(root Dictionary, current Dictionary, appliers
 	}
 	switch kind {
 	case reflect.Slice:
+		actualSlice := []Entry{}
 		for i := 0; i < v.Len(); i++ {
-			s.apply(root, current, v.Index(i).Interface(), appliers)
+			actualSlice = append(actualSlice, v.Index(i).Interface())
 		}
+		s.applySlice(root, current, actualSlice, appliers)
 	default:
 		s.apply(root, current, entry, appliers)
 	}
@@ -75,6 +77,22 @@ func (s selector) apply(root Dictionary, current Dictionary, entry Entry, applie
 		case DELETE:
 			delete(current, s.path)
 		}
+	}
+}
+
+func (s selector) applySlice(root Dictionary, current Dictionary, entries []Entry, appliers []Applier) {
+	for _, applier := range appliers {
+		result := []Entry{}
+		for _, entry := range entries {
+			action, modEntry := applier(root, current, entry)
+			switch action {
+			case WRITE:
+				result = append(result, modEntry)
+			case NOTHING:
+				result = append(result, entry)
+			}
+		}
+		current[s.path] = result
 	}
 }
 

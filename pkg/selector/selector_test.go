@@ -3,6 +3,7 @@ package selector_test
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"log"
 	"os/exec"
 	"strings"
@@ -184,6 +185,36 @@ func TestReadSub(t *testing.T) {
 	assert.True(t, found)
 }
 
+func TestWriteSub(t *testing.T) {
+	sut := selector.NewSelector("summary.name")
+
+	dictionary := getExampleAsDictionary()
+
+	found := sut.Apply(dictionary, func(rootContext, parentContext selector.Dictionary, value selector.Entry) (selector.Action, selector.Entry) {
+		assert.Equal(t, dictionary, rootContext)
+		assert.Equal(t, dictionary["summary"], parentContext)
+		assert.Equal(t, "test", value)
+		return selector.WRITE, "write"
+	})
+	assert.True(t, found)
+	assert.Equal(t, selector.Dictionary{"date": "2012-04-23T18:25:43.511Z", "name": "write", "tags": []selector.Entry{"red", "yellow"}}, dictionary["summary"])
+}
+
+func TestDeleteSub(t *testing.T) {
+	sut := selector.NewSelector("summary.name")
+
+	dictionary := getExampleAsDictionary()
+
+	found := sut.Apply(dictionary, func(rootContext, parentContext selector.Dictionary, value selector.Entry) (selector.Action, selector.Entry) {
+		assert.Equal(t, dictionary, rootContext)
+		assert.Equal(t, dictionary["summary"], parentContext)
+		assert.Equal(t, "test", value)
+		return selector.DELETE, nil
+	})
+	assert.True(t, found)
+	assert.Equal(t, selector.Dictionary{"date": "2012-04-23T18:25:43.511Z", "tags": []selector.Entry{"red", "yellow"}}, dictionary["summary"])
+}
+
 func TestReadSimpleArray(t *testing.T) {
 	sut := selector.NewSelector("summary.tags")
 
@@ -199,6 +230,28 @@ func TestReadSimpleArray(t *testing.T) {
 		}, parentContext)
 		collect = append(collect, value)
 		return selector.NOTHING, nil
+	})
+	assert.True(t, found)
+	assert.Equal(t, []selector.Entry{"red", "yellow"}, collect)
+}
+
+func TestWriteSimpleArray(t *testing.T) {
+	sut := selector.NewSelector("summary.tags")
+
+	dictionary := getExampleAsDictionary()
+
+	cnt := 0
+	collect := []selector.Entry{}
+	found := sut.Apply(dictionary, func(rootContext, parentContext selector.Dictionary, value selector.Entry) (selector.Action, selector.Entry) {
+		assert.Equal(t, dictionary, rootContext)
+		assert.Equal(t, selector.Dictionary{
+			"name": "test",
+			"date": "2012-04-23T18:25:43.511Z",
+			"tags": []selector.Entry{"red", "yellow"},
+		}, parentContext)
+		collect = append(collect, value)
+		cnt++
+		return selector.WRITE, fmt.Sprintf("%v", cnt)
 	})
 	assert.True(t, found)
 	assert.Equal(t, []selector.Entry{"red", "yellow"}, collect)
