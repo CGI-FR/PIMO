@@ -22,49 +22,57 @@ import (
 )
 
 type source struct {
-	value model.Dictionary
+	value *model.Dictionary
 	read  *bool
 }
 
-func (s source) Open() error {
+func (s *source) Open() error {
 	return nil
 }
 
-func (s source) Err() error {
+func (s *source) Err() error {
 	return nil
 }
 
-func (s source) Next() bool {
-	return !*s.read
+func (s *source) Next() bool {
+	return *s.read
 }
 
-func (s source) Value() model.Dictionary {
-	defer func() { *s.read = true }()
-	return s.value
+func (s *source) Value() model.Dictionary {
+	defer func() { *s.read = false }()
+	return *s.value
 }
 
 // MaskEngine is a value that always mask the same way
 type MaskEngine struct {
 	seed         int64
-	pipeline     model.Definition
+	source       *source
+	pipeline     model.Pipeline
 	injectParent string
 	injectRoot   string
 }
 
 // NewMask return a MaskEngine from a value
 func NewMask(seed int64, injectParent string, injectRoot string, masking ...model.Masking) MaskEngine {
-	return MaskEngine{seed, model.Definition{Seed: seed, Masking: masking}, injectParent, injectRoot}
+	read := false
+	source := source{nil, &read}
+	definition := model.Definition{Seed: seed, Masking: masking}
+	pipeline := model.NewPipeline(&source)
+	pipeline, _, _ = model.BuildPipeline(pipeline, definition)
+	return MaskEngine{seed, &source, pipeline, injectParent, injectRoot}
 }
 
 // Mask return a Constant from a MaskEngine
 func (me MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Entry, error) {
-	read := false
-	source := source{InterfaceToDictionaryEntry(e), &read}
-	pipeline := model.NewPipeline(source)
-	pipeline, _, _ = model.BuildPipeline(pipeline, me.pipeline)
 	var result []model.Dictionary
-	pipeline.AddSink(model.NewSinkToSlice(&result)).Run()
-	return result[0], nil
+	value := InterfaceToDictionaryEntry(e)
+	me.source.value = &value
+	*me.source.read = true
+	err := me.pipeline.AddSink(model.NewSinkToSlice(&result)).Run()
+	if err != nil {
+		return nil, err
+	}
+	return result[0], err
 }
 
 // Factory create a mask from a configuration
