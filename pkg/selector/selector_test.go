@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"os/exec"
+	"reflect"
 	"strings"
 	"testing"
 
@@ -43,7 +44,7 @@ var example = `
             "domain": "company.fr",
             "persons": [
                 {
-                    "name": "jean-baptise",
+                    "name": "jean-baptiste",
                     "surname": "renet",
                     "email": ""
                 },
@@ -232,7 +233,7 @@ func TestReadSimpleArray(t *testing.T) {
 		return selector.NOTHING, nil
 	})
 	assert.True(t, found)
-	assert.Equal(t, []selector.Entry{"red", "yellow"}, collect)
+	assert.Equal(t, []selector.Entry{"red", "blue", "yellow"}, collect)
 }
 
 func TestWriteSimpleArray(t *testing.T) {
@@ -280,4 +281,52 @@ func TestDeleteSimpleArray(t *testing.T) {
 	assert.True(t, found)
 	assert.Equal(t, []selector.Entry{"red", "blue", "yellow"}, collect)
 	assert.Equal(t, selector.Dictionary{"date": "2012-04-23T18:25:43.511Z", "name": "test", "tags": []selector.Entry{"red", "yellow"}}, dictionary["summary"])
+}
+
+func TestReadComplexArray(t *testing.T) {
+	sut := selector.NewSelector("organizations")
+
+	dictionary := getExampleAsDictionary()
+
+	collect := []selector.Entry{}
+	found := sut.Apply(dictionary, func(rootContext, parentContext selector.Dictionary, value selector.Entry) (selector.Action, selector.Entry) {
+		assert.Equal(t, dictionary, rootContext)
+		assert.Equal(t, dictionary, parentContext)
+		collect = append(collect, value)
+		return selector.NOTHING, nil
+	})
+	assert.True(t, found)
+	assert.Equal(t, dictionary["organizations"], collect)
+}
+
+func TestWriteComplexArray(t *testing.T) {
+	sut := selector.NewSelector("organizations")
+
+	dictionary := getExampleAsDictionary()
+
+	collect := []selector.Entry{}
+	found := sut.Apply(dictionary, func(rootContext, parentContext selector.Dictionary, value selector.Entry) (selector.Action, selector.Entry) {
+		assert.Equal(t, dictionary, rootContext)
+		assert.Equal(t, dictionary, parentContext)
+		collect = append(collect, value)
+		return selector.WRITE, selector.Dictionary{"domain": "masked", "persons": []selector.Entry{}}
+	})
+	assert.True(t, found)
+	assert.Equal(t, []selector.Entry{selector.Dictionary{"domain": "masked", "persons": []selector.Entry{}}, selector.Dictionary{"domain": "masked", "persons": []selector.Entry{}}}, dictionary["organizations"])
+}
+
+func TestDeleteComplexArray(t *testing.T) {
+	sut := selector.NewSelector("organizations")
+
+	dictionary := getExampleAsDictionary()
+
+	found := sut.Apply(dictionary, func(rootContext, parentContext selector.Dictionary, value selector.Entry) (selector.Action, selector.Entry) {
+		v := reflect.ValueOf(value)
+		if v.MapIndex(reflect.ValueOf("domain")).Interface() == "company.com" {
+			return selector.DELETE, nil
+		}
+		return selector.NOTHING, nil
+	})
+	assert.True(t, found)
+	assert.Equal(t, []selector.Entry{selector.Dictionary{"domain": "company.fr", "persons": []selector.Entry{selector.Dictionary{"email": "", "name": "jean-baptiste", "surname": "renet"}, selector.Dictionary{"email": "", "name": "paul", "surname": "crouzeau"}}}}, dictionary["organizations"])
 }
