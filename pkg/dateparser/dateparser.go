@@ -65,7 +65,7 @@ func (me MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Ent
 }
 
 // Factory Create a mask from a configuration
-func Factory(conf model.Masking, seed int64) (model.MaskEngine, bool, error) {
+func Factory(conf model.Masking, seed int64, caches map[string]model.Cache) (model.MaskEngine, bool, error) {
 	if len(conf.Mask.DateParser.InputFormat) != 0 || len(conf.Mask.DateParser.OutputFormat) != 0 {
 		mask := NewMask(conf.Mask.DateParser.InputFormat, conf.Mask.DateParser.OutputFormat)
 		return mask, true, nil

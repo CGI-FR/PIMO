@@ -93,7 +93,7 @@ func (dura MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.E
 }
 
 // Create a mask from a configuration
-func Factory(conf model.Masking, seed int64) (model.MaskEngine, bool, error) {
+func Factory(conf model.Masking, seed int64, caches map[string]model.Cache) (model.MaskEngine, bool, error) {
 	if len(conf.Mask.Duration) != 0 {
 		mask, err := NewMask(conf.Mask.Duration)
 		if err != nil {

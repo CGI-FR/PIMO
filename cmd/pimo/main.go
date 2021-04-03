@@ -113,7 +113,7 @@ func run() {
 		os.Exit(1)
 	}
 
-	pipeline, caches, err = model.BuildPipeline(pipeline, pdef)
+	pipeline, caches, err = model.BuildPipeline(pipeline, pdef, nil)
 
 	if err != nil {
 		os.Stderr.WriteString(err.Error() + "\n")
@@ -166,7 +166,6 @@ func injectMaskContextFactories() []model.MaskContextFactory {
 
 func injectMaskFactories() []model.MaskFactory {
 	return []model.MaskFactory{
-
 		constant.Factory,
 		command.Factory,
 		randomlist.Factory,
@@ -179,7 +178,6 @@ func injectMaskFactories() []model.MaskFactory {
 		replacement.Factory,
 		duration.Factory,
 		templatemask.Factory,
-
 		rangemask.Factory,
 		randdura.Factory,
 		randomdecimal.Factory,

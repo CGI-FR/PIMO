@@ -53,12 +53,12 @@ type MaskEngine struct {
 }
 
 // NewMask return a MaskEngine from a value
-func NewMask(seed int64, injectParent string, injectRoot string, masking ...model.Masking) MaskEngine {
+func NewMask(seed int64, injectParent string, injectRoot string, caches map[string]model.Cache, masking ...model.Masking) MaskEngine {
 	read := false
 	source := source{nil, &read}
 	definition := model.Definition{Seed: seed, Masking: masking}
 	pipeline := model.NewPipeline(&source)
-	pipeline, _, _ = model.BuildPipeline(pipeline, definition)
+	pipeline, _, _ = model.BuildPipeline(pipeline, definition, caches)
 	return MaskEngine{seed, &source, pipeline, injectParent, injectRoot}
 }
 
@@ -76,9 +76,9 @@ func (me MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Ent
 }
 
 // Factory create a mask from a configuration
-func Factory(conf model.Masking, seed int64) (model.MaskEngine, bool, error) {
+func Factory(conf model.Masking, seed int64, caches map[string]model.Cache) (model.MaskEngine, bool, error) {
 	if len(conf.Mask.Pipe.Masking) > 0 {
-		return NewMask(seed, conf.Mask.Pipe.InjectParent, "nil", conf.Mask.Pipe.Masking...), true, nil
+		return NewMask(seed, conf.Mask.Pipe.InjectParent, conf.Mask.Pipe.InjectRoot, caches, conf.Mask.Pipe.Masking...), true, nil
 	}
 	return nil, false, nil
 }

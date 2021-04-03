@@ -89,7 +89,7 @@ func TestDecodingKeyShouldWork(t *testing.T) {
 
 func TestFactoryShouldReturnNilOnEmptyConfig(t *testing.T) {
 	maskingConfig := model.Masking{Mask: model.MaskType{}}
-	mask, present, err := Factory(maskingConfig, 0)
+	mask, present, err := Factory(maskingConfig, 0, nil)
 	assert.Nil(t, mask, "should be nil")
 	assert.False(t, present, "should be false")
 	assert.Nil(t, err, "should be nil")
@@ -97,7 +97,7 @@ func TestFactoryShouldReturnNilOnEmptyConfig(t *testing.T) {
 
 func TestFactoryShouldReturnErrorOnWrongConfig(t *testing.T) {
 	maskingConfig := model.Masking{Mask: model.MaskType{FF1: model.FF1Type{KeyFromEnv: "XXXXXX", Radix: 0, TweakField: "tweak"}}}
-	mask, present, err := Factory(maskingConfig, 0)
+	mask, present, err := Factory(maskingConfig, 0, nil)
 	assert.Nil(t, mask, "should be nil")
 	assert.True(t, present, "should be true")
 	assert.EqualErrorf(t, err, "radix attribut is not optional", "should be nil")

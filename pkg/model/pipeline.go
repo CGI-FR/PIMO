@@ -20,21 +20,24 @@ func InjectMaskFactories(factories []MaskFactory) {
 	maskFactories = factories
 }
 
-func BuildCaches(caches map[string]CacheDefinition) map[string]Cache {
-	result := map[string]Cache{}
-
+func BuildCaches(caches map[string]CacheDefinition, existing map[string]Cache) map[string]Cache {
+	if existing == nil {
+		existing = map[string]Cache{}
+	}
 	for name, conf := range caches {
-		if conf.Unique {
-			result[name] = NewUniqueMemCache()
-		} else {
-			result[name] = NewMemCache()
+		if _, exist := existing[name]; !exist {
+			if conf.Unique {
+				existing[name] = NewUniqueMemCache()
+			} else {
+				existing[name] = NewMemCache()
+			}
 		}
 	}
-	return result
+	return existing
 }
 
-func BuildPipeline(pipeline Pipeline, conf Definition) (Pipeline, map[string]Cache, error) {
-	caches := BuildCaches(conf.Caches)
+func BuildPipeline(pipeline Pipeline, conf Definition, caches map[string]Cache) (Pipeline, map[string]Cache, error) {
+	caches = BuildCaches(conf.Caches, caches)
 	for _, v := range conf.Masking {
 		nbArg := 0
 
@@ -48,7 +51,7 @@ func BuildPipeline(pipeline Pipeline, conf Definition) (Pipeline, map[string]Cac
 		}
 
 		for _, factory := range maskFactories {
-			mask, present, err := factory(v, conf.Seed)
+			mask, present, err := factory(v, conf.Seed, caches)
 			if err != nil {
 				return nil, nil, errors.New(err.Error() + " for " + v.Selector.Jsonpath)
 			}
@@ -71,7 +74,7 @@ func BuildPipeline(pipeline Pipeline, conf Definition) (Pipeline, map[string]Cac
 		}
 
 		for _, factory := range maskContextFactories {
-			mask, present, err := factory(v, conf.Seed)
+			mask, present, err := factory(v, conf.Seed, caches)
 			if err != nil {
 				return nil, nil, errors.New(err.Error() + " for " + v.Selector.Jsonpath)
 			}

@@ -49,9 +49,9 @@ func (fme FunctionMaskEngine) Mask(e Entry, context ...Dictionary) (Entry, error
 	return fme.Function(e, context...)
 }
 
-type MaskFactory func(Masking, int64) (MaskEngine, bool, error)
+type MaskFactory func(Masking, int64, map[string]Cache) (MaskEngine, bool, error)
 
-type MaskContextFactory func(Masking, int64) (MaskContextEngine, bool, error)
+type MaskContextFactory func(Masking, int64, map[string]Cache) (MaskContextEngine, bool, error)
 
 type SelectorType struct {
 	Jsonpath string `yaml:"jsonpath"`
@@ -102,6 +102,8 @@ type FF1Type struct {
 type PipeType struct {
 	Masking      []Masking
 	InjectParent string
+	InjectRoot   string
+	File         string
 }
 
 type MaskType struct {
