@@ -21,7 +21,7 @@ var example = `
 		{
 			"name": "test",
 			"date": "2012-04-23T18:25:43.511Z",
-			"tags": ["red", "yellow"]
+			"tags": ["red","blue","yellow"]
 		},
     "organizations": [
         {
@@ -197,7 +197,7 @@ func TestWriteSub(t *testing.T) {
 		return selector.WRITE, "write"
 	})
 	assert.True(t, found)
-	assert.Equal(t, selector.Dictionary{"date": "2012-04-23T18:25:43.511Z", "name": "write", "tags": []selector.Entry{"red", "yellow"}}, dictionary["summary"])
+	assert.Equal(t, selector.Dictionary{"date": "2012-04-23T18:25:43.511Z", "name": "write", "tags": []selector.Entry{"red", "blue", "yellow"}}, dictionary["summary"])
 }
 
 func TestDeleteSub(t *testing.T) {
@@ -212,7 +212,7 @@ func TestDeleteSub(t *testing.T) {
 		return selector.DELETE, nil
 	})
 	assert.True(t, found)
-	assert.Equal(t, selector.Dictionary{"date": "2012-04-23T18:25:43.511Z", "tags": []selector.Entry{"red", "yellow"}}, dictionary["summary"])
+	assert.Equal(t, selector.Dictionary{"date": "2012-04-23T18:25:43.511Z", "tags": []selector.Entry{"red", "blue", "yellow"}}, dictionary["summary"])
 }
 
 func TestReadSimpleArray(t *testing.T) {
@@ -226,7 +226,7 @@ func TestReadSimpleArray(t *testing.T) {
 		assert.Equal(t, selector.Dictionary{
 			"name": "test",
 			"date": "2012-04-23T18:25:43.511Z",
-			"tags": []selector.Entry{"red", "yellow"},
+			"tags": []selector.Entry{"red", "blue", "yellow"},
 		}, parentContext)
 		collect = append(collect, value)
 		return selector.NOTHING, nil
@@ -247,12 +247,37 @@ func TestWriteSimpleArray(t *testing.T) {
 		assert.Equal(t, selector.Dictionary{
 			"name": "test",
 			"date": "2012-04-23T18:25:43.511Z",
-			"tags": []selector.Entry{"red", "yellow"},
+			"tags": []selector.Entry{"red", "blue", "yellow"},
 		}, parentContext)
 		collect = append(collect, value)
 		cnt++
 		return selector.WRITE, fmt.Sprintf("%v", cnt)
 	})
 	assert.True(t, found)
-	assert.Equal(t, []selector.Entry{"red", "yellow"}, collect)
+	assert.Equal(t, []selector.Entry{"red", "blue", "yellow"}, collect)
+	assert.Equal(t, selector.Dictionary{"date": "2012-04-23T18:25:43.511Z", "name": "test", "tags": []selector.Entry{"1", "2", "3"}}, dictionary["summary"])
+}
+
+func TestDeleteSimpleArray(t *testing.T) {
+	sut := selector.NewSelector("summary.tags")
+
+	dictionary := getExampleAsDictionary()
+
+	collect := []selector.Entry{}
+	found := sut.Apply(dictionary, func(rootContext, parentContext selector.Dictionary, value selector.Entry) (selector.Action, selector.Entry) {
+		assert.Equal(t, dictionary, rootContext)
+		assert.Equal(t, selector.Dictionary{
+			"name": "test",
+			"date": "2012-04-23T18:25:43.511Z",
+			"tags": []selector.Entry{"red", "blue", "yellow"},
+		}, parentContext)
+		collect = append(collect, value)
+		if value == "blue" {
+			return selector.DELETE, nil
+		}
+		return selector.NOTHING, nil
+	})
+	assert.True(t, found)
+	assert.Equal(t, []selector.Entry{"red", "blue", "yellow"}, collect)
+	assert.Equal(t, selector.Dictionary{"date": "2012-04-23T18:25:43.511Z", "name": "test", "tags": []selector.Entry{"red", "yellow"}}, dictionary["summary"])
 }
