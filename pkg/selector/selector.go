@@ -50,7 +50,7 @@ func (s selector) Apply(root Dictionary, appliers ...Applier) bool {
 func (s selector) ApplyWithContext(root Dictionary, current Dictionary, appliers ...Applier) bool {
 	entry, ok := current[s.path]
 	if !ok {
-		if s.sub != nil {
+		if s.sub == nil {
 			// apply with nil value
 			s.apply(root, current, nil, appliers)
 		}
@@ -121,17 +121,28 @@ func (s selector) ReadContext(dictionary Dictionary) (sub Dictionary, subkey str
 	s.Apply(dictionary, func(rootContext, parentContext Dictionary, key string, value Entry) (Action, Entry) {
 		sub = parentContext
 		subkey = key
-		found = value != nil
+		found = true
 		return NOTHING, nil
 	})
 	return
 }
 
 func (s selector) WriteContext(dictionary Dictionary, masked Entry) Dictionary {
-	s.Apply(dictionary, func(rootContext, parentContext Dictionary, key string, value Entry) (Action, Entry) {
+	result := Dictionary{}
+	for k, v := range dictionary {
+		result[k] = v
+	}
+	v := reflect.ValueOf(masked)
+	s.Apply(result, func(rootContext, parentContext Dictionary, key string, value Entry) (Action, Entry) {
+		if key == "" || value == nil {
+			return NOTHING, nil
+		}
+		if v.Kind() == reflect.Map {
+			masked = v.MapIndex(reflect.ValueOf(key)).Interface()
+		}
 		return WRITE, masked
 	})
-	return dictionary
+	return result
 }
 
 func (s selector) Read(dictionary Dictionary) (match Entry, found bool) {
@@ -144,10 +155,14 @@ func (s selector) Read(dictionary Dictionary) (match Entry, found bool) {
 }
 
 func (s selector) Write(dictionary Dictionary, masked Entry) Dictionary {
-	s.Apply(dictionary, func(rootContext, parentContext Dictionary, key string, value Entry) (Action, Entry) {
+	result := Dictionary{}
+	for k, v := range dictionary {
+		result[k] = v
+	}
+	s.Apply(result, func(rootContext, parentContext Dictionary, key string, value Entry) (Action, Entry) {
 		return WRITE, masked
 	})
-	return dictionary
+	return result
 }
 
 // InterfaceToMap returns a Dictionary from an interface
