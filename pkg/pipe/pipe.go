@@ -47,6 +47,8 @@ func (s *source) Value() model.Dictionary {
 type MaskEngine struct {
 	seed         int64
 	source       *source
+	definition   model.Definition
+	caches       map[string]model.Cache
 	pipeline     model.Pipeline
 	injectParent string
 	injectRoot   string
@@ -59,10 +61,9 @@ func NewMask(seed int64, injectParent string, injectRoot string, caches map[stri
 	definition := model.Definition{Seed: seed, Masking: masking}
 	pipeline := model.NewPipeline(&source)
 	pipeline, _, _ = model.BuildPipeline(pipeline, definition, caches)
-	return MaskEngine{seed, &source, pipeline, injectParent, injectRoot}
+	return MaskEngine{seed, &source, definition, caches, pipeline, injectParent, injectRoot}
 }
 
-// Mask return a Constant from a MaskEngine
 func (me MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Entry, error) {
 	var result []model.Dictionary
 	value := InterfaceToDictionaryEntry(e)
@@ -75,8 +76,40 @@ func (me MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Ent
 	return result[0], err
 }
 
+func (me MaskEngine) MaskContext(e model.Dictionary, key string, context ...model.Dictionary) (model.Dictionary, error) {
+	var result []model.Dictionary
+	input := []model.Dictionary{}
+
+	copy := model.Dictionary{}
+	for k, v := range e {
+		copy[k] = v
+	}
+
+	for _, dict := range e[key].([]model.Entry) {
+		elemInput := InterfaceToDictionaryEntry(dict)
+		if len(me.injectParent) > 0 {
+			elemInput[me.injectParent] = copy
+		}
+		input = append(input, elemInput)
+	}
+	source := model.NewSourceFromSlice(input)
+	pipeline := model.NewPipeline(source)
+	pipeline, _, _ = model.BuildPipeline(pipeline, me.definition, me.caches)
+	err := pipeline.AddSink(model.NewSinkToSlice(&result)).Run()
+	if err != nil {
+		return nil, err
+	}
+	for _, dict := range result {
+		if len(me.injectParent) > 0 {
+			delete(dict, me.injectParent)
+		}
+	}
+	copy[key] = result
+	return copy, nil
+}
+
 // Factory create a mask from a configuration
-func Factory(conf model.Masking, seed int64, caches map[string]model.Cache) (model.MaskEngine, bool, error) {
+func Factory(conf model.Masking, seed int64, caches map[string]model.Cache) (model.MaskContextEngine, bool, error) {
 	if len(conf.Mask.Pipe.Masking) > 0 {
 		return NewMask(seed, conf.Mask.Pipe.InjectParent, conf.Mask.Pipe.InjectRoot, caches, conf.Mask.Pipe.Masking...), true, nil
 	}

@@ -161,6 +161,7 @@ func injectMaskContextFactories() []model.MaskContextFactory {
 		fluxuri.Factory,
 		add.Factory,
 		remove.Factory,
+		pipe.Factory,
 	}
 }
 
@@ -183,6 +184,5 @@ func injectMaskFactories() []model.MaskFactory {
 		randomdecimal.Factory,
 		dateparser.Factory,
 		ff1.Factory,
-		pipe.Factory,
 	}
 }
