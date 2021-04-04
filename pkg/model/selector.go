@@ -3,7 +3,6 @@ package model
 import (
 	"log"
 	"reflect"
-	"strings"
 
 	"github.com/cgi-fr/pimo/pkg/selector"
 )
@@ -30,6 +29,15 @@ import (
 //       type Entry = selector.Entry
 //       type Selector = selector.Selector
 
+// func NewPathSelector(path string) Selector {
+// 	mainEntry := strings.SplitN(path, ".", 2)
+// 	if len(mainEntry) == 2 {
+// 		return ComplexePathSelector{mainEntry[0], NewPathSelector(mainEntry[1])}
+// 	} else {
+// 		return NewSimplePathSelector(mainEntry[0])
+// 	}
+// }
+
 func NewPathSelector(path string) selector.Selector {
 	return selector.NewSelector(path)
 }
@@ -43,21 +51,12 @@ type SelectorV1 interface {
 	WriteContext(Dictionary, Entry) Dictionary
 }
 
-func NewPathSelectorV1(path string) Selector {
-	mainEntry := strings.SplitN(path, ".", 2)
-	if len(mainEntry) == 2 {
-		return ComplexePathSelector{mainEntry[0], NewPathSelector(mainEntry[1])}
-	} else {
-		return NewSimplePathSelector(mainEntry[0])
-	}
-}
-
 type ComplexePathSelector struct {
 	path        string
 	subSelector Selector
 }
 
-func (s ComplexePathSelector) ApplyWithContext(Dictionary, Dictionary, ...selector.Applier) bool {
+func (s ComplexePathSelector) ApplyContext(Dictionary, Dictionary, ...selector.Applier) bool {
 	log.Fatal("Not implemented")
 	return false
 }
@@ -156,7 +155,7 @@ type SimplePathSelector struct {
 	Path string
 }
 
-func (s SimplePathSelector) ApplyWithContext(Dictionary, Dictionary, ...selector.Applier) bool {
+func (s SimplePathSelector) ApplyContext(Dictionary, ...selector.Applier) bool {
 	log.Fatal("Not implemented")
 	return false
 }

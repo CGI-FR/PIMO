@@ -402,6 +402,25 @@ func TestWriteComplexNestedArray(t *testing.T) {
 		}}}, dictionary["organizations"])
 }
 
+func TestWriteContext(t *testing.T) {
+	sut := selector.NewSelector("summary.tags")
+
+	dictionary := getExampleAsDictionary()
+
+	found := sut.ApplyContext(dictionary, func(rootContext, parentContext selector.Dictionary, key string, value selector.Entry) (selector.Action, selector.Entry) {
+		assert.Equal(t, dictionary, rootContext)
+		assert.Equal(t, parentContext, selector.Dictionary{
+			"name": "test",
+			"date": "2012-04-23T18:25:43.511Z",
+			"tags": []selector.Entry{"red", "blue", "yellow"},
+		})
+		assert.Equal(t, []selector.Entry{"red", "blue", "yellow"}, value)
+		return selector.WRITE, []selector.Entry{"pink", "cyan", "magenta"}
+	})
+	assert.True(t, found)
+	assert.Equal(t, selector.Dictionary{"date": "2012-04-23T18:25:43.511Z", "name": "test", "tags": []selector.Entry{"pink", "cyan", "magenta"}}, dictionary["summary"])
+}
+
 func TestDeleteComplexNestedArray(t *testing.T) {
 	sut := selector.NewSelector("organizations.persons")
 

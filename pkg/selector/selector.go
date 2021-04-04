@@ -20,7 +20,7 @@ type Applier func(rootContext Dictionary, parentContext Dictionary, key string, 
 
 type Selector interface {
 	Apply(Dictionary, ...Applier) bool
-	ApplyWithContext(Dictionary, Dictionary, ...Applier) bool
+	ApplyContext(Dictionary, ...Applier) bool
 
 	// old interface
 	Delete(Dictionary) Dictionary
@@ -30,24 +30,31 @@ type Selector interface {
 	Write(Dictionary, Entry) Dictionary
 }
 
+type selectorInternal interface {
+	Selector
+	// internal
+	applySub(Dictionary, Dictionary, ...Applier) bool
+	applySubContext(Dictionary, Dictionary, ...Applier) bool
+}
+
 type selector struct {
 	path string
-	sub  Selector
+	sub  selectorInternal
 }
 
 func NewSelector(path string) Selector {
 	paths := strings.SplitN(path, ".", 2)
 	if len(paths) == 2 {
-		return selector{paths[0], NewSelector(paths[1])}
+		return selector{paths[0], NewSelector(paths[1]).(selectorInternal)}
 	}
 	return selector{paths[0], nil}
 }
 
 func (s selector) Apply(root Dictionary, appliers ...Applier) bool {
-	return s.ApplyWithContext(root, root, appliers...)
+	return s.applySub(root, root, appliers...)
 }
 
-func (s selector) ApplyWithContext(root Dictionary, current Dictionary, appliers ...Applier) bool {
+func (s selector) applySub(root Dictionary, current Dictionary, appliers ...Applier) bool {
 	entry, ok := current[s.path]
 	if !ok {
 		if s.sub == nil {
@@ -62,11 +69,11 @@ func (s selector) ApplyWithContext(root Dictionary, current Dictionary, appliers
 		switch kind {
 		case reflect.Slice:
 			for i := 0; i < v.Len(); i++ {
-				s.sub.ApplyWithContext(root, v.Index(i).Interface().(Dictionary), appliers...)
+				s.sub.applySub(root, v.Index(i).Interface().(Dictionary), appliers...)
 			}
 			return true
 		default:
-			return s.sub.ApplyWithContext(root, entry.(Dictionary), appliers...)
+			return s.sub.applySub(root, entry.(Dictionary), appliers...)
 		}
 	}
 	switch kind {
@@ -110,6 +117,36 @@ func (s selector) applySlice(root Dictionary, current Dictionary, entries []Entr
 	}
 }
 
+func (s selector) ApplyContext(root Dictionary, appliers ...Applier) bool {
+	return s.applySubContext(root, root, appliers...)
+}
+
+func (s selector) applySubContext(root Dictionary, current Dictionary, appliers ...Applier) bool {
+	entry, ok := current[s.path]
+	if !ok {
+		if s.sub == nil {
+			// apply with nil value
+			s.apply(root, current, nil, appliers)
+		}
+		return false
+	}
+	v := reflect.ValueOf(entry)
+	kind := v.Kind()
+	if s.sub != nil {
+		switch kind {
+		case reflect.Slice:
+			for i := 0; i < v.Len(); i++ {
+				s.sub.applySubContext(root, v.Index(i).Interface().(Dictionary), appliers...)
+			}
+			return true
+		default:
+			return s.sub.applySubContext(root, entry.(Dictionary), appliers...)
+		}
+	}
+	s.apply(root, current, entry, appliers)
+	return true
+}
+
 func (s selector) Delete(dictionary Dictionary) Dictionary {
 	s.Apply(dictionary, func(rootContext, parentContext Dictionary, key string, value Entry) (Action, Entry) {
 		return DELETE, nil
@@ -133,7 +170,7 @@ func (s selector) WriteContext(dictionary Dictionary, masked Entry) Dictionary {
 		result[k] = v
 	}
 	v := reflect.ValueOf(masked)
-	s.Apply(result, func(rootContext, parentContext Dictionary, key string, value Entry) (Action, Entry) {
+	s.ApplyContext(result, func(rootContext, parentContext Dictionary, key string, value Entry) (Action, Entry) {
 		if key == "" || value == nil {
 			return NOTHING, nil
 		}
