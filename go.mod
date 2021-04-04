@@ -6,6 +6,7 @@ require (
 	github.com/Masterminds/goutils v1.1.0 // indirect
 	github.com/Masterminds/semver v1.5.0 // indirect
 	github.com/Masterminds/sprig v2.22.0+incompatible
+	github.com/barkimedes/go-deepcopy v0.0.0-20200817023428-a044a1957ca4
 	github.com/capitalone/fpe v1.2.1
 	github.com/goccy/go-yaml v1.4.3
 	github.com/google/gxui v0.0.0-20151028112939-f85e0a97b3a4 // indirect
