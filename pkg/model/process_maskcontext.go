@@ -1,7 +1,6 @@
 package model
 
 import (
-	"github.com/barkimedes/go-deepcopy"
 	"github.com/cgi-fr/pimo/pkg/selector"
 )
 
@@ -19,15 +18,10 @@ func (mcep *MaskContextEngineProcess) Open() error {
 }
 
 func (mcep *MaskContextEngineProcess) ProcessDictionary(dictionary Dictionary, out Collector) (ret error) {
-	// fmt.Printf("ProcessDictionaryContext(%v\n\tdictionary = %#v\n\tout = %#v\n)\n", mcep, dictionary, out)
-	copy, err := deepcopy.Anything(dictionary)
-	if err != nil {
-		return err
+	result := Dictionary{}
+	for k, v := range dictionary {
+		result[k] = v
 	}
-	result := copy.(Dictionary)
-	// defer func() {
-	// 	fmt.Printf("return ProcessDictionaryContext(%v)\n", result)
-	// }()
 	mcep.selector.ApplyContext(result, func(rootContext, parentContext Dictionary, key string, value Entry) (Action, Entry) {
 		masked, err := mcep.mask.MaskContext(parentContext, key, rootContext)
 		if err != nil {
@@ -37,7 +31,7 @@ func (mcep *MaskContextEngineProcess) ProcessDictionary(dictionary Dictionary, o
 		return selector.WRITE, masked
 	})
 
-	if err == nil {
+	if ret == nil {
 		out.Collect(result)
 	}
 

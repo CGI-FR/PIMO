@@ -450,3 +450,29 @@ func TestDeleteComplexNestedArray(t *testing.T) {
 			},
 		}}, dictionary["organizations"])
 }
+
+// Tests to copy the selector V1 API
+
+/* func TestReadV1(t *testing.T) {
+	sut := selector.NewSelector("elements.persons.phonenumber")
+	dictionary := selector.Dictionary{"elements": []selector.Entry{selector.Dictionary{"persons": []selector.Entry{selector.Dictionary{"phonenumber": "001"}, selector.Dictionary{"phonenumber": "002"}}}, selector.Dictionary{"persons": []selector.Entry{selector.Dictionary{"phonenumber": "003"}, selector.Dictionary{"phonenumber": "004"}}}}}
+
+	entry, found := sut.Read(dictionary)
+
+	expected := []selector.Entry{[]selector.Entry{"001", "002"}, []selector.Entry{"003", "004"}}
+
+	assert.Equal(t, true, found)
+	assert.Equal(t, expected, entry)
+}
+
+func TestWriteV1(t *testing.T) {
+	sut := selector.NewSelector("elements.persons.phonenumber")
+	dictionary := selector.Dictionary{"elements": []selector.Entry{selector.Dictionary{"persons": []selector.Entry{selector.Dictionary{"phonenumber": "001"}, selector.Dictionary{"phonenumber": "002"}}}, selector.Dictionary{"persons": []selector.Entry{selector.Dictionary{"phonenumber": "003"}, selector.Dictionary{"phonenumber": "004"}}}}}
+	entry := []selector.Entry{[]selector.Entry{1, 2}, []selector.Entry{3, 4}}
+
+	result := sut.Write(dictionary, entry)
+
+	expected := selector.Dictionary{"elements": []selector.Entry{selector.Dictionary{"persons": []selector.Entry{selector.Dictionary{"phonenumber": 1}, selector.Dictionary{"phonenumber": 2}}}, selector.Dictionary{"persons": []selector.Entry{selector.Dictionary{"phonenumber": 3}, selector.Dictionary{"phonenumber": 4}}}}}
+
+	assert.Equal(t, expected, result)
+} */
