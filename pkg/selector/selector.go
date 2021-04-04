@@ -137,7 +137,7 @@ func (s selector) WriteContext(dictionary Dictionary, masked Entry) Dictionary {
 		if key == "" || value == nil {
 			return NOTHING, nil
 		}
-		if v.Kind() == reflect.Map {
+		if v.Kind() == reflect.Map && v.MapIndex(reflect.ValueOf(key)).IsValid() {
 			masked = v.MapIndex(reflect.ValueOf(key)).Interface()
 		}
 		return WRITE, masked

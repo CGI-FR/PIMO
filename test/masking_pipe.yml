@@ -5,7 +5,7 @@ masking:
       jsonpath: "organizations.persons"
     mask:
       pipe:
-        inject-parent: "_"
+        injectParent: "_"
         masking:
           - selector:
               jsonpath: "name"

@@ -103,9 +103,9 @@ type FF1Type struct {
 
 type PipeType struct {
 	Masking      []Masking
-	InjectParent string
-	InjectRoot   string
-	File         string
+	InjectParent string `yaml:"injectParent"`
+	InjectRoot   string `yaml:"injectRoot"`
+	File         string `yaml:"file"`
 }
 
 type MaskType struct {
