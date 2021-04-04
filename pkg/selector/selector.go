@@ -150,7 +150,9 @@ func (s selector) applyContext(root Dictionary, current Dictionary, entry Entry,
 		action, entry := applier(root, current, s.path, entry)
 		switch action {
 		case WRITE:
-			current[s.path] = entry.(Dictionary)[s.path]
+			if value, ok := entry.(Dictionary)[s.path]; ok {
+				current[s.path] = value
+			}
 		case DELETE:
 			delete(current, s.path)
 		}
