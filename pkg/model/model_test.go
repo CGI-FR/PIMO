@@ -314,11 +314,7 @@ func dictionariesToJSONLine(dictionaries []Dictionary) string {
 
 func TestMaskEngineShouldMaskNestedArrays(t *testing.T) {
 	var i = 0
-	var nameMasking = FunctionMaskEngine{Function: func(name Entry, contexts ...Dictionary) (Entry, error) {
-		fmt.Println("MASK")
-		i++
-		return fmt.Sprintf("%d", i), nil
-	}}
+	var nameMasking = FunctionMaskEngine{Function: func(name Entry, contexts ...Dictionary) (Entry, error) { i++; return fmt.Sprintf("%d", i), nil }}
 
 	iput := `{"persons":[{"phonenumber":"001"},{"phonenumber":"002"}]}
 			 {"persons":[{"phonenumber":"003"}]}
