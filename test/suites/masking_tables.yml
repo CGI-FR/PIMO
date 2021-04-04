@@ -121,5 +121,5 @@ testcases:
     assertions:
     - result.code ShouldEqual 0
     - >
-      result.systemout ShouldContainSubstring {"elements":[{"persons": [{"phonenumber":1},{"phonenumber":2}]},{"persons": [{"phonenumber":3},{"phonenumber":4}]}]}
+      result.systemout ShouldContainSubstring {"elements":[{"persons":[{"phonenumber":1},{"phonenumber":2}]},{"persons":[{"phonenumber":3},{"phonenumber":4}]}]}
     - result.systemerr ShouldBeEmpty
