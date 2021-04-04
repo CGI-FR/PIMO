@@ -126,7 +126,7 @@ func (s selector) applySubContext(root Dictionary, current Dictionary, appliers 
 	if !ok {
 		if s.sub == nil {
 			// apply with nil value
-			s.apply(root, current, nil, appliers)
+			s.applyContext(root, current, nil, appliers)
 		}
 		return false
 	}
@@ -143,8 +143,22 @@ func (s selector) applySubContext(root Dictionary, current Dictionary, appliers 
 			return s.sub.applySubContext(root, entry.(Dictionary), appliers...)
 		}
 	}
-	s.apply(root, current, entry, appliers)
+
+	s.applyContext(root, current, entry, appliers)
+
 	return true
+}
+
+func (s selector) applyContext(root Dictionary, current Dictionary, entry Entry, appliers []Applier) {
+	for _, applier := range appliers {
+		action, entry := applier(root, current, s.path, entry)
+		switch action {
+		case WRITE:
+			current[s.path] = entry.(Dictionary)[s.path]
+		case DELETE:
+			delete(current, s.path)
+		}
+	}
 }
 
 func (s selector) Delete(dictionary Dictionary) Dictionary {
