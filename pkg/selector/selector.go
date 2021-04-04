@@ -57,10 +57,6 @@ func (s selector) Apply(root Dictionary, appliers ...Applier) bool {
 func (s selector) applySub(root Dictionary, current Dictionary, appliers ...Applier) bool {
 	entry, ok := current[s.path]
 	if !ok {
-		if s.sub == nil {
-			// apply with nil value
-			s.apply(root, current, nil, appliers)
-		}
 		return false
 	}
 	v := reflect.ValueOf(entry)
