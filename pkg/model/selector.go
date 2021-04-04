@@ -9,8 +9,8 @@ import (
 )
 
 // This file contains the old implementation of selectors.
-// To reactivate,
-//   - rename finction NewPathSelectorV1 to NewPathSelector (and fix compile error in model.go)
+// To activate the old version,
+//   - rename function NewPathSelectorV1 to NewPathSelector (and fix compile error in model.go)
 //   - rename interface SelectorV1 to Selector (and fix compile error in model.go)
 //   - change the following lines in model.go :
 //       type Dictionary = selector.Dictionary
@@ -19,6 +19,20 @@ import (
 //     to:
 //       type Dictionary = map[string]Entry
 //       type Entry = interface{}
+// To activate the new version,
+//   - rename function NewPathSelector to NewPathSelectorV1 (and fix compile error in model.go)
+//   - rename interface Selector to SelectorV1 (and fix compile error in model.go)
+//   - change the following lines in model.go :
+//       type Dictionary = map[string]Entry
+//       type Entry = interface{}
+//     to:
+//       type Dictionary = selector.Dictionary
+//       type Entry = selector.Entry
+//       type Selector = selector.Selector
+
+func NewPathSelector(path string) selector.Selector {
+	return selector.NewSelector(path)
+}
 
 // Selector acces to a specific data into a dictonary
 type SelectorV1 interface {

@@ -246,10 +246,6 @@ func (p RepeaterProcess) ProcessDictionary(dictionary Dictionary, out Collector)
 	return nil
 }
 
-func NewPathSelector(path string) Selector {
-	return selector.NewSelector(path)
-}
-
 func NewDeleteMaskEngineProcess(selector Selector) Processor {
 	return &DeleteMaskEngineProcess{selector: selector}
 }
