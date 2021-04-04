@@ -213,7 +213,7 @@ func TestMaskEngineShouldMaskAllEntriesInArray(t *testing.T) {
 func TestMaskEngineShouldMaskNestedEntry(t *testing.T) {
 	var nameMasking = FunctionMaskEngine{Function: func(name Entry, contexts ...Dictionary) (Entry, error) { return "Paris", nil }}
 
-	mySlice := []Dictionary{{"address": map[string]Entry{"city": "Nantes"}}}
+	mySlice := []Dictionary{{"address": Dictionary{"city": "Nantes"}}}
 	var result []Dictionary
 
 	pipeline := NewPipelineFromSlice(mySlice).
@@ -223,7 +223,7 @@ func TestMaskEngineShouldMaskNestedEntry(t *testing.T) {
 
 	assert.Nil(t, err)
 
-	wanted := []Dictionary{{"address": map[string]Entry{"city": "Paris"}}}
+	wanted := []Dictionary{{"address": Dictionary{"city": "Paris"}}}
 	assert.Equal(t, wanted, result)
 }
 
@@ -314,10 +314,14 @@ func dictionariesToJSONLine(dictionaries []Dictionary) string {
 
 func TestMaskEngineShouldMaskNestedArrays(t *testing.T) {
 	var i = 0
-	var nameMasking = FunctionMaskEngine{Function: func(name Entry, contexts ...Dictionary) (Entry, error) { i++; return fmt.Sprintf("%d", i), nil }}
+	var nameMasking = FunctionMaskEngine{Function: func(name Entry, contexts ...Dictionary) (Entry, error) {
+		fmt.Println("MASK")
+		i++
+		return fmt.Sprintf("%d", i), nil
+	}}
 
-	iput := `{"persons":[{"phonenumber":"027123456"},{"phonenumber":"028123456"}]}
-			 {"persons":[{"phonenumber":"027123456"}]}
+	iput := `{"persons":[{"phonenumber":"001"},{"phonenumber":"002"}]}
+			 {"persons":[{"phonenumber":"003"}]}
 			 {"persons":[]}`
 	oput := `{"persons":[{"phonenumber":"1"},{"phonenumber":"2"}]}
 			 {"persons":[{"phonenumber":"3"}]}

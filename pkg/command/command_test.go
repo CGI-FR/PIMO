@@ -39,7 +39,7 @@ func TestMaskingShouldReturnAnErrorInCaseOfWrongCommand(t *testing.T) {
 
 	data := model.Dictionary{"name": "Benjamin"}
 	result, err := nameCommandMasking.Mask(data)
-	resultmap := result.(map[string]model.Entry)
+	resultmap := result.(model.Dictionary)
 	assert.Equal(t, "Benjamin", resultmap["name"], "Result should unchanged")
 	assert.NotEqual(t, nil, err, "Error should not be nil")
 }
