@@ -50,6 +50,13 @@ func (me MaskEngine) MaskContext(e model.Dictionary, key string, context ...mode
 		if len(me.injectParent) > 0 {
 			elemInput[me.injectParent] = copy
 		}
+		if len(me.injectRoot) > 0 {
+			rootcopy := model.Dictionary{}
+			for k, v := range context[0] {
+				rootcopy[k] = v
+			}
+			elemInput[me.injectRoot] = rootcopy
+		}
 		input = append(input, elemInput)
 	}
 	err := me.pipeline.
@@ -62,6 +69,9 @@ func (me MaskEngine) MaskContext(e model.Dictionary, key string, context ...mode
 	for _, dict := range result {
 		if len(me.injectParent) > 0 {
 			delete(dict, me.injectParent)
+		}
+		if len(me.injectRoot) > 0 {
+			delete(dict, me.injectRoot)
 		}
 	}
 	copy[key] = result
