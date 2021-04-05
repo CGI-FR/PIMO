@@ -28,7 +28,11 @@ func (mcep *MaskContextEngineProcess) ProcessDictionary(dictionary Dictionary, o
 			ret = err
 			return selector.NOTHING, nil
 		}
-		return selector.WRITE, masked
+		value, ok := masked[key]
+		if !ok {
+			return selector.NOTHING, nil
+		}
+		return selector.WRITE, value
 	})
 
 	if ret == nil {
