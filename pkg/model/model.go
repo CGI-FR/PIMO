@@ -19,17 +19,7 @@ package model
 
 import (
 	"time"
-
-	"github.com/cgi-fr/pimo/pkg/selector"
 )
-
-// Dictionary is a Map with string as key and Entry as value
-type Dictionary = selector.Dictionary
-
-// Entry is a dictionary value
-type Entry = selector.Entry
-
-type Selector = selector.Selector
 
 // MaskEngine is a masking algorithm
 type MaskEngine interface {
@@ -244,27 +234,6 @@ func (p RepeaterProcess) ProcessDictionary(dictionary Dictionary, out Collector)
 		out.Collect(dictionary)
 	}
 	return nil
-}
-
-func NewDeleteMaskEngineProcess(selector Selector) Processor {
-	return &DeleteMaskEngineProcess{selector: selector}
-}
-
-type DeleteMaskEngineProcess struct {
-	selector Selector
-}
-
-func (dp *DeleteMaskEngineProcess) Open() (err error) {
-	return err
-}
-
-func (dp *DeleteMaskEngineProcess) ProcessDictionary(dictionary Dictionary, out Collector) error {
-	out.Collect(dp.selector.Delete(dictionary))
-	return nil
-}
-
-func NewMapProcess(mapper Mapper) Processor {
-	return MapProcess{mapper: mapper}
 }
 
 type MapProcess struct {

@@ -119,7 +119,7 @@ func TestPipelineWithMaskEngine(t *testing.T) {
 	var result []Dictionary
 
 	pipeline := NewPipelineFromSlice(mySlice).
-		Process(NewMaskEngineProcess(NewSimplePathSelector("name"), nameMasking)).
+		Process(NewMaskEngineProcess(NewPathSelector("name"), nameMasking)).
 		AddSink(NewSinkToSlice(&result))
 	err := pipeline.Run()
 
@@ -134,7 +134,7 @@ func TestPipelineWithDeleteMaskEngine(t *testing.T) {
 	var result []Dictionary
 
 	pipeline := NewPipelineFromSlice(mySlice).
-		Process(NewDeleteMaskEngineProcess(NewSimplePathSelector("name"))).
+		Process(NewDeleteMaskEngineProcess(NewPathSelector("name"))).
 		AddSink(NewSinkToSlice(&result))
 	err := pipeline.Run()
 
@@ -153,7 +153,7 @@ func TestMaskEngineShouldNotCreateField(t *testing.T) {
 	var result []Dictionary
 
 	pipeline := NewPipelineFromSlice(mySlice).
-		Process(NewMaskEngineProcess(NewSimplePathSelector("name"), nameMasking)).
+		Process(NewMaskEngineProcess(NewPathSelector("name"), nameMasking)).
 		AddSink(NewSinkToSlice(&result))
 	err := pipeline.Run()
 
@@ -183,7 +183,7 @@ func TestMaskEngineWithContext(t *testing.T) {
 	var result []Dictionary
 
 	pipeline := NewPipelineFromSlice(mySlice).
-		Process(NewMaskContextEngineProcess(NewSimplePathSelector("name"), TestAddMaskEngine{"Toto"})).
+		Process(NewMaskContextEngineProcess(NewPathSelector("name"), TestAddMaskEngine{"Toto"})).
 		AddSink(NewSinkToSlice(&result))
 	err := pipeline.Run()
 
@@ -200,7 +200,7 @@ func TestMaskEngineShouldMaskAllEntriesInArray(t *testing.T) {
 	var result []Dictionary
 
 	pipeline := NewPipelineFromSlice(mySlice).
-		Process(NewMaskEngineProcess(NewSimplePathSelector("city"), nameMasking)).
+		Process(NewMaskEngineProcess(NewPathSelector("city"), nameMasking)).
 		AddSink(NewSinkToSlice(&result))
 	err := pipeline.Run()
 
@@ -426,7 +426,7 @@ func TestMaskEngineShouldReturnError(t *testing.T) {
 	var result []Dictionary
 
 	pipeline := NewPipelineFromSlice(mySlice).
-		Process(NewMaskEngineProcess(NewSimplePathSelector("city"), errorMasking)).
+		Process(NewMaskEngineProcess(NewPathSelector("city"), errorMasking)).
 		AddSink(NewSinkToSlice(&result))
 	err := pipeline.Run()
 
@@ -491,7 +491,7 @@ func TestCacheShouldProvide(t *testing.T) {
 	var result []Dictionary
 
 	pipeline := NewPipelineFromSlice(mySlice).
-		Process(NewMaskEngineProcess(NewSimplePathSelector("city"), NewMaskCacheEngine(cache, errorMasking))).
+		Process(NewMaskEngineProcess(NewPathSelector("city"), NewMaskCacheEngine(cache, errorMasking))).
 		AddSink(NewSinkToSlice(&result))
 	err := pipeline.Run()
 
