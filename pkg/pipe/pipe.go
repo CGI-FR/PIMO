@@ -21,59 +21,19 @@ import (
 	"github.com/cgi-fr/pimo/pkg/model"
 )
 
-type source struct {
-	value *model.Dictionary
-	read  *bool
-}
-
-func (s *source) Open() error {
-	return nil
-}
-
-func (s *source) Err() error {
-	return nil
-}
-
-func (s *source) Next() bool {
-	return *s.read
-}
-
-func (s *source) Value() model.Dictionary {
-	defer func() { *s.read = false }()
-	return *s.value
-}
-
 // MaskEngine is a value that always mask the same way
 type MaskEngine struct {
-	seed         int64
-	source       *source
-	definition   model.Definition
-	caches       map[string]model.Cache
 	pipeline     model.Pipeline
 	injectParent string
 	injectRoot   string
 }
 
 // NewMask return a MaskEngine from a value
-func NewMask(seed int64, injectParent string, injectRoot string, caches map[string]model.Cache, masking ...model.Masking) MaskEngine {
-	read := false
-	source := source{nil, &read}
+func NewMask(seed int64, injectParent string, injectRoot string, caches map[string]model.Cache, masking ...model.Masking) (MaskEngine, error) {
 	definition := model.Definition{Seed: seed, Masking: masking}
-	pipeline := model.NewPipeline(&source)
-	pipeline, _, _ = model.BuildPipeline(pipeline, definition, caches)
-	return MaskEngine{seed, &source, definition, caches, pipeline, injectParent, injectRoot}
-}
-
-func (me MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Entry, error) {
-	var result []model.Dictionary
-	value := InterfaceToDictionaryEntry(e)
-	me.source.value = &value
-	*me.source.read = true
-	err := me.pipeline.AddSink(model.NewSinkToSlice(&result)).Run()
-	if err != nil {
-		return nil, err
-	}
-	return result[0], err
+	pipeline := model.NewPipeline(nil)
+	pipeline, _, err := model.BuildPipeline(pipeline, definition, caches)
+	return MaskEngine{pipeline, injectParent, injectRoot}, err
 }
 
 func (me MaskEngine) MaskContext(e model.Dictionary, key string, context ...model.Dictionary) (model.Dictionary, error) {
@@ -92,10 +52,10 @@ func (me MaskEngine) MaskContext(e model.Dictionary, key string, context ...mode
 		}
 		input = append(input, elemInput)
 	}
-	source := model.NewSourceFromSlice(input)
-	pipeline := model.NewPipeline(source)
-	pipeline, _, _ = model.BuildPipeline(pipeline, me.definition, me.caches)
-	err := pipeline.AddSink(model.NewSinkToSlice(&result)).Run()
+	err := me.pipeline.
+		WithSource(model.NewSourceFromSlice(input)).
+		AddSink(model.NewSinkToSlice(&result)).
+		Run()
 	if err != nil {
 		return nil, err
 	}
@@ -111,7 +71,11 @@ func (me MaskEngine) MaskContext(e model.Dictionary, key string, context ...mode
 // Factory create a mask from a configuration
 func Factory(conf model.Masking, seed int64, caches map[string]model.Cache) (model.MaskContextEngine, bool, error) {
 	if len(conf.Mask.Pipe.Masking) > 0 {
-		return NewMask(seed, conf.Mask.Pipe.InjectParent, conf.Mask.Pipe.InjectRoot, caches, conf.Mask.Pipe.Masking...), true, nil
+		mask, err := NewMask(seed, conf.Mask.Pipe.InjectParent, conf.Mask.Pipe.InjectRoot, caches, conf.Mask.Pipe.Masking...)
+		if err != nil {
+			return mask, true, err
+		}
+		return mask, true, nil
 	}
 	return nil, false, nil
 }

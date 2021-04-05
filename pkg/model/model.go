@@ -165,6 +165,7 @@ type SinkProcess interface {
 
 type Pipeline interface {
 	Process(Processor) Pipeline
+	WithSource(Source) Pipeline
 	AddSink(SinkProcess) SinkedPipeline
 }
 
@@ -299,6 +300,10 @@ func NewPipeline(source Source) Pipeline {
 	return SimplePipeline{source: source}
 }
 
+func (pipeline SimplePipeline) WithSource(source Source) Pipeline {
+	return SimplePipeline{source: source}
+}
+
 func (pipeline SimplePipeline) Process(process Processor) Pipeline {
 	return NewProcessPipeline(pipeline.source, process)
 }
@@ -403,6 +408,13 @@ func (p *ProcessPipeline) AddSink(sink SinkProcess) SinkedPipeline {
 
 func (p *ProcessPipeline) Process(process Processor) Pipeline {
 	return NewProcessPipeline(p, process)
+}
+
+func (p *ProcessPipeline) WithSource(source Source) Pipeline {
+	if s, ok := p.source.(*ProcessPipeline); ok {
+		return &ProcessPipeline{p.collector, s.WithSource(source).(Source), p.Processor, nil}
+	}
+	return &ProcessPipeline{p.collector, source, p.Processor, nil}
 }
 
 func (pipeline SimpleSinkedPipeline) Run() (err error) {
