@@ -1,13 +1,10 @@
 package selector_test
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"log"
-	"os/exec"
 	"reflect"
-	"strings"
 	"testing"
 
 	"github.com/cgi-fr/pimo/pkg/selector"
@@ -59,23 +56,6 @@ var example = `
 }
 `
 
-func getExample() string {
-	cmd := exec.Command("jq", "-cMS", ".")
-	cmd.Stdin = strings.NewReader(example)
-	var stdout bytes.Buffer
-	cmd.Stdout = &stdout
-	var stderr bytes.Buffer
-	cmd.Stderr = &stderr
-	err := cmd.Run()
-	if err != nil {
-		log.Fatal(err)
-	}
-	if stderr.Len() > 0 {
-		log.Fatal(stderr.String())
-	}
-	return stdout.String()
-}
-
 func getExampleAsInterface() interface{} {
 	var inter interface{}
 	err := json.Unmarshal(([]byte)(example), &inter)
@@ -87,33 +67,6 @@ func getExampleAsInterface() interface{} {
 
 func getExampleAsDictionary() selector.Dictionary {
 	return selector.InterfaceToDictionary(getExampleAsInterface())
-}
-
-func toMap(inter interface{}) map[string]interface{} {
-	dic := make(map[string]interface{})
-	mapint := inter.(map[string]interface{})
-
-	for k, v := range mapint {
-		switch typedValue := v.(type) {
-		case map[string]interface{}:
-			dic[k] = toMap(v)
-		case []interface{}:
-			tab := []interface{}{}
-			for _, item := range typedValue {
-				_, dico := item.(map[string]interface{})
-
-				if dico {
-					tab = append(tab, toMap(item))
-				} else {
-					tab = append(tab, item)
-				}
-			}
-			dic[k] = tab
-		default:
-			dic[k] = v
-		}
-	}
-	return dic
 }
 
 func TestNotFound(t *testing.T) {
@@ -402,7 +355,26 @@ func TestWriteComplexNestedArray(t *testing.T) {
 		}}}, dictionary["organizations"])
 }
 
-func TestWriteContext(t *testing.T) {
+func TestReadContextSimpleArray(t *testing.T) {
+	sut := selector.NewSelector("summary.tags")
+
+	dictionary := getExampleAsDictionary()
+
+	found := sut.ApplyContext(dictionary, func(rootContext, parentContext selector.Dictionary, key string, value selector.Entry) (selector.Action, selector.Entry) {
+		assert.Equal(t, dictionary, rootContext)
+		assert.Equal(t, parentContext, selector.Dictionary{
+			"name": "test",
+			"date": "2012-04-23T18:25:43.511Z",
+			"tags": []selector.Entry{"red", "blue", "yellow"},
+		})
+		assert.Equal(t, []selector.Entry{"red", "blue", "yellow"}, value)
+		return selector.NOTHING, nil
+	})
+	assert.True(t, found)
+	assert.Equal(t, selector.Dictionary{"date": "2012-04-23T18:25:43.511Z", "name": "test", "tags": []selector.Entry{"red", "blue", "yellow"}}, dictionary["summary"])
+}
+
+func TestWriteContextSimpleArray(t *testing.T) {
 	sut := selector.NewSelector("summary.tags")
 
 	dictionary := getExampleAsDictionary()

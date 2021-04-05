@@ -22,7 +22,7 @@ func (mcep *MaskContextEngineProcess) ProcessDictionary(dictionary Dictionary, o
 	for k, v := range dictionary {
 		result[k] = v
 	}
-	mcep.selector.ApplyContext(result, func(rootContext, parentContext Dictionary, key string, value Entry) (Action, Entry) {
+	mcep.selector.ApplyContext(result, func(rootContext, parentContext Dictionary, key string, _ Entry) (Action, Entry) {
 		masked, err := mcep.mask.MaskContext(parentContext, key, rootContext, parentContext)
 		if err != nil {
 			ret = err
