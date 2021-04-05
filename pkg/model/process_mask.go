@@ -25,7 +25,7 @@ func (mep *MaskEngineProcess) ProcessDictionary(dictionary Dictionary, out Colle
 		result[k] = v
 	}
 	mep.selector.Apply(result, func(rootContext, parentContext Dictionary, key string, value Entry) (Action, Entry) {
-		masked, err := mep.mask.Mask(value, rootContext)
+		masked, err := mep.mask.Mask(value, rootContext, parentContext)
 		if err != nil {
 			ret = err
 			return selector.NOTHING, nil
