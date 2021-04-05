@@ -29,10 +29,20 @@ type MaskEngine struct {
 }
 
 // NewMask return a MaskEngine from a value
-func NewMask(seed int64, injectParent string, injectRoot string, caches map[string]model.Cache, masking ...model.Masking) (MaskEngine, error) {
-	definition := model.Definition{Seed: seed, Masking: masking}
+func NewMask(seed int64, injectParent string, injectRoot string, caches map[string]model.Cache, filename string, masking ...model.Masking) (MaskEngine, error) {
+	var definition model.Definition
+	var err error
+	if len(filename) > 0 {
+		definition, err = model.LoadPipelineDefinitionFromYAML(filename)
+		if err != nil {
+			return MaskEngine{nil, injectParent, injectRoot}, err
+		}
+		definition.Seed = seed
+	} else {
+		definition = model.Definition{Seed: seed, Masking: masking}
+	}
 	pipeline := model.NewPipeline(nil)
-	pipeline, _, err := model.BuildPipeline(pipeline, definition, caches)
+	pipeline, _, err = model.BuildPipeline(pipeline, definition, caches)
 	return MaskEngine{pipeline, injectParent, injectRoot}, err
 }
 
@@ -80,8 +90,8 @@ func (me MaskEngine) MaskContext(e model.Dictionary, key string, context ...mode
 
 // Factory create a mask from a configuration
 func Factory(conf model.Masking, seed int64, caches map[string]model.Cache) (model.MaskContextEngine, bool, error) {
-	if len(conf.Mask.Pipe.Masking) > 0 {
-		mask, err := NewMask(seed, conf.Mask.Pipe.InjectParent, conf.Mask.Pipe.InjectRoot, caches, conf.Mask.Pipe.Masking...)
+	if len(conf.Mask.Pipe.Masking) > 0 || len(conf.Mask.Pipe.DefinitionFile) > 0 {
+		mask, err := NewMask(seed, conf.Mask.Pipe.InjectParent, conf.Mask.Pipe.InjectRoot, caches, conf.Mask.Pipe.DefinitionFile, conf.Mask.Pipe.Masking...)
 		if err != nil {
 			return mask, true, err
 		}
