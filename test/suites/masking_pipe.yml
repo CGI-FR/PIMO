@@ -1,6 +1,6 @@
 name: pipe mask
 testcases:
-- name: pipe example
+- name: simple pipe with parent context
   steps:
   - script: rm -f masking.yml
   - script: cp ../masking_pipe.yml masking.yml
@@ -10,4 +10,48 @@ testcases:
     - result.code ShouldEqual 0
     - >
       result.systemout ShouldEqual {"organizations":[{"domain":"company.com","persons":[{"email":"leona.miller@company.com","name":"Leona","surname":"Miller"},{"email":"joe.davis@company.com","name":"Joe","surname":"Davis"}]}]}
+    - result.systemerr ShouldBeEmpty
+- name: simple pipe with cache
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      seed: 42
+      masking:
+        - selector:
+            jsonpath: "age"
+          cache: "age"
+          mask:
+            randomInt:
+              min: 0
+              max: 100
+        - selector:
+            jsonpath: "related"
+          mask:
+            pipe:
+              masking:
+                - selector:
+                    jsonpath: "age"
+                  cache: "age"
+                  mask:
+                    randomInt:
+                      min: 0
+                      max: 100
+      caches:
+        age : {}
+      EOF
+  - script: |-
+      pimo <<EOF
+      {"age": 10, "related": [{"age":30}]}
+      {"age": 20, "related": [{"age":40}]}
+      {"age": 30, "related": [{"age":10}]}
+      {"age": 40, "related": [{"age":20}]}
+      EOF
+    assertions:
+    - result.code ShouldEqual 0
+    - 'result.systemout ShouldContainSubstring {"age":91,"related":[{"age":4}]}'
+    - 'result.systemout ShouldContainSubstring {"age":25,"related":[{"age":46}]}'
+    - 'result.systemout ShouldContainSubstring {"age":4,"related":[{"age":91}]}'
+    - 'result.systemout ShouldContainSubstring {"age":46,"related":[{"age":25}]}'
     - result.systemerr ShouldBeEmpty

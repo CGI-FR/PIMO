@@ -37,9 +37,9 @@ func NewMask(seed int64, injectParent string, injectRoot string, caches map[stri
 		if err != nil {
 			return MaskEngine{nil, injectParent, injectRoot}, err
 		}
-		definition.Seed = seed
+		definition.Seed = seed + 1
 	} else {
-		definition = model.Definition{Seed: seed, Masking: masking}
+		definition = model.Definition{Seed: seed + 1, Masking: masking}
 	}
 	pipeline := model.NewPipeline(nil)
 	pipeline, _, err = model.BuildPipeline(pipeline, definition, caches)
@@ -53,6 +53,11 @@ func (me MaskEngine) MaskContext(e model.Dictionary, key string, context ...mode
 	copy := model.Dictionary{}
 	for k, v := range e {
 		copy[k] = v
+	}
+
+	value, ok := e[key]
+	if !ok || value == nil {
+		return copy, nil
 	}
 
 	for _, dict := range e[key].([]model.Entry) {
