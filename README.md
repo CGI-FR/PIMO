@@ -447,7 +447,7 @@ This mask will replace an integer value `{"age": 27}` with a range like this `{"
 
 ## Contributors
 
-* CGI France
+* CGI France ✉[Contact support](mailto://LINO.fr@cgi.com)
 * Pole Emploi
 
 ## Licence
