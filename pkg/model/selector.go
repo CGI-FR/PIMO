@@ -228,31 +228,3 @@ func (s selector) Write(dictionary Dictionary, masked Entry) Dictionary {
 	})
 	return result
 }
-
-// InterfaceToMap returns a Dictionary from an interface
-// func InterfaceToDictionary(inter interface{}) Dictionary {
-// 	dic := make(map[string]Entry)
-// 	mapint := inter.(map[string]interface{})
-
-// 	for k, v := range mapint {
-// 		switch typedValue := v.(type) {
-// 		case map[string]interface{}:
-// 			dic[k] = InterfaceToDictionary(v)
-// 		case []interface{}:
-// 			tab := []Entry{}
-// 			for _, item := range typedValue {
-// 				_, dico := item.(map[string]interface{})
-
-// 				if dico {
-// 					tab = append(tab, InterfaceToDictionary(item))
-// 				} else {
-// 					tab = append(tab, item)
-// 				}
-// 			}
-// 			dic[k] = tab
-// 		default:
-// 			dic[k] = v
-// 		}
-// 	}
-// 	return dic
-// }
