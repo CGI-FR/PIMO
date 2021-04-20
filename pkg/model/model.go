@@ -416,9 +416,9 @@ func (p *ProcessPipeline) Process(process Processor) Pipeline {
 
 func (p *ProcessPipeline) WithSource(source Source) Pipeline {
 	if s, ok := p.source.(*ProcessPipeline); ok {
-		return &ProcessPipeline{p.collector, s.WithSource(source).(Source), p.Processor, nil}
+		return &ProcessPipeline{NewCollector(), s.WithSource(source).(Source), p.Processor, nil}
 	}
-	return &ProcessPipeline{p.collector, source, p.Processor, nil}
+	return &ProcessPipeline{NewCollector(), source, p.Processor, nil}
 }
 
 func (pipeline SimpleSinkedPipeline) Run() (err error) {
