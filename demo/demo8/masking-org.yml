@@ -1,0 +1,6 @@
+version: "1"
+masking:
+  - selector:
+      jsonpath: "email"
+    mask:
+      template: "{{.name}}.{{.surname}}@{{.org.domain}}"

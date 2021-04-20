@@ -1,6 +1,6 @@
 # Handle complex structures
 
-The `pipe` mask is a powerfull tool to be able to mask data that is nested in a complex multi-level array structure.
+The `pipe` mask is a powerful tool to be able to mask data that is nested in a complex multi-level array structure.
 
 ## Motivation
 
@@ -251,7 +251,7 @@ Here is the result of applying the above configuration.
 
 **`result`**
 ```json
-$ cat data.json | jq -c "."  | pimo -c masking-pipe-1.yml | jq
+$ cat data.json | jq -c "."  | pimo -c masking-pipe-2.yml | jq
 {
   "organizations": [
     {
@@ -350,6 +350,7 @@ masking:
               randomInt:
                 min: 0
                 max: 100
+# declared here, the cache will be shared by all sub-pipelines and the main pipeline
 caches:
   age : {}
 ```
