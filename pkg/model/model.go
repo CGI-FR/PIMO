@@ -241,6 +241,10 @@ type MapProcess struct {
 	mapper Mapper
 }
 
+func NewMapProcess(mapper Mapper) Processor {
+	return MapProcess{mapper: mapper}
+}
+
 func (mp MapProcess) Open() error { return nil }
 
 func (mp MapProcess) ProcessDictionary(dictionary Dictionary, out Collector) error {

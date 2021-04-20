@@ -42,7 +42,3 @@ func (dp *DeleteMaskEngineProcess) ProcessDictionary(dictionary Dictionary, out 
 	out.Collect(result)
 	return nil
 }
-
-func NewMapProcess(mapper Mapper) Processor {
-	return MapProcess{mapper: mapper}
-}
