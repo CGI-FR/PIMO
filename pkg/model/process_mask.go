@@ -17,12 +17,6 @@
 
 package model
 
-import (
-	"github.com/cgi-fr/pimo/pkg/selector"
-)
-
-type Action = selector.Action
-
 func NewMaskEngineProcess(selector Selector, mask MaskEngine) Processor {
 	return &MaskEngineProcess{selector, mask}
 }
@@ -45,9 +39,9 @@ func (mep *MaskEngineProcess) ProcessDictionary(dictionary Dictionary, out Colle
 		masked, err := mep.mask.Mask(value, rootContext, parentContext)
 		if err != nil {
 			ret = err
-			return selector.NOTHING, nil
+			return NOTHING, nil
 		}
-		return selector.WRITE, masked
+		return WRITE, masked
 	})
 
 	if ret == nil {

@@ -17,8 +17,6 @@
 
 package model
 
-import "github.com/cgi-fr/pimo/pkg/selector"
-
 func NewDeleteMaskEngineProcess(selector Selector) Processor {
 	return &DeleteMaskEngineProcess{selector: selector}
 }
@@ -37,7 +35,7 @@ func (dp *DeleteMaskEngineProcess) ProcessDictionary(dictionary Dictionary, out 
 		result[k] = v
 	}
 	dp.selector.Apply(result, func(rootContext, parentContext Dictionary, key string, value Entry) (Action, Entry) {
-		return selector.DELETE, nil
+		return DELETE, nil
 	})
 	out.Collect(result)
 	return nil
