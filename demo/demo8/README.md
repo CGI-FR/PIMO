@@ -105,6 +105,8 @@ masking:
       template: "{{(index (index .organizations 0).persons 0).name}}.{{(index (index .organizations 0).persons 0).surname}}@{{(index .organizations 0).domain}}"
 ```
 
+Here is the result of applying the above configuration.
+
 **`uh?`**
 ```json
 $ cat data.json | jq -c "."  | pimo -c masking-alsowrong.yml | jq
@@ -146,4 +148,238 @@ $ cat data.json | jq -c "."  | pimo -c masking-alsowrong.yml | jq
 
 The error is gone, but everyone has the email `leona.miller@company.com` which is not what we want.
 
-The truth is by using only the `template` mask (or any other except `pipe`), it is impossible to have the correct expected result. That's why the mask `pipe` was created.
+The truth is, by using only the `template` mask (or any other except `pipe`), it is impossible to have the correct expected result. That's why the mask `pipe` was created.
+
+## Using the `pipe` mask
+
+This mask can process the persons objects like an independent stream of json.
+
+The usecase exposed in the [previous chapter](#Motivation) is tackled in this part, in 2 steps.
+
+### Step 1 : setting a sub-pipeline to process the persons
+
+This mask can process the persons objects like an independent stream of json. Its content is another `masking` node defining a list of masks to apply.
+
+**`masking-pipe-1.yml`**
+```yaml
+version: "1"
+seed: 42
+masking:
+  - selector:
+      jsonpath: "organizations.persons"
+    mask:
+      pipe:
+        # starting here is the definition another masking pipeline, that applies on the persons objects
+        masking:
+          - selector:
+              jsonpath: "email"
+            mask:
+              # in the template, name and surname can be accessed directly
+              template: "{{.name}}.{{.surname}}"
+```
+
+Here is the result of applying the above configuration.
+
+**`result`**
+```json
+$ cat data.json | jq -c "."  | pimo -c masking-pipe-1.yml | jq
+{
+  "organizations": [
+    {
+      "domain": "company.com",
+      "persons": [
+        {
+          "email": "leona.miller",
+          "name": "leona",
+          "surname": "miller"
+        },
+        {
+          "email": "joe.davis",
+          "name": "joe",
+          "surname": "davis"
+        }
+      ]
+    },
+    {
+      "domain": "company.fr",
+      "persons": [
+        {
+          "email": "alain.mercier",
+          "name": "alain",
+          "surname": "mercier"
+        },
+        {
+          "email": "florian.legrand",
+          "name": "florian",
+          "surname": "legrand"
+        }
+      ]
+    }
+  ]
+}
+```
+
+The name and surname parts are now correct. The next step is is to handle the domain part.
+
+### Step 2 : handle the domain
+
+The domain is not part of a person object, but stored in the parent object (organisation).
+
+The parent object can be accessed with the `injectParent` property of the `pipe` mask. The value of the property will be used to name this field.
+
+**`masking-pipe-2.yml`**
+```yaml
+version: "1"
+seed: 42
+masking:
+  - selector:
+      jsonpath: "organizations.persons"
+    mask:
+      pipe:
+        # the parent of the person will be injected during the processing of the sub-pipeline, under the path ".org"
+        # the name "org" is an example, any valid identifier can be chosen
+        injectParent: "org"
+        masking:
+          - selector:
+              jsonpath: "email"
+            mask:
+              # now the template can read the value of the organization domain with .org.domain
+              template: "{{.name}}.{{.surname}}@{{.org.domain}}"
+```
+
+Here is the result of applying the above configuration.
+
+**`result`**
+```json
+$ cat data.json | jq -c "."  | pimo -c masking-pipe-1.yml | jq
+{
+  "organizations": [
+    {
+      "domain": "company.com",
+      "persons": [
+        {
+          "email": "leona.miller@company.com",
+          "name": "leona",
+          "surname": "miller"
+        },
+        {
+          "email": "joe.davis@company.com",
+          "name": "joe",
+          "surname": "davis"
+        }
+      ]
+    },
+    {
+      "domain": "company.fr",
+      "persons": [
+        {
+          "email": "alain.mercier@company.fr",
+          "name": "alain",
+          "surname": "mercier"
+        },
+        {
+          "email": "florian.legrand@company.fr",
+          "name": "florian",
+          "surname": "legrand"
+        }
+      ]
+    }
+  ]
+}
+```
+
+## Advanced usage
+
+### Inject root
+
+The `pipe` mask also expose the `injectRoot` property, similar to `injectParent` except it will inject the whole current structure being processed.
+
+### Externalize sub-pipeline
+
+The sub-pipeline definition can be in another YAML file.
+
+**`masking-root.yml`**
+```yaml
+version: "1"
+masking:
+  - selector:
+      jsonpath: "organizations.persons"
+    mask:
+      pipe:
+        injectParent: "org"
+        file: "masking-org.yml"
+```
+
+**`masking-org.yml`**
+```yaml
+version: "1"
+masking:
+  - selector:
+      jsonpath: "email"
+    mask:
+      template: "{{.name}}.{{.surname}}@{{.org.domain}}"
+```
+
+### Use pipes with caches
+
+Pipes are compatible with caches.
+
+If a cache mut be shared by the main pipeline and all the sub-pipelines, it must be declared at the root.
+
+**`masking-cache.yml`**
+```yaml
+version: "1"
+seed: 42
+masking:
+  - selector:
+      jsonpath: "age"
+    cache: "age"
+    mask:
+      randomInt:
+        min: 0
+        max: 100
+  - selector:
+      jsonpath: "related"
+    mask:
+      pipe:
+        masking:
+          - selector:
+              jsonpath: "age"
+            cache: "age"
+            mask:
+              randomInt:
+                min: 0
+                max: 100
+caches:
+  age : {}
+```
+
+**`data-cache.jsonl`**
+```json
+{"age": 10, "related": [{"age":30}]}
+{"age": 20, "related": [{"age":40}]}
+{"age": 30, "related": [{"age":10}]}
+{"age": 40, "related": [{"age":20}]}
+```
+
+Here is the result of applying the above configuration.
+
+**`result`**
+```json
+$ cat data-cache.jsonl | jq -c "."  | pimo -c masking-cache.yml
+{"age":91,"related":[{"age":55}]}
+{"age":25,"related":[{"age":84}]}
+{"age":55,"related":[{"age":91}]}
+{"age":84,"related":[{"age":25}]}
+```
+
+---
+**NOTE**
+
+Pipes are currently **NOT compatible** with the `fromCache` mask.
+
+The use of `fromCache` inside a pipe is **discouraged**, an the results might be unexpected.
+
+However, an approach like the one presented just above, by referencing a cache in multiple position will give a correct and expected result. The only difference with `fromCache` is that the mask must be duplicated in two locations.
+
+---

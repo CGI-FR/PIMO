@@ -1,0 +1,4 @@
+{"age": 10, "related": [{"age":30}]}
+{"age": 20, "related": [{"age":40}]}
+{"age": 30, "related": [{"age":10}]}
+{"age": 40, "related": [{"age":20}]}
