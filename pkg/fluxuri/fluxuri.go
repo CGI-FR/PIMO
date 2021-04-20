@@ -50,7 +50,7 @@ func (me MaskEngine) MaskContext(context model.Dictionary, key string, contexts 
 }
 
 // Create a mask from a configuration
-func Factory(conf model.Masking, seed int64) (model.MaskContextEngine, bool, error) {
+func Factory(conf model.Masking, seed int64, caches map[string]model.Cache) (model.MaskContextEngine, bool, error) {
 	if len(conf.Mask.FluxURI) != 0 {
 		mask, err := NewMask(conf.Mask.FluxURI)
 		return mask, true, err

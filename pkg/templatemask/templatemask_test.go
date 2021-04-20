@@ -54,7 +54,7 @@ func TestMaskingShouldReplaceSensitiveValueByTemplateInNested(t *testing.T) {
 
 func TestFactoryShouldCreateAMask(t *testing.T) {
 	maskingConfig := model.Masking{Selector: model.SelectorType{Jsonpath: "mail"}, Mask: model.MaskType{Template: "{{.name}}.{{.surname}}@gmail.com"}}
-	config, present, err := Factory(maskingConfig, 0)
+	config, present, err := Factory(maskingConfig, 0, nil)
 	assert.Nil(t, err, "error should be nil")
 	maskingEngine, _ := NewMask("{{.name}}.{{.surname}}@gmail.com")
 	assert.IsType(t, maskingEngine, config, "should be equal")
@@ -69,7 +69,7 @@ func TestFactoryShouldCreateAMask(t *testing.T) {
 
 func TestFactoryShouldNotCreateAMaskFromAnEmptyConfig(t *testing.T) {
 	maskingConfig := model.Masking{Mask: model.MaskType{}}
-	mask, present, err := Factory(maskingConfig, 0)
+	mask, present, err := Factory(maskingConfig, 0, nil)
 	assert.Nil(t, mask, "should be nil")
 	assert.False(t, present, "should be false")
 	assert.Nil(t, err, "error should be nil")
@@ -77,7 +77,7 @@ func TestFactoryShouldNotCreateAMaskFromAnEmptyConfig(t *testing.T) {
 
 func TestFactoryShouldReturnAnErrorInWrongConfig(t *testing.T) {
 	maskingConfig := model.Masking{Mask: model.MaskType{Template: "{{.name}.{{.surname}}@gmail.com"}}
-	mask, present, err := Factory(maskingConfig, 0)
+	mask, present, err := Factory(maskingConfig, 0, nil)
 	assert.Nil(t, mask, "should be nil")
 	assert.False(t, present, "should be true")
 	assert.NotNil(t, err, "error shouldn't be nil")
@@ -99,7 +99,7 @@ func TestMaskingTemplateShouldFormat(t *testing.T) {
 
 func TestRFactoryShouldCreateANestedContextMask(t *testing.T) {
 	maskingConfig := model.Masking{Selector: model.SelectorType{Jsonpath: "foo.bar"}, Mask: model.MaskType{Template: "{{.baz}}"}}
-	maskEngine, present, err := Factory(maskingConfig, 0)
+	maskEngine, present, err := Factory(maskingConfig, 0, nil)
 	assert.Nil(t, err, "should be nil")
 	assert.True(t, present, "should be true")
 	data := model.Dictionary{"baz": "BAZ", "foo": model.Dictionary{"bar": "BAR"}}

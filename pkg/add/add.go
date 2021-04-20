@@ -42,7 +42,7 @@ func (am MaskEngine) MaskContext(context model.Dictionary, key string, contexts 
 }
 
 // Create a mask from a configuration
-func Factory(conf model.Masking, seed int64) (model.MaskContextEngine, bool, error) {
+func Factory(conf model.Masking, seed int64, caches map[string]model.Cache) (model.MaskContextEngine, bool, error) {
 	if conf.Mask.Add != nil {
 		return NewMask(conf.Mask.Add), true, nil
 	}

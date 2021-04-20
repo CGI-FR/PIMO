@@ -35,7 +35,7 @@ func TestMaskingShouldRemoveField(t *testing.T) {
 
 func TestFactoryShouldCreateAMask(t *testing.T) {
 	maskingConfig := model.Masking{Selector: model.SelectorType{Jsonpath: "field"}, Mask: model.MaskType{Remove: true}}
-	mask, present, err := Factory(maskingConfig, 0)
+	mask, present, err := Factory(maskingConfig, 0, nil)
 	waitedMask := NewMask()
 	assert.Equal(t, waitedMask, mask, "should be equal")
 	assert.True(t, present, "should be true")

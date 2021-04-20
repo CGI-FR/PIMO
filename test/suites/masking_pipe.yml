@@ -1,0 +1,143 @@
+name: pipe mask
+testcases:
+- name: simple pipe with parent context
+  steps:
+  - script: rm -f masking.yml
+  - script: cp ../masking_pipe.yml masking.yml
+  - script: |-
+      echo '{"organizations":[{"domain":"company.com","persons":[{"name":"leona","surname":"miller","email":""},{"name":"joe","surname":"davis","email":""}]}]}' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - >
+      result.systemout ShouldEqual {"organizations":[{"domain":"company.com","persons":[{"email":"leona.miller@company.com","name":"Leona","surname":"Miller"},{"email":"joe.davis@company.com","name":"Joe","surname":"Davis"}]}]}
+    - result.systemerr ShouldBeEmpty
+- name: simple pipe with cache
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      seed: 42
+      masking:
+        - selector:
+            jsonpath: "age"
+          cache: "age"
+          mask:
+            randomInt:
+              min: 0
+              max: 100
+        - selector:
+            jsonpath: "related"
+          mask:
+            pipe:
+              masking:
+                - selector:
+                    jsonpath: "age"
+                  cache: "age"
+                  mask:
+                    randomInt:
+                      min: 0
+                      max: 100
+      caches:
+        age : {}
+      EOF
+  - script: |-
+      pimo <<EOF
+      {"age": 10, "related": [{"age":30}]}
+      {"age": 20, "related": [{"age":40}]}
+      {"age": 30, "related": [{"age":10}]}
+      {"age": 40, "related": [{"age":20}]}
+      EOF
+    assertions:
+    - result.code ShouldEqual 0
+    - 'result.systemout ShouldContainSubstring {"age":91,"related":[{"age":55}]}'
+    - 'result.systemout ShouldContainSubstring {"age":25,"related":[{"age":84}]}'
+    - 'result.systemout ShouldContainSubstring {"age":55,"related":[{"age":91}]}'
+    - 'result.systemout ShouldContainSubstring {"age":84,"related":[{"age":25}]}'
+    - result.systemerr ShouldBeEmpty
+- name: pipe to another file
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      seed: 42
+      masking:
+        - selector:
+            jsonpath: "tab"
+          mask:
+            pipe:
+              injectRoot: "root"
+              injectParent: "parent"
+              file: "./masking-sub.yml"
+      EOF
+  - script: rm -f masking-sub.yml
+  - script: |-
+      cat > masking-sub.yml <<EOF
+      version: "1"
+      seed: 42
+      masking:
+        - selector:
+            jsonpath: "temp"
+          mask:
+            add: ""
+        - selector:
+            jsonpath: "temp"
+          mask:
+            regex: "0[1-7]( ([0-9]){2}){4}"
+      EOF
+  - script: |-
+      pimo <<EOF
+      {"tab": [{}]}
+      {"tab": [{}]}
+      {"tab": [{}]}
+      {"tab": [{}]}
+      {"tab": []}
+      {"tab": [{},{}]}
+      EOF
+    assertions:
+    - result.code ShouldEqual 0
+    - 'result.systemout ShouldContainSubstring {"tab":[{"temp":"05 11 79 04 80"}]}'
+    - 'result.systemout ShouldContainSubstring {"tab":[{"temp":"04 23 16 63 54"}]}'
+    - 'result.systemout ShouldContainSubstring {"tab":[{"temp":"06 70 02 92 71"}]}'
+    - 'result.systemout ShouldContainSubstring {"tab":[{"temp":"03 76 54 62 52"}]}'
+    - 'result.systemout ShouldContainSubstring {"tab":[]}'
+    - 'result.systemout ShouldContainSubstring {"tab":[{"temp":"06 39 34 95 78"},{"temp":"03 59 20 03 00"}]}'
+    - result.systemerr ShouldBeEmpty
+- name: two pipe mask on the same level
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      seed: 42
+      masking:
+        - selector:
+            jsonpath: "flag1"
+          mask:
+            pipe:
+              masking:
+                - selector:
+                    jsonpath: "value"
+                  mask:
+                    regex: "#[0-9A-F]{6}"
+        # this second pipe mask should give different values than the first one, because it is not on the same path
+        - selector:
+            jsonpath: "flag2"
+          mask:
+            pipe:
+              masking:
+                - selector:
+                    jsonpath: "value"
+                  mask:
+                    regex: "#[0-9A-F]{6}"
+      EOF
+  - script: |-
+      pimo <<EOF
+      {"flag1": [{"name": "blue", "value": "#0000FF"},{"name": "white", "value": "#FFFFFF"},{"name": "red", "value": "#FF0000"}], "flag2": [{"name": "green", "value": "#00FF00"},{"name": "white", "value": "#FFFFFF"},{"name": "red", "value": "#FF0000"}]}
+      EOF
+    assertions:
+    - result.code ShouldEqual 0
+    - 'result.systemout ShouldContainSubstring "flag1":[{"name":"blue","value":"#25E171"},{"name":"white","value":"#221A71"},{"name":"red","value":"#2F25B3"}]'
+    - 'result.systemout ShouldContainSubstring "flag2":[{"name":"green","value":"#E9B20D"},{"name":"white","value":"#EF2701"},{"name":"red","value":"#51B3BC"}]'
+    - result.systemerr ShouldBeEmpty

@@ -1,0 +1,8 @@
+version: "1"
+masking:
+  - selector:
+      jsonpath: "organizations.persons"
+    mask:
+      pipe:
+        injectParent: "org"
+        file: "masking-org.yml"

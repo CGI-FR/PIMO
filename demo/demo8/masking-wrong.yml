@@ -1,0 +1,8 @@
+version: "1"
+seed: 42
+masking:
+  - selector:
+      jsonpath: "organizations.persons.email"
+    mask:
+      # this go template syntax refer to a field that is not in a nested array
+      template: "{{.organizations.persons.name}}.{{.organizations.persons.surname}}@{{.organizations.domain}}"

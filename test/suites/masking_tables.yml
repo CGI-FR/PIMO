@@ -92,7 +92,7 @@ testcases:
         - selector:
             jsonpath: "elements.persons.email"
           mask:
-            regex: "[a-z]{10}@company\.com"
+            regex: '[a-z]{10}@company\.com'
       EOF
   - script: |-
       echo '{"elements":[{"persons": [{"phonenumber": "027","email": "person@company.com"}]}]}' | pimo
@@ -100,4 +100,26 @@ testcases:
     - result.code ShouldEqual 0
     - >
       result.systemout ShouldContainSubstring {"elements":[{"persons":[{"email":"agcarobxcc@company.com","phonenumber":"04 87 48 09 96"}]}]}
+    - result.systemerr ShouldBeEmpty
+
+- name: multiple nested arrays 2
+  steps:
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      seed: 42
+      masking:
+        - selector:
+            jsonpath: "elements.persons.phonenumber"
+          mask:
+            incremental:
+              start: 1
+              increment: 1
+      EOF
+  - script: |-
+      echo '{"elements":[{"persons": [{"phonenumber": "001"},{"phonenumber": "002"}]},{"persons": [{"phonenumber": "003"},{"phonenumber": "004"}]}]}' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - >
+      result.systemout ShouldContainSubstring {"elements":[{"persons":[{"phonenumber":1},{"phonenumber":2}]},{"persons":[{"phonenumber":3},{"phonenumber":4}]}]}
     - result.systemerr ShouldBeEmpty

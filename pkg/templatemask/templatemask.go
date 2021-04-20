@@ -62,7 +62,7 @@ func (tmpl MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.E
 }
 
 // Factory create a mask from a yaml config
-func Factory(conf model.Masking, seed int64) (model.MaskEngine, bool, error) {
+func Factory(conf model.Masking, seed int64, caches map[string]model.Cache) (model.MaskEngine, bool, error) {
 	if len(conf.Mask.Template) != 0 {
 		mask, err := NewMask(conf.Mask.Template)
 		if err != nil {

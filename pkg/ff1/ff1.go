@@ -87,7 +87,7 @@ func decodingKey(key string) ([]byte, error) {
 }
 
 // Factory create a mask from a configuration
-func Factory(conf model.Masking, seed int64) (model.MaskEngine, bool, error) {
+func Factory(conf model.Masking, seed int64, caches map[string]model.Cache) (model.MaskEngine, bool, error) {
 	if conf.Mask.FF1.KeyFromEnv != "" || conf.Mask.FF1.Radix > 0 {
 		if conf.Mask.FF1.KeyFromEnv == "" {
 			return nil, true, fmt.Errorf("keyFromEnv attribut is not optional")

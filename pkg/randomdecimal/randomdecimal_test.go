@@ -43,7 +43,7 @@ func TestMaskingShouldReplaceSensitiveValueByRandomNumber(t *testing.T) {
 
 func TestFactoryShouldCreateAMask(t *testing.T) {
 	maskingConfig := model.Masking{Mask: model.MaskType{RandomDecimal: model.RandomDecimalType{Min: float64(0), Max: float64(10), Precision: 2}}}
-	_, present, err := Factory(maskingConfig, 0)
+	_, present, err := Factory(maskingConfig, 0, nil)
 	assert.True(t, present, "should be true")
 	assert.Nil(t, err, "error should be nil")
 }

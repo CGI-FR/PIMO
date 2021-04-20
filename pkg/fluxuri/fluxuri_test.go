@@ -71,7 +71,7 @@ func TestMaskingShouldMaskAsExpected(t *testing.T) {
 
 func TestFactoryShouldCreateAMask(t *testing.T) {
 	maskingConfig := model.Masking{Mask: model.MaskType{FluxURI: "file://../../test/csvvalues.csv"}}
-	conf, present, err := Factory(maskingConfig, 0)
+	conf, present, err := Factory(maskingConfig, 0, nil)
 	assert.True(t, present, "should be true")
 	assert.Nil(t, err, "error should be nil")
 	waitedMask, err := NewMask("file://../../test/csvvalues.csv")

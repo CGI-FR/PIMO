@@ -84,7 +84,7 @@ func (wml MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.En
 }
 
 // Factory create a mask from a yaml config
-func Factory(conf model.Masking, seed int64) (model.MaskEngine, bool, error) {
+func Factory(conf model.Masking, seed int64, caches map[string]model.Cache) (model.MaskEngine, bool, error) {
 	if len(conf.Mask.WeightedChoice) != 0 {
 		var maskWeight []model.WeightedChoiceType
 		for _, v := range conf.Mask.WeightedChoice {

@@ -41,7 +41,7 @@ func (rm MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Ent
 }
 
 // Factory Create a mask from a configuration
-func Factory(conf model.Masking, seed int64) (model.MaskEngine, bool, error) {
+func Factory(conf model.Masking, seed int64, caches map[string]model.Cache) (model.MaskEngine, bool, error) {
 	if conf.Mask.RangeMask != 0 {
 		return NewMask(conf.Mask.RangeMask), true, nil
 	}

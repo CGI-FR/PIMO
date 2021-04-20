@@ -35,7 +35,7 @@ func TestMaskingShouldReplaceSensitiveValueByConstantValue(t *testing.T) {
 
 func TestFactoryShouldCreateAMask(t *testing.T) {
 	maskingConfig := model.Masking{Mask: model.MaskType{Constant: "Toto"}}
-	mask, present, err := Factory(maskingConfig, 0)
+	mask, present, err := Factory(maskingConfig, 0, nil)
 	waitedMask := NewMask("Toto")
 	assert.Equal(t, waitedMask, mask, "should be equal")
 	assert.True(t, present, "should be true")
@@ -44,7 +44,7 @@ func TestFactoryShouldCreateAMask(t *testing.T) {
 
 func TestFactoryShouldNotCreateAMaskFromAnEmptyConfig(t *testing.T) {
 	maskingConfig := model.Masking{Mask: model.MaskType{}}
-	mask, present, err := Factory(maskingConfig, 0)
+	mask, present, err := Factory(maskingConfig, 0, nil)
 	assert.Nil(t, mask, "should be nil")
 	assert.False(t, present, "should be false")
 	assert.Nil(t, err, "error should be nil")

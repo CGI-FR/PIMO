@@ -33,6 +33,7 @@ import (
 	"github.com/cgi-fr/pimo/pkg/increment"
 	"github.com/cgi-fr/pimo/pkg/jsonline"
 	"github.com/cgi-fr/pimo/pkg/model"
+	"github.com/cgi-fr/pimo/pkg/pipe"
 	"github.com/cgi-fr/pimo/pkg/randdate"
 	"github.com/cgi-fr/pimo/pkg/randdura"
 	"github.com/cgi-fr/pimo/pkg/randomdecimal"
@@ -104,7 +105,15 @@ func run() {
 		caches map[string]model.Cache
 	)
 
-	pipeline, caches, err = pimo.YamlPipeline(pipeline, maskingFile, injectMaskFactories(), injectMaskContextFactories())
+	model.InjectMaskContextFactories(injectMaskContextFactories())
+	model.InjectMaskFactories(injectMaskFactories())
+	pdef, err := model.LoadPipelineDefinitionFromYAML(maskingFile)
+	if err != nil {
+		os.Stderr.WriteString(err.Error() + "\n")
+		os.Exit(1)
+	}
+
+	pipeline, caches, err = model.BuildPipeline(pipeline, pdef, nil)
 
 	if err != nil {
 		os.Stderr.WriteString(err.Error() + "\n")
@@ -152,12 +161,12 @@ func injectMaskContextFactories() []model.MaskContextFactory {
 		fluxuri.Factory,
 		add.Factory,
 		remove.Factory,
+		pipe.Factory,
 	}
 }
 
 func injectMaskFactories() []model.MaskFactory {
 	return []model.MaskFactory{
-
 		constant.Factory,
 		command.Factory,
 		randomlist.Factory,
@@ -170,7 +179,6 @@ func injectMaskFactories() []model.MaskFactory {
 		replacement.Factory,
 		duration.Factory,
 		templatemask.Factory,
-
 		rangemask.Factory,
 		randdura.Factory,
 		randomdecimal.Factory,

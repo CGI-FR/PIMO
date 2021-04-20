@@ -1,0 +1,16 @@
+version: "1"
+seed: 42
+masking:
+  - selector:
+      jsonpath: "organizations.persons"
+    mask:
+      pipe:
+        # the parent of the person will be injected during the processing of the sub-pipeline, under the path ".org"
+        # the name "org" is an example, any valid identifier can be chosen
+        injectParent: "org"
+        masking:
+          - selector:
+              jsonpath: "email"
+            mask:
+              # now the template can read the value of the organization domain
+              template: "{{.name}}.{{.surname}}@{{.org.domain}}"

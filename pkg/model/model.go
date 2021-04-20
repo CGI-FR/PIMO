@@ -18,16 +18,8 @@
 package model
 
 import (
-	"reflect"
-	"strings"
 	"time"
 )
-
-// Dictionary is a Map with string as key and Entry as value
-type Dictionary = map[string]Entry
-
-// Entry is a dictionary value
-type Entry interface{}
 
 // MaskEngine is a masking algorithm
 type MaskEngine interface {
@@ -49,9 +41,9 @@ func (fme FunctionMaskEngine) Mask(e Entry, context ...Dictionary) (Entry, error
 	return fme.Function(e, context...)
 }
 
-type MaskFactory func(Masking, int64) (MaskEngine, bool, error)
+type MaskFactory func(Masking, int64, map[string]Cache) (MaskEngine, bool, error)
 
-type MaskContextFactory func(Masking, int64) (MaskContextEngine, bool, error)
+type MaskContextFactory func(Masking, int64, map[string]Cache) (MaskContextEngine, bool, error)
 
 type SelectorType struct {
 	Jsonpath string `yaml:"jsonpath"`
@@ -99,6 +91,13 @@ type FF1Type struct {
 	Decrypt    bool
 }
 
+type PipeType struct {
+	Masking        []Masking
+	InjectParent   string `yaml:"injectParent"`
+	InjectRoot     string `yaml:"injectRoot"`
+	DefinitionFile string `yaml:"file"`
+}
+
 type MaskType struct {
 	Add               Entry                `yaml:"add"`
 	Constant          Entry                `yaml:"constant"`
@@ -123,12 +122,24 @@ type MaskType struct {
 	DateParser        DateParserType       `yaml:"dateParser"`
 	FromCache         string               `yaml:"fromCache"`
 	FF1               FF1Type              `yaml:"ff1"`
+	Pipe              PipeType             `yaml:"pipe"`
 }
 
 type Masking struct {
 	Selector SelectorType `yaml:"selector"`
 	Mask     MaskType     `yaml:"mask"`
 	Cache    string       `yaml:"cache"`
+}
+
+type CacheDefinition struct {
+	Unique bool `yaml:"unique"`
+}
+
+type Definition struct {
+	Version string                     `yaml:"version"`
+	Seed    int64                      `yaml:"seed"`
+	Masking []Masking                  `yaml:"masking"`
+	Caches  map[string]CacheDefinition `yaml:"caches"`
 }
 
 /***************
@@ -154,6 +165,7 @@ type SinkProcess interface {
 
 type Pipeline interface {
 	Process(Processor) Pipeline
+	WithSource(Source) Pipeline
 	AddSink(SinkProcess) SinkedPipeline
 }
 
@@ -167,15 +179,6 @@ type Source interface {
 	Next() bool
 	Value() Dictionary
 	Err() error
-}
-
-// Selector acces to a specific data into a dictonary
-type Selector interface {
-	Read(Dictionary) (Entry, bool)
-	Write(Dictionary, Entry) Dictionary
-	Delete(Dictionary) Dictionary
-	ReadContext(Dictionary) (Dictionary, string, bool)
-	WriteContext(Dictionary, Entry) Dictionary
 }
 
 type Mapper func(Dictionary) (Dictionary, error)
@@ -234,238 +237,12 @@ func (p RepeaterProcess) ProcessDictionary(dictionary Dictionary, out Collector)
 	return nil
 }
 
-func NewPathSelector(path string) Selector {
-	mainEntry := strings.SplitN(path, ".", 2)
-	if len(mainEntry) == 2 {
-		return ComplexePathSelector{mainEntry[0], NewPathSelector(mainEntry[1])}
-	} else {
-		return NewSimplePathSelector(mainEntry[0])
-	}
-}
-
-type ComplexePathSelector struct {
-	path        string
-	subSelector Selector
-}
-
-func (s ComplexePathSelector) Read(dictionary Dictionary) (entry Entry, ok bool) {
-	entry, ok = dictionary[s.path]
-	if !ok {
-		return
-	}
-
-	switch typedMatch := entry.(type) {
-	case []Entry:
-		entry = []Entry{}
-		for _, subEntry := range typedMatch {
-			var subResult Entry
-			subResult, ok = s.subSelector.Read(subEntry.(Dictionary))
-			if !ok {
-				return
-			}
-
-			entry = append(entry.([]Entry), subResult.(Entry))
-		}
-		return
-	case Dictionary:
-		return s.subSelector.Read(typedMatch)
-	default:
-		return nil, false
-	}
-}
-
-func (s ComplexePathSelector) ReadContext(dictionary Dictionary) (Dictionary, string, bool) {
-	entry, ok := dictionary[s.path]
-	if !ok {
-		return dictionary, "", false
-	}
-	subEntry, ok := entry.(Dictionary)
-	if !ok {
-		return dictionary, "", false
-	}
-	return s.subSelector.ReadContext(subEntry)
-}
-
-func (s ComplexePathSelector) Write(dictionary Dictionary, entry Entry) Dictionary {
-	result := Dictionary{}
-
-	for k, v := range dictionary {
-		result[k] = v
-	}
-
-	v := reflect.ValueOf(entry)
-	switch v.Kind() {
-	case reflect.Slice:
-		subTargetArray, isArray := result[s.path].([]Entry)
-		if !isArray {
-			result[s.path] = s.subSelector.Write(result[s.path].(Dictionary), entry)
-		} else {
-			subArray := []Entry{}
-			for i := 0; i < v.Len(); i++ {
-				subArray = append(subArray, s.subSelector.Write(subTargetArray[i].(Dictionary), v.Index(i).Interface()))
-			}
-			result[s.path] = subArray
-		}
-
-	default:
-		result[s.path] = s.subSelector.Write(result[s.path].(Dictionary), entry)
-	}
-
-	return result
-}
-
-func (s ComplexePathSelector) WriteContext(dictionary Dictionary, entry Entry) Dictionary {
-	return dictionary
-}
-
-func (s ComplexePathSelector) Delete(dictionary Dictionary) Dictionary {
-	result := Dictionary{}
-
-	for k, v := range dictionary {
-		if k == s.path {
-			result[k] = s.subSelector.Delete(v.(Dictionary))
-		}
-	}
-	return result
-}
-
-func NewSimplePathSelector(path string) Selector {
-	return SimplePathSelector{path}
-}
-
-type SimplePathSelector struct {
-	Path string
-}
-
-func (s SimplePathSelector) Read(dictionary Dictionary) (entry Entry, ok bool) {
-	entry, ok = dictionary[s.Path]
-	return
-}
-
-func (s SimplePathSelector) ReadContext(dictionary Dictionary) (Dictionary, string, bool) {
-	return dictionary, s.Path, true
-}
-
-func (s SimplePathSelector) Write(dictionary Dictionary, entry Entry) Dictionary {
-	result := Dictionary{}
-	for k, v := range dictionary {
-		result[k] = v
-	}
-	result[s.Path] = entry
-	return result
-}
-
-func (s SimplePathSelector) WriteContext(dictionary Dictionary, entry Entry) Dictionary {
-	return dictionary
-}
-
-func (s SimplePathSelector) Delete(dictionary Dictionary) Dictionary {
-	result := Dictionary{}
-
-	for k, v := range dictionary {
-		if k != s.Path {
-			result[k] = v
-		}
-	}
-	return result
-}
-
-func NewDeleteMaskEngineProcess(selector Selector) Processor {
-	return &DeleteMaskEngineProcess{selector: selector}
-}
-
-type DeleteMaskEngineProcess struct {
-	selector Selector
-}
-
-func (dp *DeleteMaskEngineProcess) Open() (err error) {
-	return err
-}
-
-func (dp *DeleteMaskEngineProcess) ProcessDictionary(dictionary Dictionary, out Collector) error {
-	out.Collect(dp.selector.Delete(dictionary))
-	return nil
-}
-
-func NewMaskContextEngineProcess(selector Selector, mask MaskContextEngine) Processor {
-	return &MaskContextEngineProcess{selector, mask}
-}
-
-type MaskContextEngineProcess struct {
-	selector Selector
-	mask     MaskContextEngine
-}
-
-func (mp *MaskContextEngineProcess) Open() (err error) {
-	return err
-}
-
-func (mp *MaskContextEngineProcess) ProcessDictionary(dictionary Dictionary, out Collector) error {
-	subDictionary, key, ok := mp.selector.ReadContext(dictionary)
-	if !ok {
-		out.Collect(dictionary)
-
-		return nil
-	}
-
-	masked, err := mp.mask.MaskContext(subDictionary, key, dictionary)
-	if err != nil {
-		return err
-	}
-
-	out.Collect(mp.selector.WriteContext(dictionary, masked))
-
-	return nil
-}
-
-func NewMaskEngineProcess(selector Selector, mask MaskEngine) Processor {
-	return &MaskEngineProcess{selector, mask}
-}
-
-type MaskEngineProcess struct {
-	selector Selector
-	mask     MaskEngine
-}
-
-func (mp *MaskEngineProcess) Open() (err error) {
-	return err
-}
-
-func (mp *MaskEngineProcess) ProcessDictionary(dictionary Dictionary, out Collector) error {
-	match, ok := mp.selector.Read(dictionary)
-	if !ok {
-		out.Collect(dictionary)
-		return nil
-	}
-
-	var masked Entry
-	var err error
-
-	switch typedMatch := match.(type) {
-	case []Entry:
-		masked, err = deepmask(mp.mask, typedMatch, dictionary)
-		if err != nil {
-			return err
-		}
-
-	default:
-		masked, err = mp.mask.Mask(typedMatch, dictionary)
-		if err != nil {
-			return err
-		}
-	}
-
-	out.Collect(mp.selector.Write(dictionary, masked))
-
-	return nil
+type MapProcess struct {
+	mapper Mapper
 }
 
 func NewMapProcess(mapper Mapper) Processor {
 	return MapProcess{mapper: mapper}
-}
-
-type MapProcess struct {
-	mapper Mapper
 }
 
 func (mp MapProcess) Open() error { return nil }
@@ -524,6 +301,10 @@ type SimplePipeline struct {
 }
 
 func NewPipeline(source Source) Pipeline {
+	return SimplePipeline{source: source}
+}
+
+func (pipeline SimplePipeline) WithSource(source Source) Pipeline {
 	return SimplePipeline{source: source}
 }
 
@@ -631,6 +412,13 @@ func (p *ProcessPipeline) AddSink(sink SinkProcess) SinkedPipeline {
 
 func (p *ProcessPipeline) Process(process Processor) Pipeline {
 	return NewProcessPipeline(p, process)
+}
+
+func (p *ProcessPipeline) WithSource(source Source) Pipeline {
+	if s, ok := p.source.(*ProcessPipeline); ok {
+		return &ProcessPipeline{NewCollector(), s.WithSource(source).(Source), p.Processor, nil}
+	}
+	return &ProcessPipeline{NewCollector(), source, p.Processor, nil}
 }
 
 func (pipeline SimpleSinkedPipeline) Run() (err error) {

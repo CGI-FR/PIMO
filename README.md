@@ -63,6 +63,7 @@ The following types of masks can be used :
   * [`incremental`](#incremental) is to mask data with incremental value starting from `start` with a step of `increment`.
   * [`fluxUri`](#fluxUri) is to replace by a sequence of values defined in an external resource.
   * [`replacement`](#replacement) is to mask a data with another data from the jsonline.
+  * [`pipe`](#pipe) is a mask to handle complex nested array structures, it can read an array as an object stream and process it with a sub-pipeline.
 
 A full `masking.yml` file example, using every kind of mask, is given with the source code.
 
@@ -442,6 +443,98 @@ Be sure to check [the full FPE demo](demo/demo7) to get more details about this 
 ```
 
 This mask will replace an integer value `{"age": 27}` with a range like this `{"age": "[25;29]"}`.
+
+[Return to list of masks](#possible-masks)
+
+### Pipe
+
+If the data structure contains arrays of object like in the example below, this mask can pipe the objects into a sub pipeline definition.
+
+**`data.jsonl`**
+```json
+{
+    "organizations": [
+        {
+            "domain": "company.com",
+            "persons": [
+                {
+                    "name": "leona",
+                    "surname": "miller",
+                    "email": ""
+                },
+                {
+                    "name": "joe",
+                    "surname": "davis",
+                    "email": ""
+                }
+            ]
+        },
+        {
+            "domain": "company.fr",
+            "persons": [
+                {
+                    "name": "alain",
+                    "surname": "mercier",
+                    "email": ""
+                },
+                {
+                    "name": "florian",
+                    "surname": "legrand",
+                    "email": ""
+                }
+            ]
+        }
+    ]
+}
+```
+
+**`masking.yml`**
+```yaml
+version: "1"
+seed: 42
+masking:
+  - selector:
+      # this path points to an array of persons
+      jsonpath: "organizations.persons"
+    mask:
+      # it will be piped to the masking pipeline definition below
+      pipe:
+        # the parent object (a domain) will be accessible with the "_" variable name
+        injectParent: "_"
+        masking:
+          - selector:
+              jsonpath: "name"
+            mask:
+              # fields inside the person object can be accessed directly
+              template: "{{ title .name }}"
+          - selector:
+              jsonpath: "surname"
+            mask:
+              template: "{{ title .surname }}"
+          - selector:
+              jsonpath: "email"
+            mask:
+              # the value stored inside the parent object is accessible through "_" thanks to the parent injection
+              template: "{{ lower .name }}.{{ lower .surname }}@{{ ._.domain }}"
+```
+
+In addition to the `injectParent` property, this mask also provide the `injectRoot` property to inject the whole structure of data.
+
+It is possible to simplify the `masking.yml` file by referencing an external yaml definition :
+
+```yaml
+version: "1"
+seed: 42
+masking:
+  - selector:
+      jsonpath: "organizations.persons"
+    mask:
+      pipe:
+        injectParent: "domain"
+        file: "./masking-person.yml"
+```
+
+Be sure to check [demo](demo/demo8) to get more details about this mask.
 
 [Return to list of masks](#possible-masks)
 

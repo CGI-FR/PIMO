@@ -43,7 +43,7 @@ func (rm MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Ent
 }
 
 // Factory create a mask from a yaml config
-func Factory(conf model.Masking, seed int64) (model.MaskEngine, bool, error) {
+func Factory(conf model.Masking, seed int64, caches map[string]model.Cache) (model.MaskEngine, bool, error) {
 	if len(conf.Mask.Regex) != 0 {
 		// set differents seeds for differents jsonpath
 		h := fnv.New64a()

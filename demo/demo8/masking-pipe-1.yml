@@ -1,0 +1,12 @@
+version: "1"
+seed: 42
+masking:
+  - selector:
+      jsonpath: "organizations.persons"
+    mask:
+      pipe:
+        masking:
+          - selector:
+              jsonpath: "email"
+            mask:
+              template: "{{.name}}.{{.surname}}"
