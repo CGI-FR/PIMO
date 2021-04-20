@@ -1,0 +1,9 @@
+version: "1"
+seed: 42
+masking:
+  - selector:
+      jsonpath: "organizations.persons.email"
+    mask:
+      # this go template syntax refer to a single value of index (0;0)
+      # (and it's not very readable)
+      template: "{{(index (index .organizations 0).persons 0).name}}.{{(index (index .organizations 0).persons 0).surname}}@{{(index .organizations 0).domain}}"
