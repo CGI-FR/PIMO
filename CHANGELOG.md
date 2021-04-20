@@ -21,6 +21,7 @@ Types of changes
 ## [1.3.0]
 
 - `Added` ff1 mask to meet the requirement of re-identification from a single secret key.
+- `Added` pipe mask to handle jsons with complex structure (nested arrays of objects)
 - `Fixed` use same random mask on different path produce the same value.
 - `Fixed` masking values in nested arrays generate panic error.
 
