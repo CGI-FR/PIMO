@@ -2,10 +2,13 @@
 
 This folder contains every file necessary for demos of PIMO program. Here are the available demos :
 
-* First demo - Simple use of PIMO
-* Second demo - Masking nested data
-* Third demo - Masking Tables of data
-* Fourth demo - Using other data in mask
-* Fifth demo - Multiple successive masking
+* Demo 1 - Simple use of PIMO
+* Demo 2 - Masking nested data
+* Demo 3 - Masking Tables of data
+* Demo 4 - Using other data in mask
+* Demo 5 - Multiple successive masking
+* Demo 6 - Adding and removing fields
+* Demo 7 - Format preserving encryption
+* Demo 8 - Handle complex structures
 
-More demos are to come.
+More demos will come.

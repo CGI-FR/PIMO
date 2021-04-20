@@ -1,0 +1,34 @@
+{
+    "organizations": [
+        {
+            "domain": "company.com",
+            "persons": [
+                {
+                    "name": "leona",
+                    "surname": "miller",
+                    "email": ""
+                },
+                {
+                    "name": "joe",
+                    "surname": "davis",
+                    "email": ""
+                }
+            ]
+        },
+        {
+            "domain": "company.fr",
+            "persons": [
+                {
+                    "name": "alain",
+                    "surname": "mercier",
+                    "email": ""
+                },
+                {
+                    "name": "florian",
+                    "surname": "legrand",
+                    "email": ""
+                }
+            ]
+        }
+    ]
+}

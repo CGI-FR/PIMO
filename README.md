@@ -514,7 +514,7 @@ masking:
           - selector:
               jsonpath: "email"
             mask:
-              # the value stored inside the parent object is accessible thanks to the parent injection
+              # the value stored inside the parent object is accessible through "_" thanks to the parent injection
               template: "{{ lower .name }}.{{ lower .surname }}@{{ ._.domain }}"
 ```
 
