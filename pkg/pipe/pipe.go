@@ -18,6 +18,8 @@
 package pipe
 
 import (
+	"hash/fnv"
+
 	"github.com/cgi-fr/pimo/pkg/model"
 )
 
@@ -37,7 +39,8 @@ func NewMask(seed int64, injectParent string, injectRoot string, caches map[stri
 		if err != nil {
 			return MaskEngine{nil, injectParent, injectRoot}, err
 		}
-		definition.Seed = seed + 1
+		// merge the current seed with the seed provided by configuration on the pipe
+		definition.Seed += seed
 	} else {
 		definition = model.Definition{Seed: seed + 1, Masking: masking}
 	}
@@ -96,6 +99,10 @@ func (me MaskEngine) MaskContext(e model.Dictionary, key string, context ...mode
 // Factory create a mask from a configuration
 func Factory(conf model.Masking, seed int64, caches map[string]model.Cache) (model.MaskContextEngine, bool, error) {
 	if len(conf.Mask.Pipe.Masking) > 0 || len(conf.Mask.Pipe.DefinitionFile) > 0 {
+		// set differents seeds for differents jsonpath
+		h := fnv.New64a()
+		h.Write([]byte(conf.Selector.Jsonpath))
+		seed += int64(h.Sum64())
 		mask, err := NewMask(seed, conf.Mask.Pipe.InjectParent, conf.Mask.Pipe.InjectRoot, caches, conf.Mask.Pipe.DefinitionFile, conf.Mask.Pipe.Masking...)
 		if err != nil {
 			return mask, true, err
