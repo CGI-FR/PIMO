@@ -4,6 +4,7 @@ go 1.13
 
 require (
 	github.com/Masterminds/sprig/v3 v3.2.2
+	github.com/Trendyol/overlog v0.1.0
 	github.com/capitalone/fpe v1.2.1
 	github.com/goccy/go-yaml v1.4.3
 	github.com/google/gxui v0.0.0-20151028112939-f85e0a97b3a4 // indirect

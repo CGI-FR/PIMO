@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"os"
 
+	over "github.com/Trendyol/overlog"
 	"github.com/cgi-fr/pimo/internal/app/pimo"
 	"github.com/cgi-fr/pimo/pkg/add"
 	"github.com/cgi-fr/pimo/pkg/command"
@@ -97,9 +98,9 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 }
 
 func run() {
-	logger := initLog()
-	logger.Info().Msg("Start PIMO")
-	model.InjectLogger(logger)
+	initLog()
+
+	log.Info().Msg("Start PIMO")
 
 	var source model.Source
 	if emptyInput {
@@ -120,55 +121,55 @@ func run() {
 
 	pdef, err := model.LoadPipelineDefinitionFromYAML(maskingFile)
 	if err != nil {
-		logger.Warn().Int("return", 1).Msg("End PIMO")
+		log.Warn().Int("return", 1).Msg("End PIMO")
 		os.Exit(1)
 	}
 
 	pipeline, caches, err = model.BuildPipeline(pipeline, pdef, nil)
 	if err != nil {
-		logger.Error().Err(err).Msg("Cannot build pipeline")
-		logger.Warn().Int("return", 1).Msg("End PIMO")
+		log.Error().Err(err).Msg("Cannot build pipeline")
+		log.Warn().Int("return", 1).Msg("End PIMO")
 		os.Exit(1)
 	}
 
 	for name, path := range cachesToLoad {
 		cache, ok := caches[name]
 		if !ok {
-			logger.Error().Str("cache-name", name).Msg("Cache not found")
-			logger.Warn().Int("return", 2).Msg("End PIMO")
+			log.Error().Str("cache-name", name).Msg("Cache not found")
+			log.Warn().Int("return", 2).Msg("End PIMO")
 			os.Exit(2)
 		}
 		err = pimo.LoadCache(name, cache, path)
 		if err != nil {
-			logger.Err(err).Str("cache-name", name).Str("cache-path", path).Msg("Cannot load cache")
-			logger.Warn().Int("return", 3).Msg("End PIMO")
+			log.Err(err).Str("cache-name", name).Str("cache-path", path).Msg("Cannot load cache")
+			log.Warn().Int("return", 3).Msg("End PIMO")
 			os.Exit(3)
 		}
 	}
 
 	err = pipeline.AddSink(jsonline.NewSink(os.Stdout)).Run()
 	if err != nil {
-		logger.Err(err).Msg("Pipeline didn't complete run")
-		logger.Warn().Int("return", 4).Msg("End PIMO")
+		log.Err(err).Msg("Pipeline didn't complete run")
+		log.Warn().Int("return", 4).Msg("End PIMO")
 		os.Exit(4)
 	}
 
 	for name, path := range cachesToDump {
 		cache, ok := caches[name]
 		if !ok {
-			logger.Error().Str("cache-name", name).Msg("Cache not found")
-			logger.Warn().Int("return", 2).Msg("End PIMO")
+			log.Error().Str("cache-name", name).Msg("Cache not found")
+			log.Warn().Int("return", 2).Msg("End PIMO")
 			os.Exit(2)
 		}
 		err = pimo.DumpCache(name, cache, path)
 		if err != nil {
-			logger.Err(err).Str("cache-name", name).Str("cache-path", path).Msg("Cannot dump cache")
-			logger.Warn().Int("return", 3).Msg("End PIMO")
+			log.Err(err).Str("cache-name", name).Str("cache-path", path).Msg("Cannot dump cache")
+			log.Warn().Int("return", 3).Msg("End PIMO")
 			os.Exit(3)
 		}
 	}
 
-	logger.Info().Int("return", 0).Msg("End PIMO")
+	log.Info().Int("return", 0).Msg("End PIMO")
 	os.Exit(0)
 }
 
@@ -203,47 +204,47 @@ func injectMaskFactories() []model.MaskFactory {
 	}
 }
 
-func initLog() zerolog.Logger {
-	event := log.With().Str("config", maskingFile)
-	if iteration > 1 {
-		event = event.Int("repeat", iteration)
-	}
-	if emptyInput {
-		event = event.Bool("empty-input", emptyInput)
-	}
-	if len(cachesToDump) > 0 {
-		event = event.Interface("dump-cache", cachesToDump)
-	}
-	if len(cachesToLoad) > 0 {
-		event = event.Interface("load-cache", cachesToLoad)
-	}
-
+func initLog() {
 	var logger zerolog.Logger
 	if jsonlog {
-		logger = event.Logger()
+		logger = zerolog.New(os.Stderr)
 	} else {
-		logger = event.Logger().Output(zerolog.ConsoleWriter{Out: os.Stderr})
+		logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
 	}
+
+	over.New(logger)
+	over.MDC().Set("config", maskingFile)
+	if iteration > 1 {
+		over.MDC().Set("repeat", iteration)
+	}
+	if emptyInput {
+		over.MDC().Set("empty-input", emptyInput)
+	}
+	if len(cachesToDump) > 0 {
+		over.MDC().Set("dump-cache", cachesToDump)
+	}
+	if len(cachesToLoad) > 0 {
+		over.MDC().Set("load-cache", cachesToLoad)
+	}
+	over.SetGlobalFields([]string{"config"})
 
 	switch verbosity {
 	case "trace", "5":
 		zerolog.SetGlobalLevel(zerolog.TraceLevel)
-		logger.Info().Msg("Logger level set to trace")
+		over.Log().Info("Logger level set to trace")
 	case "debug", "4":
 		zerolog.SetGlobalLevel(zerolog.DebugLevel)
-		logger.Info().Msg("Logger level set to debug")
+		over.Log().Info("Logger level set to debug")
 	case "info", "3":
 		zerolog.SetGlobalLevel(zerolog.InfoLevel)
-		logger.Info().Msg("Logger level set to info")
+		over.Log().Info("Logger level set to info")
 	case "warn", "2":
 		zerolog.SetGlobalLevel(zerolog.WarnLevel)
-		logger.Info().Msg("Logger level set to warn")
+		over.Log().Info("Logger level set to warn")
 	case "error", "1":
 		zerolog.SetGlobalLevel(zerolog.ErrorLevel)
-		logger.Info().Msg("Logger level set to error")
+		over.Log().Info("Logger level set to error")
 	default:
 		zerolog.SetGlobalLevel(zerolog.Disabled)
 	}
-
-	return logger
 }

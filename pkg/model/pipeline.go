@@ -24,19 +24,14 @@ import (
 	"time"
 
 	"github.com/goccy/go-yaml"
-	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 )
 
 // nolint: gochecknoglobals
 var (
-	log                  zerolog.Logger = zerolog.Nop()
 	maskContextFactories []MaskContextFactory
 	maskFactories        []MaskFactory
 )
-
-func InjectLogger(logger zerolog.Logger) {
-	log = logger
-}
 
 func InjectMaskContextFactories(factories []MaskContextFactory) {
 	maskContextFactories = factories
