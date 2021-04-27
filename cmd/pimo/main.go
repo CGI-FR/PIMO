@@ -59,6 +59,7 @@ var (
 	builtBy   string
 
 	verbosity    string
+	jsonlog      bool
 	iteration    int
 	emptyInput   bool
 	maskingFile  string
@@ -82,6 +83,7 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 	}
 
 	rootCmd.PersistentFlags().StringVarP(&verbosity, "verbosity", "v", "none", "set level of log verbosity : none (0), error (1), warn (2), info (3), debug (4), trace (5)")
+	rootCmd.PersistentFlags().BoolVar(&jsonlog, "log-json", false, "output logs in JSON format")
 	rootCmd.PersistentFlags().IntVarP(&iteration, "repeat", "r", 1, "number of iteration to mask each input")
 	rootCmd.PersistentFlags().BoolVar(&emptyInput, "empty-input", false, "generate data without any input, to use with repeat flag")
 	rootCmd.PersistentFlags().StringVarP(&maskingFile, "config", "c", "masking.yml", "name and location of the masking-config file")
@@ -95,7 +97,9 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 }
 
 func run() {
-	initLog()
+	logger := initLog()
+	logger.Info().Msg("Starting PIMO")
+
 	var source model.Source
 	if emptyInput {
 		source = model.NewSourceFromSlice([]model.Dictionary{{}})
@@ -158,6 +162,7 @@ func run() {
 		}
 	}
 
+	logger.Info().Int("return", 0).Msg("End of PIMO pipeline")
 	os.Exit(0)
 }
 
@@ -192,24 +197,47 @@ func injectMaskFactories() []model.MaskFactory {
 	}
 }
 
-func initLog() {
+func initLog() zerolog.Logger {
+	event := log.With().Str("config", maskingFile)
+	if iteration > 1 {
+		event = event.Int("repeat", iteration)
+	}
+	if emptyInput {
+		event = event.Bool("empty-input", emptyInput)
+	}
+	if len(cachesToDump) > 0 {
+		event = event.Interface("dump-cache", cachesToDump)
+	}
+	if len(cachesToLoad) > 0 {
+		event = event.Interface("load-cache", cachesToLoad)
+	}
+
+	var logger zerolog.Logger
+	if jsonlog {
+		logger = event.Logger()
+	} else {
+		logger = event.Logger().Output(zerolog.ConsoleWriter{Out: os.Stderr})
+	}
+
 	switch verbosity {
 	case "trace", "5":
 		zerolog.SetGlobalLevel(zerolog.TraceLevel)
-		log.Trace().Msg("Logger level set to trace")
+		logger.Trace().Msg("Logger level set to trace")
 	case "debug", "4":
 		zerolog.SetGlobalLevel(zerolog.DebugLevel)
-		log.Debug().Msg("Logger level set to debug")
+		logger.Debug().Msg("Logger level set to debug")
 	case "info", "3":
 		zerolog.SetGlobalLevel(zerolog.InfoLevel)
-		log.Info().Msg("Logger level set to info")
+		logger.Info().Msg("Logger level set to info")
 	case "warn", "2":
 		zerolog.SetGlobalLevel(zerolog.WarnLevel)
-		log.Warn().Msg("Logger level set to warn")
+		logger.Warn().Msg("Logger level set to warn")
 	case "error", "1":
 		zerolog.SetGlobalLevel(zerolog.ErrorLevel)
-		log.Error().Msg("Logger level set to error")
+		logger.Error().Msg("Logger level set to error")
 	default:
 		zerolog.SetGlobalLevel(zerolog.Disabled)
 	}
+
+	return logger
 }
