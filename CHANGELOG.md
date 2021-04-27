@@ -16,7 +16,7 @@ Types of changes
 
 ## [Unreleased]
 
-- Nothing in the backlog :)
+- `Added` sprig dependency v3 which bring new sprig functions (durationRound, numerous, toRawJson, htpasswd, duration, seq, randInt, fromJson, mustFromJson, bcrypt, randBytes, dig, regexQuoteMeta, osBase, osDir, osExt, osClean, osIsAbs, and, all, addf, add1f, subf, divf, mulf, maxf, and minf, chunk, and more...) and improve others (get)
 
 ## [1.3.0]
 
