@@ -24,10 +24,19 @@ import (
 	"time"
 
 	"github.com/goccy/go-yaml"
+	"github.com/rs/zerolog"
 )
 
-var maskContextFactories []MaskContextFactory
-var maskFactories []MaskFactory
+// nolint: gochecknoglobals
+var (
+	log                  zerolog.Logger = zerolog.Nop()
+	maskContextFactories []MaskContextFactory
+	maskFactories        []MaskFactory
+)
+
+func InjectLogger(logger zerolog.Logger) {
+	log = logger
+}
 
 func InjectMaskContextFactories(factories []MaskContextFactory) {
 	maskContextFactories = factories
@@ -110,6 +119,7 @@ func BuildPipeline(pipeline Pipeline, conf Definition, caches map[string]Cache) 
 func LoadPipelineDefinitionFromYAML(filename string) (Definition, error) {
 	source, err := ioutil.ReadFile(filename)
 	if err != nil {
+		log.Err(err).Str("filename", filename).Msg("Cannot load pipeline definition from file")
 		return Definition{}, err
 	}
 	var conf Definition

@@ -98,7 +98,8 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 
 func run() {
 	logger := initLog()
-	logger.Info().Msg("Starting PIMO")
+	logger.Info().Msg("Start PIMO")
+	model.InjectLogger(logger)
 
 	var source model.Source
 	if emptyInput {
@@ -116,53 +117,58 @@ func run() {
 
 	model.InjectMaskContextFactories(injectMaskContextFactories())
 	model.InjectMaskFactories(injectMaskFactories())
+
 	pdef, err := model.LoadPipelineDefinitionFromYAML(maskingFile)
 	if err != nil {
-		os.Stderr.WriteString(err.Error() + "\n")
+		logger.Warn().Int("return", 1).Msg("End PIMO")
 		os.Exit(1)
 	}
 
 	pipeline, caches, err = model.BuildPipeline(pipeline, pdef, nil)
-
 	if err != nil {
-		os.Stderr.WriteString(err.Error() + "\n")
+		logger.Error().Err(err).Msg("Cannot build pipeline")
+		logger.Warn().Int("return", 1).Msg("End PIMO")
 		os.Exit(1)
 	}
 
 	for name, path := range cachesToLoad {
 		cache, ok := caches[name]
 		if !ok {
-			fmt.Fprintf(os.Stderr, "Cache %s not found", name)
+			logger.Error().Str("cache-name", name).Msg("Cache not found")
+			logger.Warn().Int("return", 2).Msg("End PIMO")
 			os.Exit(2)
 		}
 		err = pimo.LoadCache(name, cache, path)
 		if err != nil {
-			fmt.Fprint(os.Stderr, err.Error())
+			logger.Err(err).Str("cache-name", name).Str("cache-path", path).Msg("Cannot load cache")
+			logger.Warn().Int("return", 3).Msg("End PIMO")
 			os.Exit(3)
 		}
 	}
 
 	err = pipeline.AddSink(jsonline.NewSink(os.Stdout)).Run()
-
 	if err != nil {
-		os.Stderr.WriteString(err.Error() + "\n")
+		logger.Err(err).Msg("Pipeline didn't complete run")
+		logger.Warn().Int("return", 4).Msg("End PIMO")
 		os.Exit(4)
 	}
 
 	for name, path := range cachesToDump {
 		cache, ok := caches[name]
 		if !ok {
-			fmt.Fprintf(os.Stderr, "Cache %s not found", name)
+			logger.Error().Str("cache-name", name).Msg("Cache not found")
+			logger.Warn().Int("return", 2).Msg("End PIMO")
 			os.Exit(2)
 		}
 		err = pimo.DumpCache(name, cache, path)
 		if err != nil {
-			fmt.Fprint(os.Stderr, err.Error())
+			logger.Err(err).Str("cache-name", name).Str("cache-path", path).Msg("Cannot dump cache")
+			logger.Warn().Int("return", 3).Msg("End PIMO")
 			os.Exit(3)
 		}
 	}
 
-	logger.Info().Int("return", 0).Msg("End of PIMO pipeline")
+	logger.Info().Int("return", 0).Msg("End PIMO")
 	os.Exit(0)
 }
 
