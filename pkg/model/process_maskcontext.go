@@ -17,6 +17,8 @@
 
 package model
 
+import over "github.com/Trendyol/overlog"
+
 func NewMaskContextEngineProcess(selector Selector, mask MaskContextEngine) Processor {
 	return &MaskContextEngineProcess{selector, mask}
 }
@@ -31,6 +33,9 @@ func (mcep *MaskContextEngineProcess) Open() error {
 }
 
 func (mcep *MaskContextEngineProcess) ProcessDictionary(dictionary Dictionary, out Collector) (ret error) {
+	over.AddGlobalFields("path")
+	over.MDC().Set("path", mcep.selector)
+	defer func() { over.MDC().Remove("path") }()
 	result := Dictionary{}
 	for k, v := range dictionary {
 		result[k] = v

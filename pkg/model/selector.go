@@ -45,6 +45,8 @@ type Selector interface {
 	WriteContext(Dictionary, Entry) Dictionary
 	Read(Dictionary) (Entry, bool)
 	Write(Dictionary, Entry) Dictionary
+
+	String() string
 }
 
 type selectorInternal interface {
@@ -65,6 +67,10 @@ func NewPathSelector(path string) Selector {
 		return selector{paths[0], NewPathSelector(paths[1]).(selectorInternal)}
 	}
 	return selector{paths[0], nil}
+}
+
+func (s selector) String() string {
+	return s.path
 }
 
 func (s selector) Apply(root Dictionary, appliers ...Applier) bool {

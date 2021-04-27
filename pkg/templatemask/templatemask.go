@@ -25,6 +25,7 @@ import (
 
 	sprig "github.com/Masterminds/sprig/v3"
 	"github.com/cgi-fr/pimo/pkg/model"
+	"github.com/rs/zerolog/log"
 	"golang.org/x/text/runes"
 	"golang.org/x/text/transform"
 	"golang.org/x/text/unicode/norm"
@@ -56,6 +57,7 @@ func NewMask(text string) (MaskEngine, error) {
 
 // Mask masks a value with a template
 func (tmpl MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Entry, error) {
+	log.Debug().Interface("data", e).Msg("Mask template")
 	var output bytes.Buffer
 	err := tmpl.template.Execute(&output, context[0])
 	return output.String(), err

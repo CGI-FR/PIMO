@@ -19,6 +19,7 @@ package replacement
 
 import (
 	"github.com/cgi-fr/pimo/pkg/model"
+	"github.com/rs/zerolog/log"
 )
 
 // ReplacementMask is to mask with a value from another field
@@ -33,6 +34,7 @@ func NewMask(field string) MaskEngine {
 
 // Mask masks a value with another field of the json
 func (remp MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Entry, error) {
+	log.Debug().Interface("data", e).Msg("Mask replacement")
 	return context[0][remp.Field], nil
 }
 

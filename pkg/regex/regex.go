@@ -22,6 +22,7 @@ import (
 	"math/rand"
 
 	"github.com/cgi-fr/pimo/pkg/model"
+	"github.com/rs/zerolog/log"
 	regen "github.com/zach-klippenstein/goregen"
 )
 
@@ -38,6 +39,7 @@ func NewMask(exp string, seed int64) (MaskEngine, error) {
 
 // Mask returns a string thanks to a regular expression
 func (rm MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Entry, error) {
+	log.Debug().Interface("data", e).Msg("Mask regex")
 	out := rm.generator.Generate()
 	return out, nil
 }

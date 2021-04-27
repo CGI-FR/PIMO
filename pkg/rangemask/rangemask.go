@@ -21,6 +21,7 @@ import (
 	"strconv"
 
 	"github.com/cgi-fr/pimo/pkg/model"
+	"github.com/rs/zerolog/log"
 )
 
 // MaskEngine is a value that always mask by replacing with a scale
@@ -35,6 +36,7 @@ func NewMask(scale int) MaskEngine {
 
 // Mask return a range from a MaskEngine
 func (rm MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Entry, error) {
+	log.Debug().Interface("data", e).Msg("Mask range")
 	scaledValue := int(e.(float64)) / rm.rangeScale * rm.rangeScale
 	rangedValue := "[" + strconv.Itoa(scaledValue) + ";" + strconv.Itoa(scaledValue+rm.rangeScale-1) + "]"
 	return rangedValue, nil

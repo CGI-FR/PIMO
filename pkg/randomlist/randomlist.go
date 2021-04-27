@@ -24,6 +24,7 @@ import (
 
 	"github.com/cgi-fr/pimo/pkg/model"
 	"github.com/cgi-fr/pimo/pkg/uri"
+	"github.com/rs/zerolog/log"
 )
 
 // MaskEngine is a list of masking value and a rand init to mask
@@ -40,6 +41,7 @@ func NewMask(list []model.Entry, seed int64) MaskEngine {
 
 // Mask choose a mask value randomly
 func (mrl MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Entry, error) {
+	log.Debug().Interface("data", e).Msg("Mask randomChoice")
 	return mrl.list[mrl.rand.Intn(len(mrl.list))], nil
 }
 

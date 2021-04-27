@@ -19,6 +19,7 @@ package constant
 
 import (
 	"github.com/cgi-fr/pimo/pkg/model"
+	"github.com/rs/zerolog/log"
 )
 
 // MaskEngine is a value that always mask the same way
@@ -33,6 +34,7 @@ func NewMask(data model.Entry) MaskEngine {
 
 // Mask return a Constant from a MaskEngine
 func (cm MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Entry, error) {
+	log.Debug().Interface("data", e).Msg("Mask constant")
 	return cm.constValue, nil
 }
 

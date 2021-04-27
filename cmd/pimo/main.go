@@ -121,12 +121,14 @@ func run() {
 
 	pdef, err := model.LoadPipelineDefinitionFromYAML(maskingFile)
 	if err != nil {
+		os.Stderr.WriteString(err.Error() + "\n")
 		log.Warn().Int("return", 1).Msg("End PIMO")
 		os.Exit(1)
 	}
 
 	pipeline, caches, err = model.BuildPipeline(pipeline, pdef, nil)
 	if err != nil {
+		os.Stderr.WriteString(err.Error() + "\n")
 		log.Error().Err(err).Msg("Cannot build pipeline")
 		log.Warn().Int("return", 1).Msg("End PIMO")
 		os.Exit(1)
@@ -135,12 +137,14 @@ func run() {
 	for name, path := range cachesToLoad {
 		cache, ok := caches[name]
 		if !ok {
+			fmt.Fprintf(os.Stderr, "Cache %s not found", name)
 			log.Error().Str("cache-name", name).Msg("Cache not found")
 			log.Warn().Int("return", 2).Msg("End PIMO")
 			os.Exit(2)
 		}
 		err = pimo.LoadCache(name, cache, path)
 		if err != nil {
+			fmt.Fprint(os.Stderr, err.Error())
 			log.Err(err).Str("cache-name", name).Str("cache-path", path).Msg("Cannot load cache")
 			log.Warn().Int("return", 3).Msg("End PIMO")
 			os.Exit(3)
@@ -149,6 +153,7 @@ func run() {
 
 	err = pipeline.AddSink(jsonline.NewSink(os.Stdout)).Run()
 	if err != nil {
+		os.Stderr.WriteString(err.Error() + "\n")
 		log.Err(err).Msg("Pipeline didn't complete run")
 		log.Warn().Int("return", 4).Msg("End PIMO")
 		os.Exit(4)
@@ -157,12 +162,14 @@ func run() {
 	for name, path := range cachesToDump {
 		cache, ok := caches[name]
 		if !ok {
+			fmt.Fprintf(os.Stderr, "Cache %s not found", name)
 			log.Error().Str("cache-name", name).Msg("Cache not found")
 			log.Warn().Int("return", 2).Msg("End PIMO")
 			os.Exit(2)
 		}
 		err = pimo.DumpCache(name, cache, path)
 		if err != nil {
+			fmt.Fprint(os.Stderr, err.Error())
 			log.Err(err).Str("cache-name", name).Str("cache-path", path).Msg("Cannot dump cache")
 			log.Warn().Int("return", 3).Msg("End PIMO")
 			os.Exit(3)
@@ -207,9 +214,9 @@ func injectMaskFactories() []model.MaskFactory {
 func initLog() {
 	var logger zerolog.Logger
 	if jsonlog {
-		logger = zerolog.New(os.Stderr)
+		logger = zerolog.New(os.Stderr) // .With().Timestamp().Caller().Logger()
 	} else {
-		logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
+		logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr}) // .With().Timestamp().Caller().Logger()
 	}
 
 	over.New(logger)
@@ -231,19 +238,19 @@ func initLog() {
 	switch verbosity {
 	case "trace", "5":
 		zerolog.SetGlobalLevel(zerolog.TraceLevel)
-		over.Log().Info("Logger level set to trace")
+		log.Info().Msg("Logger level set to trace")
 	case "debug", "4":
 		zerolog.SetGlobalLevel(zerolog.DebugLevel)
-		over.Log().Info("Logger level set to debug")
+		log.Info().Msg("Logger level set to debug")
 	case "info", "3":
 		zerolog.SetGlobalLevel(zerolog.InfoLevel)
-		over.Log().Info("Logger level set to info")
+		log.Info().Msg("Logger level set to info")
 	case "warn", "2":
 		zerolog.SetGlobalLevel(zerolog.WarnLevel)
-		over.Log().Info("Logger level set to warn")
+		log.Info().Msg("Logger level set to warn")
 	case "error", "1":
 		zerolog.SetGlobalLevel(zerolog.ErrorLevel)
-		over.Log().Info("Logger level set to error")
+		log.Info().Msg("Logger level set to error")
 	default:
 		zerolog.SetGlobalLevel(zerolog.Disabled)
 	}

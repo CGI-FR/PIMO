@@ -23,6 +23,7 @@ import (
 	"math/rand"
 
 	"github.com/cgi-fr/pimo/pkg/model"
+	"github.com/rs/zerolog/log"
 )
 
 // MaskEngine is a type to mask with a random float
@@ -41,6 +42,7 @@ func NewMask(min float64, max float64, precision int, seed int64) MaskEngine {
 
 // Mask choose a mask int randomly within boundary
 func (me MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Entry, error) {
+	log.Debug().Interface("data", e).Msg("Mask randomDecimal")
 	// Generate the random number
 	r := me.min + me.rand.Float64()*(me.max-me.min)
 

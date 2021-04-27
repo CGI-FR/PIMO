@@ -19,6 +19,7 @@ package increment
 
 import (
 	"github.com/cgi-fr/pimo/pkg/model"
+	"github.com/rs/zerolog/log"
 )
 
 // MaskEngine is a struct to create incremental int
@@ -35,6 +36,7 @@ func NewMask(start, incr int) MaskEngine {
 
 // Mask masks a value with an incremental int
 func (incr MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Entry, error) {
+	log.Debug().Interface("data", e).Msg("Mask increment")
 	output := *incr.Value
 	*incr.Value += incr.Increment
 	return output, nil
