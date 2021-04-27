@@ -23,7 +23,7 @@ import (
 	"text/template"
 	"unicode"
 
-	"github.com/Masterminds/sprig"
+	sprig "github.com/Masterminds/sprig/v3"
 	"github.com/cgi-fr/pimo/pkg/model"
 	"golang.org/x/text/runes"
 	"golang.org/x/text/transform"
