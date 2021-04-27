@@ -11,9 +11,10 @@ require (
 	github.com/huandu/xstrings v1.3.2 // indirect
 	github.com/imdario/mergo v0.3.12 // indirect
 	github.com/mitchellh/copystructure v1.1.2 // indirect
+	github.com/rs/zerolog v1.21.0
 	github.com/smartystreets/goconvey v1.6.4 // indirect
 	github.com/spf13/cobra v1.0.0
 	github.com/stretchr/testify v1.5.1
 	github.com/zach-klippenstein/goregen v0.0.0-20160303162051-795b5e3961ea
-	golang.org/x/text v0.3.2
+	golang.org/x/text v0.3.3
 )

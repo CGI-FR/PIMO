@@ -45,6 +45,8 @@ import (
 	"github.com/cgi-fr/pimo/pkg/replacement"
 	"github.com/cgi-fr/pimo/pkg/templatemask"
 	"github.com/cgi-fr/pimo/pkg/weightedchoice"
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 )
 
@@ -56,6 +58,7 @@ var (
 	buildDate string
 	builtBy   string
 
+	verbosity    string
 	iteration    int
 	emptyInput   bool
 	maskingFile  string
@@ -78,6 +81,7 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 		},
 	}
 
+	rootCmd.PersistentFlags().StringVarP(&verbosity, "verbosity", "v", "none", "set level of log verbosity : none (0), error (1), warn (2), info (3), debug (4), trace (5)")
 	rootCmd.PersistentFlags().IntVarP(&iteration, "repeat", "r", 1, "number of iteration to mask each input")
 	rootCmd.PersistentFlags().BoolVar(&emptyInput, "empty-input", false, "generate data without any input, to use with repeat flag")
 	rootCmd.PersistentFlags().StringVarP(&maskingFile, "config", "c", "masking.yml", "name and location of the masking-config file")
@@ -91,6 +95,7 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 }
 
 func run() {
+	initLog()
 	var source model.Source
 	if emptyInput {
 		source = model.NewSourceFromSlice([]model.Dictionary{{}})
@@ -184,5 +189,27 @@ func injectMaskFactories() []model.MaskFactory {
 		randomdecimal.Factory,
 		dateparser.Factory,
 		ff1.Factory,
+	}
+}
+
+func initLog() {
+	switch verbosity {
+	case "trace", "5":
+		zerolog.SetGlobalLevel(zerolog.TraceLevel)
+		log.Trace().Msg("Logger level set to trace")
+	case "debug", "4":
+		zerolog.SetGlobalLevel(zerolog.DebugLevel)
+		log.Debug().Msg("Logger level set to debug")
+	case "info", "3":
+		zerolog.SetGlobalLevel(zerolog.InfoLevel)
+		log.Info().Msg("Logger level set to info")
+	case "warn", "2":
+		zerolog.SetGlobalLevel(zerolog.WarnLevel)
+		log.Warn().Msg("Logger level set to warn")
+	case "error", "1":
+		zerolog.SetGlobalLevel(zerolog.ErrorLevel)
+		log.Error().Msg("Logger level set to error")
+	default:
+		zerolog.SetGlobalLevel(zerolog.Disabled)
 	}
 }
