@@ -228,19 +228,19 @@ func initLog() zerolog.Logger {
 	switch verbosity {
 	case "trace", "5":
 		zerolog.SetGlobalLevel(zerolog.TraceLevel)
-		logger.Trace().Msg("Logger level set to trace")
+		logger.Info().Msg("Logger level set to trace")
 	case "debug", "4":
 		zerolog.SetGlobalLevel(zerolog.DebugLevel)
-		logger.Debug().Msg("Logger level set to debug")
+		logger.Info().Msg("Logger level set to debug")
 	case "info", "3":
 		zerolog.SetGlobalLevel(zerolog.InfoLevel)
 		logger.Info().Msg("Logger level set to info")
 	case "warn", "2":
 		zerolog.SetGlobalLevel(zerolog.WarnLevel)
-		logger.Warn().Msg("Logger level set to warn")
+		logger.Info().Msg("Logger level set to warn")
 	case "error", "1":
 		zerolog.SetGlobalLevel(zerolog.ErrorLevel)
-		logger.Error().Msg("Logger level set to error")
+		logger.Info().Msg("Logger level set to error")
 	default:
 		zerolog.SetGlobalLevel(zerolog.Disabled)
 	}
