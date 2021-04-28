@@ -59,13 +59,15 @@ var (
 	buildDate string
 	builtBy   string
 
-	verbosity    string
-	jsonlog      bool
-	iteration    int
-	emptyInput   bool
-	maskingFile  string
-	cachesToDump map[string]string
-	cachesToLoad map[string]string
+	verbosity        string
+	jsonlog          bool
+	iteration        int
+	emptyInput       bool
+	maskingFile      string
+	cachesToDump     map[string]string
+	cachesToLoad     map[string]string
+	skipLineOnError  bool
+	skipFieldOnError bool
 )
 
 func main() {
@@ -90,6 +92,8 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 	rootCmd.PersistentFlags().StringVarP(&maskingFile, "config", "c", "masking.yml", "name and location of the masking-config file")
 	rootCmd.PersistentFlags().StringToStringVar(&cachesToDump, "dump-cache", map[string]string{}, "path for dumping cache into file")
 	rootCmd.PersistentFlags().StringToStringVar(&cachesToLoad, "load-cache", map[string]string{}, "path for loading cache from file")
+	rootCmd.PersistentFlags().BoolVar(&skipLineOnError, "skip-line-on-error", false, "skip a line if an error occurs while masking a field")
+	rootCmd.PersistentFlags().BoolVar(&skipFieldOnError, "skip-field-on-error", false, "remove a field if an error occurs while masking this field")
 
 	if err := rootCmd.Execute(); err != nil {
 		log.Err(err).Msg("Error when executing command")
@@ -100,7 +104,14 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 func run() {
 	initLog()
 
-	log.Info().Msg("Start PIMO")
+	log.Info().
+		Bool("skipLineOnError", skipLineOnError).
+		Bool("skipFieldOnError", skipFieldOnError).
+		Int("repeat", iteration).
+		Bool("empty-input", emptyInput).
+		Interface("dump-cache", cachesToDump).
+		Interface("load-cache", cachesToLoad).
+		Msg("Start PIMO")
 
 	var source model.Source
 	if emptyInput {
@@ -118,17 +129,16 @@ func run() {
 
 	model.InjectMaskContextFactories(injectMaskContextFactories())
 	model.InjectMaskFactories(injectMaskFactories())
+	model.InjectConfig(skipLineOnError, skipFieldOnError)
 
 	pdef, err := model.LoadPipelineDefinitionFromYAML(maskingFile)
 	if err != nil {
-		os.Stderr.WriteString(err.Error() + "\n")
 		log.Warn().Int("return", 1).Msg("End PIMO")
 		os.Exit(1)
 	}
 
 	pipeline, caches, err = model.BuildPipeline(pipeline, pdef, nil)
 	if err != nil {
-		os.Stderr.WriteString(err.Error() + "\n")
 		log.Error().Err(err).Msg("Cannot build pipeline")
 		log.Warn().Int("return", 1).Msg("End PIMO")
 		os.Exit(1)
@@ -151,7 +161,6 @@ func run() {
 
 	err = pipeline.AddSink(jsonline.NewSink(os.Stdout)).Run()
 	if err != nil {
-		os.Stderr.WriteString(err.Error() + "\n")
 		log.Err(err).Msg("Pipeline didn't complete run")
 		log.Warn().Int("return", 4).Msg("End PIMO")
 		os.Exit(4)
@@ -217,18 +226,6 @@ func initLog() {
 
 	over.New(logger)
 	over.MDC().Set("config", maskingFile)
-	if iteration > 1 {
-		over.MDC().Set("repeat", iteration)
-	}
-	if emptyInput {
-		over.MDC().Set("empty-input", emptyInput)
-	}
-	if len(cachesToDump) > 0 {
-		over.MDC().Set("dump-cache", cachesToDump)
-	}
-	if len(cachesToLoad) > 0 {
-		over.MDC().Set("load-cache", cachesToLoad)
-	}
 	over.SetGlobalFields([]string{"config"})
 
 	switch verbosity {

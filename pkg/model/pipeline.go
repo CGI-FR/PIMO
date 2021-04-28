@@ -31,6 +31,8 @@ import (
 var (
 	maskContextFactories []MaskContextFactory
 	maskFactories        []MaskFactory
+	skipLineOnError      bool
+	skipFieldOnError     bool
 )
 
 func InjectMaskContextFactories(factories []MaskContextFactory) {
@@ -39,6 +41,11 @@ func InjectMaskContextFactories(factories []MaskContextFactory) {
 
 func InjectMaskFactories(factories []MaskFactory) {
 	maskFactories = factories
+}
+
+func InjectConfig(skipLineOnErrorValue bool, skipFieldOnErrorValue bool) {
+	skipLineOnError = skipLineOnErrorValue
+	skipFieldOnError = skipFieldOnErrorValue
 }
 
 func BuildCaches(caches map[string]CacheDefinition, existing map[string]Cache) map[string]Cache {

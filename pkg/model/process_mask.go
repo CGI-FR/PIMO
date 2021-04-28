@@ -19,6 +19,7 @@ package model
 
 import (
 	over "github.com/Trendyol/overlog"
+	"github.com/rs/zerolog/log"
 )
 
 func NewMaskEngineProcess(selector Selector, mask MaskEngine) Processor {
@@ -53,6 +54,11 @@ func (mep *MaskEngineProcess) ProcessDictionary(dictionary Dictionary, out Colle
 
 	if ret == nil {
 		out.Collect(result)
+	}
+
+	if ret != nil && skipLineOnError {
+		log.Warn().AnErr("error", ret).Msg("Line skipped")
+		ret = nil
 	}
 
 	return
