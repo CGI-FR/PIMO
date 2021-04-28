@@ -20,12 +20,14 @@ package pipe
 import (
 	"hash/fnv"
 
+	over "github.com/Trendyol/overlog"
 	"github.com/cgi-fr/pimo/pkg/model"
 	"github.com/rs/zerolog/log"
 )
 
 // MaskEngine is a value that always mask the same way
 type MaskEngine struct {
+	source       string
 	pipeline     model.Pipeline
 	injectParent string
 	injectRoot   string
@@ -38,7 +40,7 @@ func NewMask(seed int64, injectParent string, injectRoot string, caches map[stri
 	if len(filename) > 0 {
 		definition, err = model.LoadPipelineDefinitionFromYAML(filename)
 		if err != nil {
-			return MaskEngine{nil, injectParent, injectRoot}, err
+			return MaskEngine{filename, nil, injectParent, injectRoot}, err
 		}
 		// merge the current seed with the seed provided by configuration on the pipe
 		definition.Seed += seed
@@ -47,7 +49,7 @@ func NewMask(seed int64, injectParent string, injectRoot string, caches map[stri
 	}
 	pipeline := model.NewPipeline(nil)
 	pipeline, _, err = model.BuildPipeline(pipeline, definition, caches)
-	return MaskEngine{pipeline, injectParent, injectRoot}, err
+	return MaskEngine{filename, pipeline, injectParent, injectRoot}, err
 }
 
 func (me MaskEngine) MaskContext(e model.Dictionary, key string, context ...model.Dictionary) (model.Dictionary, error) {
@@ -79,10 +81,15 @@ func (me MaskEngine) MaskContext(e model.Dictionary, key string, context ...mode
 		}
 		input = append(input, elemInput)
 	}
+	saveLineNumber, _ := over.MDC().Get("line-number")
+	saveConfig, _ := over.MDC().Get("config")
+	over.MDC().Set("config", me.source)
 	err := me.pipeline.
 		WithSource(model.NewSourceFromSlice(input)).
 		AddSink(model.NewSinkToSlice(&result)).
 		Run()
+	over.MDC().Set("line-number", saveLineNumber)
+	over.MDC().Set("config", saveConfig)
 	if err != nil {
 		return nil, err
 	}
