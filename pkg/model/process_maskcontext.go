@@ -65,5 +65,14 @@ func (mcep *MaskContextEngineProcess) ProcessDictionary(dictionary Dictionary, o
 		ret = nil
 	}
 
-	return
+	if ret != nil && skipFieldOnError {
+		log.Warn().AnErr("error", ret).Msg("Field skipped")
+		mcep.selector.Apply(result, func(rootContext, parentContext Dictionary, key string, value Entry) (Action, Entry) {
+			return DELETE, nil
+		})
+		out.Collect(result)
+		return nil
+	}
+
+	return ret
 }
