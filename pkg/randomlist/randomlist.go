@@ -41,7 +41,7 @@ func NewMask(list []model.Entry, seed int64) MaskEngine {
 
 // Mask choose a mask value randomly
 func (mrl MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Entry, error) {
-	log.Info().Interface("data", e).Msg("Mask randomChoice")
+	log.Info().Msg("Mask randomChoice")
 	return mrl.list[mrl.rand.Intn(len(mrl.list))], nil
 }
 

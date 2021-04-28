@@ -34,7 +34,7 @@ func NewMask(value model.Entry) MaskEngine {
 
 // MaskContext add the field
 func (am MaskEngine) MaskContext(context model.Dictionary, key string, contexts ...model.Dictionary) (model.Dictionary, error) {
-	log.Info().Interface("data", context).Msg("Mask add")
+	log.Info().Msg("Mask add")
 	_, present := context[key]
 	if !present {
 		context[key] = am.value

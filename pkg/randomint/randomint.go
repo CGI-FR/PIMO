@@ -40,7 +40,7 @@ func NewMask(min int, max int, seed int64) MaskEngine {
 
 // Mask choose a mask int randomly within boundary
 func (rim MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Entry, error) {
-	log.Info().Interface("data", e).Msg("Mask randomInt")
+	log.Info().Msg("Mask randomInt")
 	return rim.rand.Intn(rim.max+1-rim.min) + rim.min, nil
 }
 

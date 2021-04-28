@@ -34,7 +34,7 @@ func NewMask(data model.Entry) MaskEngine {
 
 // Mask return a Constant from a MaskEngine
 func (cm MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Entry, error) {
-	log.Info().Interface("data", e).Msg("Mask constant")
+	log.Info().Msg("Mask constant")
 	return cm.constValue, nil
 }
 

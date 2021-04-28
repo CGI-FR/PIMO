@@ -57,7 +57,7 @@ func NewMask(text string) (MaskEngine, error) {
 
 // Mask masks a value with a template
 func (tmpl MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Entry, error) {
-	log.Info().Interface("data", e).Msg("Mask template")
+	log.Info().Msg("Mask template")
 	var output bytes.Buffer
 	err := tmpl.template.Execute(&output, context[0])
 	return output.String(), err

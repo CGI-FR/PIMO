@@ -51,7 +51,7 @@ func NewMask(seed int64, injectParent string, injectRoot string, caches map[stri
 }
 
 func (me MaskEngine) MaskContext(e model.Dictionary, key string, context ...model.Dictionary) (model.Dictionary, error) {
-	log.Info().Interface("data", e).Msg("Mask pipe")
+	log.Info().Msg("Mask pipe")
 	var result []model.Dictionary
 	input := []model.Dictionary{}
 

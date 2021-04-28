@@ -34,7 +34,7 @@ func NewMask(field string) MaskEngine {
 
 // Mask masks a value with another field of the json
 func (remp MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Entry, error) {
-	log.Info().Interface("data", e).Msg("Mask replacement")
+	log.Info().Msg("Mask replacement")
 	return context[0][remp.Field], nil
 }
 
