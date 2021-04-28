@@ -54,12 +54,22 @@ func (mep *MaskEngineProcess) ProcessDictionary(dictionary Dictionary, out Colle
 
 	if ret == nil {
 		out.Collect(result)
+		return
 	}
 
 	if ret != nil && skipLineOnError {
 		log.Warn().AnErr("error", ret).Msg("Line skipped")
-		ret = nil
+		return nil
 	}
 
-	return
+	if ret != nil && skipFieldOnError {
+		log.Warn().AnErr("error", ret).Msg("Field skipped")
+		mep.selector.Apply(result, func(rootContext, parentContext Dictionary, key string, value Entry) (Action, Entry) {
+			return DELETE, nil
+		})
+		out.Collect(result)
+		return nil
+	}
+
+	return ret
 }
