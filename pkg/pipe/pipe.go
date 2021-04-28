@@ -18,6 +18,7 @@
 package pipe
 
 import (
+	"fmt"
 	"hash/fnv"
 
 	over "github.com/Trendyol/overlog"
@@ -49,7 +50,7 @@ func NewMask(seed int64, injectParent string, injectRoot string, caches map[stri
 	}
 	pipeline := model.NewPipeline(nil)
 	pipeline, _, err = model.BuildPipeline(pipeline, definition, caches)
-	return MaskEngine{filename, pipeline, injectParent, injectRoot}, err
+	return MaskEngine{"", pipeline, injectParent, injectRoot}, err
 }
 
 func (me MaskEngine) MaskContext(e model.Dictionary, key string, context ...model.Dictionary) (model.Dictionary, error) {
@@ -84,7 +85,11 @@ func (me MaskEngine) MaskContext(e model.Dictionary, key string, context ...mode
 	saveLineNumber, _ := over.MDC().Get("line-number")
 	saveConfig, _ := over.MDC().Get("config")
 	savePath, _ := over.MDC().Get("path")
-	over.MDC().Set("config", me.source)
+	if len(me.source) == 0 {
+		over.MDC().Set("config", fmt.Sprintf("%s/%s", saveConfig, "pipe"))
+	} else {
+		over.MDC().Set("config", me.source)
+	}
 	err := me.pipeline.
 		WithSource(model.NewSourceFromSlice(input)).
 		AddSink(model.NewSinkToSlice(&result)).
