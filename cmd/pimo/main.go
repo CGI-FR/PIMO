@@ -114,9 +114,12 @@ func run() {
 		Msg("Start PIMO")
 
 	var source model.Source
+	over.AddGlobalFields("context")
 	if emptyInput {
+		over.MDC().Set("context", "empty-input")
 		source = model.NewSourceFromSlice([]model.Dictionary{{}})
 	} else {
+		over.MDC().Set("context", "stdin")
 		source = jsonline.NewSource(os.Stdin)
 	}
 	pipeline := model.NewPipeline(source).
@@ -225,8 +228,6 @@ func initLog() {
 	}
 
 	over.New(logger)
-	over.MDC().Set("config", maskingFile)
-	over.SetGlobalFields([]string{"config"})
 
 	switch verbosity {
 	case "trace", "5":
@@ -247,4 +248,6 @@ func initLog() {
 	default:
 		zerolog.SetGlobalLevel(zerolog.Disabled)
 	}
+	over.MDC().Set("config", maskingFile)
+	over.SetGlobalFields([]string{"config"})
 }

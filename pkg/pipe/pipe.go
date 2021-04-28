@@ -85,9 +85,9 @@ func (me MaskEngine) MaskContext(e model.Dictionary, key string, context ...mode
 	saveLineNumber, _ := over.MDC().Get("line-number")
 	saveConfig, _ := over.MDC().Get("config")
 	savePath, _ := over.MDC().Get("path")
-	if len(me.source) == 0 {
-		over.MDC().Set("config", fmt.Sprintf("%s/%s", saveConfig, "pipe"))
-	} else {
+	saveContext, _ := over.MDC().Get("context")
+	over.MDC().Set("context", fmt.Sprintf("%s[%d]/%s", saveContext, saveLineNumber, savePath))
+	if len(me.source) > 0 {
 		over.MDC().Set("config", me.source)
 	}
 	err := me.pipeline.
@@ -97,6 +97,7 @@ func (me MaskEngine) MaskContext(e model.Dictionary, key string, context ...mode
 	over.MDC().Set("line-number", saveLineNumber)
 	over.MDC().Set("config", saveConfig)
 	over.MDC().Set("path", savePath)
+	over.MDC().Set("context", saveContext)
 	if err != nil {
 		return nil, err
 	}
