@@ -83,6 +83,7 @@ func (me MaskEngine) MaskContext(e model.Dictionary, key string, context ...mode
 	}
 	saveLineNumber, _ := over.MDC().Get("line-number")
 	saveConfig, _ := over.MDC().Get("config")
+	savePath, _ := over.MDC().Get("path")
 	over.MDC().Set("config", me.source)
 	err := me.pipeline.
 		WithSource(model.NewSourceFromSlice(input)).
@@ -90,6 +91,7 @@ func (me MaskEngine) MaskContext(e model.Dictionary, key string, context ...mode
 		Run()
 	over.MDC().Set("line-number", saveLineNumber)
 	over.MDC().Set("config", saveConfig)
+	over.MDC().Set("path", savePath)
 	if err != nil {
 		return nil, err
 	}

@@ -18,6 +18,7 @@
 package model
 
 import (
+	"fmt"
 	"reflect"
 	"strings"
 )
@@ -46,7 +47,7 @@ type Selector interface {
 	Read(Dictionary) (Entry, bool)
 	Write(Dictionary, Entry) Dictionary
 
-	String() string
+	fmt.Stringer
 }
 
 type selectorInternal interface {
@@ -70,6 +71,9 @@ func NewPathSelector(path string) Selector {
 }
 
 func (s selector) String() string {
+	if s.sub != nil {
+		return s.path + "." + s.sub.String()
+	}
 	return s.path
 }
 
