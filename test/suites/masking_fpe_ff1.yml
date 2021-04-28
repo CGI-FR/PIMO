@@ -135,7 +135,7 @@ testcases:
     assertions:
     - result.code ShouldEqual 4
     - |-
-      result.systemerr ShouldEqual "Environment variable named 'FF1_ENCRYPTION_KEY' should be defined"
+      result.systemerr ShouldContainSubstring "Environment variable named 'FF1_ENCRYPTION_KEY' should be defined"
 
 - name: ff1 mask encrypt with no encryption key
   steps:
@@ -157,7 +157,7 @@ testcases:
     assertions:
     - result.code ShouldEqual 4
     - |-
-      result.systemerr ShouldEqual "Environment variable named 'FF1_ENCRYPTION_KEY' should be defined"
+      result.systemerr ShouldContainSubstring "Environment variable named 'FF1_ENCRYPTION_KEY' should be defined"
 
 - name: ff1 mask encrypt with encryption key not valid
   steps:
@@ -179,4 +179,4 @@ testcases:
     assertions:
     - result.code ShouldEqual 4
     - |-
-      result.systemerr ShouldEqual "key length must be 128, 192, or 256 bits"
+      result.systemerr ShouldContainSubstring "key length must be 128, 192, or 256 bits"

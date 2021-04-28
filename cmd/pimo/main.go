@@ -83,7 +83,7 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 		},
 	}
 
-	rootCmd.PersistentFlags().StringVarP(&verbosity, "verbosity", "v", "none", "set level of log verbosity : none (0), error (1), warn (2), info (3), debug (4), trace (5)")
+	rootCmd.PersistentFlags().StringVarP(&verbosity, "verbosity", "v", "error", "set level of log verbosity, default is error : none (0), error (1), warn (2), info (3), debug (4), trace (5)")
 	rootCmd.PersistentFlags().BoolVar(&jsonlog, "log-json", false, "output logs in JSON format")
 	rootCmd.PersistentFlags().IntVarP(&iteration, "repeat", "r", 1, "number of iteration to mask each input")
 	rootCmd.PersistentFlags().BoolVar(&emptyInput, "empty-input", false, "generate data without any input, to use with repeat flag")
@@ -92,7 +92,7 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 	rootCmd.PersistentFlags().StringToStringVar(&cachesToLoad, "load-cache", map[string]string{}, "path for loading cache from file")
 
 	if err := rootCmd.Execute(); err != nil {
-		fmt.Println(err)
+		log.Err(err).Msg("Error when executing command")
 		os.Exit(1)
 	}
 }
@@ -137,14 +137,12 @@ func run() {
 	for name, path := range cachesToLoad {
 		cache, ok := caches[name]
 		if !ok {
-			fmt.Fprintf(os.Stderr, "Cache %s not found", name)
 			log.Error().Str("cache-name", name).Msg("Cache not found")
 			log.Warn().Int("return", 2).Msg("End PIMO")
 			os.Exit(2)
 		}
 		err = pimo.LoadCache(name, cache, path)
 		if err != nil {
-			fmt.Fprint(os.Stderr, err.Error())
 			log.Err(err).Str("cache-name", name).Str("cache-path", path).Msg("Cannot load cache")
 			log.Warn().Int("return", 3).Msg("End PIMO")
 			os.Exit(3)
@@ -162,14 +160,12 @@ func run() {
 	for name, path := range cachesToDump {
 		cache, ok := caches[name]
 		if !ok {
-			fmt.Fprintf(os.Stderr, "Cache %s not found", name)
 			log.Error().Str("cache-name", name).Msg("Cache not found")
 			log.Warn().Int("return", 2).Msg("End PIMO")
 			os.Exit(2)
 		}
 		err = pimo.DumpCache(name, cache, path)
 		if err != nil {
-			fmt.Fprint(os.Stderr, err.Error())
 			log.Err(err).Str("cache-name", name).Str("cache-path", path).Msg("Cannot dump cache")
 			log.Warn().Int("return", 3).Msg("End PIMO")
 			os.Exit(3)
