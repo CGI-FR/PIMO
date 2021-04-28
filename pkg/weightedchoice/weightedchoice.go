@@ -81,7 +81,7 @@ func NewMask(list []model.WeightedChoiceType, seed int64) MaskEngine {
 
 // Mask choose a mask value randomly
 func (wml MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Entry, error) {
-	log.Debug().Interface("data", e).Msg("Mask weightedChoice")
+	log.Info().Interface("data", e).Msg("Mask weightedChoice")
 	return wml.cs.Pick(), nil
 }
 

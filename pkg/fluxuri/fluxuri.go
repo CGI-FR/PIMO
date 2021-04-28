@@ -43,7 +43,7 @@ func NewMask(name string) (MaskEngine, error) {
 
 // MaskContext add the field if not existing or replace the value if existing
 func (me MaskEngine) MaskContext(context model.Dictionary, key string, contexts ...model.Dictionary) (model.Dictionary, error) {
-	log.Debug().Interface("data", context).Msg("Mask fluxuri")
+	log.Info().Interface("data", context).Msg("Mask fluxuri")
 	if *me.Actual < me.LenList {
 		context[key] = me.List[*me.Actual]
 		*me.Actual++

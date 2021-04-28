@@ -59,7 +59,7 @@ func NewMask(minString, maxString string, seed int64) (MaskEngine, error) {
 
 // Mask masks a time value with a duration
 func (me MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Entry, error) {
-	log.Debug().Interface("data", e).Msg("Mask randomDuration")
+	log.Info().Interface("data", e).Msg("Mask randomDuration")
 	var t time.Time
 	var err error
 	switch v := e.(type) {

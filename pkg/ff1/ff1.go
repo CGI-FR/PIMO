@@ -42,7 +42,7 @@ func NewMask(key string, tweak string, radix uint, decrypt bool) MaskEngine {
 
 // Mask return a Constant from a MaskEngine
 func (ff1m MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Entry, error) {
-	log.Debug().Interface("data", e).Msg("Mask ff1")
+	log.Info().Interface("data", e).Msg("Mask ff1")
 	// Extract tweak from the Dictionary (context)
 	var tweak string
 	if context[0][ff1m.tweakField] == nil {

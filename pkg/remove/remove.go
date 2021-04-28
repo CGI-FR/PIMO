@@ -33,7 +33,7 @@ func NewMask() MaskEngine {
 
 // MaskContext remove the field
 func (rm MaskEngine) MaskContext(context model.Dictionary, key string, contexts ...model.Dictionary) (model.Dictionary, error) {
-	log.Debug().Interface("data", context).Msg("Mask delete")
+	log.Info().Interface("data", context).Msg("Mask delete")
 	delete(context, key)
 
 	return context, nil

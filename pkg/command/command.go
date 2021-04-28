@@ -37,7 +37,7 @@ func NewMask(cmd string) MaskEngine {
 
 // Mask delegate mask algorithm to an external program
 func (cme MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Entry, error) {
-	log.Debug().Interface("data", e).Msg("Mask command")
+	log.Info().Interface("data", e).Msg("Mask command")
 	splitCommand := strings.Split(cme.Cmd, " ")
 	/* #nosec */
 	out, err := exec.Command(splitCommand[0], splitCommand[1:]...).Output()
