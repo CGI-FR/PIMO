@@ -22,6 +22,7 @@ import (
 	"encoding/json"
 	"io"
 
+	over "github.com/Trendyol/overlog"
 	"github.com/cgi-fr/pimo/pkg/model"
 )
 
@@ -76,11 +77,18 @@ func (s *Source) Err() error {
 
 // NewSink creates a new Sink.
 func NewSink(file io.Writer) model.SinkProcess {
-	return Sink{file}
+	return Sink{file, ""}
+}
+
+// NewSinkWithContext creates a new Sink.
+func NewSinkWithContext(file io.Writer, counter string) model.SinkProcess {
+	over.MDC().Set(counter, 1)
+	return Sink{file, counter}
 }
 
 type Sink struct {
-	file io.Writer
+	file    io.Writer
+	counter string
 }
 
 func (s Sink) Open() error {
@@ -98,5 +106,17 @@ func (s Sink) ProcessDictionary(dictionary model.Dictionary) error {
 	if err != nil {
 		return err
 	}
+
+	if len(s.counter) > 0 {
+		value, exists := over.MDC().Get(s.counter)
+		if !exists {
+			return nil
+		}
+
+		if counter, ok := value.(int); ok {
+			over.MDC().Set(s.counter, counter+1)
+		}
+	}
+
 	return nil
 }

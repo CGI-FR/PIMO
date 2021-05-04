@@ -19,8 +19,6 @@ package model
 
 import (
 	"time"
-
-	over "github.com/Trendyol/overlog"
 )
 
 // MaskEngine is a masking algorithm
@@ -433,18 +431,12 @@ func (pipeline SimpleSinkedPipeline) Run() (err error) {
 		return err
 	}
 
-	linecount := 1
-	over.AddGlobalFields("output-line")
-	over.MDC().Set("output-line", linecount)
 	for pipeline.source.Next() {
 		err := pipeline.sink.ProcessDictionary(pipeline.source.Value())
 		if err != nil {
 			return err
 		}
-		linecount++
-		over.MDC().Set("output-line", linecount)
 	}
-	over.MDC().Set("output-line", linecount-1)
 	return pipeline.source.Err()
 }
 

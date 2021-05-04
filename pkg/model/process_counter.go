@@ -2,7 +2,6 @@ package model
 
 import (
 	over "github.com/Trendyol/overlog"
-	"github.com/rs/zerolog/log"
 )
 
 type CounterProcess struct {
@@ -15,17 +14,13 @@ func NewCounterProcess(contextName string, initValue int) Processor {
 }
 
 func NewCounterProcessWithCallback(contextName string, initValue int, updater func(int)) Processor {
-	process := CounterProcess{contextName, nil}
-	err := process.Open()
-	if err != nil {
-		log.Warn().AnErr("err", err).Msg("Should not happen")
-	}
 	over.MDC().Set(contextName, initValue)
 	return CounterProcess{contextName, updater}
 }
 
 func (p CounterProcess) Open() error {
-	over.AddGlobalFields(p.contextName)
+	// we don't do that, because sometime we want a hidden counter
+	// over.AddGlobalFields(p.contextName)
 	return nil
 }
 

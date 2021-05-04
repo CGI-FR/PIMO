@@ -83,7 +83,6 @@ func (me MaskEngine) MaskContext(e model.Dictionary, key string, context ...mode
 		}
 		input = append(input, elemInput)
 	}
-	saveSourceLine, _ := over.MDC().Get("input-line")
 	saveConfig, _ := over.MDC().Get("config")
 	savePath, _ := over.MDC().Get("path")
 	saveContext, _ := over.MDC().Get("context")
@@ -91,13 +90,17 @@ func (me MaskEngine) MaskContext(e model.Dictionary, key string, context ...mode
 	if len(me.source) > 0 {
 		over.MDC().Set("config", me.source)
 	}
-	// model.NewSourceFromSlice(input).Process(model.NewCounterProcess("input-line")).Process(me.pipeline).AddSink(model.NewSinkToSlice(&result)).Run()
+	// TODO: possible refactoring
+	// model.NewSourceFromSlice(input).
+	//			Process(model.NewCounterProcessWithCallback("input-line", 1, updateContext)).
+	//			Process(me.pipeline).
+	//			AddSink(model.NewSinkToSlice(&result)).
+	//			Run()
 	err := me.pipeline.
 		WithSource(model.NewSourceFromSlice(input)).
-		Process(model.NewCounterProcessWithCallback("input-line", 1, updateContext)).
+		Process(model.NewCounterProcessWithCallback("internal", 1, updateContext)).
 		AddSink(model.NewSinkToSlice(&result)).
 		Run()
-	over.MDC().Set("input-line", saveSourceLine)
 	over.MDC().Set("config", saveConfig)
 	over.MDC().Set("path", savePath)
 	over.MDC().Set("context", saveContext)
