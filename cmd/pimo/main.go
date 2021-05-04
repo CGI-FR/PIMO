@@ -62,6 +62,7 @@ var (
 	builtBy   string
 
 	verbosity        string
+	debug            bool
 	jsonlog          bool
 	iteration        int
 	emptyInput       bool
@@ -87,7 +88,8 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 		},
 	}
 
-	rootCmd.PersistentFlags().StringVarP(&verbosity, "verbosity", "v", "error", "set level of log verbosity, default is error : none (0), error (1), warn (2), info (3), debug (4), trace (5)")
+	rootCmd.PersistentFlags().StringVarP(&verbosity, "verbosity", "v", "error", "set level of log verbosity : none (0), error (1), warn (2), info (3), debug (4), trace (5)")
+	rootCmd.PersistentFlags().BoolVar(&debug, "debug", false, "add debug information to logs (very slow)")
 	rootCmd.PersistentFlags().BoolVar(&jsonlog, "log-json", false, "output logs in JSON format")
 	rootCmd.PersistentFlags().IntVarP(&iteration, "repeat", "r", 1, "number of iteration to mask each input")
 	rootCmd.PersistentFlags().BoolVar(&emptyInput, "empty-input", false, "generate data without any input, to use with repeat flag")
@@ -138,6 +140,7 @@ func run() {
 
 	pdef, err := model.LoadPipelineDefinitionFromYAML(maskingFile)
 	if err != nil {
+		log.Err(err).Msg("Cannot load pipeline definition from file")
 		log.Warn().Int("return", 1).Msg("End PIMO")
 		os.Exit(1)
 	}
@@ -239,6 +242,9 @@ func initLog() {
 	} else {
 		logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr}) // .With().Caller().Logger()
 	}
+	if debug {
+		logger = logger.With().Caller().Logger()
+	}
 
 	over.New(logger)
 
@@ -254,10 +260,8 @@ func initLog() {
 		log.Info().Msg("Logger level set to info")
 	case "warn", "2":
 		zerolog.SetGlobalLevel(zerolog.WarnLevel)
-		log.Info().Msg("Logger level set to warn")
 	case "error", "1":
 		zerolog.SetGlobalLevel(zerolog.ErrorLevel)
-		log.Info().Msg("Logger level set to error")
 	default:
 		zerolog.SetGlobalLevel(zerolog.Disabled)
 	}

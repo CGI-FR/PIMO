@@ -24,7 +24,6 @@ import (
 	"time"
 
 	"github.com/goccy/go-yaml"
-	"github.com/rs/zerolog/log"
 )
 
 // nolint: gochecknoglobals
@@ -121,7 +120,6 @@ func BuildPipeline(pipeline Pipeline, conf Definition, caches map[string]Cache) 
 func LoadPipelineDefinitionFromYAML(filename string) (Definition, error) {
 	source, err := ioutil.ReadFile(filename)
 	if err != nil {
-		log.Err(err).Str("filename", filename).Msg("Cannot load pipeline definition from file")
 		return Definition{}, err
 	}
 	var conf Definition
