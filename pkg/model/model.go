@@ -434,17 +434,17 @@ func (pipeline SimpleSinkedPipeline) Run() (err error) {
 	}
 
 	linecount := 1
-	over.AddGlobalFields("line-number")
-	over.MDC().Set("line-number", linecount)
+	over.AddGlobalFields("output-line")
+	over.MDC().Set("output-line", linecount)
 	for pipeline.source.Next() {
 		err := pipeline.sink.ProcessDictionary(pipeline.source.Value())
 		if err != nil {
 			return err
 		}
 		linecount++
-		over.MDC().Set("line-number", linecount)
+		over.MDC().Set("output-line", linecount)
 	}
-	over.MDC().Set("line-number", linecount-1)
+	over.MDC().Set("output-line", linecount-1)
 	return pipeline.source.Err()
 }
 

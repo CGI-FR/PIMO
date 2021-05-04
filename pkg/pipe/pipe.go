@@ -82,19 +82,21 @@ func (me MaskEngine) MaskContext(e model.Dictionary, key string, context ...mode
 		}
 		input = append(input, elemInput)
 	}
-	saveLineNumber, _ := over.MDC().Get("line-number")
+	saveSourceLine, _ := over.MDC().Get("input-line")
 	saveConfig, _ := over.MDC().Get("config")
 	savePath, _ := over.MDC().Get("path")
 	saveContext, _ := over.MDC().Get("context")
-	over.MDC().Set("context", fmt.Sprintf("%s[%d]/%s", saveContext, saveLineNumber, savePath))
+	over.MDC().Set("context", fmt.Sprintf("%s[%d]/%s", saveContext, saveSourceLine, savePath))
 	if len(me.source) > 0 {
 		over.MDC().Set("config", me.source)
 	}
+	// model.NewSourceFromSlice(input).Process(model.NewCounterProcess("input-line")).Process(me.pipeline).AddSink(model.NewSinkToSlice(&result)).Run()
 	err := me.pipeline.
 		WithSource(model.NewSourceFromSlice(input)).
+		Process(model.NewCounterProcess("input-line", 1)).
 		AddSink(model.NewSinkToSlice(&result)).
 		Run()
-	over.MDC().Set("line-number", saveLineNumber)
+	over.MDC().Set("input-line", saveSourceLine)
 	over.MDC().Set("config", saveConfig)
 	over.MDC().Set("path", savePath)
 	over.MDC().Set("context", saveContext)

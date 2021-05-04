@@ -104,7 +104,7 @@ testcases:
     assertions:
     - result.code ShouldEqual 4
     - result.systemerr ShouldContainSubstring "level":"error"
-    - result.systemerr ShouldContainSubstring "line-number":"0"
+    - result.systemerr ShouldContainSubstring "output-line":"0"
 - name: a masking error with flag --skip-line-on-error should not interrupt pipeline
   steps:
   - script: |-
@@ -124,4 +124,4 @@ testcases:
     - result.code ShouldEqual 0
     - result.systemerr ShouldNotContainSubstring "level":"error"
     - result.systemerr ShouldContainSubstring Line skipped
-    - result.systemerr ShouldContainSubstring "line-number":"1"
+    - result.systemerr ShouldContainSubstring "output-line":"1"

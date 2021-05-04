@@ -127,6 +127,7 @@ func run() {
 		source = jsonline.NewSource(os.Stdin)
 	}
 	pipeline := model.NewPipeline(source).
+		Process(model.NewCounterProcess("input-line", 0)).
 		Process(model.NewRepeaterProcess(iteration))
 
 	var (
@@ -178,7 +179,7 @@ func run() {
 	over.MDC().Set("duration", duration)
 	stats := statistics.Compute()
 
-	over.SetGlobalFields([]string{"config", "context", "line-number", "duration"})
+	over.SetGlobalFields([]string{"config", "context", "output-line", "duration"})
 	if err != nil {
 		log.Err(err).Msg("Pipeline didn't complete run")
 		log.Warn().RawJSON("stats", stats.ToJSON()).Int("return", 4).Msg("End PIMO")
