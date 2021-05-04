@@ -182,7 +182,7 @@ func run() {
 	over.MDC().Set("duration", duration)
 	stats := statistics.Compute()
 
-	over.SetGlobalFields([]string{"config", "context", "output-line", "input-line", "duration"})
+	over.SetGlobalFields([]string{"config", "output-line", "input-line", "duration"})
 	if err != nil {
 		log.Err(err).Msg("Pipeline didn't complete run")
 		log.Warn().RawJSON("stats", stats.ToJSON()).Int("return", 4).Msg("End PIMO")
