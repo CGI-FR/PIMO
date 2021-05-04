@@ -17,7 +17,10 @@
 
 package model
 
-import over "github.com/Trendyol/overlog"
+import (
+	over "github.com/Trendyol/overlog"
+	"github.com/rs/zerolog/log"
+)
 
 func NewDeleteMaskEngineProcess(selector Selector) Processor {
 	return &DeleteMaskEngineProcess{selector: selector}
@@ -39,9 +42,14 @@ func (dp *DeleteMaskEngineProcess) ProcessDictionary(dictionary Dictionary, out 
 	for k, v := range dictionary {
 		result[k] = v
 	}
-	dp.selector.Apply(result, func(rootContext, parentContext Dictionary, key string, value Entry) (Action, Entry) {
+	applied := dp.selector.Apply(result, func(rootContext, parentContext Dictionary, key string, value Entry) (Action, Entry) {
 		return DELETE, nil
 	})
+
+	if !applied {
+		log.Warn().Msg("Field not found")
+	}
+
 	out.Collect(result)
 	return nil
 }
