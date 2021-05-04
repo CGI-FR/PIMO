@@ -86,6 +86,9 @@ This takes the `data.json` file, masks the data contained inside it and put the 
 * `--config=filename.yml` This flag allow to use another file for config than the default `masking.yml`.
 * `--load-cache cacheName=filename.json` This flag load an initial cache content from a file (json line format `{"key":"a", "value":"b"}`).
 * `--dump-cache cacheName=filename.json` This flag dump final cache content to a file (json line format `{"key":"a", "value":"b"}`).
+* `--verbosity <level>` or `-v<level>` This flag increase verbosity on the stderr output, possible values: none (0), error (1), warn (2), info (3), debug (4), trace (5).
+* `--debug` This flag complete the logs with debug information (source file, line number).
+* `--log-json` Set this flag to produce JSON formatted logs.
 
 ## Examples
 
