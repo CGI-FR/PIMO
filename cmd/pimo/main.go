@@ -20,6 +20,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"regexp"
 	"time"
 
 	over "github.com/Trendyol/overlog"
@@ -127,7 +128,7 @@ func run() {
 		source = jsonline.NewSource(os.Stdin)
 	}
 	pipeline := model.NewPipeline(source).
-		Process(model.NewCounterProcess("input-line", 0)).
+		Process(model.NewCounterProcessWithCallback("input-line", 0, updateContext)).
 		Process(model.NewRepeaterProcess(iteration))
 
 	var (
@@ -179,7 +180,7 @@ func run() {
 	over.MDC().Set("duration", duration)
 	stats := statistics.Compute()
 
-	over.SetGlobalFields([]string{"config", "context", "output-line", "duration"})
+	over.SetGlobalFields([]string{"config", "context", "output-line", "input-line", "duration"})
 	if err != nil {
 		log.Err(err).Msg("Pipeline didn't complete run")
 		log.Warn().RawJSON("stats", stats.ToJSON()).Int("return", 4).Msg("End PIMO")
@@ -268,4 +269,11 @@ func initLog() {
 	}
 	over.MDC().Set("config", maskingFile)
 	over.SetGlobalFields([]string{"config"})
+}
+
+var re = regexp.MustCompile(`(\[\d*\])?$`)
+
+func updateContext(counter int) {
+	context := over.MDC().GetString("context")
+	over.MDC().Set("context", re.ReplaceAllString(context, fmt.Sprintf("[%d]", counter)))
 }

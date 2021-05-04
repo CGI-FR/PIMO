@@ -7,16 +7,21 @@ import (
 
 type CounterProcess struct {
 	contextName string
+	updater     func(int)
 }
 
 func NewCounterProcess(contextName string, initValue int) Processor {
-	process := CounterProcess{contextName}
+	return NewCounterProcessWithCallback(contextName, initValue, nil)
+}
+
+func NewCounterProcessWithCallback(contextName string, initValue int, updater func(int)) Processor {
+	process := CounterProcess{contextName, nil}
 	err := process.Open()
 	if err != nil {
 		log.Warn().AnErr("err", err).Msg("Should not happen")
 	}
 	over.MDC().Set(contextName, initValue)
-	return CounterProcess{contextName}
+	return CounterProcess{contextName, updater}
 }
 
 func (p CounterProcess) Open() error {
@@ -35,7 +40,11 @@ func (p CounterProcess) ProcessDictionary(dictionary Dictionary, out Collector) 
 	}
 
 	if counter, ok := value.(int); ok {
-		over.MDC().Set(p.contextName, counter+1)
+		counter++
+		over.MDC().Set(p.contextName, counter)
+		if p.updater != nil {
+			p.updater(counter)
+		}
 	}
 
 	out.Collect(dictionary)
