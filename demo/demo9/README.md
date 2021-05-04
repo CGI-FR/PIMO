@@ -11,8 +11,8 @@ PIMO has 6 level of logging :
 This can be set with the `-v` flag (long version `--verbosity`) :
 
 ```console
-$ pimo --empty-input -v5
-2:57PM INF Logger level set to trace
+$ pimo --empty-input -vinfo
+2:57PM INF Logger level set to info
 2:57PM INF Start PIMO config=masking.yml dump-cache={} empty-input=true load-cache={} repeat=1 skipFieldOnError=false skipLineOnError=false
 2:57PM WRN Path not found config=masking.yml context=empty-input[1] input-line=1 output-line=1 path=name
 2:57PM WRN Path not found config=masking.yml context=empty-input[1] input-line=1 output-line=1 path=surname
@@ -91,7 +91,7 @@ $ echo '{"name": "", "surname": "", "town": "", "age": ""}' | pimo -vinfo --repe
 With `--log-json` flag :
 
 ```json
-$ echo '{"name": "", "surname": "", "town": "", "age": ""}' | pimo -vinfo --repeat 2
+$ echo '{"name": "", "surname": "", "town": "", "age": ""}' | pimo -vinfo --log-json --repeat 2
 {"level":"info","message":"Logger level set to info"}
 {"level":"info","skipLineOnError":false,"skipFieldOnError":false,"repeat":2,"empty-input":false,"dump-cache":{},"load-cache":{},"config":"masking.yml","message":"Start PIMO"}
 {"level":"info","config":"masking.yml","context":"stdin[1]","input-line":"1","output-line":"1","path":"name","message":"Mask constant"}
