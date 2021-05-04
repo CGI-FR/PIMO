@@ -19,6 +19,7 @@ package model
 
 import (
 	over "github.com/Trendyol/overlog"
+	"github.com/cgi-fr/pimo/pkg/statistics"
 	"github.com/rs/zerolog/log"
 )
 
@@ -47,7 +48,8 @@ func (dp *DeleteMaskEngineProcess) ProcessDictionary(dictionary Dictionary, out 
 	})
 
 	if !applied {
-		log.Warn().Msg("Field not found")
+		statistics.IncIgnoredPathsCount()
+		log.Warn().Msg("Path not found")
 	}
 
 	out.Collect(result)

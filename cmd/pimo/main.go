@@ -45,6 +45,7 @@ import (
 	"github.com/cgi-fr/pimo/pkg/regex"
 	"github.com/cgi-fr/pimo/pkg/remove"
 	"github.com/cgi-fr/pimo/pkg/replacement"
+	"github.com/cgi-fr/pimo/pkg/statistics"
 	"github.com/cgi-fr/pimo/pkg/templatemask"
 	"github.com/cgi-fr/pimo/pkg/weightedchoice"
 	"github.com/rs/zerolog"
@@ -163,14 +164,21 @@ func run() {
 		}
 	}
 
+	// init stats and time measure to zero
+	statistics.Reset()
 	startTime := time.Now()
+
 	err = pipeline.AddSink(jsonline.NewSink(os.Stdout)).Run()
+
+	// include duration info and stats in log output
 	duration := time.Since(startTime)
-	over.SetGlobalFields([]string{"config", "context", "line-number", "duration"})
 	over.MDC().Set("duration", duration)
+	stats := statistics.Compute()
+
+	over.SetGlobalFields([]string{"config", "context", "line-number", "duration"})
 	if err != nil {
 		log.Err(err).Msg("Pipeline didn't complete run")
-		log.Warn().Int("return", 4).Msg("End PIMO")
+		log.Warn().RawJSON("stats", stats.ToJSON()).Int("return", 4).Msg("End PIMO")
 		os.Exit(4)
 	}
 
@@ -178,18 +186,18 @@ func run() {
 		cache, ok := caches[name]
 		if !ok {
 			log.Error().Str("cache-name", name).Msg("Cache not found")
-			log.Warn().Int("return", 2).Msg("End PIMO")
+			log.Warn().RawJSON("stats", stats.ToJSON()).Int("return", 2).Msg("End PIMO")
 			os.Exit(2)
 		}
 		err = pimo.DumpCache(name, cache, path)
 		if err != nil {
 			log.Err(err).Str("cache-name", name).Str("cache-path", path).Msg("Cannot dump cache")
-			log.Warn().Int("return", 3).Msg("End PIMO")
+			log.Warn().RawJSON("stats", stats.ToJSON()).Int("return", 3).Msg("End PIMO")
 			os.Exit(3)
 		}
 	}
 
-	log.Info().Int("return", 0).Msg("End PIMO")
+	log.Info().RawJSON("stats", stats.ToJSON()).Int("return", 0).Msg("End PIMO")
 	os.Exit(0)
 }
 

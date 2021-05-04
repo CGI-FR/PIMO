@@ -19,6 +19,7 @@ package model
 
 import (
 	over "github.com/Trendyol/overlog"
+	"github.com/cgi-fr/pimo/pkg/statistics"
 	"github.com/rs/zerolog/log"
 )
 
@@ -57,7 +58,8 @@ func (mcep *MaskContextEngineProcess) ProcessDictionary(dictionary Dictionary, o
 	})
 
 	if !applied {
-		log.Warn().Msg("Field not found")
+		statistics.IncIgnoredPathsCount()
+		log.Warn().Msg("Path not found")
 	}
 
 	if ret == nil {
@@ -66,11 +68,13 @@ func (mcep *MaskContextEngineProcess) ProcessDictionary(dictionary Dictionary, o
 
 	if ret != nil && skipLineOnError {
 		log.Warn().AnErr("error", ret).Msg("Line skipped")
+		statistics.IncIgnoredLinesCount()
 		ret = nil
 	}
 
 	if ret != nil && skipFieldOnError {
 		log.Warn().AnErr("error", ret).Msg("Field skipped")
+		statistics.IncIgnoredFieldsCount()
 		mcep.selector.Apply(result, func(rootContext, parentContext Dictionary, key string, value Entry) (Action, Entry) {
 			return DELETE, nil
 		})
