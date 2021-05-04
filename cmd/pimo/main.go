@@ -20,6 +20,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"time"
 
 	over "github.com/Trendyol/overlog"
 	"github.com/cgi-fr/pimo/internal/app/pimo"
@@ -162,7 +163,11 @@ func run() {
 		}
 	}
 
+	startTime := time.Now()
 	err = pipeline.AddSink(jsonline.NewSink(os.Stdout)).Run()
+	duration := time.Since(startTime)
+	over.SetGlobalFields([]string{"config", "context", "line-number", "duration"})
+	over.MDC().Set("duration", duration)
 	if err != nil {
 		log.Err(err).Msg("Pipeline didn't complete run")
 		log.Warn().Int("return", 4).Msg("End PIMO")
