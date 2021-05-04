@@ -10,5 +10,6 @@ This folder contains every file necessary for demos of PIMO program. Here are th
 * Demo 6 - Adding and removing fields
 * Demo 7 - Format preserving encryption
 * Demo 8 - Handle complex structures
+* Demo 9 - Logging
 
 More demos will come.
