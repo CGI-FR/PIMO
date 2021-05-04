@@ -17,6 +17,10 @@ Types of changes
 ## [Unreleased]
 
 - `Added` sprig dependency v3 which bring new sprig functions (durationRound, numerous, toRawJson, htpasswd, duration, seq, randInt, fromJson, mustFromJson, bcrypt, randBytes, dig, regexQuoteMeta, osBase, osDir, osExt, osClean, osIsAbs, and, all, addf, add1f, subf, divf, mulf, maxf, and minf, chunk, and more...) and improve others (get)
+- `Added` strutured logging with `-v` and `--log-json` flags
+- `Added` debug option `--debug`, warning it's slow do not use in production
+- `Fixed` flag `--skip-line-on-error`
+- `Fixed` flag `--skip-field-on-error`
 
 ## [1.3.0]
 
