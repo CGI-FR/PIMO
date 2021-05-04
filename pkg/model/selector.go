@@ -151,7 +151,7 @@ func (s selector) applySubContext(root Dictionary, current Dictionary, appliers 
 			// apply with nil value
 			s.applyContext(root, current, nil, appliers)
 		}
-		return false
+		return true
 	}
 	v := reflect.ValueOf(entry)
 	kind := v.Kind()
