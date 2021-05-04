@@ -43,7 +43,7 @@ func (mep *MaskEngineProcess) ProcessDictionary(dictionary Dictionary, out Colle
 	for k, v := range dictionary {
 		result[k] = v
 	}
-	mep.selector.Apply(result, func(rootContext, parentContext Dictionary, key string, value Entry) (Action, Entry) {
+	applied := mep.selector.Apply(result, func(rootContext, parentContext Dictionary, key string, value Entry) (Action, Entry) {
 		masked, err := mep.mask.Mask(value, rootContext, parentContext)
 		if err != nil {
 			ret = err
@@ -51,6 +51,10 @@ func (mep *MaskEngineProcess) ProcessDictionary(dictionary Dictionary, out Colle
 		}
 		return WRITE, masked
 	})
+
+	if !applied {
+		log.Warn().Msg("Field not found")
+	}
 
 	if ret == nil {
 		out.Collect(result)

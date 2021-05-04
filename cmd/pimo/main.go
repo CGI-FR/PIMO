@@ -222,9 +222,9 @@ func injectMaskFactories() []model.MaskFactory {
 func initLog() {
 	var logger zerolog.Logger
 	if jsonlog {
-		logger = zerolog.New(os.Stderr) // .With().Timestamp().Caller().Logger()
+		logger = zerolog.New(os.Stderr) // .With().Caller().Logger()
 	} else {
-		logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr}) // .With().Timestamp().Caller().Logger()
+		logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr}) // .With().Caller().Logger()
 	}
 
 	over.New(logger)

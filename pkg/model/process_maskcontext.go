@@ -43,7 +43,7 @@ func (mcep *MaskContextEngineProcess) ProcessDictionary(dictionary Dictionary, o
 	for k, v := range dictionary {
 		result[k] = v
 	}
-	mcep.selector.ApplyContext(result, func(rootContext, parentContext Dictionary, key string, _ Entry) (Action, Entry) {
+	applied := mcep.selector.ApplyContext(result, func(rootContext, parentContext Dictionary, key string, _ Entry) (Action, Entry) {
 		masked, err := mcep.mask.MaskContext(parentContext, key, rootContext, parentContext)
 		if err != nil {
 			ret = err
@@ -55,6 +55,10 @@ func (mcep *MaskContextEngineProcess) ProcessDictionary(dictionary Dictionary, o
 		}
 		return WRITE, value
 	})
+
+	if !applied {
+		log.Warn().Msg("Field not found")
+	}
 
 	if ret == nil {
 		out.Collect(result)
