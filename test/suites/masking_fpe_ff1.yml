@@ -152,6 +152,7 @@ testcases:
               keyFromEnv: "FF1_ENCRYPTION_KEY"
               tweakField: "tweak"
       EOF
+  - script: unset FF1_ENCRYPTION_KEY
   - script: |-
       echo '{"name": "Toto", "tweak": "mytweak"}' | pimo
     assertions:

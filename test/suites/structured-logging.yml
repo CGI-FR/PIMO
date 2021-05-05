@@ -100,7 +100,7 @@ testcases:
               keyFromEnv: "INVALID_VALUE"
       EOF
   - script: |-
-      echo '{"field": null}' | pimo --log-json -vinfo
+      echo '{"field": ""}' | pimo --log-json -vinfo
     assertions:
     - result.code ShouldEqual 4
     - result.systemerr ShouldContainSubstring "level":"error"
@@ -119,7 +119,7 @@ testcases:
               keyFromEnv: "INVALID_VALUE"
       EOF
   - script: |-
-      echo '{"field": null}' | pimo --skip-line-on-error --log-json -vinfo
+      echo '{"field": ""}' | pimo --skip-line-on-error --log-json -vinfo
     assertions:
     - result.code ShouldEqual 0
     - result.systemerr ShouldNotContainSubstring "level":"error"
