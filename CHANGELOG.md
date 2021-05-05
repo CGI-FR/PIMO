@@ -21,6 +21,7 @@ Types of changes
 - `Added` debug option `--debug`, warning it's slow do not use in production
 - `Fixed` flag `--skip-line-on-error`
 - `Fixed` flag `--skip-field-on-error`
+- `Fixed` handling of null values by the the `ff1` mask
 
 ## [1.3.0]
 
