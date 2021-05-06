@@ -17,6 +17,12 @@
 
 package model
 
+import (
+	over "github.com/Trendyol/overlog"
+	"github.com/cgi-fr/pimo/pkg/statistics"
+	"github.com/rs/zerolog/log"
+)
+
 func NewDeleteMaskEngineProcess(selector Selector) Processor {
 	return &DeleteMaskEngineProcess{selector: selector}
 }
@@ -30,13 +36,22 @@ func (dp *DeleteMaskEngineProcess) Open() (err error) {
 }
 
 func (dp *DeleteMaskEngineProcess) ProcessDictionary(dictionary Dictionary, out Collector) error {
+	over.AddGlobalFields("path")
+	over.MDC().Set("path", dp.selector)
+	defer func() { over.MDC().Remove("path") }()
 	result := Dictionary{}
 	for k, v := range dictionary {
 		result[k] = v
 	}
-	dp.selector.Apply(result, func(rootContext, parentContext Dictionary, key string, value Entry) (Action, Entry) {
+	applied := dp.selector.Apply(result, func(rootContext, parentContext Dictionary, key string, value Entry) (Action, Entry) {
 		return DELETE, nil
 	})
+
+	if !applied {
+		statistics.IncIgnoredPathsCount()
+		log.Warn().Msg("Path not found")
+	}
+
 	out.Collect(result)
 	return nil
 }

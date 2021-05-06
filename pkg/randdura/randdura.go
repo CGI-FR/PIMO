@@ -25,6 +25,7 @@ import (
 
 	"github.com/cgi-fr/pimo/pkg/duration"
 	"github.com/cgi-fr/pimo/pkg/model"
+	"github.com/rs/zerolog/log"
 )
 
 // MaskEngine is to mask a value thanks to 2 durations
@@ -58,6 +59,7 @@ func NewMask(minString, maxString string, seed int64) (MaskEngine, error) {
 
 // Mask masks a time value with a duration
 func (me MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Entry, error) {
+	log.Info().Msg("Mask randomDuration")
 	var t time.Time
 	var err error
 	switch v := e.(type) {

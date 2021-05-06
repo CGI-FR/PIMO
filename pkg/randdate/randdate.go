@@ -23,6 +23,7 @@ import (
 	"time"
 
 	"github.com/cgi-fr/pimo/pkg/model"
+	"github.com/rs/zerolog/log"
 )
 
 // MaskEngine is a struct to mask the date
@@ -40,6 +41,7 @@ func NewMask(min, max time.Time, seed int64) MaskEngine {
 
 // Mask choose a mask date randomly
 func (dateRange MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Entry, error) {
+	log.Info().Msg("Mask randDate")
 	delta := dateRange.DateMax.Unix() - dateRange.DateMin.Unix()
 	sec := time.Unix(dateRange.rand.Int63n(delta)+dateRange.DateMin.Unix(), 0)
 	return sec, nil

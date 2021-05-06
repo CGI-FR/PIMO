@@ -24,6 +24,7 @@ import (
 	"time"
 
 	"github.com/cgi-fr/pimo/pkg/model"
+	"github.com/rs/zerolog/log"
 )
 
 // MaskEngine is to mask a value thanks to a duration
@@ -76,6 +77,7 @@ func ParseInt64(value string) int64 {
 
 // Mask masks a time value with a duration
 func (dura MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Entry, error) {
+	log.Info().Msg("Mask duration")
 	var t time.Time
 	var err error
 	switch v := e.(type) {

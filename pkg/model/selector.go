@@ -18,6 +18,7 @@
 package model
 
 import (
+	"fmt"
 	"reflect"
 	"strings"
 )
@@ -45,6 +46,8 @@ type Selector interface {
 	WriteContext(Dictionary, Entry) Dictionary
 	Read(Dictionary) (Entry, bool)
 	Write(Dictionary, Entry) Dictionary
+
+	fmt.Stringer
 }
 
 type selectorInternal interface {
@@ -65,6 +68,13 @@ func NewPathSelector(path string) Selector {
 		return selector{paths[0], NewPathSelector(paths[1]).(selectorInternal)}
 	}
 	return selector{paths[0], nil}
+}
+
+func (s selector) String() string {
+	if s.sub != nil {
+		return s.path + "." + s.sub.String()
+	}
+	return s.path
 }
 
 func (s selector) Apply(root Dictionary, appliers ...Applier) bool {
@@ -141,7 +151,7 @@ func (s selector) applySubContext(root Dictionary, current Dictionary, appliers 
 			// apply with nil value
 			s.applyContext(root, current, nil, appliers)
 		}
-		return false
+		return true
 	}
 	v := reflect.ValueOf(entry)
 	kind := v.Kind()

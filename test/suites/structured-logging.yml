@@ -1,0 +1,127 @@
+name: structured logging
+testcases:
+- name: no flags should not activate structured logging
+  steps:
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+      EOF
+  - script: |-
+      echo '{}' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldEqual {}
+    - result.systemerr ShouldBeEmpty
+- name: by default structured logging is on error level so errors should be visible
+  steps:
+  - script: |-
+      cat > masking.yml <<EOF
+      invalid yaml
+      EOF
+  - script: |-
+      echo '{}' | pimo
+    assertions:
+    - result.code ShouldNotEqual 0
+    - result.systemerr ShouldContainSubstring ERR
+    - result.systemerr ShouldNotContainSubstring WRN
+- name: flag -v0 or -vnone should completely disable output on stderr
+  steps:
+  - script: |-
+      cat > masking.yml <<EOF
+      invalid yaml
+      EOF
+  - script: |-
+      echo '{}' | pimo -v0
+      echo '{}' | pimo -vnone
+    assertions:
+    - result.code ShouldNotEqual 0
+    - result.systemerr ShouldBeEmpty
+- name: flag -v2 or -vwarn should show warnings
+  steps:
+  - script: |-
+      cat > masking.yml <<EOF
+      invalid yaml
+      EOF
+  - script: |-
+      echo '{}' | pimo -v2
+      echo '{}' | pimo -vwarn
+    assertions:
+    - result.code ShouldNotEqual 0
+    - result.systemerr ShouldContainSubstring WRN
+- name: flag -v3 or -vinfo should show informations
+  steps:
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "field"
+          mask:
+            constant: "value"
+      EOF
+  - script: |-
+      echo '{"field": null}' | pimo -v3
+      echo '{"field": null}' | pimo -vinfo
+    assertions:
+    - result.code ShouldEqual 0
+    - |
+      result.systemout ShouldContainSubstring {"field":"value"}
+    - result.systemerr ShouldContainSubstring INF
+- name: missing field should increase .stats.ignoredPath statistic
+  steps:
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "field"
+          mask:
+            constant: "value"
+      EOF
+  - script: |-
+      echo '{}' | pimo --log-json -vinfo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemerr ShouldContainSubstring "warn"
+    - result.systemerr ShouldContainSubstring Path not found
+    - result.systemerr ShouldContainSubstring "ignoredPaths":1
+- name: a masking error should interrupt pipeline
+  steps:
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "field"
+          mask:
+            ff1:
+              radix: 10
+              keyFromEnv: "INVALID_VALUE"
+      EOF
+  - script: |-
+      echo '{"field": ""}' | pimo --log-json -vinfo
+    assertions:
+    - result.code ShouldEqual 4
+    - result.systemerr ShouldContainSubstring "level":"error"
+    - result.systemerr ShouldContainSubstring "output-line":"1"
+- name: a masking error with flag --skip-line-on-error should not interrupt pipeline
+  steps:
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "field"
+          mask:
+            ff1:
+              radix: 10
+              keyFromEnv: "INVALID_VALUE"
+      EOF
+  - script: |-
+      echo '{"field": ""}' | pimo --skip-line-on-error --log-json -vinfo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemerr ShouldNotContainSubstring "level":"error"
+    - result.systemerr ShouldContainSubstring Line skipped
+    - result.systemerr ShouldContainSubstring "output-line":"1"

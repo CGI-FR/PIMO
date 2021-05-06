@@ -18,13 +18,18 @@
 package pipe
 
 import (
+	"fmt"
 	"hash/fnv"
+	"regexp"
 
+	over "github.com/Trendyol/overlog"
 	"github.com/cgi-fr/pimo/pkg/model"
+	"github.com/rs/zerolog/log"
 )
 
 // MaskEngine is a value that always mask the same way
 type MaskEngine struct {
+	source       string
 	pipeline     model.Pipeline
 	injectParent string
 	injectRoot   string
@@ -37,7 +42,7 @@ func NewMask(seed int64, injectParent string, injectRoot string, caches map[stri
 	if len(filename) > 0 {
 		definition, err = model.LoadPipelineDefinitionFromYAML(filename)
 		if err != nil {
-			return MaskEngine{nil, injectParent, injectRoot}, err
+			return MaskEngine{filename, nil, injectParent, injectRoot}, err
 		}
 		// merge the current seed with the seed provided by configuration on the pipe
 		definition.Seed += seed
@@ -46,10 +51,11 @@ func NewMask(seed int64, injectParent string, injectRoot string, caches map[stri
 	}
 	pipeline := model.NewPipeline(nil)
 	pipeline, _, err = model.BuildPipeline(pipeline, definition, caches)
-	return MaskEngine{pipeline, injectParent, injectRoot}, err
+	return MaskEngine{"", pipeline, injectParent, injectRoot}, err
 }
 
 func (me MaskEngine) MaskContext(e model.Dictionary, key string, context ...model.Dictionary) (model.Dictionary, error) {
+	log.Info().Msg("Mask pipe")
 	var result []model.Dictionary
 	input := []model.Dictionary{}
 
@@ -77,10 +83,27 @@ func (me MaskEngine) MaskContext(e model.Dictionary, key string, context ...mode
 		}
 		input = append(input, elemInput)
 	}
+	saveConfig, _ := over.MDC().Get("config")
+	savePath, _ := over.MDC().Get("path")
+	saveContext, _ := over.MDC().Get("context")
+	over.MDC().Set("context", fmt.Sprintf("%s/%s[1]", saveContext, savePath))
+	if len(me.source) > 0 {
+		over.MDC().Set("config", me.source)
+	}
+	// TODO: possible refactoring
+	// model.NewSourceFromSlice(input).
+	//			Process(model.NewCounterProcessWithCallback("input-line", 1, updateContext)).
+	//			Process(me.pipeline).
+	//			AddSink(model.NewSinkToSlice(&result)).
+	//			Run()
 	err := me.pipeline.
 		WithSource(model.NewSourceFromSlice(input)).
+		Process(model.NewCounterProcessWithCallback("internal", 1, updateContext)).
 		AddSink(model.NewSinkToSlice(&result)).
 		Run()
+	over.MDC().Set("config", saveConfig)
+	over.MDC().Set("path", savePath)
+	over.MDC().Set("context", saveContext)
 	if err != nil {
 		return nil, err
 	}
@@ -139,4 +162,11 @@ func InterfaceToDictionaryEntry(inter interface{}) model.Dictionary {
 	}
 
 	return dic
+}
+
+var re = regexp.MustCompile(`(\[\d*\])?$`)
+
+func updateContext(counter int) {
+	context := over.MDC().GetString("context")
+	over.MDC().Set("context", re.ReplaceAllString(context, fmt.Sprintf("[%d]", counter)))
 }

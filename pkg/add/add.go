@@ -19,6 +19,7 @@ package add
 
 import (
 	"github.com/cgi-fr/pimo/pkg/model"
+	"github.com/rs/zerolog/log"
 )
 
 // MaskEngine is a value that will be the initialisation of the field when it's created
@@ -33,6 +34,7 @@ func NewMask(value model.Entry) MaskEngine {
 
 // MaskContext add the field
 func (am MaskEngine) MaskContext(context model.Dictionary, key string, contexts ...model.Dictionary) (model.Dictionary, error) {
+	log.Info().Msg("Mask add")
 	_, present := context[key]
 	if !present {
 		context[key] = am.value

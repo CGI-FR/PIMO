@@ -17,6 +17,12 @@
 
 package model
 
+import (
+	over "github.com/Trendyol/overlog"
+	"github.com/cgi-fr/pimo/pkg/statistics"
+	"github.com/rs/zerolog/log"
+)
+
 func NewMaskContextEngineProcess(selector Selector, mask MaskContextEngine) Processor {
 	return &MaskContextEngineProcess{selector, mask}
 }
@@ -31,11 +37,14 @@ func (mcep *MaskContextEngineProcess) Open() error {
 }
 
 func (mcep *MaskContextEngineProcess) ProcessDictionary(dictionary Dictionary, out Collector) (ret error) {
+	over.AddGlobalFields("path")
+	over.MDC().Set("path", mcep.selector)
+	defer func() { over.MDC().Remove("path") }()
 	result := Dictionary{}
 	for k, v := range dictionary {
 		result[k] = v
 	}
-	mcep.selector.ApplyContext(result, func(rootContext, parentContext Dictionary, key string, _ Entry) (Action, Entry) {
+	applied := mcep.selector.ApplyContext(result, func(rootContext, parentContext Dictionary, key string, _ Entry) (Action, Entry) {
 		masked, err := mcep.mask.MaskContext(parentContext, key, rootContext, parentContext)
 		if err != nil {
 			ret = err
@@ -48,9 +57,30 @@ func (mcep *MaskContextEngineProcess) ProcessDictionary(dictionary Dictionary, o
 		return WRITE, value
 	})
 
+	if !applied {
+		statistics.IncIgnoredPathsCount()
+		log.Warn().Msg("Path not found")
+	}
+
 	if ret == nil {
 		out.Collect(result)
 	}
 
-	return
+	if ret != nil && skipLineOnError {
+		log.Warn().AnErr("error", ret).Msg("Line skipped")
+		statistics.IncIgnoredLinesCount()
+		ret = nil
+	}
+
+	if ret != nil && skipFieldOnError {
+		log.Warn().AnErr("error", ret).Msg("Field skipped")
+		statistics.IncIgnoredFieldsCount()
+		mcep.selector.Apply(result, func(rootContext, parentContext Dictionary, key string, value Entry) (Action, Entry) {
+			return DELETE, nil
+		})
+		out.Collect(result)
+		return nil
+	}
+
+	return ret
 }

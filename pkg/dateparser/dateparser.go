@@ -22,6 +22,7 @@ import (
 	"time"
 
 	"github.com/cgi-fr/pimo/pkg/model"
+	"github.com/rs/zerolog/log"
 )
 
 // MaskEngine is a type to change a date format
@@ -37,6 +38,7 @@ func NewMask(input, output string) MaskEngine {
 
 // Mask change a time format
 func (me MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Entry, error) {
+	log.Info().Msg("Mask dateparser")
 	var t time.Time
 	var err error
 	if me.inputFormat != "" {

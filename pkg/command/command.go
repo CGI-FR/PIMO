@@ -22,6 +22,7 @@ import (
 	"strings"
 
 	"github.com/cgi-fr/pimo/pkg/model"
+	"github.com/rs/zerolog/log"
 )
 
 // MaskEngine implements MaskEngine with a console command
@@ -36,6 +37,7 @@ func NewMask(cmd string) MaskEngine {
 
 // Mask delegate mask algorithm to an external program
 func (cme MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Entry, error) {
+	log.Info().Msg("Mask command")
 	splitCommand := strings.Split(cme.Cmd, " ")
 	/* #nosec */
 	out, err := exec.Command(splitCommand[0], splitCommand[1:]...).Output()

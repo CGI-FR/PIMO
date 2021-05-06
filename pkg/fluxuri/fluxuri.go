@@ -20,6 +20,7 @@ package fluxuri
 import (
 	"github.com/cgi-fr/pimo/pkg/model"
 	"github.com/cgi-fr/pimo/pkg/uri"
+	"github.com/rs/zerolog/log"
 )
 
 // MaskEngine is a list of value to mask in order from a list
@@ -42,6 +43,7 @@ func NewMask(name string) (MaskEngine, error) {
 
 // MaskContext add the field if not existing or replace the value if existing
 func (me MaskEngine) MaskContext(context model.Dictionary, key string, contexts ...model.Dictionary) (model.Dictionary, error) {
+	log.Info().Msg("Mask fluxuri")
 	if *me.Actual < me.LenList {
 		context[key] = me.List[*me.Actual]
 		*me.Actual++

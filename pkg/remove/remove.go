@@ -19,6 +19,7 @@ package remove
 
 import (
 	"github.com/cgi-fr/pimo/pkg/model"
+	"github.com/rs/zerolog/log"
 )
 
 // MaskEngine is an empty mask to link to a field to remove
@@ -32,6 +33,7 @@ func NewMask() MaskEngine {
 
 // MaskContext remove the field
 func (rm MaskEngine) MaskContext(context model.Dictionary, key string, contexts ...model.Dictionary) (model.Dictionary, error) {
+	log.Info().Msg("Mask delete")
 	delete(context, key)
 
 	return context, nil
