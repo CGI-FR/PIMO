@@ -1,12 +1,12 @@
 # Logging
 
 PIMO has 6 level of logging :
-1. none : log nothing at all
-2. error : log only errors
-3. warn : same as level 1 + warnings that should be checked by user
-4. info : same as level 2 + information about what is processed
-5. debug : same as level 3 + debugging information, to analyse what can cause an unexpected behavior
-6. trace : same as level 4 + tracing of events in code (enter function, exit function, values...)
+- 0 (none) : log nothing at all
+- 1 (error) : log only errors
+- 2 (warn) : same as level 1 + warnings that should be checked by user
+- 3 (info) : same as level 2 + information about what is processed
+- 4 (debug) : same as level 3 + debugging information, to analyse what can cause an unexpected behavior
+- 5 (trace) : same as level 4 + tracing of events in code (enter function, exit function, values...)
 
 This can be set with the `-v` flag (long version `--verbosity`) :
 
