@@ -49,6 +49,7 @@ func TestUriReaderShouldCreateListFromInsideFiles(t *testing.T) {
 	if err != nil {
 		assert.Fail(t, err.Error())
 	}
+	// nolint: gocritic
 	waitedList := append(maskingdata.NameFRM, maskingdata.NameFRF...)
 	for i := range waitedList {
 		assert.Equal(t, waitedList[i], nameList[i], "Should return the right list")

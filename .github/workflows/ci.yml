@@ -1,12 +1,14 @@
 # This is a basic workflow to help you get started with Actions
 
-name: Release
+name: CI
 
 # Controls when the action will run.
 on:
+  # Triggers the workflow on push or pull request events but only for the main branch
   push:
-    tags:
-      - "*"
+    branches: [main]
+  pull_request:
+    branches: [main]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -22,8 +24,6 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
 
       - name: Build
         run: docker-compose -f .devcontainer/docker-compose.yml build
@@ -35,18 +35,12 @@ jobs:
         run: docker-compose -f .devcontainer/docker-compose.yml exec -T -u root -w /workspace vscode make init
 
       - uses: FranzDiebold/github-env-vars-action@v2
-      - name: Release
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Run CI # up to test-int (info → refresh → lint → test → release → test-int)
         run: |
-          docker-compose -f .devcontainer/docker-compose.yml exec -e GITHUB_TOKEN=${GITHUB_TOKEN} -T -u root vscode bash -c 'echo "GITHUB_TOKEN: ${GITHUB_TOKEN}" > ~/.github.yml'
           docker-compose -f .devcontainer/docker-compose.yml exec \
             -T \
             -u root \
             -w /workspace \
             -e PATH=/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/go/bin:/home/vscode/go/bin:/workspace/bin \
             vscode \
-            neon -props "{tag: ${CI_ACTION_REF_NAME}, MODULE: github.com/${CI_REPOSITORY,,}, BY: ${CI_ACTOR}}" publish
-
-      - name: Test version
-        run: docker-compose -f .devcontainer/docker-compose.yml exec -T -u root ./dist/pimo_linux_amd64/pimo --version
+            neon -props "{tag: ${CI_ACTION_REF_NAME}, MODULE: github.com/${CI_REPOSITORY,,}, BY: ${CI_ACTOR}}" test-int
