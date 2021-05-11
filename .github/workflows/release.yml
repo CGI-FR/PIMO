@@ -49,4 +49,4 @@ jobs:
             neon -props "{tag: ${CI_ACTION_REF_NAME}, MODULE: github.com/${CI_REPOSITORY,,}, BY: ${CI_ACTOR}}" publish
 
       - name: Test version
-        run: ./dist/pimo_linux_amd64/pimo --version
+        run: docker-compose -f .devcontainer/docker-compose.yml exec -T -u root ./dist/pimo_linux_amd64/pimo --version
