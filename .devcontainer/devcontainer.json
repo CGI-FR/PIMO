@@ -1,7 +1,7 @@
 {
     "name": "PIMO",
     "dockerComposeFile": [
-        "../docker-compose.yml"
+        "docker-compose.yml"
     ],
     "service": "vscode",
     "runServices": [
