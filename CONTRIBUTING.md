@@ -13,11 +13,11 @@ You need :
 
 Details are available on [the official Visual Studio documentation](https://code.visualstudio.com/docs/remote/containers#_getting-started).
 
-### Steps to submit a idea/request
+### Steps to submit a contribution
 
 1. Make sure the topic is not already discussed by an opened issue
 2. Submit your idea in [an new issue](https://github.com/CGI-FR/PIMO/issues/new) to discuss about it with us
-3. Therefore you can open and submit a Pull Request to the project
+3. Then you can open and submit a Pull Request to the project
 
 ### Checklists for pull requests
 
