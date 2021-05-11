@@ -39,7 +39,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          docker-compose -f .devcontainer/docker-compose.yml exec -T -u root -w /workspace vscode git reset
+          docker-compose -f .devcontainer/docker-compose.yml exec -T -u root -w /workspace vscode git reset --hard
           docker-compose -f .devcontainer/docker-compose.yml exec -e GITHUB_TOKEN=${GITHUB_TOKEN} -T -u root vscode bash -c 'echo "GITHUB_TOKEN: ${GITHUB_TOKEN}" > ~/.github.yml'
           docker-compose -f .devcontainer/docker-compose.yml exec \
             -T \
