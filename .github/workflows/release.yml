@@ -26,21 +26,21 @@ jobs:
           fetch-depth: 0
 
       - name: Build
-        run: docker-compose build
+        run: docker-compose -f .devcontainer/docker-compose.yml build
 
       - name: Start services
-        run: docker-compose up -d vscode
+        run: docker-compose -f .devcontainer/docker-compose.yml up -d vscode
 
       - name: Init env
-        run: docker-compose exec -T -u root -w /workspace vscode make init
+        run: docker-compose -f .devcontainer/docker-compose.yml exec -T -u root -w /workspace vscode make init
 
       - uses: FranzDiebold/github-env-vars-action@v2
       - name: Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          docker-compose exec -e GITHUB_TOKEN=${GITHUB_TOKEN} -T -u root vscode bash -c 'echo "GITHUB_TOKEN: ${GITHUB_TOKEN}" > ~/.github.yml'
-          docker-compose exec \
+          docker-compose -f .devcontainer/docker-compose.yml exec -e GITHUB_TOKEN=${GITHUB_TOKEN} -T -u root vscode bash -c 'echo "GITHUB_TOKEN: ${GITHUB_TOKEN}" > ~/.github.yml'
+          docker-compose -f .devcontainer/docker-compose.yml exec \
             -T \
             -u root \
             -w /workspace \

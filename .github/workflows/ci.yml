@@ -26,18 +26,18 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Build
-        run: docker-compose build
+        run: docker-compose -f .devcontainer/docker-compose.yml build
 
       - name: Start services
-        run: docker-compose up -d vscode
+        run: docker-compose -f .devcontainer/docker-compose.yml up -d vscode
 
       - name: Init env
-        run: docker-compose exec -T -u root -w /workspace vscode make init
+        run: docker-compose -f .devcontainer/docker-compose.yml exec -T -u root -w /workspace vscode make init
 
       - uses: FranzDiebold/github-env-vars-action@v2
       - name: Run CI # up to test-int (info → refresh → lint → test → release → test-int)
         run: |
-          docker-compose exec \
+          docker-compose -f .devcontainer/docker-compose.yml exec \
             -T \
             -u root \
             -w /workspace \
