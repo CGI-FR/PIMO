@@ -1,35 +1,33 @@
 {
-    "name": "Pimo",
+    "name": "PIMO",
     "dockerComposeFile": [
-        "docker-compose.yml"
+        "../docker-compose.yml"
     ],
     "service": "vscode",
     "runServices": [
         "vscode"
     ],
     "shutdownAction": "stopCompose",
-    "postCreateCommand": "make init",
+    "postCreateCommand": "sudo chown -R vscode:vscode /workspace/. && make init",
     "workspaceFolder": "/workspace",
-    // "overrideCommand": "",
     "remoteEnv": {
         "PATH": "${containerEnv:PATH}:/workspace/bin/"
     },
     "extensions": [
-        "ms-vscode.go",
-        "IBM.output-colorizer",
+        "golang.Go",
         "eamodio.gitlens",
-        "mhutchie.git-graph",
-        "davidanson.vscode-markdownlint",
+        "donjayamanne.githistory",
+        "DavidAnson.vscode-markdownlint",
+        "esbenp.prettier-vscode",
+        "yzhang.markdown-all-in-one",
+        "ms-azuretools.vscode-docker",
         "shardulm94.trailing-spaces",
-        "alefragnani.Bookmarks",
-        "Gruntfuggly.todo-tree",
-        "mohsen1.prettify-json",
+        "vscode-icons-team.vscode-icons",
+        "johnpapa.vscode-peacock",
+        "aaron-bond.better-comments",
         "quicktype.quicktype",
         "spikespaz.vscode-smoothtype",
-        "stkb.rewrap",
-        "vscode-icons-team.vscode-icons",
-        "ms-azuretools.vscode-docker",
-        "premparihar.gotestexplorer"
+        "EditorConfig.EditorConfig",
     ],
     "settings": {
         // General settings
@@ -40,59 +38,24 @@
         },
         // Golang general settings
         "go.useLanguageServer": true,
-        "go.autocompleteUnimportedPackages": true,
-        "go.gotoSymbol.includeImports": true,
-        "go.gotoSymbol.includeGoroot": true,
         "gopls": {
-            "completeUnimported": true,
-            "deepCompletion": true,
-            "usePlaceholders": false
+            "usePlaceholders": false,
+            "gofumpt": true
         },
         "go.lintTool": "golangci-lint",
         "go.lintFlags": [
-            "--fast",
-            "--enable",
-            "bodyclose",
-            "--enable",
-            "dogsled",
-            "--enable",
-            "dupl",
-            "--enable",
-            "gochecknoglobals",
-            "--enable",
-            "gochecknoinits",
-            "--enable",
-            "gocognit",
-            "--enable",
-            "goconst",
-            "--enable",
-            "gocritic",
-            "--enable",
-            "gocyclo",
-            "--enable",
-            "goimports",
-            "--enable",
-            "golint",
-            "--enable",
-            "gosec",
-            "--enable",
-            "interfacer",
-            "--enable",
-            "maligned",
-            "--enable",
-            "misspell",
-            "--enable",
-            "nakedret",
-            "--enable",
-            "prealloc",
-            "--enable",
+            //"--fast",
+            "--enable-all",
+            "--disable",
+            "gci",
+            "--disable",
+            "forbidigo",
+            "--disable",
             "scopelint",
-            "--enable",
-            "unconvert",
-            "--enable",
-            "unparam",
-            "--enable",
-            "whitespace"
+            "--disable",
+            "interfacer",
+            "--disable",
+            "maligned",
         ],
         // Golang on save
         "go.buildOnSave": "workspace",
@@ -105,16 +68,12 @@
             }
         },
         // Golang testing
-        "go.toolsEnvVars": {
-            "GOFLAGS": "-tags=integration"
-        },
-        "gopls.env": {
-            "GOFLAGS": "-tags=integration"
-        },
-        "go.testEnvVars": {},
         "go.testFlags": [
             "-v"
         ],
-        "go.testTimeout": "600s"
+        "go.testTimeout": "600s",
+        "go.coverOnSingleTest": true,
+        "go.coverOnSingleTestFile": true,
+        "go.coverShowCounts": true,
     }
 }

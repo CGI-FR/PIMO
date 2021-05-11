@@ -1,0 +1,18 @@
+env:
+  - GO111MODULE=on
+before:
+  hooks:
+    - go mod download
+dist: bin/dist
+builds:
+{{range (getenv "BUILDPATHS" | jsonArray)}}
+  - id: "{{.}}"
+    binary: "{{ path.Base . }}"
+    main: "./{{.}}"
+    goos:
+      - darwin
+      - linux
+      - windows
+    ldflags:
+      - -s -w -X main.name={{ path.Base . }} {{env.Getenv "LDFLAGS"}}
+{{end}}

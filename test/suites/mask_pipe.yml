@@ -1,18 +1,18 @@
 name: pipe features
 testcases:
-- name: End of file
-  steps:
-  - script: cp ../masking.yml masking.yml
-  - script: echo {} | pimo
-    assertions:
-    - result.code  ShouldEqual 0
-    - result.systemout ShouldEqual {}
-    - result.systemerr ShouldBeEmpty
-- name: not json
-  steps:
-  - script: cp ../masking.yml masking.yml
-  - script: echo "{}\n { "| pimo
-    assertions:
-    - result.code  ShouldEqual 4
-    - result.systemout ShouldEqual {}
-    - result.systemerr ShouldContainSubstring unexpected end of JSON input
+  - name: End of file
+    steps:
+      - script: cp ../masking.yml masking.yml
+      - script: echo {} | pimo
+        assertions:
+          - result.code  ShouldEqual 0
+          - result.systemout ShouldEqual {}
+          - result.systemerr ShouldBeEmpty
+  - name: not json
+    steps:
+      - script: cp ../masking.yml masking.yml
+      - script: echo -e "{}\n { "| pimo
+        assertions:
+          - result.code  ShouldEqual 4
+          - result.systemout ShouldEqual {}
+          - result.systemerr ShouldContainSubstring unexpected end of JSON input
