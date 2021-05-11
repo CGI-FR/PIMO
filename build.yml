@@ -277,6 +277,7 @@ targets:
       - $: (export LDFLAGS="={ldflags}"; export BUILDPATHS="={buildpaths}"; cat .goreleaser.template.yml | gomplate)
         1>: ={BUILD_DIR}/.goreleaser.yml
         1x: true
+      - $: go mod tidy
       - if: snapshot
         then:
           - $: goreleaser release -f ={BUILD_DIR}/.goreleaser.yml --rm-dist --snapshot
