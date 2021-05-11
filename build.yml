@@ -9,7 +9,8 @@ expose: [
     "test",
     "release",
     "test-int",
-    "publish",
+    # We don't expose this target to contributors, it is only used by GitHub Action "Release".
+    # "publish",
     # The project doesn't have Dockerfiles to build for now
     # "docker",
     # "docker-tag",
@@ -89,14 +90,13 @@ targets:
           print -P "%B%F{blue}test%f%b         Run all tests with coverage [info->refresh->lint]"
           print -P "%B%F{blue}release%f%b      Compile binary files for production [info->refresh->lint->test]"
           print -P "%B%F{blue}test-int%f%b     Run all integration tests [info->refresh->lint->test->release]"
-          print -P "%B%F{blue}publish%f%b      Publish tagged binary to Github [info->refresh->lint->test->release->test-int]"
           # The project doesn't have Dockerfiles to build for now
           # print -P "%B%F{blue}docker%f%b       Build docker images [info]"
           # print -P "%B%F{blue}docker-tag%f%b   Tag docker images [info->docker]"
           # print -P "%B%F{blue}docker-push%f%b  Publish docker images to Dockerhub [info->docker->docker-tag]"
           print -P "%B%F{blue}license%f%b      Scan licenses from binaries and generate notice file [info->refresh->compile]"
           print
-          print -P "%BExample:%b neon -props '{latest: true}' promote publish docker-push"
+          print -P "%BExample:%b neon promote release"
           print
           print -P "%BTarget dependencies%b"
           print
@@ -106,7 +106,7 @@ targets:
           # print -P "→ info ┰ docker → docker-tag → docker-push"
           # print -P "       ┖ refresh ┰ compile → license"
           print -P "→ info → refresh ┰ compile → license"
-          print -P "                 ┖ lint → test → release → test-int → publish"
+          print -P "                 ┖ lint → test → release → test-int"
 
   info:
     doc: "Print build informations"
