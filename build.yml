@@ -259,7 +259,7 @@ targets:
       - copy: "**/*.yml"
         dir: "test/suites"
         todir: =TEST_WS_DIR
-      - $: venom run --stop-on-failure ={TEST_WS_DIR}/*/*.yml
+      - $: venom run --stop-on-failure ={TEST_WS_DIR}/*.yml
 
   # run "neon -props '{buildpaths: ["path/to/main/package1","path/to/main/package2"]}' publish" to publish specific targets
   # example : neon -props '{buildpaths: ["cmd/cli"]}' publish
