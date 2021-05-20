@@ -257,7 +257,7 @@ targets:
       - delete: ={TEST_WS_DIR}/**
       - mkdir: =TEST_WS_DIR
       - copy: "**/*.yml"
-        dir: "tests/suites"
+        dir: "test/suites"
         todir: =TEST_WS_DIR
       - $: venom run --stop-on-failure ={TEST_WS_DIR}/*/*.yml
 
