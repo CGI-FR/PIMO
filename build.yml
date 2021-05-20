@@ -137,7 +137,7 @@ targets:
           - $: "echo -n ={BY}"
             1=: "by"
             3x: true
-      - $: 'if expr match "={version}" "\d\+\.\d\+\.\d\+" 1>/dev/null 2>&1; then echo -n "yes"; else echo -n "no"; fi'
+      - $: 'if expr match "={version}" "v\?[0-9]\+\.[0-9]\+\.[0-9]\+" 1>/dev/null 2>&1; then echo -n "yes"; else echo -n "no"; fi'
         1=: "is_release"
         3x: true
       - $: "cut -f1 -d."
@@ -187,9 +187,8 @@ targets:
   promote:
     doc: "Promote the project with a new tag based on git log history"
     steps:
-      - try:
-          - $: "# ={tag}"
-        catch:
+      - if: tag==""
+        then:
           - $: svu next || echo -n v0.1.0
             3x: true
             1=: tag
@@ -201,8 +200,8 @@ targets:
     doc: "Refresh go modules (add missing and remove unused modules)"
     depends: "info"
     steps:
-      - $: "rm -f go.mod go.sum"
-      - $: "go mod init ={mod}"
+      # - $: "rm -f go.mod go.sum"
+      # - $: "go mod init ={mod}"
       - $: "go mod tidy"
 
   # run "neon -props '{buildpaths: ["path/to/main/package1","path/to/main/package2"]}' compile" to compile specific targets
@@ -255,13 +254,12 @@ targets:
     doc: "Run all integration tests"
     depends: ["info", "refresh", "lint", "test", "release"]
     steps:
-      # - mkdir: =TEST_WS_DIR
-      # - chdir: =TEST_WS_DIR
-      - try:
-          - $: venom run test/suites/*.yml
-        finally:
-          # this is a temporary fix waiting for venom project to fix issue https://github.com/ovh/venom/issues/400
-          - $: git clean -f test/suites/
+      - delete: ={TEST_WS_DIR}/**
+      - mkdir: =TEST_WS_DIR
+      - copy: "**/*.yml"
+        dir: "test/suites"
+        todir: =TEST_WS_DIR
+      - $: venom run --stop-on-failure ={TEST_WS_DIR}/*.yml
 
   # run "neon -props '{buildpaths: ["path/to/main/package1","path/to/main/package2"]}' publish" to publish specific targets
   # example : neon -props '{buildpaths: ["cmd/cli"]}' publish
@@ -301,6 +299,13 @@ targets:
                 DOCKERHUB_USER: <your dockerhub user>
                 DOCKERHUB_PASS: <your dockerhub password or a dockerhub token>
           - $: return 1
+      - $: "date -u +'%Y-%m-%dT%H:%M:%SZ'"
+        1=: "daterfc3339"
+        3x: true
+      - |
+        build_args  = " --build-arg BUILD_DATE=" + daterfc3339
+        build_args += " --build-arg VERSION=" + version
+        build_args += " --build-arg REVISION=" + commit
       - for: key
         in: keys(dockerfiles)
         do:
@@ -310,7 +315,7 @@ targets:
             if len(keycomponents) > 1 {
               suffix = "-" + keycomponents[len(keycomponents)-1]
             }
-          - $: "sudo docker build -q --iidfile ={BUILD_DIR}/last-={key} -t ={DOCKERHUB_USER}/={project}={suffix}:={tag} -f ={key} ={dockerfiles[key]}"
+          - $: "sudo docker build -q --iidfile ={BUILD_DIR}/last-={key} -t ={DOCKERHUB_USER}/={project}={suffix}:={tag} -f ={key} ={build_args} ={dockerfiles[key]}"
             1x: true
           - $: "sudo docker images --no-trunc | grep $(cat ={BUILD_DIR}/last-={key})"
 
@@ -323,7 +328,7 @@ targets:
       - if: 'is_release == "yes"'
         then:
           - try:
-              - $: "# ={DOCKERHUB_PASS}"
+              - $: "# ={DOCKERHUB_USER}"
                 3x: true
             catch:
               - print: |
