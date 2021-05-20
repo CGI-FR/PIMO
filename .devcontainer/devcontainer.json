@@ -4,6 +4,7 @@
         "docker-compose.yml"
     ],
     "service": "vscode",
+    "remoteUser": "vscode",
     "runServices": [
         "vscode"
     ],
