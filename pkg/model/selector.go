@@ -23,11 +23,14 @@ import (
 	"strings"
 )
 
-type Entry interface{}
-type Dictionary map[string]Entry
+type (
+	Entry interface{}
+	// Dictionary map[string]Entry
+)
 
 type Action uint
 
+// Action types
 const (
 	NOTHING Action = iota
 	WRITE          = iota
@@ -82,7 +85,7 @@ func (s selector) Apply(root Dictionary, appliers ...Applier) bool {
 }
 
 func (s selector) applySub(root Dictionary, current Dictionary, appliers ...Applier) bool {
-	entry, ok := current[s.path]
+	entry, ok := current.GetValue(s.path)
 	if !ok {
 		return false
 	}
@@ -117,9 +120,9 @@ func (s selector) apply(root Dictionary, current Dictionary, entry Entry, applie
 		action, entry := applier(root, current, s.path, entry)
 		switch action {
 		case WRITE:
-			current[s.path] = entry
+			current.Set(s.path, entry)
 		case DELETE:
-			delete(current, s.path)
+			current.Delete(s.path)
 		}
 	}
 }
@@ -136,7 +139,7 @@ func (s selector) applySlice(root Dictionary, current Dictionary, entries []Entr
 				result = append(result, entry)
 			}
 		}
-		current[s.path] = result
+		current.Set(s.path, result)
 	}
 }
 
@@ -145,7 +148,7 @@ func (s selector) ApplyContext(root Dictionary, appliers ...Applier) bool {
 }
 
 func (s selector) applySubContext(root Dictionary, current Dictionary, appliers ...Applier) bool {
-	entry, ok := current[s.path]
+	entry, ok := current.GetValue(s.path)
 	if !ok {
 		if s.sub == nil {
 			// apply with nil value
@@ -177,9 +180,9 @@ func (s selector) applyContext(root Dictionary, current Dictionary, entry Entry,
 		action, entry := applier(root, current, s.path, entry)
 		switch action {
 		case WRITE:
-			current[s.path] = entry
+			current.Set(s.path, entry)
 		case DELETE:
-			delete(current, s.path)
+			current.Delete(s.path)
 		}
 	}
 }
@@ -202,10 +205,7 @@ func (s selector) ReadContext(dictionary Dictionary) (sub Dictionary, subkey str
 }
 
 func (s selector) WriteContext(dictionary Dictionary, masked Entry) Dictionary {
-	result := Dictionary{}
-	for k, v := range dictionary {
-		result[k] = v
-	}
+	result := CopyDictionary(dictionary)
 	v := reflect.ValueOf(masked)
 	s.ApplyContext(result, func(rootContext, parentContext Dictionary, key string, value Entry) (Action, Entry) {
 		if key == "" || value == nil {
@@ -229,10 +229,7 @@ func (s selector) Read(dictionary Dictionary) (match Entry, found bool) {
 }
 
 func (s selector) Write(dictionary Dictionary, masked Entry) Dictionary {
-	result := Dictionary{}
-	for k, v := range dictionary {
-		result[k] = v
-	}
+	result := CopyDictionary(dictionary)
 	s.Apply(result, func(rootContext, parentContext Dictionary, key string, value Entry) (Action, Entry) {
 		return WRITE, masked
 	})

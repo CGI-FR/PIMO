@@ -27,50 +27,50 @@ import (
 
 func TestMaskingShouldEncryptStringWithTweak(t *testing.T) {
 	os.Setenv("FF1_ENCRYPTION_KEY", "70NZ2NWAqk9/A21vBPxqlA==")
-	var context = map[string]model.Entry{
+	context := map[string]model.Entry{
 		"name":  "Toto",
 		"tweak": "mytweak",
 	}
 	ff1Mask := NewMask("FF1_ENCRYPTION_KEY", "tweak", 62, false)
 	line := "Toto"
-	result, err := ff1Mask.Mask(line, context)
+	result, err := ff1Mask.Mask(line, model.NewDictionaryFromMap(context))
 	assert.Nil(t, err)
 	assert.Equal(t, "nhIy", result, "Should be equal")
 }
 
 func TestMaskingShouldEncryptStringWithoutTweak(t *testing.T) {
 	os.Setenv("FF1_ENCRYPTION_KEY", "70NZ2NWAqk9/A21vBPxqlA==")
-	var context = map[string]model.Entry{
+	context := map[string]model.Entry{
 		"name": "Toto",
 	}
 	ff1Mask := NewMask("FF1_ENCRYPTION_KEY", "tweak", 62, false)
 	line := "Toto"
-	result, err := ff1Mask.Mask(line, context)
+	result, err := ff1Mask.Mask(line, model.NewDictionaryFromMap(context))
 	assert.Nil(t, err)
 	assert.Equal(t, "Uaow", result, "Should be equal")
 }
 
 func TestMaskingShouldDecryptStringWithTweak(t *testing.T) {
 	os.Setenv("FF1_ENCRYPTION_KEY", "70NZ2NWAqk9/A21vBPxqlA==")
-	var context = map[string]model.Entry{
+	context := map[string]model.Entry{
 		"name":  "nhIy",
 		"tweak": "mytweak",
 	}
 	ff1Mask := NewMask("FF1_ENCRYPTION_KEY", "tweak", 62, true)
 	line := "nhIy"
-	result, err := ff1Mask.Mask(line, context)
+	result, err := ff1Mask.Mask(line, model.NewDictionaryFromMap(context))
 	assert.Nil(t, err)
 	assert.Equal(t, "Toto", result, "Should be equal")
 }
 
 func TestMaskingShouldDecryptStringWithoutTweak(t *testing.T) {
 	os.Setenv("FF1_ENCRYPTION_KEY", "70NZ2NWAqk9/A21vBPxqlA==")
-	var context = map[string]model.Entry{
+	context := map[string]model.Entry{
 		"name": "Uaow",
 	}
 	ff1Mask := NewMask("FF1_ENCRYPTION_KEY", "tweak", 62, true)
 	line := "Uaow"
-	result, err := ff1Mask.Mask(line, context)
+	result, err := ff1Mask.Mask(line, model.NewDictionaryFromMap(context))
 	assert.Nil(t, err)
 	assert.Equal(t, "Toto", result, "Should be equal")
 }

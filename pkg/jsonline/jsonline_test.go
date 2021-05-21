@@ -32,10 +32,10 @@ func TestSourceReturnDictionary(t *testing.T) {
 	err := pipeline.AddSink(model.NewSinkToSlice(&result)).Run()
 	assert.Nil(t, err)
 	assert.Equal(t, 1, len(result))
-	waited := model.Dictionary{"personne": []model.Entry{
-		model.Dictionary{"name": "Benjamin", "age": float64(35)},
-		model.Dictionary{"name": "Nicolas", "age": float64(38)},
-	}}
+	waited := model.NewDictionaryFromMap(map[string]model.Entry{"personne": []model.Entry{
+		model.NewDictionaryFromMap(map[string]model.Entry{"name": "Benjamin", "age": float64(35)}),
+		model.NewDictionaryFromMap(map[string]model.Entry{"name": "Nicolas", "age": float64(38)}),
+	}})
 	assert.Equal(t, waited, result[0], "Should create the right model.Dictionary")
 }
 
@@ -49,10 +49,10 @@ func TestSourceReturnError(t *testing.T) {
 }
 
 func TestSinkWriteDictionary(t *testing.T) {
-	source := model.Dictionary{"personne": []model.Entry{
-		model.Dictionary{"name": "Benjamin", "age": float64(35)},
-		model.Dictionary{"name": "Nicolas", "age": float64(38)},
-	}}
+	source := model.NewDictionaryFromMap(map[string]model.Entry{"personne": []model.Entry{
+		model.NewDictionaryFromMap(map[string]model.Entry{"name": "Benjamin", "age": float64(35)}),
+		model.NewDictionaryFromMap(map[string]model.Entry{"name": "Nicolas", "age": float64(38)}),
+	}})
 
 	result := bytes.Buffer{}
 

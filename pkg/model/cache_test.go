@@ -67,16 +67,16 @@ func TestNewUniqueMaskCacheEngine(t *testing.T) {
 }
 
 func TestFromCacheProcessShouldWaitForValueProvide(t *testing.T) {
-	var idMasking = FunctionMaskEngine{Function: func(name Entry, contexts ...Dictionary) (Entry, error) {
-		return strings.ToLower(contexts[0]["name"].(string)), nil
+	idMasking := FunctionMaskEngine{Function: func(name Entry, contexts ...Dictionary) (Entry, error) {
+		return strings.ToLower(contexts[0].Get("name").(string)), nil
 	}}
 
 	cache := NewMemCache()
 
 	mySlice := []Dictionary{
-		{"id": "1", "name": "Bob", "supervisor": "2"},
-		{"id": "2", "name": "John", "supervisor": "4"},
-		{"id": "3", "name": "Tom", "supervisor": "2"},
+		NewDictionaryFromMap(map[string]Entry{"id": "1", "name": "Bob", "supervisor": "2"}),
+		NewDictionaryFromMap(map[string]Entry{"id": "2", "name": "John", "supervisor": "4"}),
+		NewDictionaryFromMap(map[string]Entry{"id": "3", "name": "Tom", "supervisor": "2"}),
 	}
 	var result []Dictionary
 
@@ -89,23 +89,23 @@ func TestFromCacheProcessShouldWaitForValueProvide(t *testing.T) {
 	assert.Nil(t, err)
 
 	wanted := []Dictionary{
-		{"id": "bob", "name": "Bob", "supervisor": "john"},
-		{"id": "tom", "name": "Tom", "supervisor": "john"},
+		NewDictionaryFromMap(map[string]Entry{"id": "bob", "name": "Bob", "supervisor": "john"}),
+		NewDictionaryFromMap(map[string]Entry{"id": "tom", "name": "Tom", "supervisor": "john"}),
 	}
 	assert.Equal(t, wanted, result)
 }
 
 func TestFromCacheProcessShouldWaitForLoopProvid(t *testing.T) {
-	var idMasking = FunctionMaskEngine{Function: func(name Entry, contexts ...Dictionary) (Entry, error) {
-		return strings.ToLower(contexts[0]["name"].(string)), nil
+	idMasking := FunctionMaskEngine{Function: func(name Entry, contexts ...Dictionary) (Entry, error) {
+		return strings.ToLower(contexts[0].Get("name").(string)), nil
 	}}
 
 	cache := NewMemCache()
 
 	mySlice := []Dictionary{
-		{"id": "1", "name": "Bob", "supervisor": "2"},
-		{"id": "2", "name": "John", "supervisor": "3"},
-		{"id": "3", "name": "Tom", "supervisor": "1"},
+		NewDictionaryFromMap(map[string]Entry{"id": "1", "name": "Bob", "supervisor": "2"}),
+		NewDictionaryFromMap(map[string]Entry{"id": "2", "name": "John", "supervisor": "3"}),
+		NewDictionaryFromMap(map[string]Entry{"id": "3", "name": "Tom", "supervisor": "1"}),
 	}
 	var result []Dictionary
 
@@ -118,16 +118,16 @@ func TestFromCacheProcessShouldWaitForLoopProvid(t *testing.T) {
 	assert.Nil(t, err)
 
 	wanted := []Dictionary{
-		{"id": "bob", "name": "Bob", "supervisor": "john"},
-		{"id": "john", "name": "John", "supervisor": "tom"},
-		{"id": "tom", "name": "Tom", "supervisor": "bob"},
+		NewDictionaryFromMap(map[string]Entry{"id": "bob", "name": "Bob", "supervisor": "john"}),
+		NewDictionaryFromMap(map[string]Entry{"id": "john", "name": "John", "supervisor": "tom"}),
+		NewDictionaryFromMap(map[string]Entry{"id": "tom", "name": "Tom", "supervisor": "bob"}),
 	}
 	assert.Equal(t, wanted, result)
 }
 
 func TestFromCacheProcessShouldUsedPreviouslyCachedValue(t *testing.T) {
-	var idMasking = FunctionMaskEngine{Function: func(name Entry, contexts ...Dictionary) (Entry, error) {
-		return strings.ToLower(contexts[0]["name"].(string)), nil
+	idMasking := FunctionMaskEngine{Function: func(name Entry, contexts ...Dictionary) (Entry, error) {
+		return strings.ToLower(contexts[0].Get("name").(string)), nil
 	}}
 
 	cache := NewMemCache()
@@ -135,9 +135,9 @@ func TestFromCacheProcessShouldUsedPreviouslyCachedValue(t *testing.T) {
 	cache.Put("1", "boby")
 
 	mySlice := []Dictionary{
-		{"id": "1", "name": "Bob", "supervisor": "2"},
-		{"id": "2", "name": "John", "supervisor": "3"},
-		{"id": "3", "name": "Tom", "supervisor": "1"},
+		NewDictionaryFromMap(map[string]Entry{"id": "1", "name": "Bob", "supervisor": "2"}),
+		NewDictionaryFromMap(map[string]Entry{"id": "2", "name": "John", "supervisor": "3"}),
+		NewDictionaryFromMap(map[string]Entry{"id": "3", "name": "Tom", "supervisor": "1"}),
 	}
 	var result []Dictionary
 
@@ -150,26 +150,26 @@ func TestFromCacheProcessShouldUsedPreviouslyCachedValue(t *testing.T) {
 	assert.Nil(t, err)
 
 	wanted := []Dictionary{
-		{"id": "boby", "name": "Bob", "supervisor": "john"},
-		{"id": "john", "name": "John", "supervisor": "tom"},
-		{"id": "tom", "name": "Tom", "supervisor": "boby"},
+		NewDictionaryFromMap(map[string]Entry{"id": "boby", "name": "Bob", "supervisor": "john"}),
+		NewDictionaryFromMap(map[string]Entry{"id": "john", "name": "John", "supervisor": "tom"}),
+		NewDictionaryFromMap(map[string]Entry{"id": "tom", "name": "Tom", "supervisor": "boby"}),
 	}
 	assert.Equal(t, wanted, result)
 }
 
 func TestFromCacheProcessShouldReorderList(t *testing.T) {
-	var idMasking = FunctionMaskEngine{Function: func(name Entry, contexts ...Dictionary) (Entry, error) {
-		return strings.ToLower(contexts[0]["name"].(string)), nil
+	idMasking := FunctionMaskEngine{Function: func(name Entry, contexts ...Dictionary) (Entry, error) {
+		return strings.ToLower(contexts[0].Get("name").(string)), nil
 	}}
 
 	cache := NewMemCache()
 
 	mySlice := []Dictionary{
-		{"id": "1", "name": "Bob", "supervisor": "2"},
-		{"id": "4", "name": "Alice", "supervisor": "5"},
-		{"id": "5", "name": "Rabbit", "supervisor": "5"},
-		{"id": "2", "name": "John", "supervisor": "3"},
-		{"id": "3", "name": "Tom", "supervisor": "1"},
+		NewDictionaryFromMap(map[string]Entry{"id": "1", "name": "Bob", "supervisor": "2"}),
+		NewDictionaryFromMap(map[string]Entry{"id": "4", "name": "Alice", "supervisor": "5"}),
+		NewDictionaryFromMap(map[string]Entry{"id": "5", "name": "Rabbit", "supervisor": "5"}),
+		NewDictionaryFromMap(map[string]Entry{"id": "2", "name": "John", "supervisor": "3"}),
+		NewDictionaryFromMap(map[string]Entry{"id": "3", "name": "Tom", "supervisor": "1"}),
 	}
 	var result []Dictionary
 
@@ -182,26 +182,26 @@ func TestFromCacheProcessShouldReorderList(t *testing.T) {
 	assert.Nil(t, err)
 
 	wanted := []Dictionary{
-		{"id": "alice", "name": "Alice", "supervisor": "rabbit"},
-		{"id": "rabbit", "name": "Rabbit", "supervisor": "rabbit"},
-		{"id": "bob", "name": "Bob", "supervisor": "john"},
-		{"id": "john", "name": "John", "supervisor": "tom"},
-		{"id": "tom", "name": "Tom", "supervisor": "bob"},
+		NewDictionaryFromMap(map[string]Entry{"id": "alice", "name": "Alice", "supervisor": "rabbit"}),
+		NewDictionaryFromMap(map[string]Entry{"id": "rabbit", "name": "Rabbit", "supervisor": "rabbit"}),
+		NewDictionaryFromMap(map[string]Entry{"id": "bob", "name": "Bob", "supervisor": "john"}),
+		NewDictionaryFromMap(map[string]Entry{"id": "john", "name": "John", "supervisor": "tom"}),
+		NewDictionaryFromMap(map[string]Entry{"id": "tom", "name": "Tom", "supervisor": "bob"}),
 	}
 	assert.Equal(t, wanted, result)
 }
 
 func TestFromCacheProcessShouldWaitWithUnique(t *testing.T) {
-	var idMasking = FunctionMaskEngine{Function: func(name Entry, contexts ...Dictionary) (Entry, error) {
-		return strings.ToLower(contexts[0]["name"].(string)), nil
+	idMasking := FunctionMaskEngine{Function: func(name Entry, contexts ...Dictionary) (Entry, error) {
+		return strings.ToLower(contexts[0].Get("name").(string)), nil
 	}}
 
 	cache := NewUniqueMemCache()
 
 	mySlice := []Dictionary{
-		{"id": "1", "name": "Bob", "supervisor": "2"},
-		{"id": "2", "name": "John", "supervisor": "3"},
-		{"id": "3", "name": "Tom", "supervisor": "1"},
+		NewDictionaryFromMap(map[string]Entry{"id": "1", "name": "Bob", "supervisor": "2"}),
+		NewDictionaryFromMap(map[string]Entry{"id": "2", "name": "John", "supervisor": "3"}),
+		NewDictionaryFromMap(map[string]Entry{"id": "3", "name": "Tom", "supervisor": "1"}),
 	}
 	var result []Dictionary
 
@@ -214,9 +214,9 @@ func TestFromCacheProcessShouldWaitWithUnique(t *testing.T) {
 	assert.Nil(t, err)
 
 	wanted := []Dictionary{
-		{"id": "bob", "name": "Bob", "supervisor": "john"},
-		{"id": "john", "name": "John", "supervisor": "tom"},
-		{"id": "tom", "name": "Tom", "supervisor": "bob"},
+		NewDictionaryFromMap(map[string]Entry{"id": "bob", "name": "Bob", "supervisor": "john"}),
+		NewDictionaryFromMap(map[string]Entry{"id": "john", "name": "John", "supervisor": "tom"}),
+		NewDictionaryFromMap(map[string]Entry{"id": "tom", "name": "Tom", "supervisor": "bob"}),
 	}
 	assert.Equal(t, wanted, result)
 }

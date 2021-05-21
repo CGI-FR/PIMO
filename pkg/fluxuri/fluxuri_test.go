@@ -41,31 +41,31 @@ func TestMaskingShouldMaskAsExpected(t *testing.T) {
 	assert.Nil(t, err, "error should be nil")
 
 	// Creating the field
-	firstData := model.Dictionary{"field": "thing", "field2": "thing"}
+	firstData := model.NewDictionaryFromMap(map[string]model.Entry{"field": "thing", "field2": "thing"})
 	firstMasked, err := mask.MaskContext(firstData, "id")
 	assert.Equal(t, nil, err, "error should be nil")
-	firstWaited := model.Dictionary{"id": 1623, "field": "thing", "field2": "thing"}
+	firstWaited := model.NewDictionaryFromMap(map[string]model.Entry{"id": 1623, "field": "thing", "field2": "thing"})
 	assert.Equal(t, firstMasked, firstWaited, "First id masking should be equal")
 
 	// Creating the field with the second value
-	secondData := model.Dictionary{"field": "thing", "field2": "thing"}
+	secondData := model.NewDictionaryFromMap(map[string]model.Entry{"field": "thing", "field2": "thing"})
 	secondMasked, err := mask.MaskContext(secondData, "id")
 	assert.Equal(t, nil, err, "error should be nil")
-	secondWaited := model.Dictionary{"id": 1512, "field": "thing", "field2": "thing"}
+	secondWaited := model.NewDictionaryFromMap(map[string]model.Entry{"id": 1512, "field": "thing", "field2": "thing"})
 	assert.Equal(t, secondMasked, secondWaited, "Second id masking should be equal")
 
 	// Replacing the existing field
-	thirdData := model.Dictionary{"id": 25, "field": "thing", "field2": "thing"}
+	thirdData := model.NewDictionaryFromMap(map[string]model.Entry{"id": 25, "field": "thing", "field2": "thing"})
 	thirdMasked, err := mask.MaskContext(thirdData, "id")
 	assert.Equal(t, nil, err, "error should be nil")
-	thirdWaited := model.Dictionary{"id": 905, "field": "thing", "field2": "thing"}
+	thirdWaited := model.NewDictionaryFromMap(map[string]model.Entry{"id": 905, "field": "thing", "field2": "thing"})
 	assert.Equal(t, thirdMasked, thirdWaited, "Third id masking should be equal")
 
 	// Not creating field if every data is used
-	fourthData := model.Dictionary{"field": "thing", "field2": "thing"}
+	fourthData := model.NewDictionaryFromMap(map[string]model.Entry{"field": "thing", "field2": "thing"})
 	fourthMasked, err := mask.MaskContext(fourthData, "id")
 	assert.Equal(t, nil, err, "error should be nil")
-	fourthWaited := model.Dictionary{"field": "thing", "field2": "thing"}
+	fourthWaited := model.NewDictionaryFromMap(map[string]model.Entry{"field": "thing", "field2": "thing"})
 	assert.Equal(t, fourthMasked, fourthWaited, "Third id masking should be equal")
 }
 

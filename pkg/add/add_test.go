@@ -26,10 +26,10 @@ import (
 
 func TestMaskingShouldAddField(t *testing.T) {
 	addMask := NewMask("newvalue")
-	data := model.Dictionary{"field": "SomeInformation"}
+	data := model.NewDictionaryFromMap(map[string]model.Entry{"field": "SomeInformation"})
 	result, err := addMask.MaskContext(data, "newfield")
 	assert.Equal(t, nil, err, "error should be nil")
-	waited := model.Dictionary{"field": "SomeInformation", "newfield": "newvalue"}
+	waited := model.NewDictionaryFromMap(map[string]model.Entry{"field": "SomeInformation", "newfield": "newvalue"})
 	assert.Equal(t, waited, result, "field should be added")
 }
 

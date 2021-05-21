@@ -83,7 +83,7 @@ func getExampleAsInterface() interface{} {
 }
 
 func getExampleAsDictionary() model.Dictionary {
-	return model.InterfaceToDictionary(getExampleAsInterface())
+	return model.CleanTypes(getExampleAsInterface()).(model.Dictionary)
 }
 
 func TestNotFound(t *testing.T) {
@@ -125,7 +125,7 @@ func TestWriteSingle(t *testing.T) {
 		return model.WRITE, "0"
 	})
 	assert.True(t, found)
-	assert.Equal(t, "0", dictionary["id"])
+	assert.Equal(t, "0", dictionary.Get("id"))
 }
 
 func TestDeleteSingle(t *testing.T) {
@@ -150,7 +150,7 @@ func TestReadSub(t *testing.T) {
 
 	found := sut.Apply(dictionary, func(rootContext, parentContext model.Dictionary, key string, value model.Entry) (model.Action, model.Entry) {
 		assert.Equal(t, dictionary, rootContext)
-		assert.Equal(t, dictionary["summary"], parentContext)
+		assert.Equal(t, dictionary.Get("summary"), parentContext)
 		assert.Equal(t, "name", key)
 		assert.Equal(t, "test", value)
 		return model.NOTHING, nil
@@ -165,12 +165,12 @@ func TestWriteSub(t *testing.T) {
 
 	found := sut.Apply(dictionary, func(rootContext, parentContext model.Dictionary, key string, value model.Entry) (model.Action, model.Entry) {
 		assert.Equal(t, dictionary, rootContext)
-		assert.Equal(t, dictionary["summary"], parentContext)
+		assert.Equal(t, dictionary.Get("summary"), parentContext)
 		assert.Equal(t, "test", value)
 		return model.WRITE, "write"
 	})
 	assert.True(t, found)
-	assert.Equal(t, model.Dictionary{"date": "2012-04-23T18:25:43.511Z", "name": "write", "tags": []model.Entry{"red", "blue", "yellow"}}, dictionary["summary"])
+	assert.Equal(t, model.NewDictionaryFromMap(map[string]model.Entry{"date": "2012-04-23T18:25:43.511Z", "name": "write", "tags": []model.Entry{"red", "blue", "yellow"}}), dictionary.Get("summary"))
 }
 
 func TestDeleteSub(t *testing.T) {
@@ -180,12 +180,12 @@ func TestDeleteSub(t *testing.T) {
 
 	found := sut.Apply(dictionary, func(rootContext, parentContext model.Dictionary, key string, value model.Entry) (model.Action, model.Entry) {
 		assert.Equal(t, dictionary, rootContext)
-		assert.Equal(t, dictionary["summary"], parentContext)
+		assert.Equal(t, dictionary.Get("summary"), parentContext)
 		assert.Equal(t, "test", value)
 		return model.DELETE, nil
 	})
 	assert.True(t, found)
-	assert.Equal(t, model.Dictionary{"date": "2012-04-23T18:25:43.511Z", "tags": []model.Entry{"red", "blue", "yellow"}}, dictionary["summary"])
+	assert.Equal(t, model.NewDictionaryFromMap(map[string]model.Entry{"date": "2012-04-23T18:25:43.511Z", "tags": []model.Entry{"red", "blue", "yellow"}}), dictionary.Get("summary"))
 }
 
 func TestReadSimpleArray(t *testing.T) {
@@ -196,11 +196,11 @@ func TestReadSimpleArray(t *testing.T) {
 	collect := []model.Entry{}
 	found := sut.Apply(dictionary, func(rootContext, parentContext model.Dictionary, key string, value model.Entry) (model.Action, model.Entry) {
 		assert.Equal(t, dictionary, rootContext)
-		assert.Equal(t, model.Dictionary{
+		assert.Equal(t, model.NewDictionaryFromMap(map[string]model.Entry{
 			"name": "test",
 			"date": "2012-04-23T18:25:43.511Z",
 			"tags": []model.Entry{"red", "blue", "yellow"},
-		}, parentContext)
+		}), parentContext)
 		assert.Equal(t, "tags", key)
 		collect = append(collect, value)
 		return model.NOTHING, nil
@@ -218,18 +218,18 @@ func TestWriteSimpleArray(t *testing.T) {
 	collect := []model.Entry{}
 	found := sut.Apply(dictionary, func(rootContext, parentContext model.Dictionary, key string, value model.Entry) (model.Action, model.Entry) {
 		assert.Equal(t, dictionary, rootContext)
-		assert.Equal(t, model.Dictionary{
+		assert.Equal(t, model.NewDictionaryFromMap(map[string]model.Entry{
 			"name": "test",
 			"date": "2012-04-23T18:25:43.511Z",
 			"tags": []model.Entry{"red", "blue", "yellow"},
-		}, parentContext)
+		}), parentContext)
 		collect = append(collect, value)
 		cnt++
 		return model.WRITE, fmt.Sprintf("%v", cnt)
 	})
 	assert.True(t, found)
 	assert.Equal(t, []model.Entry{"red", "blue", "yellow"}, collect)
-	assert.Equal(t, model.Dictionary{"date": "2012-04-23T18:25:43.511Z", "name": "test", "tags": []model.Entry{"1", "2", "3"}}, dictionary["summary"])
+	assert.Equal(t, model.NewDictionaryFromMap(map[string]model.Entry{"date": "2012-04-23T18:25:43.511Z", "name": "test", "tags": []model.Entry{"1", "2", "3"}}), dictionary.Get("summary"))
 }
 
 func TestDeleteSimpleArray(t *testing.T) {
@@ -240,11 +240,11 @@ func TestDeleteSimpleArray(t *testing.T) {
 	collect := []model.Entry{}
 	found := sut.Apply(dictionary, func(rootContext, parentContext model.Dictionary, key string, value model.Entry) (model.Action, model.Entry) {
 		assert.Equal(t, dictionary, rootContext)
-		assert.Equal(t, model.Dictionary{
+		assert.Equal(t, model.NewDictionaryFromMap(map[string]model.Entry{
 			"name": "test",
 			"date": "2012-04-23T18:25:43.511Z",
 			"tags": []model.Entry{"red", "blue", "yellow"},
-		}, parentContext)
+		}), parentContext)
 		collect = append(collect, value)
 		if value == "blue" {
 			return model.DELETE, nil
@@ -253,7 +253,7 @@ func TestDeleteSimpleArray(t *testing.T) {
 	})
 	assert.True(t, found)
 	assert.Equal(t, []model.Entry{"red", "blue", "yellow"}, collect)
-	assert.Equal(t, model.Dictionary{"date": "2012-04-23T18:25:43.511Z", "name": "test", "tags": []model.Entry{"red", "yellow"}}, dictionary["summary"])
+	assert.Equal(t, model.NewDictionaryFromMap(map[string]model.Entry{"date": "2012-04-23T18:25:43.511Z", "name": "test", "tags": []model.Entry{"red", "yellow"}}), dictionary.Get("summary"))
 }
 
 func TestReadComplexArray(t *testing.T) {
@@ -269,7 +269,7 @@ func TestReadComplexArray(t *testing.T) {
 		return model.NOTHING, nil
 	})
 	assert.True(t, found)
-	assert.Equal(t, dictionary["organizations"], collect)
+	assert.Equal(t, dictionary.Get("organizations"), collect)
 }
 
 func TestWriteComplexArray(t *testing.T) {
@@ -282,10 +282,10 @@ func TestWriteComplexArray(t *testing.T) {
 		assert.Equal(t, dictionary, rootContext)
 		assert.Equal(t, dictionary, parentContext)
 		collect = append(collect, value)
-		return model.WRITE, model.Dictionary{"domain": "masked", "persons": []model.Entry{}}
+		return model.WRITE, model.NewDictionaryFromMap(map[string]model.Entry{"domain": "masked", "persons": []model.Entry{}})
 	})
 	assert.True(t, found)
-	assert.Equal(t, []model.Entry{model.Dictionary{"domain": "masked", "persons": []model.Entry{}}, model.Dictionary{"domain": "masked", "persons": []model.Entry{}}}, dictionary["organizations"])
+	assert.Equal(t, []model.Entry{model.NewDictionaryFromMap(map[string]model.Entry{"domain": "masked", "persons": []model.Entry{}}), model.NewDictionaryFromMap(map[string]model.Entry{"domain": "masked", "persons": []model.Entry{}})}, dictionary.Get("organizations"))
 }
 
 func TestDeleteComplexArray(t *testing.T) {
@@ -301,7 +301,7 @@ func TestDeleteComplexArray(t *testing.T) {
 		return model.NOTHING, nil
 	})
 	assert.True(t, found)
-	assert.Equal(t, []model.Entry{model.Dictionary{"domain": "company.fr", "persons": []model.Entry{model.Dictionary{"email": "", "name": "jean-baptiste", "surname": "renet"}, model.Dictionary{"email": "", "name": "paul", "surname": "crouzeau"}}}}, dictionary["organizations"])
+	assert.Equal(t, []model.Entry{model.NewDictionaryFromMap(map[string]model.Entry{"domain": "company.fr", "persons": []model.Entry{model.NewDictionaryFromMap(map[string]model.Entry{"email": "", "name": "jean-baptiste", "surname": "renet"}), model.NewDictionaryFromMap(map[string]model.Entry{"email": "", "name": "paul", "surname": "crouzeau"})}})}, dictionary.Get("organizations"))
 }
 
 func TestReadComplexNestedArray(t *testing.T) {
@@ -318,37 +318,37 @@ func TestReadComplexNestedArray(t *testing.T) {
 	})
 	assert.True(t, found)
 	// company.com is seen twice, then company.fr is seen twice
-	assert.Equal(t, []model.Entry{model.Dictionary{
+	assert.Equal(t, []model.Entry{model.NewDictionaryFromMap(map[string]model.Entry{
 		"domain": "company.com",
 		"persons": []model.Entry{
-			model.Dictionary{"email": "", "name": "leona", "surname": "miller"},
-			model.Dictionary{"email": "", "name": "joe", "surname": "davis"},
+			model.NewDictionaryFromMap(map[string]model.Entry{"email": "", "name": "leona", "surname": "miller"}),
+			model.NewDictionaryFromMap(map[string]model.Entry{"email": "", "name": "joe", "surname": "davis"}),
 		},
-	}, model.Dictionary{
+	}), model.NewDictionaryFromMap(map[string]model.Entry{
 		"domain": "company.com",
 		"persons": []model.Entry{
-			model.Dictionary{"email": "", "name": "leona", "surname": "miller"},
-			model.Dictionary{"email": "", "name": "joe", "surname": "davis"},
+			model.NewDictionaryFromMap(map[string]model.Entry{"email": "", "name": "leona", "surname": "miller"}),
+			model.NewDictionaryFromMap(map[string]model.Entry{"email": "", "name": "joe", "surname": "davis"}),
 		},
-	}, model.Dictionary{
+	}), model.NewDictionaryFromMap(map[string]model.Entry{
 		"domain": "company.fr",
 		"persons": []model.Entry{
-			model.Dictionary{"email": "", "name": "jean-baptiste", "surname": "renet"},
-			model.Dictionary{"email": "", "name": "paul", "surname": "crouzeau"},
+			model.NewDictionaryFromMap(map[string]model.Entry{"email": "", "name": "jean-baptiste", "surname": "renet"}),
+			model.NewDictionaryFromMap(map[string]model.Entry{"email": "", "name": "paul", "surname": "crouzeau"}),
 		},
-	}, model.Dictionary{
+	}), model.NewDictionaryFromMap(map[string]model.Entry{
 		"domain": "company.fr",
 		"persons": []model.Entry{
-			model.Dictionary{"email": "", "name": "jean-baptiste", "surname": "renet"},
-			model.Dictionary{"email": "", "name": "paul", "surname": "crouzeau"},
+			model.NewDictionaryFromMap(map[string]model.Entry{"email": "", "name": "jean-baptiste", "surname": "renet"}),
+			model.NewDictionaryFromMap(map[string]model.Entry{"email": "", "name": "paul", "surname": "crouzeau"}),
 		},
-	}}, collectParents)
+	})}, collectParents)
 	// the four persons are seen in this order
 	assert.Equal(t, []model.Entry{
-		model.Dictionary{"email": "", "name": "leona", "surname": "miller"},
-		model.Dictionary{"email": "", "name": "joe", "surname": "davis"},
-		model.Dictionary{"email": "", "name": "jean-baptiste", "surname": "renet"},
-		model.Dictionary{"email": "", "name": "paul", "surname": "crouzeau"},
+		model.NewDictionaryFromMap(map[string]model.Entry{"email": "", "name": "leona", "surname": "miller"}),
+		model.NewDictionaryFromMap(map[string]model.Entry{"email": "", "name": "joe", "surname": "davis"}),
+		model.NewDictionaryFromMap(map[string]model.Entry{"email": "", "name": "jean-baptiste", "surname": "renet"}),
+		model.NewDictionaryFromMap(map[string]model.Entry{"email": "", "name": "paul", "surname": "crouzeau"}),
 	}, collectValues)
 }
 
@@ -358,18 +358,19 @@ func TestWriteComplexNestedArray(t *testing.T) {
 	dictionary := getExampleAsDictionary()
 
 	found := sut.Apply(dictionary, func(rootContext, parentContext model.Dictionary, key string, value model.Entry) (model.Action, model.Entry) {
-		return model.WRITE, model.Dictionary{"email": "", "name": "rick", "surname": "roll"}
+		return model.WRITE, model.NewDictionaryFromMap(map[string]model.Entry{"email": "", "name": "rick", "surname": "roll"})
 	})
 	assert.True(t, found)
 	assert.Equal(t, []model.Entry{
-		model.Dictionary{"domain": "company.com", "persons": []model.Entry{
-			model.Dictionary{"email": "", "name": "rick", "surname": "roll"},
-			model.Dictionary{"email": "", "name": "rick", "surname": "roll"},
-		}},
-		model.Dictionary{"domain": "company.fr", "persons": []model.Entry{
-			model.Dictionary{"email": "", "name": "rick", "surname": "roll"},
-			model.Dictionary{"email": "", "name": "rick", "surname": "roll"},
-		}}}, dictionary["organizations"])
+		model.NewDictionaryFromMap(map[string]model.Entry{"domain": "company.com", "persons": []model.Entry{
+			model.NewDictionaryFromMap(map[string]model.Entry{"email": "", "name": "rick", "surname": "roll"}),
+			model.NewDictionaryFromMap(map[string]model.Entry{"email": "", "name": "rick", "surname": "roll"}),
+		}}),
+		model.NewDictionaryFromMap(map[string]model.Entry{"domain": "company.fr", "persons": []model.Entry{
+			model.NewDictionaryFromMap(map[string]model.Entry{"email": "", "name": "rick", "surname": "roll"}),
+			model.NewDictionaryFromMap(map[string]model.Entry{"email": "", "name": "rick", "surname": "roll"}),
+		}}),
+	}, dictionary.Get("organizations"))
 }
 
 func TestReadContextSimpleArray(t *testing.T) {
@@ -379,16 +380,16 @@ func TestReadContextSimpleArray(t *testing.T) {
 
 	found := sut.ApplyContext(dictionary, func(rootContext, parentContext model.Dictionary, key string, value model.Entry) (model.Action, model.Entry) {
 		assert.Equal(t, dictionary, rootContext)
-		assert.Equal(t, parentContext, model.Dictionary{
+		assert.Equal(t, parentContext, model.NewDictionaryFromMap(map[string]model.Entry{
 			"name": "test",
 			"date": "2012-04-23T18:25:43.511Z",
 			"tags": []model.Entry{"red", "blue", "yellow"},
-		})
+		}))
 		assert.Equal(t, []model.Entry{"red", "blue", "yellow"}, value)
 		return model.NOTHING, nil
 	})
 	assert.True(t, found)
-	assert.Equal(t, model.Dictionary{"date": "2012-04-23T18:25:43.511Z", "name": "test", "tags": []model.Entry{"red", "blue", "yellow"}}, dictionary["summary"])
+	assert.Equal(t, model.NewDictionaryFromMap(map[string]model.Entry{"date": "2012-04-23T18:25:43.511Z", "name": "test", "tags": []model.Entry{"red", "blue", "yellow"}}), dictionary.Get("summary"))
 }
 
 func TestWriteContextSimpleArray(t *testing.T) {
@@ -398,16 +399,16 @@ func TestWriteContextSimpleArray(t *testing.T) {
 
 	found := sut.ApplyContext(dictionary, func(rootContext, parentContext model.Dictionary, key string, value model.Entry) (model.Action, model.Entry) {
 		assert.Equal(t, dictionary, rootContext)
-		assert.Equal(t, parentContext, model.Dictionary{
+		assert.Equal(t, parentContext, model.NewDictionaryFromMap(map[string]model.Entry{
 			"name": "test",
 			"date": "2012-04-23T18:25:43.511Z",
 			"tags": []model.Entry{"red", "blue", "yellow"},
-		})
+		}))
 		assert.Equal(t, []model.Entry{"red", "blue", "yellow"}, value)
 		return model.WRITE, []model.Entry{"pink", "cyan", "magenta"}
 	})
 	assert.True(t, found)
-	assert.Equal(t, model.Dictionary{"date": "2012-04-23T18:25:43.511Z", "name": "test", "tags": []model.Entry{"pink", "cyan", "magenta"}}, dictionary["summary"])
+	assert.Equal(t, model.NewDictionaryFromMap(map[string]model.Entry{"date": "2012-04-23T18:25:43.511Z", "name": "test", "tags": []model.Entry{"pink", "cyan", "magenta"}}), dictionary.Get("summary"))
 }
 
 func TestDeleteComplexNestedArray(t *testing.T) {
@@ -424,20 +425,21 @@ func TestDeleteComplexNestedArray(t *testing.T) {
 	})
 	assert.True(t, found)
 	assert.Equal(t, []model.Entry{
-		model.Dictionary{
+		model.NewDictionaryFromMap(map[string]model.Entry{
 			"domain": "company.com",
 			"persons": []model.Entry{
 				// leona is missing
-				model.Dictionary{"email": "", "name": "joe", "surname": "davis"},
+				model.NewDictionaryFromMap(map[string]model.Entry{"email": "", "name": "joe", "surname": "davis"}),
 			},
-		},
-		model.Dictionary{
+		}),
+		model.NewDictionaryFromMap(map[string]model.Entry{
 			"domain": "company.fr",
 			"persons": []model.Entry{
-				model.Dictionary{"email": "", "name": "jean-baptiste", "surname": "renet"},
-				model.Dictionary{"email": "", "name": "paul", "surname": "crouzeau"},
+				model.NewDictionaryFromMap(map[string]model.Entry{"email": "", "name": "jean-baptiste", "surname": "renet"}),
+				model.NewDictionaryFromMap(map[string]model.Entry{"email": "", "name": "paul", "surname": "crouzeau"}),
 			},
-		}}, dictionary["organizations"])
+		}),
+	}, dictionary.Get("organizations"))
 }
 
 // Tests to copy the selector V1 API

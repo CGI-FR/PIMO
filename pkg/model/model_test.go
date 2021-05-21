@@ -27,7 +27,7 @@ import (
 )
 
 func TestPipelineSource(t *testing.T) {
-	mySlice := []Dictionary{{"v": 1}, {"v": 2}, {"v": 3}, {"v": 4}}
+	mySlice := []Dictionary{NewDictionaryFromMap(map[string]Entry{"v": 1}), NewDictionaryFromMap(map[string]Entry{"v": 2}), NewDictionaryFromMap(map[string]Entry{"v": 3}), NewDictionaryFromMap(map[string]Entry{"v": 4})}
 	var result []Dictionary
 
 	pipeline := NewPipelineFromSlice(mySlice).
@@ -39,47 +39,47 @@ func TestPipelineSource(t *testing.T) {
 }
 
 func TestPipelineWithProcessorSource(t *testing.T) {
-	mySlice := []Dictionary{{"v": 1}, {"v": 2}, {"v": 3}, {"v": 4}}
+	mySlice := []Dictionary{NewDictionaryFromMap(map[string]Entry{"v": 1}), NewDictionaryFromMap(map[string]Entry{"v": 2}), NewDictionaryFromMap(map[string]Entry{"v": 3}), NewDictionaryFromMap(map[string]Entry{"v": 4})}
 	var result []Dictionary
 
 	pipeline := NewPipelineFromSlice(mySlice).
 		Process(NewMapProcess(func(d Dictionary) (Dictionary, error) {
-			value := d["v"].(int)
-			return Dictionary{"v": value + 1}, nil
+			value := d.Get("v").(int)
+			return NewDictionaryFromMap(map[string]Entry{"v": value + 1}), nil
 		})).
 		AddSink(NewSinkToSlice(&result))
 	err := pipeline.Run()
 
 	assert.Nil(t, err)
 
-	wanted := []Dictionary{{"v": 2}, {"v": 3}, {"v": 4}, {"v": 5}}
+	wanted := []Dictionary{NewDictionaryFromMap(map[string]Entry{"v": 2}), NewDictionaryFromMap(map[string]Entry{"v": 3}), NewDictionaryFromMap(map[string]Entry{"v": 4})}
 	assert.Equal(t, wanted, result)
 }
 
 func TestPipelineWithChainedProcessorSource(t *testing.T) {
-	mySlice := []Dictionary{{"v": 1}, {"v": 2}, {"v": 3}, {"v": 4}}
+	mySlice := []Dictionary{NewDictionaryFromMap(map[string]Entry{"v": 1}), NewDictionaryFromMap(map[string]Entry{"v": 2}), NewDictionaryFromMap(map[string]Entry{"v": 3}), NewDictionaryFromMap(map[string]Entry{"v": 4})}
 	var result []Dictionary
 
 	pipeline := NewPipelineFromSlice(mySlice).
 		Process(NewMapProcess(func(d Dictionary) (Dictionary, error) {
-			value := d["v"].(int)
-			return Dictionary{"v": value + 1}, nil
+			value := d.Get("v").(int)
+			return NewDictionaryFromMap(map[string]Entry{"v": value + 1}), nil
 		})).
 		Process(NewMapProcess(func(d Dictionary) (Dictionary, error) {
-			value := d["v"].(int)
-			return Dictionary{"v": value * value}, nil
+			value := d.Get("v").(int)
+			return NewDictionaryFromMap(map[string]Entry{"v": value * value}), nil
 		})).
 		AddSink(NewSinkToSlice(&result))
 	err := pipeline.Run()
 
 	assert.Nil(t, err)
 
-	wanted := []Dictionary{{"v": 4}, {"v": 9}, {"v": 16}, {"v": 25}}
+	wanted := []Dictionary{NewDictionaryFromMap(map[string]Entry{"v": 4}), NewDictionaryFromMap(map[string]Entry{"v": 9}), NewDictionaryFromMap(map[string]Entry{"v": 16}), NewDictionaryFromMap(map[string]Entry{"v": 25})}
 	assert.Equal(t, wanted, result)
 }
 
 func TestPipelineWithRepeaterProcessor(t *testing.T) {
-	mySlice := []Dictionary{{"v": 1}, {"v": 2}, {"v": 3}, {"v": 4}}
+	mySlice := []Dictionary{NewDictionaryFromMap(map[string]Entry{"v": 1}), NewDictionaryFromMap(map[string]Entry{"v": 2}), NewDictionaryFromMap(map[string]Entry{"v": 3}), NewDictionaryFromMap(map[string]Entry{"v": 4})}
 	var result []Dictionary
 
 	pipeline := NewPipelineFromSlice(mySlice).
@@ -89,33 +89,33 @@ func TestPipelineWithRepeaterProcessor(t *testing.T) {
 
 	assert.Nil(t, err)
 
-	wanted := []Dictionary{{"v": 1}, {"v": 1}, {"v": 2}, {"v": 2}, {"v": 3}, {"v": 3}, {"v": 4}, {"v": 4}}
+	wanted := []Dictionary{NewDictionaryFromMap(map[string]Entry{"v": 1}), NewDictionaryFromMap(map[string]Entry{"v": 1}), NewDictionaryFromMap(map[string]Entry{"v": 2}), NewDictionaryFromMap(map[string]Entry{"v": 2}), NewDictionaryFromMap(map[string]Entry{"v": 3}), NewDictionaryFromMap(map[string]Entry{"v": 3}), NewDictionaryFromMap(map[string]Entry{"v": 4}), NewDictionaryFromMap(map[string]Entry{"v": 4})}
 	assert.Equal(t, wanted, result)
 }
 
 func TestPipelineWithRepeaterAndMapChainedProcessor(t *testing.T) {
-	mySlice := []Dictionary{{"v": 1}, {"v": 2}, {"v": 3}, {"v": 4}}
+	mySlice := []Dictionary{NewDictionaryFromMap(map[string]Entry{"v": 1}), NewDictionaryFromMap(map[string]Entry{"v": 2}), NewDictionaryFromMap(map[string]Entry{"v": 3}), NewDictionaryFromMap(map[string]Entry{"v": 4})}
 	var result []Dictionary
 
 	pipeline := NewPipelineFromSlice(mySlice).
 		Process(NewRepeaterProcess(2)).
 		Process(NewMapProcess(func(d Dictionary) (Dictionary, error) {
-			value := d["v"].(int)
-			return Dictionary{"v": value * value}, nil
+			value := d.Get("v").(int)
+			return NewDictionaryFromMap(map[string]Entry{"v": value * value}), nil
 		})).
 		AddSink(NewSinkToSlice(&result))
 	err := pipeline.Run()
 
 	assert.Nil(t, err)
 
-	wanted := []Dictionary{{"v": 1}, {"v": 1}, {"v": 4}, {"v": 4}, {"v": 9}, {"v": 9}, {"v": 16}, {"v": 16}}
+	wanted := []Dictionary{NewDictionaryFromMap(map[string]Entry{"v": 1}), NewDictionaryFromMap(map[string]Entry{"v": 1}), NewDictionaryFromMap(map[string]Entry{"v": 4}), NewDictionaryFromMap(map[string]Entry{"v": 4}), NewDictionaryFromMap(map[string]Entry{"v": 9}), NewDictionaryFromMap(map[string]Entry{"v": 9}), NewDictionaryFromMap(map[string]Entry{"v": 16}), NewDictionaryFromMap(map[string]Entry{"v": 16})}
 	assert.Equal(t, wanted, result)
 }
 
 func TestPipelineWithMaskEngine(t *testing.T) {
-	var nameMasking = FunctionMaskEngine{Function: func(name Entry, contexts ...Dictionary) (Entry, error) { return "Toto", nil }}
+	nameMasking := FunctionMaskEngine{Function: func(name Entry, contexts ...Dictionary) (Entry, error) { return "Toto", nil }}
 
-	mySlice := []Dictionary{{"name": "Bob"}}
+	mySlice := []Dictionary{NewDictionaryFromMap(map[string]Entry{"name": "Bob"})}
 	var result []Dictionary
 
 	pipeline := NewPipelineFromSlice(mySlice).
@@ -125,12 +125,12 @@ func TestPipelineWithMaskEngine(t *testing.T) {
 
 	assert.Nil(t, err)
 
-	wanted := []Dictionary{{"name": "Toto"}}
+	wanted := []Dictionary{NewDictionaryFromMap(map[string]Entry{"name": "Toto"})}
 	assert.Equal(t, wanted, result)
 }
 
 func TestPipelineWithDeleteMaskEngine(t *testing.T) {
-	mySlice := []Dictionary{{"name": "Bob", "city": "Nantes"}}
+	mySlice := []Dictionary{NewDictionaryFromMap(map[string]Entry{"name": "Bob", "city": "Nantes"})}
 	var result []Dictionary
 
 	pipeline := NewPipelineFromSlice(mySlice).
@@ -140,16 +140,16 @@ func TestPipelineWithDeleteMaskEngine(t *testing.T) {
 
 	assert.Nil(t, err)
 
-	wanted := []Dictionary{{"city": "Nantes"}}
+	wanted := []Dictionary{NewDictionaryFromMap(map[string]Entry{"city": "Nantes"})}
 	assert.Equal(t, wanted, result)
 
 	assert.NotEqual(t, wanted, mySlice)
 }
 
 func TestMaskEngineShouldNotCreateField(t *testing.T) {
-	var nameMasking = FunctionMaskEngine{Function: func(name Entry, contexts ...Dictionary) (Entry, error) { return "Toto", nil }}
+	nameMasking := FunctionMaskEngine{Function: func(name Entry, contexts ...Dictionary) (Entry, error) { return "Toto", nil }}
 
-	mySlice := []Dictionary{{"city": "Nantes"}}
+	mySlice := []Dictionary{NewDictionaryFromMap(map[string]Entry{"city": "Nantes"})}
 	var result []Dictionary
 
 	pipeline := NewPipelineFromSlice(mySlice).
@@ -159,7 +159,7 @@ func TestMaskEngineShouldNotCreateField(t *testing.T) {
 
 	assert.Nil(t, err)
 
-	wanted := []Dictionary{{"city": "Nantes"}}
+	wanted := []Dictionary{NewDictionaryFromMap(map[string]Entry{"city": "Nantes"})}
 	assert.Equal(t, wanted, result)
 }
 
@@ -170,16 +170,16 @@ type TestAddMaskEngine struct {
 
 // MaskContext add the field
 func (am TestAddMaskEngine) MaskContext(context Dictionary, key string, contexts ...Dictionary) (Dictionary, error) {
-	_, present := context[key]
+	_, present := context.GetValue(key)
 	if !present {
-		context[key] = am.value
+		context.Set(key, am.value)
 	}
 
 	return context, nil
 }
 
 func TestMaskEngineWithContext(t *testing.T) {
-	mySlice := []Dictionary{{"city": "Nantes"}}
+	mySlice := []Dictionary{NewDictionaryFromMap(map[string]Entry{"city": "Nantes"})}
 	var result []Dictionary
 
 	pipeline := NewPipelineFromSlice(mySlice).
@@ -189,14 +189,14 @@ func TestMaskEngineWithContext(t *testing.T) {
 
 	assert.Nil(t, err)
 
-	wanted := []Dictionary{{"city": "Nantes", "name": "Toto"}}
+	wanted := []Dictionary{NewDictionaryFromMap(map[string]Entry{"city": "Nantes", "name": "Toto"})}
 	assert.Equal(t, wanted, result)
 }
 
 func TestMaskEngineShouldMaskAllEntriesInArray(t *testing.T) {
-	var nameMasking = FunctionMaskEngine{Function: func(name Entry, contexts ...Dictionary) (Entry, error) { return "Paris", nil }}
+	nameMasking := FunctionMaskEngine{Function: func(name Entry, contexts ...Dictionary) (Entry, error) { return "Paris", nil }}
 
-	mySlice := []Dictionary{{"city": []Entry{"Nantes", "Rennes", "Grenoble"}}}
+	mySlice := []Dictionary{NewDictionaryFromMap(map[string]Entry{"city": []Entry{"Nantes", "Rennes", "Grenoble"}})}
 	var result []Dictionary
 
 	pipeline := NewPipelineFromSlice(mySlice).
@@ -206,14 +206,14 @@ func TestMaskEngineShouldMaskAllEntriesInArray(t *testing.T) {
 
 	assert.Nil(t, err)
 
-	wanted := []Dictionary{{"city": []Entry{"Paris", "Paris", "Paris"}}}
+	wanted := []Dictionary{NewDictionaryFromMap(map[string]Entry{"city": []Entry{"Paris", "Paris", "Paris"}})}
 	assert.Equal(t, wanted, result)
 }
 
 func TestMaskEngineShouldMaskNestedEntry(t *testing.T) {
-	var nameMasking = FunctionMaskEngine{Function: func(name Entry, contexts ...Dictionary) (Entry, error) { return "Paris", nil }}
+	nameMasking := FunctionMaskEngine{Function: func(name Entry, contexts ...Dictionary) (Entry, error) { return "Paris", nil }}
 
-	mySlice := []Dictionary{{"address": Dictionary{"city": "Nantes"}}}
+	mySlice := []Dictionary{NewDictionaryFromMap(map[string]Entry{"address": NewDictionaryFromMap(map[string]Entry{"city": "Nantes"})})}
 	var result []Dictionary
 
 	pipeline := NewPipelineFromSlice(mySlice).
@@ -223,19 +223,19 @@ func TestMaskEngineShouldMaskNestedEntry(t *testing.T) {
 
 	assert.Nil(t, err)
 
-	wanted := []Dictionary{{"address": Dictionary{"city": "Paris"}}}
+	wanted := []Dictionary{NewDictionaryFromMap(map[string]Entry{"address": NewDictionaryFromMap(map[string]Entry{"city": "Paris"})})}
 	assert.Equal(t, wanted, result)
 }
 
 func TestMaskEngineShouldMaskNestedDictionariesArray(t *testing.T) {
-	var nameMasking = FunctionMaskEngine{Function: func(name Entry, contexts ...Dictionary) (Entry, error) { return "Paris", nil }}
+	nameMasking := FunctionMaskEngine{Function: func(name Entry, contexts ...Dictionary) (Entry, error) { return "Paris", nil }}
 
 	mySlice := []Dictionary{
-		{"address": []Entry{
-			Dictionary{"city": "Nantes"},
-			Dictionary{"city": "Rennes"},
-			Dictionary{"city": "Grenoble"},
-		}},
+		NewDictionaryFromMap(map[string]Entry{"address": []Entry{
+			NewDictionaryFromMap(map[string]Entry{"city": "Nantes"}),
+			NewDictionaryFromMap(map[string]Entry{"city": "Rennes"}),
+			NewDictionaryFromMap(map[string]Entry{"city": "Grenoble"}),
+		}}),
 	}
 
 	var result []Dictionary
@@ -248,24 +248,24 @@ func TestMaskEngineShouldMaskNestedDictionariesArray(t *testing.T) {
 	assert.Nil(t, err)
 
 	wanted := []Dictionary{
-		{"address": []Entry{
-			Dictionary{"city": "Paris"},
-			Dictionary{"city": "Paris"},
-			Dictionary{"city": "Paris"},
-		}},
+		NewDictionaryFromMap(map[string]Entry{"address": []Entry{
+			NewDictionaryFromMap(map[string]Entry{"city": "Paris"}),
+			NewDictionaryFromMap(map[string]Entry{"city": "Paris"}),
+			NewDictionaryFromMap(map[string]Entry{"city": "Paris"}),
+		}}),
 	}
 	assert.Equal(t, wanted, result)
 }
 
 func TestMaskEngineShouldMaskNestedArray(t *testing.T) {
-	var nameMasking = FunctionMaskEngine{Function: func(name Entry, contexts ...Dictionary) (Entry, error) { return "Paris", nil }}
+	nameMasking := FunctionMaskEngine{Function: func(name Entry, contexts ...Dictionary) (Entry, error) { return "Paris", nil }}
 
 	mySlice := []Dictionary{
-		{"address": Dictionary{"city": []Entry{
+		NewDictionaryFromMap(map[string]Entry{"address": NewDictionaryFromMap(map[string]Entry{"city": []Entry{
 			"Nantes",
 			"Rennes",
 			"Grenoble",
-		}}},
+		}})}),
 	}
 
 	var result []Dictionary
@@ -278,12 +278,13 @@ func TestMaskEngineShouldMaskNestedArray(t *testing.T) {
 	assert.Nil(t, err)
 
 	wanted := []Dictionary{
-		{"address": Dictionary{"city": []Entry{
-			"Paris",
-			"Paris",
-			"Paris",
-		}},
-		},
+		NewDictionaryFromMap(map[string]Entry{
+			"address": NewDictionaryFromMap(map[string]Entry{"city": []Entry{
+				"Paris",
+				"Paris",
+				"Paris",
+			}}),
+		}),
 	}
 	assert.Equal(t, wanted, result)
 }
@@ -297,7 +298,7 @@ func jsonlineToDictionaries(jsl string) []Dictionary {
 		if err != nil {
 			return nil
 		}
-		result = append(result, InterfaceToDictionary(inter))
+		result = append(result, CleanTypes(inter).(Dictionary))
 	}
 	return result
 }
@@ -313,8 +314,8 @@ func dictionariesToJSONLine(dictionaries []Dictionary) string {
 }
 
 func TestMaskEngineShouldMaskNestedArrays(t *testing.T) {
-	var i = 0
-	var nameMasking = FunctionMaskEngine{Function: func(name Entry, contexts ...Dictionary) (Entry, error) { i++; return fmt.Sprintf("%d", i), nil }}
+	i := 0
+	nameMasking := FunctionMaskEngine{Function: func(name Entry, contexts ...Dictionary) (Entry, error) { i++; return fmt.Sprintf("%d", i), nil }}
 
 	iput := `{"persons":[{"phonenumber":"001"},{"phonenumber":"002"}]}
 			 {"persons":[{"phonenumber":"003"}]}
@@ -340,8 +341,8 @@ func TestMaskEngineShouldMaskNestedArrays(t *testing.T) {
 }
 
 func TestMaskEngineShouldMaskNestedNestedArrays(t *testing.T) {
-	var i = 0
-	var nameMasking = FunctionMaskEngine{Function: func(name Entry, contexts ...Dictionary) (Entry, error) { i++; return fmt.Sprintf("%d", i), nil }}
+	i := 0
+	nameMasking := FunctionMaskEngine{Function: func(name Entry, contexts ...Dictionary) (Entry, error) { i++; return fmt.Sprintf("%d", i), nil }}
 
 	iput := `{"elements":[{"persons":[{"phonenumber":"027123456"},{"phonenumber":"028123456"}]},{"persons":[{"phonenumber":"029123456"},{"phonenumber":"020123456"}]}]}`
 	oput := `{"elements":[{"persons":[{"phonenumber":"1"},{"phonenumber":"2"}]},{"persons":[{"phonenumber":"3"},{"phonenumber":"4"}]}]}`
@@ -363,7 +364,7 @@ func TestMaskEngineShouldMaskNestedNestedArrays(t *testing.T) {
 }
 
 func TestInOutFormat1(t *testing.T) {
-	var masking = FunctionMaskEngine{Function: func(name Entry, contexts ...Dictionary) (Entry, error) { return "mask", nil }}
+	masking := FunctionMaskEngine{Function: func(name Entry, contexts ...Dictionary) (Entry, error) { return "mask", nil }}
 	var odict []Dictionary
 	iput := `{"key": ["mask"]}`
 	idict := jsonlineToDictionaries(iput)
@@ -377,7 +378,7 @@ func TestInOutFormat1(t *testing.T) {
 }
 
 func TestInOutFormat2(t *testing.T) {
-	var masking = FunctionMaskEngine{Function: func(name Entry, contexts ...Dictionary) (Entry, error) { return "mask", nil }}
+	masking := FunctionMaskEngine{Function: func(name Entry, contexts ...Dictionary) (Entry, error) { return "mask", nil }}
 	var odict []Dictionary
 	iput := `{"key1": [{"key2": "mask"}]}`
 	idict := jsonlineToDictionaries(iput)
@@ -391,10 +392,10 @@ func TestInOutFormat2(t *testing.T) {
 }
 
 func TestMaskEngineShouldMaskMultipleNestedNestedArrays(t *testing.T) {
-	var i = 0
-	var j = 0
-	var nameMasking = FunctionMaskEngine{Function: func(name Entry, contexts ...Dictionary) (Entry, error) { i++; return fmt.Sprintf("%d", i), nil }}
-	var emailMasking = FunctionMaskEngine{Function: func(name Entry, contexts ...Dictionary) (Entry, error) {
+	i := 0
+	j := 0
+	nameMasking := FunctionMaskEngine{Function: func(name Entry, contexts ...Dictionary) (Entry, error) { i++; return fmt.Sprintf("%d", i), nil }}
+	emailMasking := FunctionMaskEngine{Function: func(name Entry, contexts ...Dictionary) (Entry, error) {
 		j++
 		return fmt.Sprintf("email.%d@company.com", j), nil
 	}}
@@ -420,9 +421,9 @@ func TestMaskEngineShouldMaskMultipleNestedNestedArrays(t *testing.T) {
 }
 
 func TestMaskEngineShouldReturnError(t *testing.T) {
-	var errorMasking = FunctionMaskEngine{Function: func(name Entry, contexts ...Dictionary) (Entry, error) { return "", fmt.Errorf("Test error") }}
+	errorMasking := FunctionMaskEngine{Function: func(name Entry, contexts ...Dictionary) (Entry, error) { return "", fmt.Errorf("Test error") }}
 
-	mySlice := []Dictionary{{"city": "Nantes"}}
+	mySlice := []Dictionary{NewDictionaryFromMap(map[string]Entry{"city": "Nantes"})}
 	var result []Dictionary
 
 	pipeline := NewPipelineFromSlice(mySlice).
@@ -434,11 +435,11 @@ func TestMaskEngineShouldReturnError(t *testing.T) {
 }
 
 func TestPipelineShouldReturnError(t *testing.T) {
-	var errorMap = func(Dictionary) (Dictionary, error) {
-		return nil, fmt.Errorf("Test error")
+	errorMap := func(Dictionary) (Dictionary, error) {
+		return NewDictionary(), fmt.Errorf("Test error")
 	}
 
-	mySlice := []Dictionary{{"city": "Nantes"}}
+	mySlice := []Dictionary{NewDictionaryFromMap(map[string]Entry{"city": "Nantes"})}
 	var result []Dictionary
 
 	pipeline := NewPipelineFromSlice(mySlice).
@@ -449,18 +450,18 @@ func TestPipelineShouldReturnError(t *testing.T) {
 	assert.NotNil(t, err)
 }
 
-type ErrorSource struct {
-}
+type ErrorSource struct{}
 
 func (s ErrorSource) Err() error {
 	return fmt.Errorf("Test error")
 }
+
 func (s ErrorSource) Next() bool {
 	return false
 }
 
 func (s ErrorSource) Value() Dictionary {
-	return nil
+	return NewDictionary()
 }
 
 func (s ErrorSource) Open() error {
@@ -480,14 +481,14 @@ func TestPipelineShouldReturnErrorFromSource(t *testing.T) {
 func TestCacheShouldProvide(t *testing.T) {
 	i := 0
 
-	var errorMasking = FunctionMaskEngine{Function: func(name Entry, contexts ...Dictionary) (Entry, error) {
+	errorMasking := FunctionMaskEngine{Function: func(name Entry, contexts ...Dictionary) (Entry, error) {
 		i++
 		return fmt.Sprintf("%s - %d", name, i), nil
 	}}
 
 	cache := NewMemCache()
 
-	mySlice := []Dictionary{{"city": "Nantes"}, {"city": "Grenoble"}, {"city": "Nantes"}}
+	mySlice := []Dictionary{NewDictionaryFromMap(map[string]Entry{"city": "Nantes"}), NewDictionaryFromMap(map[string]Entry{"city": "Grenoble"}), NewDictionaryFromMap(map[string]Entry{"city": "Nantes"})}
 	var result []Dictionary
 
 	pipeline := NewPipelineFromSlice(mySlice).
@@ -497,7 +498,7 @@ func TestCacheShouldProvide(t *testing.T) {
 
 	assert.Nil(t, err)
 
-	wanted := []Dictionary{{"city": "Nantes - 1"}, {"city": "Grenoble - 2"}, {"city": "Nantes - 1"}}
+	wanted := []Dictionary{NewDictionaryFromMap(map[string]Entry{"city": "Nantes - 1"}), NewDictionaryFromMap(map[string]Entry{"city": "Grenoble - 2"}), NewDictionaryFromMap(map[string]Entry{"city": "Nantes - 1"})}
 
 	assert.Equal(t, wanted, result)
 }

@@ -27,7 +27,7 @@ import (
 func TestMaskingShouldReplaceSensitiveValueByAnotherField(t *testing.T) {
 	remplacement := NewMask("name1")
 
-	data := model.Dictionary{"name1": "Dupont", "name2": "Dupond"}
+	data := model.NewDictionaryFromMap(map[string]model.Entry{"name1": "Dupont", "name2": "Dupond"})
 	result, err := remplacement.Mask("Dupond", data)
 	assert.Equal(t, nil, err, "error should be nil")
 	waited := "Dupont"

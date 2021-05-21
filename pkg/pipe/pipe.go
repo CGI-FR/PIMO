@@ -59,27 +59,21 @@ func (me MaskEngine) MaskContext(e model.Dictionary, key string, context ...mode
 	var result []model.Dictionary
 	input := []model.Dictionary{}
 
-	copy := model.Dictionary{}
-	for k, v := range e {
-		copy[k] = v
-	}
+	copy := model.CopyDictionary(e)
 
-	value, ok := e[key]
+	value, ok := e.GetValue(key)
 	if !ok || value == nil {
 		return copy, nil
 	}
 
-	for _, dict := range e[key].([]model.Entry) {
-		elemInput := InterfaceToDictionaryEntry(dict)
+	for _, dict := range e.Get(key).([]model.Entry) {
+		elemInput := model.CleanTypes(dict).(model.Dictionary)
 		if len(me.injectParent) > 0 {
-			elemInput[me.injectParent] = copy
+			elemInput.Set(me.injectParent, copy)
 		}
 		if len(me.injectRoot) > 0 {
-			rootcopy := model.Dictionary{}
-			for k, v := range context[0] {
-				rootcopy[k] = v
-			}
-			elemInput[me.injectRoot] = rootcopy
+			rootcopy := model.CopyDictionary(context[0])
+			elemInput.Set(me.injectRoot, rootcopy)
 		}
 		input = append(input, elemInput)
 	}
@@ -105,17 +99,17 @@ func (me MaskEngine) MaskContext(e model.Dictionary, key string, context ...mode
 	over.MDC().Set("path", savePath)
 	over.MDC().Set("context", saveContext)
 	if err != nil {
-		return nil, err
+		return model.NewDictionary(), err
 	}
 	for _, dict := range result {
 		if len(me.injectParent) > 0 {
-			delete(dict, me.injectParent)
+			dict.Delete(me.injectParent)
 		}
 		if len(me.injectRoot) > 0 {
-			delete(dict, me.injectRoot)
+			dict.Delete(me.injectRoot)
 		}
 	}
-	copy[key] = result
+	copy.Set(key, result)
 	return copy, nil
 }
 
@@ -133,35 +127,6 @@ func Factory(conf model.Masking, seed int64, caches map[string]model.Cache) (mod
 		return mask, true, nil
 	}
 	return nil, false, nil
-}
-
-// InterfaceToDictionary returns a model.Dictionary from an interface
-func InterfaceToDictionaryEntry(inter interface{}) model.Dictionary {
-	dic := make(map[string]model.Entry)
-	mapint := inter.(model.Dictionary)
-
-	for k, v := range mapint {
-		switch typedValue := v.(type) {
-		case map[string]interface{}:
-			dic[k] = model.InterfaceToDictionary(v)
-		case []interface{}:
-			tab := []model.Entry{}
-			for _, item := range typedValue {
-				_, dico := item.(map[string]interface{})
-
-				if dico {
-					tab = append(tab, model.InterfaceToDictionary(item))
-				} else {
-					tab = append(tab, item)
-				}
-			}
-			dic[k] = tab
-		default:
-			dic[k] = v
-		}
-	}
-
-	return dic
 }
 
 var re = regexp.MustCompile(`(\[\d*\])?$`)
