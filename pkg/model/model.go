@@ -79,6 +79,7 @@ type RandomDecimalType struct {
 	Max       float64
 	Precision int
 }
+
 type DateParserType struct {
 	InputFormat  string `yaml:"inputFormat"`
 	OutputFormat string `yaml:"outputFormat"`
@@ -213,6 +214,7 @@ func (source *SourceFromSlice) Value() Dictionary {
 func (source *SourceFromSlice) Err() error {
 	return nil
 }
+
 func (source *SourceFromSlice) Open() error {
 	source.offset = 0
 	return nil
@@ -287,7 +289,7 @@ func (sink *SinkToCache) Open() error {
 }
 
 func (sink *SinkToCache) ProcessDictionary(dictionary Dictionary) error {
-	sink.cache.Put(dictionary["key"], dictionary["value"])
+	sink.cache.Put(dictionary.Get("key"), dictionary.Get("value"))
 	return nil
 }
 
@@ -333,7 +335,7 @@ func (pipeline SimplePipeline) Open() error {
 }
 
 func NewCollector() *QueueCollector {
-	return &QueueCollector{[]Dictionary{}, nil}
+	return &QueueCollector{[]Dictionary{}, NewDictionary()}
 }
 
 type QueueCollector struct {
@@ -395,11 +397,7 @@ func (p *ProcessPipeline) Next() bool {
 }
 
 func (p *ProcessPipeline) Value() Dictionary {
-	result := Dictionary{}
-	for k, v := range p.collector.Value() {
-		result[k] = v
-	}
-	return result
+	return CopyDictionary(p.collector.Value())
 }
 
 func (p *ProcessPipeline) Err() error {
@@ -438,33 +436,4 @@ func (pipeline SimpleSinkedPipeline) Run() (err error) {
 		}
 	}
 	return pipeline.source.Err()
-}
-
-// InterfaceToDictionary returns a model.Dictionary from an interface
-func InterfaceToDictionary(inter interface{}) Dictionary {
-	dic := make(map[string]Entry)
-	mapint := inter.(map[string]interface{})
-
-	for k, v := range mapint {
-		switch typedValue := v.(type) {
-		case map[string]interface{}:
-			dic[k] = InterfaceToDictionary(v)
-		case []interface{}:
-			tab := []Entry{}
-			for _, item := range typedValue {
-				_, dico := item.(map[string]interface{})
-
-				if dico {
-					tab = append(tab, InterfaceToDictionary(item))
-				} else {
-					tab = append(tab, item)
-				}
-			}
-			dic[k] = tab
-		default:
-			dic[k] = v
-		}
-	}
-
-	return dic
 }

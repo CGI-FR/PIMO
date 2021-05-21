@@ -40,17 +40,14 @@ func (mcep *MaskContextEngineProcess) ProcessDictionary(dictionary Dictionary, o
 	over.AddGlobalFields("path")
 	over.MDC().Set("path", mcep.selector)
 	defer func() { over.MDC().Remove("path") }()
-	result := Dictionary{}
-	for k, v := range dictionary {
-		result[k] = v
-	}
+	result := CopyDictionary(dictionary)
 	applied := mcep.selector.ApplyContext(result, func(rootContext, parentContext Dictionary, key string, _ Entry) (Action, Entry) {
 		masked, err := mcep.mask.MaskContext(parentContext, key, rootContext, parentContext)
 		if err != nil {
 			ret = err
 			return NOTHING, nil
 		}
-		value, ok := masked[key]
+		value, ok := masked.GetValue(key)
 		if !ok {
 			return NOTHING, nil
 		}

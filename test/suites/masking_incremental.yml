@@ -18,6 +18,6 @@ testcases:
           echo -e '{"name": "Toto", "id": 12}\n{"name": "Dorothy", "id":3}' | pimo
         assertions:
           - result.code ShouldEqual 0
-          - result.systemout ShouldContainSubstring "id":5,"name":"Toto"
-          - result.systemout ShouldContainSubstring "id":7,"name":"Dorothy"
+          - result.systemout ShouldContainSubstring "name":"Toto","id":5
+          - result.systemout ShouldContainSubstring "name":"Dorothy","id":7
           - result.systemerr ShouldBeEmpty

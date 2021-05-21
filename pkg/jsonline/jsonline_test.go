@@ -19,6 +19,7 @@ package jsonline
 
 import (
 	"bytes"
+	"encoding/json"
 	"testing"
 
 	"github.com/cgi-fr/pimo/pkg/model"
@@ -32,11 +33,12 @@ func TestSourceReturnDictionary(t *testing.T) {
 	err := pipeline.AddSink(model.NewSinkToSlice(&result)).Run()
 	assert.Nil(t, err)
 	assert.Equal(t, 1, len(result))
-	waited := model.Dictionary{"personne": []model.Entry{
-		model.Dictionary{"name": "Benjamin", "age": float64(35)},
-		model.Dictionary{"name": "Nicolas", "age": float64(38)},
-	}}
-	assert.Equal(t, waited, result[0], "Should create the right model.Dictionary")
+	expected := model.NewDictionary().
+		With("personne", []model.Entry{
+			model.NewDictionary().With("name", "Benjamin").With("age", json.Number("35")),
+			model.NewDictionary().With("name", "Nicolas").With("age", json.Number("38")),
+		})
+	assert.Equal(t, expected, result[0], "Should create the right model.Dictionary")
 }
 
 func TestSourceReturnError(t *testing.T) {
@@ -49,15 +51,16 @@ func TestSourceReturnError(t *testing.T) {
 }
 
 func TestSinkWriteDictionary(t *testing.T) {
-	source := model.Dictionary{"personne": []model.Entry{
-		model.Dictionary{"name": "Benjamin", "age": float64(35)},
-		model.Dictionary{"name": "Nicolas", "age": float64(38)},
-	}}
+	source := model.NewDictionary().
+		With("personne", []model.Entry{
+			model.NewDictionary().With("name", "Benjamin").With("age", json.Number("35")),
+			model.NewDictionary().With("name", "Nicolas").With("age", json.Number("38")),
+		})
 
 	result := bytes.Buffer{}
 
 	err := model.NewPipelineFromSlice([]model.Dictionary{source}).AddSink(NewSink(&result)).Run()
-	jsonline := []byte(`{"personne":[{"age":35,"name":"Benjamin"},{"age":38,"name":"Nicolas"}]}
+	jsonline := []byte(`{"personne":[{"name":"Benjamin","age":35},{"name":"Nicolas","age":38}]}
 `)
 
 	assert.Nil(t, err)

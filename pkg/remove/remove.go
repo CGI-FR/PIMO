@@ -23,8 +23,7 @@ import (
 )
 
 // MaskEngine is an empty mask to link to a field to remove
-type MaskEngine struct {
-}
+type MaskEngine struct{}
 
 // NewMask return an empty mask
 func NewMask() MaskEngine {
@@ -34,7 +33,7 @@ func NewMask() MaskEngine {
 // MaskContext remove the field
 func (rm MaskEngine) MaskContext(context model.Dictionary, key string, contexts ...model.Dictionary) (model.Dictionary, error) {
 	log.Info().Msg("Mask delete")
-	delete(context, key)
+	context.Delete(key)
 
 	return context, nil
 }

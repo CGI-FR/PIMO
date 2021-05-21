@@ -27,7 +27,7 @@ import (
 func TestMaskingShouldReplaceSensitiveValueByRandomInList(t *testing.T) {
 	nameList := []model.Entry{"Michel", "Marc", "Matthias", "Youen", "Alexis"}
 
-	data := model.Dictionary{"name": "Benjamin"}
+	data := model.NewDictionary().With("name", "Benjamin")
 	result, err := NewMask(nameList, 0).Mask(data)
 	assert.Equal(t, nil, err, "error should be nil")
 	assert.NotEqual(t, data, result, "should be masked")

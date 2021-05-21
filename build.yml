@@ -53,6 +53,9 @@ properties:
     ]
   lintersno: ["scopelint", "interfacer", "maligned", "forbidigo", "gci"] # List of linters to exclude on running the lint target
 
+  # test suites to execute on test-int target
+  testsuites: "*.yml"
+
   # If true, do not upload release when publish target is used
   snapshot: false
 
@@ -259,7 +262,7 @@ targets:
       - copy: "**/*.yml"
         dir: "test/suites"
         todir: =TEST_WS_DIR
-      - $: venom run --stop-on-failure ={TEST_WS_DIR}/*.yml
+      - $: venom run --stop-on-failure ={TEST_WS_DIR}/={testsuites}
 
   # run "neon -props '{buildpaths: ["path/to/main/package1","path/to/main/package2"]}' publish" to publish specific targets
   # example : neon -props '{buildpaths: ["cmd/cli"]}' publish

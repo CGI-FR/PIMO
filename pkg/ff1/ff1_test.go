@@ -27,10 +27,9 @@ import (
 
 func TestMaskingShouldEncryptStringWithTweak(t *testing.T) {
 	os.Setenv("FF1_ENCRYPTION_KEY", "70NZ2NWAqk9/A21vBPxqlA==")
-	var context = map[string]model.Entry{
-		"name":  "Toto",
-		"tweak": "mytweak",
-	}
+	context := model.NewDictionary().
+		With("name", "Toto").
+		With("tweak", "mytweak")
 	ff1Mask := NewMask("FF1_ENCRYPTION_KEY", "tweak", 62, false)
 	line := "Toto"
 	result, err := ff1Mask.Mask(line, context)
@@ -40,9 +39,8 @@ func TestMaskingShouldEncryptStringWithTweak(t *testing.T) {
 
 func TestMaskingShouldEncryptStringWithoutTweak(t *testing.T) {
 	os.Setenv("FF1_ENCRYPTION_KEY", "70NZ2NWAqk9/A21vBPxqlA==")
-	var context = map[string]model.Entry{
-		"name": "Toto",
-	}
+	context := model.NewDictionary().
+		With("name", "Toto")
 	ff1Mask := NewMask("FF1_ENCRYPTION_KEY", "tweak", 62, false)
 	line := "Toto"
 	result, err := ff1Mask.Mask(line, context)
@@ -52,10 +50,9 @@ func TestMaskingShouldEncryptStringWithoutTweak(t *testing.T) {
 
 func TestMaskingShouldDecryptStringWithTweak(t *testing.T) {
 	os.Setenv("FF1_ENCRYPTION_KEY", "70NZ2NWAqk9/A21vBPxqlA==")
-	var context = map[string]model.Entry{
-		"name":  "nhIy",
-		"tweak": "mytweak",
-	}
+	context := model.NewDictionary().
+		With("name", "nhIy").
+		With("tweak", "mytweak")
 	ff1Mask := NewMask("FF1_ENCRYPTION_KEY", "tweak", 62, true)
 	line := "nhIy"
 	result, err := ff1Mask.Mask(line, context)
@@ -65,9 +62,8 @@ func TestMaskingShouldDecryptStringWithTweak(t *testing.T) {
 
 func TestMaskingShouldDecryptStringWithoutTweak(t *testing.T) {
 	os.Setenv("FF1_ENCRYPTION_KEY", "70NZ2NWAqk9/A21vBPxqlA==")
-	var context = map[string]model.Entry{
-		"name": "Uaow",
-	}
+	context := model.NewDictionary().
+		With("name", "Uaow")
 	ff1Mask := NewMask("FF1_ENCRYPTION_KEY", "tweak", 62, true)
 	line := "Uaow"
 	result, err := ff1Mask.Mask(line, context)

@@ -26,10 +26,10 @@ import (
 
 func TestMaskingShouldRemoveField(t *testing.T) {
 	removeMask := NewMask()
-	data := model.Dictionary{"field": "SomeInformation", "otherfield": "SomeOtherInformation"}
+	data := model.NewDictionary().With("field", "SomeInformation").With("otherfield", "SomeOtherInformation")
 	result, err := removeMask.MaskContext(data, "field")
 	assert.Equal(t, nil, err, "error should be nil")
-	waited := model.Dictionary{"otherfield": "SomeOtherInformation"}
+	waited := model.NewDictionary().With("otherfield", "SomeOtherInformation")
 	assert.Equal(t, waited, result, "should be Toto")
 }
 

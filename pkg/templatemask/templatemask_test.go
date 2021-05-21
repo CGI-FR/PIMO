@@ -31,7 +31,7 @@ func TestMaskingShouldReplaceSensitiveValueByTemplate(t *testing.T) {
 		assert.Fail(t, err.Error())
 	}
 
-	data := model.Dictionary{"name": "Jean", "surname": "Bonbeur", "mail": "jean44@outlook.com"}
+	data := model.NewDictionary().With("name", "Jean").With("surname", "Bonbeur").With("mail", "jean44@outlook.com")
 	result, err := tempMask.Mask("jean44@outlook.com", data)
 	assert.Equal(t, nil, err, "error should be nil")
 	waited := "Jean.Bonbeur@gmail.com"
@@ -45,7 +45,14 @@ func TestMaskingShouldReplaceSensitiveValueByTemplateInNested(t *testing.T) {
 		assert.Fail(t, err.Error())
 	}
 
-	data := model.Dictionary{"customer": model.Dictionary{"identity": model.Dictionary{"name": "Jean", "surname": "Bonbeur"}}, "mail": "jean44@outlook.com"}
+	data := model.NewDictionary().
+		With("customer", model.NewDictionary().
+			With("identity", model.NewDictionary().
+				With("name", "Jean").
+				With("surname", "Bonbeur"),
+			).
+			With("mail", "jean44@outlook.com"),
+		)
 	result, err := tempMask.Mask("jean44@outlook.com", data)
 	assert.Equal(t, nil, err, "error should be nil")
 	waited := "Jean.Bonbeur@gmail.com"
@@ -60,7 +67,7 @@ func TestFactoryShouldCreateAMask(t *testing.T) {
 	assert.IsType(t, maskingEngine, config, "should be equal")
 	assert.True(t, present, "should be true")
 	assert.Nil(t, err, "error should be nil")
-	data := model.Dictionary{"name": "Toto", "surname": "Tata", "mail": ""}
+	data := model.NewDictionary().With("name", "Toto").With("surname", "Tata").With("mail", "")
 	result, err := maskingEngine.Mask(data, data)
 	assert.Nil(t, err, "error should be nil")
 	waitedResult := "Toto.Tata@gmail.com"
@@ -90,7 +97,7 @@ func TestMaskingTemplateShouldFormat(t *testing.T) {
 		assert.Fail(t, err.Error())
 	}
 
-	data := model.Dictionary{"field": "anything"}
+	data := model.NewDictionary().With("field", "anything")
 	result, err := tempMask.Mask("anything", data)
 	assert.Equal(t, nil, err, "error should be nil")
 	waited := "HELLO!HELLO!"
@@ -102,7 +109,9 @@ func TestRFactoryShouldCreateANestedContextMask(t *testing.T) {
 	maskEngine, present, err := Factory(maskingConfig, 0, nil)
 	assert.Nil(t, err, "should be nil")
 	assert.True(t, present, "should be true")
-	data := model.Dictionary{"baz": "BAZ", "foo": model.Dictionary{"bar": "BAR"}}
+	data := model.NewDictionary().
+		With("baz", "BAZ").
+		With("foo", model.NewDictionary().With("bar", "BAR"))
 
 	masked, _ := maskEngine.Mask("bar", data)
 

@@ -37,7 +37,7 @@ func NewMask(name string) (MaskEngine, error) {
 		return MaskEngine{}, err
 	}
 	length := len(list)
-	var actual = 0
+	actual := 0
 	return MaskEngine{list, length, &actual}, nil
 }
 
@@ -45,7 +45,7 @@ func NewMask(name string) (MaskEngine, error) {
 func (me MaskEngine) MaskContext(context model.Dictionary, key string, contexts ...model.Dictionary) (model.Dictionary, error) {
 	log.Info().Msg("Mask fluxuri")
 	if *me.Actual < me.LenList {
-		context[key] = me.List[*me.Actual]
+		context.Set(key, me.List[*me.Actual])
 		*me.Actual++
 	}
 	return context, nil

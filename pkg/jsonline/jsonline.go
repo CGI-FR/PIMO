@@ -31,7 +31,7 @@ func NewSource(file io.Reader) model.Source {
 	scanner := bufio.NewScanner(file)
 	buf := make([]byte, 0, 64*1024)
 	scanner.Buffer(buf, 1024*1024*100) // increase buffer up to 100 MB
-	return &Source{scanner, nil, nil}
+	return &Source{scanner, model.NewDictionary(), nil}
 }
 
 // Source export line to JSON format.
@@ -43,13 +43,13 @@ type Source struct {
 
 // JSONToDictionary return a model.Dictionary from a jsonline
 func JSONToDictionary(jsonline []byte) (model.Dictionary, error) {
-	var inter interface{}
-	err := json.Unmarshal(jsonline, &inter)
+	dict := model.NewDictionary()
+
+	err := json.Unmarshal(jsonline, &dict)
 	if err != nil {
-		return nil, err
+		return model.NewDictionary(), err
 	}
-	dic := model.InterfaceToDictionary(inter)
-	return dic, nil
+	return model.CleanDictionary(dict), nil
 }
 
 func (s *Source) Open() error {

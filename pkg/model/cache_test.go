@@ -67,16 +67,16 @@ func TestNewUniqueMaskCacheEngine(t *testing.T) {
 }
 
 func TestFromCacheProcessShouldWaitForValueProvide(t *testing.T) {
-	var idMasking = FunctionMaskEngine{Function: func(name Entry, contexts ...Dictionary) (Entry, error) {
-		return strings.ToLower(contexts[0]["name"].(string)), nil
+	idMasking := FunctionMaskEngine{Function: func(name Entry, contexts ...Dictionary) (Entry, error) {
+		return strings.ToLower(contexts[0].Get("name").(string)), nil
 	}}
 
 	cache := NewMemCache()
 
 	mySlice := []Dictionary{
-		{"id": "1", "name": "Bob", "supervisor": "2"},
-		{"id": "2", "name": "John", "supervisor": "4"},
-		{"id": "3", "name": "Tom", "supervisor": "2"},
+		NewDictionary().With("id", "1").With("name", "Bob").With("supervisor", "2"),
+		NewDictionary().With("id", "2").With("name", "John").With("supervisor", "4"),
+		NewDictionary().With("id", "3").With("name", "Tom").With("supervisor", "2"),
 	}
 	var result []Dictionary
 
@@ -89,23 +89,23 @@ func TestFromCacheProcessShouldWaitForValueProvide(t *testing.T) {
 	assert.Nil(t, err)
 
 	wanted := []Dictionary{
-		{"id": "bob", "name": "Bob", "supervisor": "john"},
-		{"id": "tom", "name": "Tom", "supervisor": "john"},
+		NewDictionary().With("id", "bob").With("name", "Bob").With("supervisor", "john"),
+		NewDictionary().With("id", "tom").With("name", "Tom").With("supervisor", "john"),
 	}
 	assert.Equal(t, wanted, result)
 }
 
 func TestFromCacheProcessShouldWaitForLoopProvid(t *testing.T) {
-	var idMasking = FunctionMaskEngine{Function: func(name Entry, contexts ...Dictionary) (Entry, error) {
-		return strings.ToLower(contexts[0]["name"].(string)), nil
+	idMasking := FunctionMaskEngine{Function: func(name Entry, contexts ...Dictionary) (Entry, error) {
+		return strings.ToLower(contexts[0].Get("name").(string)), nil
 	}}
 
 	cache := NewMemCache()
 
 	mySlice := []Dictionary{
-		{"id": "1", "name": "Bob", "supervisor": "2"},
-		{"id": "2", "name": "John", "supervisor": "3"},
-		{"id": "3", "name": "Tom", "supervisor": "1"},
+		NewDictionary().With("id", "1").With("name", "Bob").With("supervisor", "2"),
+		NewDictionary().With("id", "2").With("name", "John").With("supervisor", "3"),
+		NewDictionary().With("id", "3").With("name", "Tom").With("supervisor", "1"),
 	}
 	var result []Dictionary
 
@@ -118,16 +118,16 @@ func TestFromCacheProcessShouldWaitForLoopProvid(t *testing.T) {
 	assert.Nil(t, err)
 
 	wanted := []Dictionary{
-		{"id": "bob", "name": "Bob", "supervisor": "john"},
-		{"id": "john", "name": "John", "supervisor": "tom"},
-		{"id": "tom", "name": "Tom", "supervisor": "bob"},
+		NewDictionary().With("id", "bob").With("name", "Bob").With("supervisor", "john"),
+		NewDictionary().With("id", "john").With("name", "John").With("supervisor", "tom"),
+		NewDictionary().With("id", "tom").With("name", "Tom").With("supervisor", "bob"),
 	}
 	assert.Equal(t, wanted, result)
 }
 
 func TestFromCacheProcessShouldUsedPreviouslyCachedValue(t *testing.T) {
-	var idMasking = FunctionMaskEngine{Function: func(name Entry, contexts ...Dictionary) (Entry, error) {
-		return strings.ToLower(contexts[0]["name"].(string)), nil
+	idMasking := FunctionMaskEngine{Function: func(name Entry, contexts ...Dictionary) (Entry, error) {
+		return strings.ToLower(contexts[0].Get("name").(string)), nil
 	}}
 
 	cache := NewMemCache()
@@ -135,9 +135,9 @@ func TestFromCacheProcessShouldUsedPreviouslyCachedValue(t *testing.T) {
 	cache.Put("1", "boby")
 
 	mySlice := []Dictionary{
-		{"id": "1", "name": "Bob", "supervisor": "2"},
-		{"id": "2", "name": "John", "supervisor": "3"},
-		{"id": "3", "name": "Tom", "supervisor": "1"},
+		NewDictionary().With("id", "1").With("name", "Bob").With("supervisor", "2"),
+		NewDictionary().With("id", "2").With("name", "John").With("supervisor", "3"),
+		NewDictionary().With("id", "3").With("name", "Tom").With("supervisor", "1"),
 	}
 	var result []Dictionary
 
@@ -150,26 +150,26 @@ func TestFromCacheProcessShouldUsedPreviouslyCachedValue(t *testing.T) {
 	assert.Nil(t, err)
 
 	wanted := []Dictionary{
-		{"id": "boby", "name": "Bob", "supervisor": "john"},
-		{"id": "john", "name": "John", "supervisor": "tom"},
-		{"id": "tom", "name": "Tom", "supervisor": "boby"},
+		NewDictionary().With("id", "boby").With("name", "Bob").With("supervisor", "john"),
+		NewDictionary().With("id", "john").With("name", "John").With("supervisor", "tom"),
+		NewDictionary().With("id", "tom").With("name", "Tom").With("supervisor", "boby"),
 	}
 	assert.Equal(t, wanted, result)
 }
 
 func TestFromCacheProcessShouldReorderList(t *testing.T) {
-	var idMasking = FunctionMaskEngine{Function: func(name Entry, contexts ...Dictionary) (Entry, error) {
-		return strings.ToLower(contexts[0]["name"].(string)), nil
+	idMasking := FunctionMaskEngine{Function: func(name Entry, contexts ...Dictionary) (Entry, error) {
+		return strings.ToLower(contexts[0].Get("name").(string)), nil
 	}}
 
 	cache := NewMemCache()
 
 	mySlice := []Dictionary{
-		{"id": "1", "name": "Bob", "supervisor": "2"},
-		{"id": "4", "name": "Alice", "supervisor": "5"},
-		{"id": "5", "name": "Rabbit", "supervisor": "5"},
-		{"id": "2", "name": "John", "supervisor": "3"},
-		{"id": "3", "name": "Tom", "supervisor": "1"},
+		NewDictionary().With("id", "1").With("name", "Bob").With("supervisor", "2"),
+		NewDictionary().With("id", "4").With("name", "Alice").With("supervisor", "5"),
+		NewDictionary().With("id", "5").With("name", "Rabbit").With("supervisor", "5"),
+		NewDictionary().With("id", "2").With("name", "John").With("supervisor", "3"),
+		NewDictionary().With("id", "3").With("name", "Tom").With("supervisor", "1"),
 	}
 	var result []Dictionary
 
@@ -182,26 +182,26 @@ func TestFromCacheProcessShouldReorderList(t *testing.T) {
 	assert.Nil(t, err)
 
 	wanted := []Dictionary{
-		{"id": "alice", "name": "Alice", "supervisor": "rabbit"},
-		{"id": "rabbit", "name": "Rabbit", "supervisor": "rabbit"},
-		{"id": "bob", "name": "Bob", "supervisor": "john"},
-		{"id": "john", "name": "John", "supervisor": "tom"},
-		{"id": "tom", "name": "Tom", "supervisor": "bob"},
+		NewDictionary().With("id", "alice").With("name", "Alice").With("supervisor", "rabbit"),
+		NewDictionary().With("id", "rabbit").With("name", "Rabbit").With("supervisor", "rabbit"),
+		NewDictionary().With("id", "bob").With("name", "Bob").With("supervisor", "john"),
+		NewDictionary().With("id", "john").With("name", "John").With("supervisor", "tom"),
+		NewDictionary().With("id", "tom").With("name", "Tom").With("supervisor", "bob"),
 	}
 	assert.Equal(t, wanted, result)
 }
 
 func TestFromCacheProcessShouldWaitWithUnique(t *testing.T) {
-	var idMasking = FunctionMaskEngine{Function: func(name Entry, contexts ...Dictionary) (Entry, error) {
-		return strings.ToLower(contexts[0]["name"].(string)), nil
+	idMasking := FunctionMaskEngine{Function: func(name Entry, contexts ...Dictionary) (Entry, error) {
+		return strings.ToLower(contexts[0].Get("name").(string)), nil
 	}}
 
 	cache := NewUniqueMemCache()
 
 	mySlice := []Dictionary{
-		{"id": "1", "name": "Bob", "supervisor": "2"},
-		{"id": "2", "name": "John", "supervisor": "3"},
-		{"id": "3", "name": "Tom", "supervisor": "1"},
+		NewDictionary().With("id", "1").With("name", "Bob").With("supervisor", "2"),
+		NewDictionary().With("id", "2").With("name", "John").With("supervisor", "3"),
+		NewDictionary().With("id", "3").With("name", "Tom").With("supervisor", "1"),
 	}
 	var result []Dictionary
 
@@ -214,9 +214,9 @@ func TestFromCacheProcessShouldWaitWithUnique(t *testing.T) {
 	assert.Nil(t, err)
 
 	wanted := []Dictionary{
-		{"id": "bob", "name": "Bob", "supervisor": "john"},
-		{"id": "john", "name": "John", "supervisor": "tom"},
-		{"id": "tom", "name": "Tom", "supervisor": "bob"},
+		NewDictionary().With("id", "bob").With("name", "Bob").With("supervisor", "john"),
+		NewDictionary().With("id", "john").With("name", "John").With("supervisor", "tom"),
+		NewDictionary().With("id", "tom").With("name", "Tom").With("supervisor", "bob"),
 	}
 	assert.Equal(t, wanted, result)
 }
