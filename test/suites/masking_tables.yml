@@ -99,7 +99,7 @@ testcases:
     assertions:
     - result.code ShouldEqual 0
     - >
-      result.systemout ShouldContainSubstring {"elements":[{"persons":[{"email":"agcarobxcc@company.com","phonenumber":"04 87 48 09 96"}]}]}
+      result.systemout ShouldContainSubstring {"elements":[{"persons":[{"phonenumber":"04 87 48 09 96","email":"agcarobxcc@company.com"}]}]}
     - result.systemerr ShouldBeEmpty
 
 - name: multiple nested arrays 2

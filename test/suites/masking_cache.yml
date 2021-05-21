@@ -59,10 +59,10 @@ testcases:
       EOF
     assertions:
     - result.code ShouldEqual 0
-    - result.systemout ShouldContainSubstring "id":5,"name":"Toto"
-    - result.systemout ShouldContainSubstring "id":7,"name":"Dorothy"
-    - result.systemout ShouldContainSubstring "id":5,"name":"Toto2"
-    - result.systemout ShouldContainSubstring "id":7,"name":"Dorothy4"
+    - result.systemout ShouldContainSubstring "name":"Toto","id":5
+    - result.systemout ShouldContainSubstring "name":"Dorothy","id":7
+    - result.systemout ShouldContainSubstring "name":"Toto2","id":5
+    - result.systemout ShouldContainSubstring "name":"Dorothy4","id":7
     - result.systemerr ShouldBeEmpty
   - script: cat id.jsonl
     assertions:
@@ -104,10 +104,10 @@ testcases:
       EOF
     assertions:
     - result.code ShouldEqual 0
-    - result.systemout ShouldContainSubstring "id":21,"name":"Toto"
-    - result.systemout ShouldContainSubstring "id":8,"name":"Dorothy"
-    - result.systemout ShouldContainSubstring "id":21,"name":"Toto2"
-    - result.systemout ShouldContainSubstring "id":8,"name":"Dorothy4"
+    - result.systemout ShouldContainSubstring "name":"Toto","id":21
+    - result.systemout ShouldContainSubstring "name":"Dorothy","id":8
+    - result.systemout ShouldContainSubstring "name":"Toto2","id":21
+    - result.systemout ShouldContainSubstring "name":"Dorothy4","id":8
     - result.systemerr ShouldBeEmpty
 
 - name: using cache
@@ -138,10 +138,10 @@ testcases:
       EOF
     assertions:
     - result.code ShouldEqual 0
-    - result.systemout ShouldContainSubstring "id":5,"name":"Toto"
-    - result.systemout ShouldContainSubstring "id":7,"name":"Dorothy"
-    - result.systemout ShouldContainSubstring "id":5,"name":"Toto2"
-    - result.systemout ShouldContainSubstring "id":7,"name":"Dorothy4"
+    - result.systemout ShouldContainSubstring "name":"Toto","id":5
+    - result.systemout ShouldContainSubstring "name":"Dorothy","id":7
+    - result.systemout ShouldContainSubstring "name":"Toto2","id":5
+    - result.systemout ShouldContainSubstring "name":"Dorothy4","id":7
     - result.systemerr ShouldBeEmpty
 
 - name: undefined cache
@@ -203,12 +203,12 @@ testcases:
       EOF
     assertions:
     - result.code ShouldEqual 0
-    - result.systemout ShouldContainSubstring "id":1,"name":"Marcel"
-    - result.systemout ShouldContainSubstring "id":2,"name":"Mickael"
-    - result.systemout ShouldContainSubstring "id":3,"name":"Marcel"
-    - result.systemout ShouldContainSubstring "id":4,"name":"Mickael"
-    - result.systemout ShouldContainSubstring "id":5,"name":"Mathieu"
-    - result.systemout ShouldContainSubstring "id":6,"name":"Mathieu"
+    - result.systemout ShouldContainSubstring "name":"Marcel","id":1
+    - result.systemout ShouldContainSubstring "name":"Mickael","id":2
+    - result.systemout ShouldContainSubstring "name":"Marcel","id":3
+    - result.systemout ShouldContainSubstring "name":"Mickael","id":4
+    - result.systemout ShouldContainSubstring "name":"Mathieu","id":5
+    - result.systemout ShouldContainSubstring "name":"Mathieu","id":6
     - result.systemerr ShouldBeEmpty
 
 - name: no error when no more value for cache
@@ -314,9 +314,9 @@ testcases:
       {"name": "Dorothy", "id":2, "supervisor" : "Justine"}
     assertions:
     - result.code ShouldEqual 0
-    - result.systemout ShouldContainSubstring '{"id":1,"name":"Marcel","supervisor":"Mathieu"}'
-    - result.systemout ShouldContainSubstring '{"id":5,"name":"Mickael","supervisor":"Mickael"}'
-    - result.systemout ShouldContainSubstring '{"id":2,"name":"Mathieu","supervisor":"Mickael"}'
+    - result.systemout ShouldContainSubstring '{"name":"Marcel","id":1,"supervisor":"Mathieu"}'
+    - result.systemout ShouldContainSubstring '{"name":"Mickael","id":5,"supervisor":"Mickael"}'
+    - result.systemout ShouldContainSubstring '{"name":"Mathieu","id":2,"supervisor":"Mickael"}'
     
     - result.systemerr ShouldBeEmpty
 
@@ -354,9 +354,9 @@ testcases:
       {"name": "Dorothy", "id":2}
     assertions:
     - result.code ShouldEqual 0
-    - result.systemout ShouldContainSubstring '{"id":1,"name":"Marcel"}'
-    - result.systemout ShouldContainSubstring '{"id":5,"name":"Mickael"}'
-    - result.systemout ShouldContainSubstring '{"id":2,"name":"Mathieu"}'
+    - result.systemout ShouldContainSubstring '{"name":"Marcel","id":1}'
+    - result.systemout ShouldContainSubstring '{"name":"Mickael","id":5}'
+    - result.systemout ShouldContainSubstring '{"name":"Mathieu","id":2}'
     
     - result.systemerr ShouldBeEmpty
   - script: cat name.jsonl
