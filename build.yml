@@ -255,7 +255,7 @@ targets:
 
   test-int:
     doc: "Run all integration tests"
-    # depends: ["info", "refresh", "lint", "test", "release"]
+    depends: ["info", "refresh", "lint", "test", "release"]
     steps:
       - delete: ={TEST_WS_DIR}/**
       - mkdir: =TEST_WS_DIR
