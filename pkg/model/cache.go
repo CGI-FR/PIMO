@@ -46,7 +46,10 @@ type MemCache struct {
 func (mc *MemCache) Iterate() Source {
 	collector := NewCollector()
 	for k, v := range mc.cache {
-		collector.Collect(NewDictionaryFromMap(map[string]Entry{"key": k, "value": v}))
+		entry := NewDictionary()
+		entry.Set("key", k)
+		entry.Set("value", v)
+		collector.Collect(entry)
 	}
 	return collector
 }
