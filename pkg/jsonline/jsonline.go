@@ -24,8 +24,6 @@ import (
 
 	over "github.com/Trendyol/overlog"
 	"github.com/cgi-fr/pimo/pkg/model"
-	"github.com/rs/zerolog"
-	"github.com/rs/zerolog/log"
 )
 
 // NewSource creates a new Source.
@@ -45,19 +43,13 @@ type Source struct {
 
 // JSONToDictionary return a model.Dictionary from a jsonline
 func JSONToDictionary(jsonline []byte) (model.Dictionary, error) {
-	dic := model.NewDictionary()
+	dict := model.NewDictionary()
 
-	err := json.Unmarshal(jsonline, &dic)
+	err := json.Unmarshal(jsonline, &dict)
 	if err != nil {
 		return model.NewDictionary(), err
 	}
-	dict := model.CleanDictionary(dic)
-	control := []byte{}
-	if log.Logger.GetLevel() == zerolog.TraceLevel {
-		control, _ = json.Marshal(dict)
-	}
-	log.Trace().Bytes("jsonline", jsonline).Interface("result", dict).Bytes("control", control).Msg("Unmarshaling")
-	return dict, nil
+	return model.CleanDictionary(dict), nil
 }
 
 func (s *Source) Open() error {
