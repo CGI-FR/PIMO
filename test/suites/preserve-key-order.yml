@@ -1,0 +1,43 @@
+name: preservation of key ordering
+testcases:
+- name: keys order should be preserved on all levels
+  steps:
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+      EOF
+  - script: |-
+      echo '{"c":"","b":"","a":{"3":null, "2": null, "1": null}}' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldEqual {"c":"","b":"","a":{"3":null,"2":null,"1":null}}
+    - result.systemerr ShouldBeEmpty
+
+- name: order of arrays should be preserved
+  steps:
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+      EOF
+  - script: |-
+      echo '{"array":["c","b","a"]}' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldEqual {"array":["c","b","a"]}
+    - result.systemerr ShouldBeEmpty
+
+- name: order of nested arrays of objects should be preserved
+  steps:
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+      EOF
+  - script: |-
+      echo '{"array":[{"c":null,"b":null,"a":null},{"b":null,"a":null,"c":null}]}' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldEqual {"array":[{"c":null,"b":null,"a":null},{"b":null,"a":null,"c":null}]}
+    - result.systemerr ShouldBeEmpty
