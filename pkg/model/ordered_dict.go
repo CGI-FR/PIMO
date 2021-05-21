@@ -1,6 +1,8 @@
 package model
 
 import (
+	"fmt"
+
 	"github.com/rs/zerolog/log"
 	"gitlab.com/c0b/go-ordered-json"
 )
@@ -11,10 +13,6 @@ type Dictionary struct {
 
 func NewDictionary() Dictionary {
 	return Dictionary{ordered.NewOrderedMap()}
-}
-
-func NewDictionaryFromMap(kv map[string]Entry) Dictionary {
-	return CleanTypes(kv).(Dictionary)
 }
 
 func CopyDictionary(other Dictionary) Dictionary {
@@ -147,4 +145,18 @@ func (d Dictionary) Copy() Dictionary {
 
 func (d Dictionary) Unordered() map[string]Entry {
 	return UnorderedTypes(d).(map[string]Entry)
+}
+
+func (d Dictionary) String() string {
+	b, err := d.MarshalJSON()
+	if err != nil {
+		return fmt.Sprint(d.OrderedMap)
+	}
+	return string(b)
+}
+
+func (d Dictionary) With(key string, value interface{}) Dictionary {
+	result := CleanDictionary(d)
+	result.Set(key, CleanTypes(value))
+	return result
 }

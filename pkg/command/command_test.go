@@ -37,7 +37,7 @@ func TestMaskingShouldReplaceSensitiveValueByCommand(t *testing.T) {
 func TestMaskingShouldReturnAnErrorInCaseOfWrongCommand(t *testing.T) {
 	nameCommandMasking := NewMask("WrongCommand")
 
-	data := model.NewDictionaryFromMap(map[string]model.Entry{"name": "Benjamin"})
+	data := model.NewDictionary().With("name", "Benjamin")
 	result, err := nameCommandMasking.Mask(data)
 	resultmap := result.(model.Dictionary)
 	assert.Equal(t, "Benjamin", resultmap.Get("name"), "Result should unchanged")
