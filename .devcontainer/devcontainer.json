@@ -9,7 +9,7 @@
         "vscode"
     ],
     "shutdownAction": "stopCompose",
-    "postCreateCommand": "sudo chown -R vscode:vscode /workspace/. && make init",
+    "postCreateCommand": "sudo chown -R vscode:vscode /workspace/. ; make init",
     "workspaceFolder": "/workspace",
     "remoteEnv": {
         "PATH": "${containerEnv:PATH}:/workspace/bin/"
