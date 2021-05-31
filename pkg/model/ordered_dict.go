@@ -15,6 +15,7 @@ func NewDictionary() Dictionary {
 	return Dictionary{ordered.NewOrderedMap()}
 }
 
+// CopyDictionary clone deeply dictionary
 func CopyDictionary(other Dictionary) Dictionary {
 	if other.OrderedMap == nil {
 		return NewDictionary()
@@ -28,7 +29,12 @@ func CopyDictionary(other Dictionary) Dictionary {
 		if !ok {
 			break
 		}
-		om.Set(pair.Key, pair.Value)
+		switch typedVal := pair.Value.(type) {
+		case Dictionary:
+			om.Set(pair.Key, CopyDictionary(typedVal))
+		default:
+			om.Set(pair.Key, pair.Value)
+		}
 	}
 	return Dictionary{om}
 }
@@ -85,8 +91,31 @@ func CleanTypes(inter interface{}) interface{} {
 }
 
 // CleanDictionary fixes all types in the structure
-func CleanDictionary(dict Dictionary) Dictionary {
+func CleanDictionary(dict interface{}) Dictionary {
 	return CleanTypes(dict).(Dictionary)
+}
+
+func CleanDictionarySlice(dictSlice interface{}) []Dictionary {
+	result := []Dictionary{}
+
+	switch typedInter := dictSlice.(type) {
+	case []interface{}:
+		for _, d := range typedInter {
+			result = append(result, CleanDictionary(d))
+		}
+
+	case []Dictionary:
+		for _, d := range typedInter {
+			result = append(result, CleanDictionary(d))
+		}
+
+	case []Entry:
+		for _, d := range typedInter {
+			result = append(result, CleanDictionary(d))
+		}
+	}
+
+	return result
 }
 
 // UnorderedTypes a composition of map[string]Entry

@@ -66,8 +66,7 @@ func (me MaskEngine) MaskContext(e model.Dictionary, key string, context ...mode
 		return copy, nil
 	}
 
-	for _, dict := range e.Get(key).([]model.Entry) {
-		elemInput := model.CleanTypes(dict).(model.Dictionary)
+	for _, elemInput := range model.CleanDictionarySlice(e.Get(key)) {
 		if len(me.injectParent) > 0 {
 			elemInput.Set(me.injectParent, copy)
 		}
