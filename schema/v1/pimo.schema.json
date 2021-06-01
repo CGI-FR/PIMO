@@ -1,0 +1,479 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "$ref": "#/definitions/Definition",
+  "definitions": {
+    "CacheDefinition": {
+      "properties": {
+        "unique": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "DateParserType": {
+      "properties": {
+        "inputFormat": {
+          "type": "string"
+        },
+        "outputFormat": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "Definition": {
+      "required": [
+        "version",
+        "masking"
+      ],
+      "properties": {
+        "version": {
+          "type": "string"
+        },
+        "seed": {
+          "type": "integer"
+        },
+        "masking": {
+          "items": {
+            "$schema": "http://json-schema.org/draft-04/schema#",
+            "$ref": "#/definitions/Masking"
+          },
+          "type": "array"
+        },
+        "caches": {
+          "patternProperties": {
+            ".*": {
+              "$schema": "http://json-schema.org/draft-04/schema#",
+              "$ref": "#/definitions/CacheDefinition"
+            }
+          },
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "FF1Type": {
+      "required": [
+        "keyFromEnv"
+      ],
+      "properties": {
+        "keyFromEnv": {
+          "type": "string"
+        },
+        "tweakField": {
+          "type": "string"
+        },
+        "radix": {
+          "type": "integer"
+        },
+        "decrypt": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "IncrementalType": {
+      "required": [
+        "start",
+        "increment"
+      ],
+      "properties": {
+        "start": {
+          "type": "integer"
+        },
+        "increment": {
+          "type": "integer"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "MaskType": {
+      "properties": {
+        "add": {
+          "additionalProperties": true
+        },
+        "constant": {
+          "additionalProperties": true
+        },
+        "randomChoice": {
+          "items": {
+            "additionalProperties": true
+          },
+          "type": "array"
+        },
+        "randomChoiceInUri": {
+          "type": "string"
+        },
+        "command": {
+          "type": "string"
+        },
+        "randomInt": {
+          "$schema": "http://json-schema.org/draft-04/schema#",
+          "$ref": "#/definitions/RandIntType"
+        },
+        "weightedChoice": {
+          "items": {
+            "$schema": "http://json-schema.org/draft-04/schema#",
+            "$ref": "#/definitions/WeightedChoiceType"
+          },
+          "type": "array"
+        },
+        "regex": {
+          "type": "string"
+        },
+        "hash": {
+          "items": {
+            "additionalProperties": true
+          },
+          "type": "array"
+        },
+        "hashInUri": {
+          "type": "string"
+        },
+        "randDate": {
+          "$schema": "http://json-schema.org/draft-04/schema#",
+          "$ref": "#/definitions/RandDateType"
+        },
+        "incremental": {
+          "$schema": "http://json-schema.org/draft-04/schema#",
+          "$ref": "#/definitions/IncrementalType"
+        },
+        "replacement": {
+          "type": "string"
+        },
+        "template": {
+          "type": "string"
+        },
+        "duration": {
+          "type": "string"
+        },
+        "remove": {
+          "type": "boolean"
+        },
+        "range": {
+          "type": "integer"
+        },
+        "randomDuration": {
+          "$schema": "http://json-schema.org/draft-04/schema#",
+          "$ref": "#/definitions/RandomDurationType"
+        },
+        "fluxUri": {
+          "type": "string"
+        },
+        "randomDecimal": {
+          "$schema": "http://json-schema.org/draft-04/schema#",
+          "$ref": "#/definitions/RandomDecimalType"
+        },
+        "dateParser": {
+          "$schema": "http://json-schema.org/draft-04/schema#",
+          "$ref": "#/definitions/DateParserType"
+        },
+        "fromCache": {
+          "type": "string"
+        },
+        "ff1": {
+          "$schema": "http://json-schema.org/draft-04/schema#",
+          "$ref": "#/definitions/FF1Type"
+        },
+        "pipe": {
+          "$schema": "http://json-schema.org/draft-04/schema#",
+          "$ref": "#/definitions/PipeType"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "oneOf": [
+        {
+          "required": [
+            "add"
+          ],
+          "title": "Add"
+        },
+        {
+          "required": [
+            "constant"
+          ],
+          "title": "Constant"
+        },
+        {
+          "required": [
+            "randomChoice"
+          ],
+          "title": "RandomChoice"
+        },
+        {
+          "required": [
+            "randomChoiceInUri"
+          ],
+          "title": "RandomChoiceInURI"
+        },
+        {
+          "required": [
+            "command"
+          ],
+          "title": "Command"
+        },
+        {
+          "required": [
+            "randomInt"
+          ],
+          "title": "RandomInt"
+        },
+        {
+          "required": [
+            "weightedChoice"
+          ],
+          "title": "WeightedChoice"
+        },
+        {
+          "required": [
+            "regex"
+          ],
+          "title": "Regex"
+        },
+        {
+          "required": [
+            "hash"
+          ],
+          "title": "Hash"
+        },
+        {
+          "required": [
+            "hashInUri"
+          ],
+          "title": "HashInURI"
+        },
+        {
+          "required": [
+            "randDate"
+          ],
+          "title": "RandDate"
+        },
+        {
+          "required": [
+            "incremental"
+          ],
+          "title": "Incremental"
+        },
+        {
+          "required": [
+            "replacement"
+          ],
+          "title": "Replacement"
+        },
+        {
+          "required": [
+            "template"
+          ],
+          "title": "Template"
+        },
+        {
+          "required": [
+            "duration"
+          ],
+          "title": "Duration"
+        },
+        {
+          "required": [
+            "remove"
+          ],
+          "title": "Remove"
+        },
+        {
+          "required": [
+            "range"
+          ],
+          "title": "RangeMask"
+        },
+        {
+          "required": [
+            "randomDuration"
+          ],
+          "title": "RandomDuration"
+        },
+        {
+          "required": [
+            "fluxUri"
+          ],
+          "title": "FluxURI"
+        },
+        {
+          "required": [
+            "randomDecimal"
+          ],
+          "title": "RandomDecimal"
+        },
+        {
+          "required": [
+            "dateParser"
+          ],
+          "title": "DateParser"
+        },
+        {
+          "required": [
+            "fromCache"
+          ],
+          "title": "FromCache"
+        },
+        {
+          "required": [
+            "ff1"
+          ],
+          "title": "FF1"
+        },
+        {
+          "required": [
+            "pipe"
+          ],
+          "title": "Pipe"
+        }
+      ]
+    },
+    "Masking": {
+      "required": [
+        "selector",
+        "mask"
+      ],
+      "properties": {
+        "selector": {
+          "$schema": "http://json-schema.org/draft-04/schema#",
+          "$ref": "#/definitions/SelectorType"
+        },
+        "mask": {
+          "$schema": "http://json-schema.org/draft-04/schema#",
+          "$ref": "#/definitions/MaskType"
+        },
+        "cache": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "PipeType": {
+      "properties": {
+        "masking": {
+          "items": {
+            "$ref": "#/definitions/Masking"
+          },
+          "type": "array"
+        },
+        "injectParent": {
+          "type": "string"
+        },
+        "injectRoot": {
+          "type": "string"
+        },
+        "file": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "RandDateType": {
+      "required": [
+        "dateMin",
+        "dateMax"
+      ],
+      "properties": {
+        "dateMin": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "dateMax": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "RandIntType": {
+      "required": [
+        "min",
+        "max"
+      ],
+      "properties": {
+        "min": {
+          "type": "integer"
+        },
+        "max": {
+          "type": "integer"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "RandomDecimalType": {
+      "required": [
+        "Min",
+        "Max",
+        "Precision"
+      ],
+      "properties": {
+        "Min": {
+          "type": "number"
+        },
+        "Max": {
+          "type": "number"
+        },
+        "Precision": {
+          "type": "integer"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "RandomDurationType": {
+      "required": [
+        "Min",
+        "Max"
+      ],
+      "properties": {
+        "Min": {
+          "type": "string"
+        },
+        "Max": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "SelectorType": {
+      "required": [
+        "jsonpath"
+      ],
+      "properties": {
+        "jsonpath": {
+          "type": "string",
+          "description": "Field's path to mask ex: \"user.name\""
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "WeightedChoiceType": {
+      "required": [
+        "choice",
+        "weight"
+      ],
+      "properties": {
+        "choice": {
+          "additionalProperties": true
+        },
+        "weight": {
+          "type": "integer"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    }
+  }
+}

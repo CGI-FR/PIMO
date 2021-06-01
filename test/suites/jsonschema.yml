@@ -1,0 +1,8 @@
+name: jsonschema features
+testcases:
+- name: export jsonschema
+  steps:
+  - script: pimo jsonschema
+    assertions:
+    - result.code ShouldEqual 0
+    
