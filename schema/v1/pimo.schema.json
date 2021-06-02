@@ -452,8 +452,7 @@
       ],
       "properties": {
         "jsonpath": {
-          "type": "string",
-          "description": "Field's path to mask ex: \"user.name\""
+          "type": "string"
         }
       },
       "additionalProperties": false,
