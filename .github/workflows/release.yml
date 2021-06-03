@@ -52,4 +52,4 @@ jobs:
             vscode \
             neon -props "{tag: ${CI_ACTION_REF_NAME}, MODULE: github.com/${CI_REPOSITORY,,}, BY: ${CI_ACTOR}, dockerfiles: {'Dockerfile': '.'}}" publish docker-push
       - name: Test version
-        run: docker-compose -f .devcontainer/docker-compose.yml exec -T -u root /workspace/bin/dist/cmd/pimo_linux_amd64/pimo --version
+        run: docker-compose -f .devcontainer/docker-compose.yml exec -T -u root vscode /workspace/bin/dist/cmd/pimo_linux_amd64/pimo --version
