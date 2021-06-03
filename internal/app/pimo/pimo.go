@@ -18,41 +18,14 @@
 package pimo
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 
+	"github.com/alecthomas/jsonschema"
 	"github.com/cgi-fr/pimo/pkg/jsonline"
 	"github.com/cgi-fr/pimo/pkg/model"
 )
-
-// YAMLStructure of the file
-type YAMLStructure struct {
-	Version string               `yaml:"version"`
-	Seed    int64                `yaml:"seed"`
-	Masking []model.Masking      `yaml:"masking"`
-	Caches  map[string]YAMLCache `yaml:"caches"`
-}
-
-type MaskingV2 struct {
-	Selector SelectorTypeV2         `yaml:"selector"`
-	Mask     map[string]interface{} `yaml:"mask"`
-	Cache    string                 `yaml:"cache"`
-}
-
-type SelectorTypeV2 struct {
-	JsonPath string `yaml:"jsonpath"`
-}
-
-type YAMLStructureV2 struct {
-	Version string               `yaml:"version"`
-	Seed    int64                `yaml:"seed"`
-	Masking []MaskingV2          `yaml:"masking"`
-	Caches  map[string]YAMLCache `yaml:"caches"`
-}
-
-type YAMLCache struct {
-	Unique bool `yaml:"unique"`
-}
 
 type CachedMaskEngineFactories func(model.MaskEngine) model.MaskEngine
 
@@ -82,4 +55,12 @@ func LoadCache(name string, cache model.Cache, path string) error {
 		return fmt.Errorf("Cache %s not loaded : %s", name, err.Error())
 	}
 	return nil
+}
+
+func GetJsonSchema() (string, error) {
+	resBytes, err := json.MarshalIndent(jsonschema.Reflect(&model.Definition{}), "", "  ")
+	if err != nil {
+		return "", err
+	}
+	return string(resBytes), nil
 }

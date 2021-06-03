@@ -81,66 +81,66 @@ type RandomDecimalType struct {
 }
 
 type DateParserType struct {
-	InputFormat  string `yaml:"inputFormat"`
-	OutputFormat string `yaml:"outputFormat"`
+	InputFormat  string `yaml:"inputFormat,omitempty"`
+	OutputFormat string `yaml:"outputFormat,omitempty"`
 }
 
 type FF1Type struct {
 	KeyFromEnv string `yaml:"keyFromEnv"`
-	TweakField string `yaml:"tweakField"`
-	Radix      uint
-	Decrypt    bool
+	TweakField string `yaml:"tweakField,omitempty"`
+	Radix      uint   `yaml:"radix,omitempty"`
+	Decrypt    bool   `yaml:"decrypt,omitempty"`
 }
 
 type PipeType struct {
-	Masking        []Masking
-	InjectParent   string `yaml:"injectParent"`
-	InjectRoot     string `yaml:"injectRoot"`
-	DefinitionFile string `yaml:"file"`
+	Masking        []Masking `yaml:"masking,omitempty"`
+	InjectParent   string    `yaml:"injectParent,omitempty"`
+	InjectRoot     string    `yaml:"injectRoot,omitempty"`
+	DefinitionFile string    `yaml:"file,omitempty"`
 }
 
 type MaskType struct {
-	Add               Entry                `yaml:"add"`
-	Constant          Entry                `yaml:"constant"`
-	RandomChoice      []Entry              `yaml:"randomChoice"`
-	RandomChoiceInURI string               `yaml:"randomChoiceInUri"`
-	Command           string               `yaml:"command"`
-	RandomInt         RandIntType          `yaml:"randomInt"`
-	WeightedChoice    []WeightedChoiceType `yaml:"weightedChoice"`
-	Regex             string               `yaml:"regex"`
-	Hash              []Entry              `yaml:"hash"`
-	HashInURI         string               `yaml:"hashInUri"`
-	RandDate          RandDateType         `yaml:"randDate"`
-	Incremental       IncrementalType      `yaml:"incremental"`
-	Replacement       string               `yaml:"replacement"`
-	Template          string               `yaml:"template"`
-	Duration          string               `yaml:"duration"`
-	Remove            bool                 `yaml:"remove"`
-	RangeMask         int                  `yaml:"range"`
-	RandomDuration    RandomDurationType   `yaml:"randomDuration"`
-	FluxURI           string               `yaml:"fluxUri"`
-	RandomDecimal     RandomDecimalType    `yaml:"randomDecimal"`
-	DateParser        DateParserType       `yaml:"dateParser"`
-	FromCache         string               `yaml:"fromCache"`
-	FF1               FF1Type              `yaml:"ff1"`
-	Pipe              PipeType             `yaml:"pipe"`
+	Add               Entry                `yaml:"add,omitempty" jsonschema:"oneof_required=Add"`
+	Constant          Entry                `yaml:"constant,omitempty" jsonschema:"oneof_required=Constant"`
+	RandomChoice      []Entry              `yaml:"randomChoice,omitempty" jsonschema:"oneof_required=RandomChoice"`
+	RandomChoiceInURI string               `yaml:"randomChoiceInUri,omitempty" jsonschema:"oneof_required=RandomChoiceInURI"`
+	Command           string               `yaml:"command,omitempty" jsonschema:"oneof_required=Command"`
+	RandomInt         RandIntType          `yaml:"randomInt,omitempty" jsonschema:"oneof_required=RandomInt"`
+	WeightedChoice    []WeightedChoiceType `yaml:"weightedChoice,omitempty" jsonschema:"oneof_required=WeightedChoice"`
+	Regex             string               `yaml:"regex,omitempty" jsonschema:"oneof_required=Regex"`
+	Hash              []Entry              `yaml:"hash,omitempty" jsonschema:"oneof_required=Hash"`
+	HashInURI         string               `yaml:"hashInUri,omitempty" jsonschema:"oneof_required=HashInURI"`
+	RandDate          RandDateType         `yaml:"randDate,omitempty" jsonschema:"oneof_required=RandDate"`
+	Incremental       IncrementalType      `yaml:"incremental,omitempty" jsonschema:"oneof_required=Incremental"`
+	Replacement       string               `yaml:"replacement,omitempty" jsonschema:"oneof_required=Replacement"`
+	Template          string               `yaml:"template,omitempty" jsonschema:"oneof_required=Template"`
+	Duration          string               `yaml:"duration,omitempty" jsonschema:"oneof_required=Duration"`
+	Remove            bool                 `yaml:"remove,omitempty" jsonschema:"oneof_required=Remove"`
+	RangeMask         int                  `yaml:"range,omitempty" jsonschema:"oneof_required=RangeMask"`
+	RandomDuration    RandomDurationType   `yaml:"randomDuration,omitempty" jsonschema:"oneof_required=RandomDuration"`
+	FluxURI           string               `yaml:"fluxUri,omitempty" jsonschema:"oneof_required=FluxURI"`
+	RandomDecimal     RandomDecimalType    `yaml:"randomDecimal,omitempty" jsonschema:"oneof_required=RandomDecimal"`
+	DateParser        DateParserType       `yaml:"dateParser,omitempty" jsonschema:"oneof_required=DateParser"`
+	FromCache         string               `yaml:"fromCache,omitempty" jsonschema:"oneof_required=FromCache"`
+	FF1               FF1Type              `yaml:"ff1,omitempty" jsonschema:"oneof_required=FF1"`
+	Pipe              PipeType             `yaml:"pipe,omitempty" jsonschema:"oneof_required=Pipe"`
 }
 
 type Masking struct {
 	Selector SelectorType `yaml:"selector"`
 	Mask     MaskType     `yaml:"mask"`
-	Cache    string       `yaml:"cache"`
+	Cache    string       `yaml:"cache,omitempty"`
 }
 
 type CacheDefinition struct {
-	Unique bool `yaml:"unique"`
+	Unique bool `yaml:"unique,omitempty"`
 }
 
 type Definition struct {
 	Version string                     `yaml:"version"`
-	Seed    int64                      `yaml:"seed"`
+	Seed    int64                      `yaml:"seed,omitempty"`
 	Masking []Masking                  `yaml:"masking"`
-	Caches  map[string]CacheDefinition `yaml:"caches"`
+	Caches  map[string]CacheDefinition `yaml:"caches,omitempty"`
 }
 
 /***************

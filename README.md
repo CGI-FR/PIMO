@@ -541,6 +541,22 @@ Be sure to check [demo](demo/demo8) to get more details about this mask.
 
 [Return to list of masks](#possible-masks)
 
+## Visual Studio Code
+
+To integrate with Visual Studio Code (opens new window), download the [YAML extension](https://marketplace.visualstudio.com/items?itemName=redhat.vscode-yaml).
+
+Then, edit your Visual Studio Code settings `yaml.schemas` to containing the following configuration:
+
+```json
+{
+  "yaml.schemas": {
+    "https://raw.githubusercontent.com/CGI-FR/PIMO/main/schema/v1/pimo.schema.json": "/**/*masking*.yml"
+  }
+}
+```
+
+Using this configuration, the schema will be applied on every YAML file containing the word `masking`` in their name.
+
 ## Contributors
 
 * CGI France ✉[Contact support](mailto:LINO.fr@cgi.com)

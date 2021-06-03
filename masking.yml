@@ -13,9 +13,9 @@ masking:
       jsonpath: "name2"
     mask:
       randomChoice:
-       - "Mickael"
-       - "Mathieu"
-       - "Marcelle"
+        - "Mickael"
+        - "Mathieu"
+        - "Marcelle"
   - selector:
       jsonpath: "age"
     mask:

@@ -75,7 +75,7 @@ var (
 )
 
 func main() {
-	var rootCmd = &cobra.Command{
+	rootCmd := &cobra.Command{
 		Use:   "pimo",
 		Short: "Command line to mask data from jsonlines",
 		Long:  `Pimo is a tool to mask private data contained in jsonlines by using masking configurations`,
@@ -99,6 +99,17 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 	rootCmd.PersistentFlags().StringToStringVar(&cachesToLoad, "load-cache", map[string]string{}, "path for loading cache from file")
 	rootCmd.PersistentFlags().BoolVar(&skipLineOnError, "skip-line-on-error", false, "skip a line if an error occurs while masking a field")
 	rootCmd.PersistentFlags().BoolVar(&skipFieldOnError, "skip-field-on-error", false, "remove a field if an error occurs while masking this field")
+
+	rootCmd.AddCommand(&cobra.Command{
+		Use: "jsonschema",
+		Run: func(cmd *cobra.Command, args []string) {
+			jsonschema, err := pimo.GetJsonSchema()
+			if err != nil {
+				os.Exit(8)
+			}
+			fmt.Println(jsonschema)
+		},
+	})
 
 	if err := rootCmd.Execute(); err != nil {
 		log.Err(err).Msg("Error when executing command")
