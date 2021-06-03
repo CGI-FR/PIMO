@@ -42,7 +42,7 @@ jobs:
         run: |
           docker-compose -f .devcontainer/docker-compose.yml exec -T -u root -w /workspace vscode git reset --hard
           docker-compose -f .devcontainer/docker-compose.yml exec -e GITHUB_TOKEN=${GITHUB_TOKEN} -T -u root vscode bash -c 'echo "GITHUB_TOKEN: ${GITHUB_TOKEN}" > ~/.github.yml'
-          docker-compose -f .devcontainer/docker-compose.yml exec -e -T -u root vscode bash -c 'echo "DOCKERHUB_USER: cgibot" > ~/.dockerhub.yml'
+          docker-compose -f .devcontainer/docker-compose.yml exec -T -u root vscode bash -c 'echo "DOCKERHUB_USER: cgibot" > ~/.dockerhub.yml'
           docker-compose -f .devcontainer/docker-compose.yml exec -e DOCKERHUB_PASS=${DOCKERHUB_PASS} -T -u root vscode bash -c 'echo "DOCKERHUB_PASS: ${DOCKERHUB_PASS}" >> ~/.dockerhub.yml'
           docker-compose -f .devcontainer/docker-compose.yml exec \
             -T \
