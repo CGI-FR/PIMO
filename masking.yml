@@ -13,7 +13,7 @@ masking:
       jsonpath: "name2"
     mask:
       randomChoice:
-        - "Mickael"
+        - "Mickaël"
         - "Mathieu"
         - "Marcelle"
   - selector:
