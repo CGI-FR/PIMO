@@ -50,13 +50,6 @@ jobs:
             -w /workspace \
             -e PATH=/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/go/bin:/home/vscode/go/bin:/workspace/bin \
             vscode \
-            neon -props "{tag: ${CI_ACTION_REF_NAME}, MODULE: github.com/${CI_REPOSITORY,,}, BY: ${CI_ACTOR}}" publish
-          docker-compose -f .devcontainer/docker-compose.yml exec \
-            -T \
-            -u root \
-            -w /workspace \
-            -e PATH=/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/go/bin:/home/vscode/go/bin:/workspace/bin \
-            vscode \
-            neon -props '{dockerfiles: {"Dockerfile": "."}}' docker-push
+            neon -props "{tag: ${CI_ACTION_REF_NAME}, MODULE: github.com/${CI_REPOSITORY,,}, BY: ${CI_ACTOR}, dockerfiles: {'Dockerfile': '.'}}" publish docker-push
       - name: Test version
         run: docker-compose -f .devcontainer/docker-compose.yml exec -T -u root /workspace/bin/dist/cmd/pimo_linux_amd64/pimo --version
