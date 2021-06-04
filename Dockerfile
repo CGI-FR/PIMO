@@ -30,7 +30,7 @@ ARG REVISION
 # https://github.com/opencontainers/image-spec/blob/master/annotations.md
 LABEL org.opencontainers.image.created       "${BUILD_DATE}"
 LABEL org.opencontainers.image.authors       "CGI Lino <lino.fr@cgi.com>"
-LABEL org.opencontainers.image.url           "https://github.com/CGI-FR/PIMO"
+LABEL org.opencontainers.image.url           "https://hub.docker.com/r/cgifr/pimo"
 LABEL org.opencontainers.image.documentation "https://github.com/CGI-FR/PIMO/blob/main/README.md"
 LABEL org.opencontainers.image.source        "https://github.com/CGI-FR/PIMO.git"
 LABEL org.opencontainers.image.version       "${VERSION}"
