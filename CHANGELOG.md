@@ -14,6 +14,10 @@ Types of changes
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [1.6.0]
+
+- `Added` jsonschema command to generate schema of masking.yml file
+
 ## [1.5.0]
 
 - `Changed` order of keys on JSON objects will now be preserved on the output

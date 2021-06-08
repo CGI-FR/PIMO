@@ -29,6 +29,7 @@
         "quicktype.quicktype",
         "spikespaz.vscode-smoothtype",
         "EditorConfig.EditorConfig",
+        "redhat.vscode-yaml"
     ],
     "settings": {
         // General settings
@@ -76,5 +77,8 @@
         "go.coverOnSingleTest": true,
         "go.coverOnSingleTestFile": true,
         "go.coverShowCounts": true,
+        "yaml.schemas": {
+            "https://raw.githubusercontent.com/CGI-FR/PIMO/main/schema/v1/pimo.schema.json": "/**/*masking*.yml"
+        }
     }
 }

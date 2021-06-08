@@ -5,6 +5,7 @@ go 1.16
 require (
 	github.com/Masterminds/sprig/v3 v3.2.2
 	github.com/Trendyol/overlog v0.1.0
+	github.com/alecthomas/jsonschema v0.0.0-20210526225647-edb03dcab7bc
 	github.com/capitalone/fpe v1.2.1
 	github.com/goccy/go-yaml v1.8.9
 	github.com/google/gxui v0.0.0-20151028112939-f85e0a97b3a4 // indirect
