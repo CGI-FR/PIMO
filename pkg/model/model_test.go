@@ -360,7 +360,7 @@ func jsonlineToDictionaries(jsl string) []Dictionary {
 	return result
 }
 
-func dictionariesToJSONLine(dictionaries []Dictionary) string {
+func DictionariesToJSONLine(dictionaries []Dictionary) string {
 	var jsonline []byte
 	for _, dictionary := range dictionaries {
 		result, _ := json.Marshal(dictionary)
@@ -397,8 +397,8 @@ func TestMaskEngineShouldMaskNestedArrays(t *testing.T) {
 
 	assert.Nil(t, err)
 
-	expected := dictionariesToJSONLine(jsonlineToDictionaries(oput))
-	actual := dictionariesToJSONLine(result)
+	expected := DictionariesToJSONLine(jsonlineToDictionaries(oput))
+	actual := DictionariesToJSONLine(result)
 	assert.Equal(t, expected, actual)
 }
 
@@ -420,8 +420,8 @@ func TestMaskEngineShouldMaskNestedNestedArrays(t *testing.T) {
 
 	assert.Nil(t, err)
 
-	expected := dictionariesToJSONLine(jsonlineToDictionaries(oput))
-	actual := dictionariesToJSONLine(result)
+	expected := DictionariesToJSONLine(jsonlineToDictionaries(oput))
+	actual := DictionariesToJSONLine(result)
 	assert.Equal(t, expected, actual)
 }
 
@@ -477,8 +477,8 @@ func TestMaskEngineShouldMaskMultipleNestedNestedArrays(t *testing.T) {
 
 	assert.Nil(t, err)
 
-	expected := dictionariesToJSONLine(jsonlineToDictionaries(oput))
-	actual := dictionariesToJSONLine(result)
+	expected := DictionariesToJSONLine(jsonlineToDictionaries(oput))
+	actual := DictionariesToJSONLine(result)
 	assert.Equal(t, expected, actual)
 }
 

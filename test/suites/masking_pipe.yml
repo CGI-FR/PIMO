@@ -141,3 +141,74 @@ testcases:
     - 'result.systemout ShouldContainSubstring "flag1":[{"name":"blue","value":"#25E171"},{"name":"white","value":"#221A71"},{"name":"red","value":"#2F25B3"}]'
     - 'result.systemout ShouldContainSubstring "flag2":[{"name":"green","value":"#E9B20D"},{"name":"white","value":"#EF2701"},{"name":"red","value":"#51B3BC"}]'
     - result.systemerr ShouldBeEmpty
+- name: simple pipe with repeat
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      seed: 42
+      masking:
+        - selector:
+            jsonpath: "DD014.REL_COMPETENCE"
+          mask:
+            pipe:
+              masking:
+                - selector:
+                    jsonpath: "ID_RCI"
+                  mask:
+                    template: "{{.ID_RCI}}+"
+      EOF
+  - script: |-
+      pimo --repeat 3 > result.json <<EOF
+      {"DD014": { "REL_COMPETENCE" :  [{"ID_RCI":1}]}}
+      EOF
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemerr ShouldBeEmpty
+  - script : |-
+      cat > expected.json <<EOF
+      {"DD014":{"REL_COMPETENCE":[{"ID_RCI":"1+"}]}}
+      {"DD014":{"REL_COMPETENCE":[{"ID_RCI":"1+"}]}}
+      {"DD014":{"REL_COMPETENCE":[{"ID_RCI":"1+"}]}}
+      EOF
+  - script: diff expected.json result.json
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldBeEmpty
+
+- name: simple pipe without repeat
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      seed: 42
+      masking:
+        - selector:
+            jsonpath: "DD014.REL_COMPETENCE"
+          mask:
+            pipe:
+              masking:
+                - selector:
+                    jsonpath: "ID_RCI"
+                  mask:
+                    template: "{{.ID_RCI}}+"
+      EOF
+  - script: |-
+      pimo > result.json <<EOF
+      {"DD014": { "REL_COMPETENCE" :  [{"ID_RCI":"1"}]}}
+      {"DD014": { "REL_COMPETENCE" :  [{"ID_RCI":"1"}]}}
+      EOF
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemerr ShouldBeEmpty
+  - script : |-
+      cat > expected.json <<EOF
+      {"DD014":{"REL_COMPETENCE":[{"ID_RCI":"1+"}]}}
+      {"DD014":{"REL_COMPETENCE":[{"ID_RCI":"1+"}]}}
+      EOF
+  - script: diff expected.json result.json
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldBeEmpty
