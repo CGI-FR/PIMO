@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"os"
 	"regexp"
+	"strings"
 	"time"
 
 	over "github.com/Trendyol/overlog"
@@ -49,6 +50,7 @@ import (
 	"github.com/cgi-fr/pimo/pkg/statistics"
 	"github.com/cgi-fr/pimo/pkg/templatemask"
 	"github.com/cgi-fr/pimo/pkg/weightedchoice"
+	"github.com/mattn/go-isatty"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
@@ -65,6 +67,7 @@ var (
 	verbosity        string
 	debug            bool
 	jsonlog          bool
+	colormode        string
 	iteration        int
 	emptyInput       bool
 	maskingFile      string
@@ -92,6 +95,7 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 	rootCmd.PersistentFlags().StringVarP(&verbosity, "verbosity", "v", "error", "set level of log verbosity : none (0), error (1), warn (2), info (3), debug (4), trace (5)")
 	rootCmd.PersistentFlags().BoolVar(&debug, "debug", false, "add debug information to logs (very slow)")
 	rootCmd.PersistentFlags().BoolVar(&jsonlog, "log-json", false, "output logs in JSON format")
+	rootCmd.PersistentFlags().StringVar(&colormode, "color", "auto", "use colors in log outputs : yes, no or auto")
 	rootCmd.PersistentFlags().IntVarP(&iteration, "repeat", "r", 1, "number of iteration to mask each input")
 	rootCmd.PersistentFlags().BoolVar(&emptyInput, "empty-input", false, "generate data without any input, to use with repeat flag")
 	rootCmd.PersistentFlags().StringVarP(&maskingFile, "config", "c", "masking.yml", "name and location of the masking-config file")
@@ -251,11 +255,22 @@ func injectMaskFactories() []model.MaskFactory {
 }
 
 func initLog() {
+	color := false
+	switch strings.ToLower(colormode) {
+	case "auto":
+		if isatty.IsTerminal(os.Stdout.Fd()) {
+			// Is Terminal
+			color = true
+		}
+	case "yes", "true", "1", "on", "enable":
+		color = true
+	}
+
 	var logger zerolog.Logger
 	if jsonlog {
 		logger = zerolog.New(os.Stderr) // .With().Caller().Logger()
 	} else {
-		logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr}) // .With().Caller().Logger()
+		logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr, NoColor: !color}) // .With().Caller().Logger()
 	}
 	if debug {
 		logger = logger.With().Caller().Logger()

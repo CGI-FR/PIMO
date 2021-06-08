@@ -17,6 +17,7 @@ Types of changes
 ## [1.6.0]
 
 - `Added` jsonschema command to generate schema of masking.yml file
+- `Added` flag to enable or disable coloring in output logs (--color [yes|no|auto])
 
 ## [1.5.0]
 
