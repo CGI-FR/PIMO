@@ -125,3 +125,19 @@ testcases:
     - result.systemerr ShouldNotContainSubstring "level":"error"
     - result.systemerr ShouldContainSubstring Line skipped
     - result.systemerr ShouldContainSubstring "output-line":"1"
+
+- name: remove color from output logs
+  steps:
+  - script: pimo -c invalid-file.yml --color no
+    assertions:
+    - result.systemerr ShouldNotContainSubstring [0m
+- name: add color to output logs
+  steps:
+  - script: pimo -c invalid-file.yml --color yes
+    assertions:
+    - result.systemerr ShouldContainSubstring [0m
+- name: auto detect terminal should not include color codes in venom test
+  steps:
+  - script: pimo -c invalid-file.yml
+    assertions:
+    - result.systemerr ShouldNotContainSubstring [0m
