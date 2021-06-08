@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"os"
 	"regexp"
+	"runtime"
 	"strings"
 	"time"
 
@@ -258,8 +259,7 @@ func initLog() {
 	color := false
 	switch strings.ToLower(colormode) {
 	case "auto":
-		if isatty.IsTerminal(os.Stdout.Fd()) {
-			// Is Terminal
+		if isatty.IsTerminal(os.Stdout.Fd()) && runtime.GOOS != "windows" {
 			color = true
 		}
 	case "yes", "true", "1", "on", "enable":
