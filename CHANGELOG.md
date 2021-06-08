@@ -16,6 +16,7 @@ Types of changes
 
 ## [1.6.0]
 
+- `Fixed` Pipe mask with repeat flag failed in panic (#34)
 - `Added` jsonschema command to generate schema of masking.yml file
 
 ## [1.5.0]
