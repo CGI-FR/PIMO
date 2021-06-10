@@ -1,0 +1,11 @@
+version: "1"
+seed: 42
+masking:
+  - selector:
+      jsonpath: "PERMIS"
+    mask:
+      template: |
+                {{- range $index, $rel := .REL_PERMIS -}}
+                  {{- if $index }},{{end -}}
+                  {"id": {{.ID_PERMIS}},"type":"PERMIS"}
+                {{- end -}}

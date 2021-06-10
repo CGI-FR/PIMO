@@ -32,3 +32,24 @@ testcases:
     - result.systemoutjson.mail ShouldEqual noel.lea@gmail.com
     - result.systemoutjson.mail ShouldNotEqual Noël.Léa@gmail.com
     - result.systemerr ShouldBeEmpty
+
+- name: template with range over slice
+  steps:
+  - script: rm -f masking.yml
+  - script: cp ../masking_template_range.yml masking.yml
+  - script: |-
+      pimo > result.json <<EOF
+      {"REL_PERMIS":[{"ID_PERMIS":1}],"PERMIS":""}
+      EOF
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemerr ShouldBeEmpty
+  - script : |-
+      cat > expected.json <<EOF
+      {"REL_PERMIS":[{"ID_PERMIS":1}],"PERMIS":"{\"id\": 1,\"type\":\"PERMIS\"}"}
+      EOF
+  - script: diff expected.json result.json
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldBeEmpty
+
