@@ -14,6 +14,10 @@ Types of changes
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [1.6.1]
+
+- `Fixed` Range over array in template mask
+
 ## [1.6.0]
 
 - `Fixed` Pipe mask with repeat flag failed in panic (#34)

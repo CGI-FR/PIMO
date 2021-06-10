@@ -163,6 +163,25 @@ func UnorderedTypes(inter interface{}) interface{} {
 		}
 
 		return tab
+
+	case []Dictionary:
+		tab := []Entry{}
+
+		for _, item := range typedInter {
+			tab = append(tab, UnorderedTypes(item))
+		}
+
+		return tab
+
+	case []Entry:
+		tab := []Entry{}
+
+		for _, item := range typedInter {
+			tab = append(tab, UnorderedTypes(item))
+		}
+
+		return tab
+
 	default:
 		return inter
 	}

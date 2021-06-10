@@ -118,3 +118,20 @@ func TestRFactoryShouldCreateANestedContextMask(t *testing.T) {
 	waited := "BAZ"
 	assert.Equal(t, waited, masked, "Should replace foo.bar with BAZ")
 }
+
+func TestMaskingTemplateShouldIterOverContextArray(t *testing.T) {
+	template := `{{- range $index, $rel := .REL_PERMIS -}}{{.ID_PERMIS}}{{- end -}}`
+	tempMask, err := NewMask(template)
+	if err != nil {
+		assert.Fail(t, err.Error())
+	}
+
+	data := model.NewDictionary().With("REL_PERMIS", []model.Dictionary{model.NewDictionary().With("ID_PERMIS", 1)})
+
+	result, err := tempMask.Mask("anything", data)
+	if err != nil {
+		assert.Fail(t, err.Error())
+	}
+	waited := "1"
+	assert.Equal(t, waited, result, "Should create the right field")
+}
