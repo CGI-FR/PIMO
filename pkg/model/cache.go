@@ -126,6 +126,10 @@ func (mce MaskCacheEngine) Mask(e Entry, context ...Dictionary) (Entry, error) {
 	return value, err
 }
 
+func (mce MaskCacheEngine) Name() string {
+	return fmt.Sprintf("cached mask of %s", mce.OriginalEngine.Name())
+}
+
 type UniqueMaskCacheEngine struct {
 	cache          UniqueCache
 	originalEngine MaskEngine
@@ -154,6 +158,10 @@ func (umce UniqueMaskCacheEngine) Mask(e Entry, context ...Dictionary) (Entry, e
 		}
 	}
 	return nil, fmt.Errorf("Unique value not found")
+}
+
+func (umce UniqueMaskCacheEngine) Name() string {
+	return fmt.Sprintf("unique cache of %s", umce.originalEngine.Name())
 }
 
 func NewFromCacheProcess(selector Selector, cache Cache) Processor {

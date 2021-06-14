@@ -18,6 +18,8 @@
 package fluxuri
 
 import (
+	"fmt"
+
 	"github.com/cgi-fr/pimo/pkg/model"
 	"github.com/cgi-fr/pimo/pkg/uri"
 	"github.com/rs/zerolog/log"
@@ -43,12 +45,16 @@ func NewMask(name string) (MaskEngine, error) {
 
 // MaskContext add the field if not existing or replace the value if existing
 func (me MaskEngine) MaskContext(context model.Dictionary, key string, contexts ...model.Dictionary) (model.Dictionary, error) {
-	log.Info().Msg("Mask fluxuri")
+	log.Debug().Msg("Mask fluxuri")
 	if *me.Actual < me.LenList {
 		context.Set(key, me.List[*me.Actual])
 		*me.Actual++
 	}
 	return context, nil
+}
+
+func (me MaskEngine) Name() string {
+	return fmt.Sprintf("fluxuri size=%d", len(me.List))
 }
 
 // Create a mask from a configuration

@@ -235,6 +235,10 @@ func (am TestAddMaskEngine) MaskContext(context Dictionary, key string, contexts
 	return context, nil
 }
 
+func (am TestAddMaskEngine) Name() string {
+	return "test function"
+}
+
 func TestMaskEngineWithContext(t *testing.T) {
 	mySlice := []Dictionary{NewDictionary().With("city", "Nantes")}
 	var result []Dictionary

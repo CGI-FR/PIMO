@@ -18,6 +18,8 @@
 package add
 
 import (
+	"fmt"
+
 	"github.com/cgi-fr/pimo/pkg/model"
 	"github.com/rs/zerolog/log"
 )
@@ -34,13 +36,17 @@ func NewMask(value model.Entry) MaskEngine {
 
 // MaskContext add the field
 func (am MaskEngine) MaskContext(context model.Dictionary, key string, contexts ...model.Dictionary) (model.Dictionary, error) {
-	log.Info().Msg("Mask add")
+	log.Debug().Msg("Mask add")
 	_, present := context.GetValue(key)
 	if !present {
 		context.Set(key, am.value)
 	}
 
 	return context, nil
+}
+
+func (am MaskEngine) Name() string {
+	return fmt.Sprintf("add %v", am.value)
 }
 
 // Create a mask from a configuration

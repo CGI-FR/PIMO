@@ -24,11 +24,13 @@ import (
 // MaskEngine is a masking algorithm
 type MaskEngine interface {
 	Mask(Entry, ...Dictionary) (Entry, error)
+	Name() string
 }
 
 // MaskContextEngine is a masking algorithm for dictionary
 type MaskContextEngine interface {
 	MaskContext(Dictionary, string, ...Dictionary) (Dictionary, error)
+	Name() string
 }
 
 // FunctionMaskEngine implements MaskEngine with a simple function
@@ -39,6 +41,10 @@ type FunctionMaskEngine struct {
 // Mask delegate mask algorithm to the function
 func (fme FunctionMaskEngine) Mask(e Entry, context ...Dictionary) (Entry, error) {
 	return fme.Function(e, context...)
+}
+
+func (fme FunctionMaskEngine) Name() string {
+	return "function mask engine"
 }
 
 type MaskFactory func(Masking, int64, map[string]Cache) (MaskEngine, bool, error)

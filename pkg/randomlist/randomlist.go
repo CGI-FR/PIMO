@@ -41,8 +41,12 @@ func NewMask(list []model.Entry, seed int64) MaskEngine {
 
 // Mask choose a mask value randomly
 func (mrl MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Entry, error) {
-	log.Info().Msg("Mask randomChoice")
+	log.Debug().Msg("Mask randomChoice")
 	return mrl.list[mrl.rand.Intn(len(mrl.list))], nil
+}
+
+func (mrl MaskEngine) Name() string {
+	return fmt.Sprintf("hash size=%d", len(mrl.list))
 }
 
 // Factory create a mask from a yaml config

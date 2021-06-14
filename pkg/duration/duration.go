@@ -77,7 +77,7 @@ func ParseInt64(value string) int64 {
 
 // Mask masks a time value with a duration
 func (dura MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Entry, error) {
-	log.Info().Msg("Mask duration")
+	log.Debug().Msg("Mask duration")
 	var t time.Time
 	var err error
 	switch v := e.(type) {
@@ -92,6 +92,10 @@ func (dura MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.E
 		return nil, err
 	}
 	return t.Add(dura.duration), nil
+}
+
+func (dura MaskEngine) Name() string {
+	return fmt.Sprintf("duration %s", dura.duration)
 }
 
 // Create a mask from a configuration

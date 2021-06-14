@@ -18,6 +18,7 @@
 package randdate
 
 import (
+	"fmt"
 	"hash/fnv"
 	"math/rand"
 	"time"
@@ -41,10 +42,14 @@ func NewMask(min, max time.Time, seed int64) MaskEngine {
 
 // Mask choose a mask date randomly
 func (dateRange MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Entry, error) {
-	log.Info().Msg("Mask randDate")
+	log.Debug().Msg("Mask randDate")
 	delta := dateRange.DateMax.Unix() - dateRange.DateMin.Unix()
 	sec := time.Unix(dateRange.rand.Int63n(delta)+dateRange.DateMin.Unix(), 0)
 	return sec, nil
+}
+
+func (dateRange MaskEngine) Name() string {
+	return fmt.Sprintf("randDate dateMin=%s dateMax=%s", dateRange.DateMin, dateRange.DateMax)
 }
 
 // Create a mask from a configuration

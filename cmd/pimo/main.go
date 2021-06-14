@@ -146,7 +146,6 @@ func run() {
 	pipeline := model.NewPipeline(source).
 		Process(model.NewCounterProcessWithCallback("input-line", 0, updateContext)).
 		Process(model.NewRepeaterProcess(iteration))
-	over.AddGlobalFields("input-line")
 
 	var (
 		err    error
@@ -190,6 +189,7 @@ func run() {
 	statistics.Reset()
 	startTime := time.Now()
 
+	over.AddGlobalFields("input-line")
 	over.AddGlobalFields("output-line")
 	err = pipeline.AddSink(jsonline.NewSinkWithContext(os.Stdout, "output-line")).Run()
 

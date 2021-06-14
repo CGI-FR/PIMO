@@ -18,6 +18,7 @@
 package weightedchoice
 
 import (
+	"fmt"
 	"hash/fnv"
 	"math/rand"
 	"sort"
@@ -81,8 +82,12 @@ func NewMask(list []model.WeightedChoiceType, seed int64) MaskEngine {
 
 // Mask choose a mask value randomly
 func (wml MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Entry, error) {
-	log.Info().Msg("Mask weightedChoice")
+	log.Debug().Msg("Mask weightedChoice")
 	return wml.cs.Pick(), nil
+}
+
+func (wml MaskEngine) Name() string {
+	return fmt.Sprintf("weightedChoice size=%d", len(wml.cs.data))
 }
 
 // Factory create a mask from a yaml config

@@ -48,7 +48,7 @@ func (ff1m MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.E
 		return e, nil
 	}
 
-	log.Info().Msg("Mask ff1")
+	log.Debug().Msg("Mask ff1")
 
 	// Extract tweak from the Dictionary (context)
 	var tweak string
@@ -93,6 +93,10 @@ func decodingKey(key string) ([]byte, error) {
 		return nil, err
 	}
 	return decodedkey, nil
+}
+
+func (ff1m MaskEngine) Name() string {
+	return fmt.Sprintf("dateparser keyFromEnv='%s' radix='%d' tweakField='%s' decrypt='%v'", ff1m.keyFromEnv, ff1m.radix, ff1m.tweakField, ff1m.decrypt)
 }
 
 // Factory create a mask from a configuration

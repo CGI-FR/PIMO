@@ -55,7 +55,7 @@ func NewMask(seed int64, injectParent string, injectRoot string, caches map[stri
 }
 
 func (me MaskEngine) MaskContext(e model.Dictionary, key string, context ...model.Dictionary) (model.Dictionary, error) {
-	log.Info().Msg("Mask pipe")
+	log.Debug().Msg("Mask pipe")
 	var result []model.Dictionary
 	input := []model.Dictionary{}
 
@@ -110,6 +110,10 @@ func (me MaskEngine) MaskContext(e model.Dictionary, key string, context ...mode
 	}
 	copy.Set(key, result)
 	return copy, nil
+}
+
+func (me MaskEngine) Name() string {
+	return fmt.Sprintf("pipe injectParent=%s injectRoot=%s source=%s", me.injectParent, me.injectRoot, me.source)
 }
 
 // Factory create a mask from a configuration

@@ -18,6 +18,7 @@
 package randomint
 
 import (
+	"fmt"
 	"hash/fnv"
 	"math/rand"
 
@@ -40,8 +41,12 @@ func NewMask(min int, max int, seed int64) MaskEngine {
 
 // Mask choose a mask int randomly within boundary
 func (rim MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Entry, error) {
-	log.Info().Msg("Mask randomInt")
+	log.Debug().Msg("Mask randomInt")
 	return rim.rand.Intn(rim.max+1-rim.min) + rim.min, nil
+}
+
+func (rim MaskEngine) Name() string {
+	return fmt.Sprintf("randomInt min=%d max=%d", rim.min, rim.max)
 }
 
 // Factory create a mask from a yaml config
