@@ -38,6 +38,9 @@ func NewMask(scale int) MaskEngine {
 // Mask return a range from a MaskEngine
 func (rm MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Entry, error) {
 	log.Info().Msg("Mask range")
+	if e == nil {
+		return e, nil
+	}
 	i, err := e.(json.Number).Int64()
 	if err != nil {
 		return nil, err
