@@ -40,7 +40,7 @@ func (remp MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.E
 	return context[0].Get(remp.Field), nil
 }
 
-func (remp MaskEngine) Name() string {
+func (remp MaskEngine) String() string {
 	return fmt.Sprintf("replacement %s", remp.Field)
 }
 

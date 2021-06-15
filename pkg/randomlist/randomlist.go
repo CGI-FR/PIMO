@@ -45,7 +45,7 @@ func (mrl MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.En
 	return mrl.list[mrl.rand.Intn(len(mrl.list))], nil
 }
 
-func (mrl MaskEngine) Name() string {
+func (mrl MaskEngine) String() string {
 	return fmt.Sprintf("hash size=%d", len(mrl.list))
 }
 

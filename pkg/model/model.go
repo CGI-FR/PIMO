@@ -24,13 +24,13 @@ import (
 // MaskEngine is a masking algorithm
 type MaskEngine interface {
 	Mask(Entry, ...Dictionary) (Entry, error)
-	Name() string
+	String() string
 }
 
 // MaskContextEngine is a masking algorithm for dictionary
 type MaskContextEngine interface {
 	MaskContext(Dictionary, string, ...Dictionary) (Dictionary, error)
-	Name() string
+	String() string
 }
 
 // FunctionMaskEngine implements MaskEngine with a simple function
@@ -43,7 +43,7 @@ func (fme FunctionMaskEngine) Mask(e Entry, context ...Dictionary) (Entry, error
 	return fme.Function(e, context...)
 }
 
-func (fme FunctionMaskEngine) Name() string {
+func (fme FunctionMaskEngine) String() string {
 	return "function mask engine"
 }
 

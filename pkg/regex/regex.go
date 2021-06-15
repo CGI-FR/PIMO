@@ -45,7 +45,7 @@ func (rm MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Ent
 	return out, nil
 }
 
-func (rm MaskEngine) Name() string {
+func (rm MaskEngine) String() string {
 	return fmt.Sprintf("regex %s", rm.generator.String())
 }
 

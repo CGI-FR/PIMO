@@ -52,7 +52,7 @@ func (me MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Ent
 	return rounded, nil
 }
 
-func (me MaskEngine) Name() string {
+func (me MaskEngine) String() string {
 	return fmt.Sprintf("randomDecimal min=%f max=%f precision=%d", me.min, me.max, me.precision)
 }
 

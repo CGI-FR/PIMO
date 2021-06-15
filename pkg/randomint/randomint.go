@@ -45,7 +45,7 @@ func (rim MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.En
 	return rim.rand.Intn(rim.max+1-rim.min) + rim.min, nil
 }
 
-func (rim MaskEngine) Name() string {
+func (rim MaskEngine) String() string {
 	return fmt.Sprintf("randomInt min=%d max=%d", rim.min, rim.max)
 }
 

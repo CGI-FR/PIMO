@@ -95,7 +95,7 @@ func decodingKey(key string) ([]byte, error) {
 	return decodedkey, nil
 }
 
-func (ff1m MaskEngine) Name() string {
+func (ff1m MaskEngine) String() string {
 	return fmt.Sprintf("dateparser keyFromEnv='%s' radix='%d' tweakField='%s' decrypt='%v'", ff1m.keyFromEnv, ff1m.radix, ff1m.tweakField, ff1m.decrypt)
 }
 

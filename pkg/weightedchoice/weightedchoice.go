@@ -86,7 +86,7 @@ func (wml MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.En
 	return wml.cs.Pick(), nil
 }
 
-func (wml MaskEngine) Name() string {
+func (wml MaskEngine) String() string {
 	return fmt.Sprintf("weightedChoice size=%d", len(wml.cs.data))
 }
 

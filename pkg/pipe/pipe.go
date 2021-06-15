@@ -112,7 +112,7 @@ func (me MaskEngine) MaskContext(e model.Dictionary, key string, context ...mode
 	return copy, nil
 }
 
-func (me MaskEngine) Name() string {
+func (me MaskEngine) String() string {
 	return fmt.Sprintf("pipe injectParent=%s injectRoot=%s source=%s", me.injectParent, me.injectRoot, me.source)
 }
 

@@ -94,7 +94,7 @@ func (dura MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.E
 	return t.Add(dura.duration), nil
 }
 
-func (dura MaskEngine) Name() string {
+func (dura MaskEngine) String() string {
 	return fmt.Sprintf("duration %s", dura.duration)
 }
 

@@ -50,7 +50,7 @@ func (cme MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.En
 	return resulting, nil
 }
 
-func (cme MaskEngine) Name() string {
+func (cme MaskEngine) String() string {
 	return fmt.Sprintf("command %s", cme.Cmd)
 }
 

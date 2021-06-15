@@ -40,7 +40,7 @@ func (cm MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Ent
 	return cm.constValue, nil
 }
 
-func (cm MaskEngine) Name() string {
+func (cm MaskEngine) String() string {
 	return fmt.Sprintf("constant %s", cm.constValue)
 }
 

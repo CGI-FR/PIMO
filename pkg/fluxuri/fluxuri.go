@@ -53,7 +53,7 @@ func (me MaskEngine) MaskContext(context model.Dictionary, key string, contexts 
 	return context, nil
 }
 
-func (me MaskEngine) Name() string {
+func (me MaskEngine) String() string {
 	return fmt.Sprintf("fluxuri size=%d", len(me.List))
 }
 

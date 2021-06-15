@@ -98,7 +98,7 @@ func BuildPipeline(pipeline Pipeline, conf Definition, caches map[string]Cache) 
 					}
 				}
 				pipeline = pipeline.Process(NewMaskEngineProcess(NewPathSelector(v.Selector.Jsonpath), mask))
-				log.Info().Str("path", v.Selector.Jsonpath).Str("mask", mask.Name()).Msg("Add mask")
+				log.Info().Str("path", v.Selector.Jsonpath).Str("mask", mask.String()).Msg("Add mask")
 				nbArg++
 			}
 		}
@@ -110,7 +110,7 @@ func BuildPipeline(pipeline Pipeline, conf Definition, caches map[string]Cache) 
 			}
 			if present {
 				pipeline = pipeline.Process(NewMaskContextEngineProcess(NewPathSelector(v.Selector.Jsonpath), mask))
-				log.Info().Str("path", v.Selector.Jsonpath).Str("mask", mask.Name()).Msg("Add mask")
+				log.Info().Str("path", v.Selector.Jsonpath).Str("mask", mask.String()).Msg("Add mask")
 				nbArg++
 			}
 		}

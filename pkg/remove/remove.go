@@ -38,7 +38,7 @@ func (rm MaskEngine) MaskContext(context model.Dictionary, key string, contexts 
 	return context, nil
 }
 
-func (rm MaskEngine) Name() string {
+func (rm MaskEngine) String() string {
 	return "delete"
 }
 

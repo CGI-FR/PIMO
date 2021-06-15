@@ -65,7 +65,7 @@ func (tmpl MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.E
 	return output.String(), err
 }
 
-func (tmpl MaskEngine) Name() string {
+func (tmpl MaskEngine) String() string {
 	return fmt.Sprintf("template %s", tmpl.source)
 }
 

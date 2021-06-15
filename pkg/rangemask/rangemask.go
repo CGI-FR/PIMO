@@ -48,7 +48,7 @@ func (rm MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Ent
 	return rangedValue, nil
 }
 
-func (rm MaskEngine) Name() string {
+func (rm MaskEngine) String() string {
 	return fmt.Sprintf("range scale=%v", rm.rangeScale)
 }
 

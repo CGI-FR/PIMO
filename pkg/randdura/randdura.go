@@ -88,7 +88,7 @@ func (me MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Ent
 	return t.Add(time.Duration(dura)), nil
 }
 
-func (me MaskEngine) Name() string {
+func (me MaskEngine) String() string {
 	return fmt.Sprintf("randomDuration min=%s max=%s", me.Min, me.Max)
 }
 

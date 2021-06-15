@@ -39,7 +39,7 @@ func (hm MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Ent
 	return hm.List[int(h.Sum32())%len(hm.List)], err
 }
 
-func (hm MaskEngine) Name() string {
+func (hm MaskEngine) String() string {
 	return fmt.Sprintf("hash size=%d", len(hm.List))
 }
 

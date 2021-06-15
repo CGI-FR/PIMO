@@ -45,7 +45,7 @@ func (am MaskEngine) MaskContext(context model.Dictionary, key string, contexts 
 	return context, nil
 }
 
-func (am MaskEngine) Name() string {
+func (am MaskEngine) String() string {
 	return fmt.Sprintf("add %v", am.value)
 }
 

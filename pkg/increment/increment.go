@@ -44,7 +44,7 @@ func (incr MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.E
 	return output, nil
 }
 
-func (incr MaskEngine) Name() string {
+func (incr MaskEngine) String() string {
 	return fmt.Sprintf("increment increment=%d start=%d", incr.Increment, incr.Value)
 }
 

@@ -235,7 +235,7 @@ func (am TestAddMaskEngine) MaskContext(context Dictionary, key string, contexts
 	return context, nil
 }
 
-func (am TestAddMaskEngine) Name() string {
+func (am TestAddMaskEngine) String() string {
 	return "test function"
 }
 

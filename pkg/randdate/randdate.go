@@ -48,7 +48,7 @@ func (dateRange MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (mo
 	return sec, nil
 }
 
-func (dateRange MaskEngine) Name() string {
+func (dateRange MaskEngine) String() string {
 	return fmt.Sprintf("randDate dateMin=%s dateMax=%s", dateRange.DateMin, dateRange.DateMax)
 }
 

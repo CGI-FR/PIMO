@@ -66,7 +66,7 @@ func (me MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Ent
 	return t, nil
 }
 
-func (cme MaskEngine) Name() string {
+func (cme MaskEngine) String() string {
 	return fmt.Sprintf("dateparser inputFormat='%s' outputFormat='%s'", cme.inputFormat, cme.outputFormat)
 }
 
