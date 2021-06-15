@@ -18,6 +18,8 @@
 package constant
 
 import (
+	"fmt"
+
 	"github.com/cgi-fr/pimo/pkg/model"
 	"github.com/rs/zerolog/log"
 )
@@ -34,8 +36,12 @@ func NewMask(data model.Entry) MaskEngine {
 
 // Mask return a Constant from a MaskEngine
 func (cm MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Entry, error) {
-	log.Info().Msg("Mask constant")
+	log.Debug().Msg("Mask constant")
 	return cm.constValue, nil
+}
+
+func (cm MaskEngine) String() string {
+	return fmt.Sprintf("constant %s", cm.constValue)
 }
 
 // Factory create a mask from a configuration

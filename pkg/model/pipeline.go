@@ -24,6 +24,7 @@ import (
 	"time"
 
 	"github.com/goccy/go-yaml"
+	"github.com/rs/zerolog/log"
 )
 
 // nolint: gochecknoglobals
@@ -74,6 +75,7 @@ func BuildPipeline(pipeline Pipeline, conf Definition, caches map[string]Cache) 
 				return nil, nil, errors.New("Cache '" + v.Cache + "' not found for '" + v.Selector.Jsonpath + "'")
 			}
 			pipeline = pipeline.Process(NewFromCacheProcess(NewPathSelector(v.Selector.Jsonpath), cache))
+			log.Info().Str("path", v.Selector.Jsonpath).Interface("mask", v.Mask.FromCache).Msg("Add mask")
 			nbArg++
 		}
 
@@ -96,6 +98,7 @@ func BuildPipeline(pipeline Pipeline, conf Definition, caches map[string]Cache) 
 					}
 				}
 				pipeline = pipeline.Process(NewMaskEngineProcess(NewPathSelector(v.Selector.Jsonpath), mask))
+				log.Info().Str("path", v.Selector.Jsonpath).Str("mask", mask.String()).Msg("Add mask")
 				nbArg++
 			}
 		}
@@ -107,6 +110,7 @@ func BuildPipeline(pipeline Pipeline, conf Definition, caches map[string]Cache) 
 			}
 			if present {
 				pipeline = pipeline.Process(NewMaskContextEngineProcess(NewPathSelector(v.Selector.Jsonpath), mask))
+				log.Info().Str("path", v.Selector.Jsonpath).Str("mask", mask.String()).Msg("Add mask")
 				nbArg++
 			}
 		}

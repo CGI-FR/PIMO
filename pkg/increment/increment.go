@@ -18,6 +18,8 @@
 package increment
 
 import (
+	"fmt"
+
 	"github.com/cgi-fr/pimo/pkg/model"
 	"github.com/rs/zerolog/log"
 )
@@ -36,10 +38,14 @@ func NewMask(start, incr int) MaskEngine {
 
 // Mask masks a value with an incremental int
 func (incr MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Entry, error) {
-	log.Info().Msg("Mask increment")
+	log.Debug().Msg("Mask increment")
 	output := *incr.Value
 	*incr.Value += incr.Increment
 	return output, nil
+}
+
+func (incr MaskEngine) String() string {
+	return fmt.Sprintf("increment increment=%d start=%d", incr.Increment, incr.Value)
 }
 
 // Create a mask from a configuration

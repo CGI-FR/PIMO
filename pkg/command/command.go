@@ -18,6 +18,7 @@
 package command
 
 import (
+	"fmt"
 	"os/exec"
 	"strings"
 
@@ -37,7 +38,7 @@ func NewMask(cmd string) MaskEngine {
 
 // Mask delegate mask algorithm to an external program
 func (cme MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Entry, error) {
-	log.Info().Msg("Mask command")
+	log.Debug().Msg("Mask command")
 	splitCommand := strings.Split(cme.Cmd, " ")
 	/* #nosec */
 	out, err := exec.Command(splitCommand[0], splitCommand[1:]...).Output()
@@ -47,6 +48,10 @@ func (cme MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.En
 		return e, err
 	}
 	return resulting, nil
+}
+
+func (cme MaskEngine) String() string {
+	return fmt.Sprintf("command %s", cme.Cmd)
 }
 
 // Create a mask from a configuration

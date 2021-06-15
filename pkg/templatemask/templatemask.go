@@ -19,6 +19,7 @@ package templatemask
 
 import (
 	"bytes"
+	"fmt"
 	"strings"
 	"text/template"
 	"unicode"
@@ -33,6 +34,7 @@ import (
 
 // MaskEngine is to mask a value thanks to a template
 type MaskEngine struct {
+	source   string
 	template *template.Template
 }
 
@@ -52,15 +54,19 @@ func NewMask(text string) (MaskEngine, error) {
 		"NoAccent": rmAcc,
 	}
 	temp, err := template.New("template").Funcs(sprig.TxtFuncMap()).Funcs(funcMap).Parse(text)
-	return MaskEngine{temp}, err
+	return MaskEngine{text, temp}, err
 }
 
 // Mask masks a value with a template
 func (tmpl MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Entry, error) {
-	log.Info().Msg("Mask template")
+	log.Debug().Msg("Mask template")
 	var output bytes.Buffer
 	err := tmpl.template.Execute(&output, context[0].Unordered())
 	return output.String(), err
+}
+
+func (tmpl MaskEngine) String() string {
+	return fmt.Sprintf("template %s", tmpl.source)
 }
 
 // Factory create a mask from a yaml config

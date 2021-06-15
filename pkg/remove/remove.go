@@ -32,10 +32,14 @@ func NewMask() MaskEngine {
 
 // MaskContext remove the field
 func (rm MaskEngine) MaskContext(context model.Dictionary, key string, contexts ...model.Dictionary) (model.Dictionary, error) {
-	log.Info().Msg("Mask delete")
+	log.Debug().Msg("Mask delete")
 	context.Delete(key)
 
 	return context, nil
+}
+
+func (rm MaskEngine) String() string {
+	return "delete"
 }
 
 // Factory create a mask from a yaml config

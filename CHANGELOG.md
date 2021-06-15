@@ -14,6 +14,11 @@ Types of changes
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [1.7.0]
+
+- `Added` Log masks and parameters once at PIMO startup
+- `Changed` Process logs move from INFO level to DEBUG level
+
 ## [1.6.1]
 
 - `Fixed` Range over array in template mask

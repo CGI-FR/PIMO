@@ -18,6 +18,7 @@
 package randomdecimal
 
 import (
+	"fmt"
 	"hash/fnv"
 	"math"
 	"math/rand"
@@ -42,13 +43,17 @@ func NewMask(min float64, max float64, precision int, seed int64) MaskEngine {
 
 // Mask choose a mask int randomly within boundary
 func (me MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Entry, error) {
-	log.Info().Msg("Mask randomDecimal")
+	log.Debug().Msg("Mask randomDecimal")
 	// Generate the random number
 	r := me.min + me.rand.Float64()*(me.max-me.min)
 
 	// Round the number to the precision
 	rounded := math.Round(r*math.Pow(10, float64(me.precision))) / math.Pow(10, float64(me.precision))
 	return rounded, nil
+}
+
+func (me MaskEngine) String() string {
+	return fmt.Sprintf("randomDecimal min=%f max=%f precision=%d", me.min, me.max, me.precision)
 }
 
 // Factory create a mask from a yaml config

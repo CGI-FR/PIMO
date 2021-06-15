@@ -19,6 +19,7 @@ package rangemask
 
 import (
 	"encoding/json"
+	"fmt"
 	"strconv"
 
 	"github.com/cgi-fr/pimo/pkg/model"
@@ -37,7 +38,7 @@ func NewMask(scale int) MaskEngine {
 
 // Mask return a range from a MaskEngine
 func (rm MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Entry, error) {
-	log.Info().Msg("Mask range")
+	log.Debug().Msg("Mask range")
 	i, err := e.(json.Number).Int64()
 	if err != nil {
 		return nil, err
@@ -45,6 +46,10 @@ func (rm MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Ent
 	scaledValue := int(i) / rm.rangeScale * rm.rangeScale
 	rangedValue := "[" + strconv.Itoa(scaledValue) + ";" + strconv.Itoa(scaledValue+rm.rangeScale-1) + "]"
 	return rangedValue, nil
+}
+
+func (rm MaskEngine) String() string {
+	return fmt.Sprintf("range scale=%v", rm.rangeScale)
 }
 
 // Factory Create a mask from a configuration

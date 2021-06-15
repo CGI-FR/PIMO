@@ -18,6 +18,7 @@
 package regex
 
 import (
+	"fmt"
 	"hash/fnv"
 	"math/rand"
 
@@ -39,9 +40,13 @@ func NewMask(exp string, seed int64) (MaskEngine, error) {
 
 // Mask returns a string thanks to a regular expression
 func (rm MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Entry, error) {
-	log.Info().Msg("Mask regex")
+	log.Debug().Msg("Mask regex")
 	out := rm.generator.Generate()
 	return out, nil
+}
+
+func (rm MaskEngine) String() string {
+	return fmt.Sprintf("regex %s", rm.generator.String())
 }
 
 // Factory create a mask from a yaml config
