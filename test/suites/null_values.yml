@@ -1,0 +1,322 @@
+name: test protection against null values
+testcases:
+- name: regex mask
+  steps:
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "value"
+          mask:
+            regex: "[0-9]{5}"
+  - script: |-
+      echo '{"value": null}' | pimo
+- name: randomInt mask
+  steps:
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "value"
+          mask:
+            randomInt:
+              min: 25
+              max: 32
+  - script: |-
+      echo '{"value": null}' | pimo
+- name: randomDecimal mask
+  steps:
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "value"
+          mask:
+            randomDecimal:
+              min: 0
+              max: 17.23
+              precision: 2
+  - script: |-
+      echo '{"value": null}' | pimo
+- name: randomDate mask
+  steps:
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "value"
+          mask:
+            randDate:
+              dateMin: "1970-01-01T00:00:00Z"
+              dateMax: "2020-01-01T00:00:00Z"
+  - script: |-
+      echo '{"value": null}' | pimo
+- name: randomDuration mask
+  steps:
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "value"
+          mask:
+            randomDuration:
+              min: "-P2D"
+              max: "-P27D"
+  - script: |-
+      echo '{"value": null}' | pimo
+- name: randomChoice mask
+  steps:
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "value"
+          mask:
+            randomChoice:
+            - "Mickael"
+            - "Mathieu"
+            - "Marcelle"
+  - script: |-
+      echo '{"value": null}' | pimo
+- name: weightedChoice mask
+  steps:
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "value"
+          mask:
+            weightedChoice:
+              - choice: "Dupont"
+                weight: 9
+              - choice: "Dupond"
+                weight: 1
+  - script: |-
+      echo '{"value": null}' | pimo
+- name: randomChoiceInUri mask
+  steps:
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "value"
+          mask:
+            randomChoiceInUri: "file://names.txt"
+  - script: |-
+      echo '{"value": null}' | pimo
+- name: range mask
+  steps:
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "value"
+          mask:
+            range: 5
+  - script: |-
+      echo '{"value": null}' | pimo
+- name: duration mask
+  steps:
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "value"
+          mask:
+            duration: "-P2D"
+  - script: |-
+      echo '{"value": null}' | pimo
+- name: hash mask
+  steps:
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "value"
+          mask:
+            hash:
+              - "Emerald City"
+              - "Ruby City"
+              - "Sapphire City"
+- name: hashInUri mask
+  steps:
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "value"
+          mask:
+            hashInUri: "pimo://nameFR"
+  - script: |-
+      echo '{"value": null}' | pimo
+- name: fromCache mask
+  steps:
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "value"
+          mask:
+            fromCache: "fakeId"
+      caches:
+        fakeId :
+          unique: true
+  - script: |-
+      echo '{"value": null}' | pimo
+- name: ff1 mask
+  steps:
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "value"
+          mask:
+            ff1:
+              radix: 10
+              keyFromEnv: "FF1_ENCRYPTION_KEY"
+  - script: |-
+      echo '{"value": null}' | pimo
+- name: dateParser mask
+  steps:
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "value"
+          mask:
+            dateParser:
+              inputFormat: "2006-01-02"
+              outputFormat: "01/02/06"
+  - script: |-
+      echo '{"value": null}' | pimo
+- name: template mask
+  steps:
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "value"
+          mask:
+            template: "{{.surname}}.{{.name}}@gmail.com"
+  - script: |-
+      echo '{"value": null}' | pimo
+- name: remove mask
+  steps:
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "value"
+          mask:
+            remove: true
+  - script: |-
+      echo '{"value": null}' | pimo
+- name: add mask
+  steps:
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "value"
+          mask:
+            add: "newvalue"
+  - script: |-
+      echo '{"value": null}' | pimo
+- name: constant mask
+  steps:
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "value"
+          mask:
+            constant: "Bill"
+  - script: |-
+      echo '{"value": null}' | pimo
+- name: command mask
+  steps:
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "value"
+          mask:
+            command: "echo -n Dorothy"
+  - script: |-
+      echo '{"value": null}' | pimo
+- name: incremental mask
+  steps:
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "value"
+          mask:
+            incremental:
+              start: 1
+              increment: 1
+  - script: |-
+      echo '{"value": null}' | pimo
+- name: fluxURI mask
+  steps:
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "value"
+          mask:
+            fluxURI: "file://id.csv"
+  - script: |-
+      echo '{"value": null}' | pimo
+- name: replacement mask
+  steps:
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "value"
+          mask:
+            replacement: "name"
+  - script: |-
+      echo '{"value": null}' | pimo
+- name: pipe mask
+  steps:
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "value"
+          mask:
+            pipe:
+              injectParent: "_"
+              masking:
+                - selector:
+                    jsonpath: "name"
+                  mask:
+                    constant: "value"
+  - script: |-
+      echo '{"value": null}' | pimo
