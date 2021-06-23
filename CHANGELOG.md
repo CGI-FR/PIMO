@@ -14,6 +14,10 @@ Types of changes
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [1.6.2]
+
+- `Fixed` Protect masks against null values (dateparser, duration, hash, randdura, range)
+
 ## [1.6.1]
 
 - `Fixed` Range over array in template mask

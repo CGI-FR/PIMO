@@ -34,6 +34,9 @@ type MaskEngine struct {
 // Mask choose a mask value by hash
 func (hm MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Entry, error) {
 	log.Info().Msg("Mask hash")
+	if e == nil {
+		return e, nil
+	}
 	h := fnv.New32a()
 	_, err := h.Write([]byte(e.(string)))
 	return hm.List[int(h.Sum32())%len(hm.List)], err

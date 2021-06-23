@@ -39,6 +39,9 @@ func NewMask(input, output string) MaskEngine {
 // Mask change a time format
 func (me MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Entry, error) {
 	log.Info().Msg("Mask dateparser")
+	if e == nil {
+		return e, nil
+	}
 	var t time.Time
 	var err error
 	if me.inputFormat != "" {
