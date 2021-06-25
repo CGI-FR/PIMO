@@ -33,7 +33,9 @@ import (
 
 // MaskEngine is to mask a value thanks to a template
 type MaskEngine struct {
-	template *template.Template
+	template  *template.Template
+	itemName  string
+	indexName string
 }
 
 // rmAcc removes accents from string
@@ -45,14 +47,14 @@ func rmAcc(s string) string {
 }
 
 // NewMask create a MaskEngine
-func NewMask(text string) (MaskEngine, error) {
+func NewMask(text string, itemName string, indexName string) (MaskEngine, error) {
 	funcMap := template.FuncMap{
 		"ToUpper":  strings.ToUpper,
 		"ToLower":  strings.ToLower,
 		"NoAccent": rmAcc,
 	}
 	temp, err := template.New("template-each").Funcs(sprig.TxtFuncMap()).Funcs(funcMap).Parse(text)
-	return MaskEngine{temp}, err
+	return MaskEngine{temp, itemName, indexName}, err
 }
 
 // Mask masks a value with a template
@@ -73,9 +75,11 @@ func (tmpl MaskEngine) MaskContext(context model.Dictionary, key string, context
 		case []model.Entry:
 			result := []model.Entry{}
 
-			for _, item := range typedVal {
-				log.Trace().Interface("item", item).Msg("Debug")
-				tmplctx["item"] = item
+			for idx, item := range typedVal {
+				tmplctx[tmpl.itemName] = item
+				if len(tmpl.indexName) > 0 {
+					tmplctx[tmpl.indexName] = idx + 1
+				}
 
 				var output bytes.Buffer
 				if err := tmpl.template.Execute(&output, tmplctx); err != nil {
@@ -101,7 +105,7 @@ func (tmpl MaskEngine) MaskContext(context model.Dictionary, key string, context
 // Factory create a mask from a yaml config
 func Factory(conf model.Masking, seed int64, caches map[string]model.Cache) (model.MaskContextEngine, bool, error) {
 	if len(conf.Mask.TemplateEach.Template) != 0 {
-		mask, err := NewMask(conf.Mask.TemplateEach.Template)
+		mask, err := NewMask(conf.Mask.TemplateEach.Template, conf.Mask.TemplateEach.Item, conf.Mask.TemplateEach.Index)
 		if err != nil {
 			return nil, false, err
 		}
