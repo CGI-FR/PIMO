@@ -14,6 +14,10 @@ Types of changes
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [1.7.0]
+
+- `Added` new mask `template-each` to mask each value of an array with a template
+
 ## [1.6.2]
 
 - `Fixed` Protect masks against null values (dateparser, duration, hash, randdura, range)
