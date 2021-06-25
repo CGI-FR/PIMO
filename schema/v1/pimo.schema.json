@@ -149,6 +149,10 @@
         "template": {
           "type": "string"
         },
+        "template-each": {
+          "$schema": "http://json-schema.org/draft-04/schema#",
+          "$ref": "#/definitions/TemplateEachType"
+        },
         "duration": {
           "type": "string"
         },
@@ -271,6 +275,12 @@
             "template"
           ],
           "title": "Template"
+        },
+        {
+          "required": [
+            "template-each"
+          ],
+          "title": "TemplateEach"
         },
         {
           "required": [
@@ -452,6 +462,21 @@
       ],
       "properties": {
         "jsonpath": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "TemplateEachType": {
+      "properties": {
+        "item": {
+          "type": "string"
+        },
+        "index": {
+          "type": "string"
+        },
+        "template": {
           "type": "string"
         }
       },

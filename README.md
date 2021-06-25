@@ -22,11 +22,11 @@ caches:
     unique: true
 ```
 
-`version` is the version of the masking file.  
-`seed` is to give every random mask the same seed, it is optional and if it is not defined, the seed is derived from the current time to increase randomness.  
+`version` is the version of the masking file.
+`seed` is to give every random mask the same seed, it is optional and if it is not defined, the seed is derived from the current time to increase randomness.
 `masking` is used to define the pipeline of masks that is going to be applied.
-`selector` is made of a jsonpath and a mask.  
-`jsonpath` defines the path of the entry that has to be masked in the json file.  
+`selector` is made of a jsonpath and a mask.
+`jsonpath` defines the path of the entry that has to be masked in the json file.
 `mask` defines the mask that will be used for the entry defined by `selector`.
 `cache` is optional, if the current entry is already in the cache as key the associated value is returned without executing the mask. Otherwise the mask is executed and a new entry is added in the cache with the orignal content as `key` and the masked result as `value`. The cache have to be declared in the `caches` section of the YAML file.
 
@@ -54,6 +54,7 @@ The following types of masks can be used :
 * Formatting
   * [`dateParser`](#dateParser) is to change a date format.
   * [`template`](#template) is to mask a data with a template using other values from the jsonline.
+  * [`template-each`](#template-each) is like template but will apply on each value of an array.
 * Data structure manipulation
   * [`remove`](#remove) is to mask a field by completely removing it.
   * [`add`](#add) is a mask to add a field to the jsonline.
@@ -357,6 +358,26 @@ The template mask can format the fields used. The following example will create 
 ```
 
 Available functions for templates come from <http://masterminds.github.io/sprig/>.
+
+[Return to list of masks](#possible-masks)
+
+### Template each
+
+```yaml
+  - selector:
+      jsonpath: "array"
+    mask:
+      template-each:
+        template: "{{title .value}}"
+        item: "value"
+```
+
+This will affect every values in the array field. The field must be an array (`{"array": ["value1", "value2]`).
+The `item` property is optional and defines the name of the current item in the templating string (defaults to "it"). There is another optional property `index`, if defined then a property with the given name will be available in the templating string (e.g. : `index: "idx"` can be used in template with `{{.idx}}`).
+
+The format for the template should respect the `text/template` package : <https://golang.org/pkg/text/template/>
+
+See also the [Template mask](#template) for other options, all functions are applicable on template-each.
 
 [Return to list of masks](#possible-masks)
 

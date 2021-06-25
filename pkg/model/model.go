@@ -99,6 +99,12 @@ type PipeType struct {
 	DefinitionFile string    `yaml:"file,omitempty"`
 }
 
+type TemplateEachType struct {
+	Item     string `yaml:"item,omitempty"`
+	Index    string `yaml:"index,omitempty"`
+	Template string `yaml:"template,omitempty"`
+}
+
 type MaskType struct {
 	Add               Entry                `yaml:"add,omitempty" jsonschema:"oneof_required=Add"`
 	Constant          Entry                `yaml:"constant,omitempty" jsonschema:"oneof_required=Constant"`
@@ -114,6 +120,7 @@ type MaskType struct {
 	Incremental       IncrementalType      `yaml:"incremental,omitempty" jsonschema:"oneof_required=Incremental"`
 	Replacement       string               `yaml:"replacement,omitempty" jsonschema:"oneof_required=Replacement"`
 	Template          string               `yaml:"template,omitempty" jsonschema:"oneof_required=Template"`
+	TemplateEach      TemplateEachType     `yaml:"template-each,omitempty" jsonschema:"oneof_required=TemplateEach"`
 	Duration          string               `yaml:"duration,omitempty" jsonschema:"oneof_required=Duration"`
 	Remove            bool                 `yaml:"remove,omitempty" jsonschema:"oneof_required=Remove"`
 	RangeMask         int                  `yaml:"range,omitempty" jsonschema:"oneof_required=RangeMask"`
