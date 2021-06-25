@@ -1,5 +1,6 @@
 name: mask template-each
 testcases:
+
 - name: simple test
   steps:
   - script: |-
@@ -11,7 +12,6 @@ testcases:
           mask:
             template-each:
               item: "item"
-              index: "index"
               template: "{{title .item}}"
       EOF
   - script: |-
@@ -20,4 +20,47 @@ testcases:
     - result.code ShouldEqual 0
     - |
       result.systemout ShouldEqual {"array":["Value1","Value2","Value3"]}
+    - result.systemerr ShouldBeEmpty
+
+- name: different name
+  steps:
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "array"
+          mask:
+            template-each:
+              item: "val"
+              template: "{{title .val}}"
+      EOF
+  - script: |-
+      echo '{"array": ["value1", "value2", "value3"]}' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - |
+      result.systemout ShouldEqual {"array":["Value1","Value2","Value3"]}
+    - result.systemerr ShouldBeEmpty
+
+- name: index
+  steps:
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "array"
+          mask:
+            template-each:
+              item: "val"
+              index: "idx"
+              template: "{{title .val}} {{.idx}}"
+      EOF
+  - script: |-
+      echo '{"array": ["value1", "value2", "value3"]}' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - |
+      result.systemout ShouldEqual {"array":["Value1 1","Value2 2","Value3 3"]}
     - result.systemerr ShouldBeEmpty
