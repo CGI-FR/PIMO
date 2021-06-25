@@ -469,9 +469,6 @@
       "type": "object"
     },
     "TemplateEachType": {
-      "required": [
-        "item"
-      ],
       "properties": {
         "item": {
           "type": "string"

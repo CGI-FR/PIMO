@@ -100,7 +100,7 @@ type PipeType struct {
 }
 
 type TemplateEachType struct {
-	Item     string `yaml:"item"`
+	Item     string `yaml:"item,omitempty"`
 	Index    string `yaml:"index,omitempty"`
 	Template string `yaml:"template,omitempty"`
 }

@@ -54,16 +54,15 @@ func NewMask(text string, itemName string, indexName string) (MaskEngine, error)
 		"NoAccent": rmAcc,
 	}
 	temp, err := template.New("template-each").Funcs(sprig.TxtFuncMap()).Funcs(funcMap).Parse(text)
+	if len(itemName) == 0 {
+		itemName = "it"
+	}
 	return MaskEngine{temp, itemName, indexName}, err
 }
 
 // Mask masks a value with a template
 func (tmpl MaskEngine) MaskContext(context model.Dictionary, key string, contexts ...model.Dictionary) (model.Dictionary, error) {
 	log.Info().Msg("Mask template-each")
-	// var output bytes.Buffer
-	// err := tmpl.template.Execute(&output, context[0].Unordered())
-	// return output.String(), err
-
 	log.Trace().Interface("input", context).Str("key", key).Interface("contexts", contexts).Msg("Enter MaskContext")
 
 	copy := model.CopyDictionary(context)

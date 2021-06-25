@@ -43,6 +43,27 @@ testcases:
       result.systemout ShouldEqual {"array":["Value1","Value2","Value3"]}
     - result.systemerr ShouldBeEmpty
 
+
+- name: default name
+  steps:
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "array"
+          mask:
+            template-each:
+              template: "{{title .it}}"
+      EOF
+  - script: |-
+      echo '{"array": ["value1", "value2", "value3"]}' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - |
+      result.systemout ShouldEqual {"array":["Value1","Value2","Value3"]}
+    - result.systemerr ShouldBeEmpty
+
 - name: index
   steps:
   - script: |-
