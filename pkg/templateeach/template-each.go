@@ -18,6 +18,7 @@
 package templateeach
 
 import (
+	"bytes"
 	"strings"
 	"text/template"
 	"unicode"
@@ -60,13 +61,47 @@ func (tmpl MaskEngine) MaskContext(context model.Dictionary, key string, context
 	// var output bytes.Buffer
 	// err := tmpl.template.Execute(&output, context[0].Unordered())
 	// return output.String(), err
-	return context, nil
+
+	log.Trace().Interface("input", context).Str("key", key).Interface("contexts", contexts).Msg("Enter MaskContext")
+
+	copy := model.CopyDictionary(context)
+	tmplctx := contexts[0].Unordered()
+
+	value, ok := copy.GetValue(key)
+	if ok {
+		switch typedVal := model.CleanTypes(value).(type) {
+		case []model.Entry:
+			result := []model.Entry{}
+
+			for _, item := range typedVal {
+				log.Trace().Interface("item", item).Msg("Debug")
+				tmplctx["item"] = item
+
+				var output bytes.Buffer
+				if err := tmpl.template.Execute(&output, tmplctx); err != nil {
+					return copy, err
+				}
+
+				result = append(result, output.String())
+			}
+
+			copy.Set(key, result)
+		default:
+			log.Debug().Str("key", key).Msg("Mask template-each - value is not an array, ignored masking")
+		}
+	} else {
+		log.Debug().Str("key", key).Msg("Mask template-each - key is not present in context, ignored masking")
+	}
+
+	log.Trace().Interface("output", copy).Str("key", key).Msg("Exit MaskContext")
+
+	return copy, nil
 }
 
 // Factory create a mask from a yaml config
 func Factory(conf model.Masking, seed int64, caches map[string]model.Cache) (model.MaskContextEngine, bool, error) {
-	if len(conf.Mask.TemplateEach.Index) != 0 {
-		mask, err := NewMask(conf.Mask.Template)
+	if len(conf.Mask.TemplateEach.Template) != 0 {
+		mask, err := NewMask(conf.Mask.TemplateEach.Template)
 		if err != nil {
 			return nil, false, err
 		}

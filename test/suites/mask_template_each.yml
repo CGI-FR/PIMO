@@ -12,12 +12,12 @@ testcases:
             template-each:
               item: "item"
               index: "index"
-              template: "{{toUpper .item}}"
+              template: "{{title .item}}"
       EOF
   - script: |-
       echo '{"array": ["value1", "value2", "value3"]}' | pimo
     assertions:
     - result.code ShouldEqual 0
     - |
-      result.systemout ShouldEqual {"array": ["Value1", "Value2", "Value3"]}
+      result.systemout ShouldEqual {"array":["Value1","Value2","Value3"]}
     - result.systemerr ShouldBeEmpty
