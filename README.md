@@ -372,7 +372,8 @@ Available functions for templates come from <http://masterminds.github.io/sprig/
         item: "value"
 ```
 
-This will change every values in the array field. The field must be an array (`{"array": ["value1", "value2]`).
+This will affect every values in the array field. The field must be an array (`{"array": ["value1", "value2]`).
+The `item` property is optional and defines the name of the current item in the templating string (defaults to "it"). There is another optional property `index`, if defined then a property with the given name will be available in the templating string (e.g. : `index: "idx"` can be used in template with `{{.idx}}`).
 
 The format for the template should respect the `text/template` package : <https://golang.org/pkg/text/template/>
 
