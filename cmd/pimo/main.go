@@ -49,6 +49,7 @@ import (
 	"github.com/cgi-fr/pimo/pkg/remove"
 	"github.com/cgi-fr/pimo/pkg/replacement"
 	"github.com/cgi-fr/pimo/pkg/statistics"
+	"github.com/cgi-fr/pimo/pkg/templateeach"
 	"github.com/cgi-fr/pimo/pkg/templatemask"
 	"github.com/cgi-fr/pimo/pkg/weightedchoice"
 	"github.com/mattn/go-isatty"
@@ -230,6 +231,7 @@ func injectMaskContextFactories() []model.MaskContextFactory {
 		add.Factory,
 		remove.Factory,
 		pipe.Factory,
+		templateeach.Factory,
 	}
 }
 
