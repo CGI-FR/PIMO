@@ -16,6 +16,8 @@ testcases:
     assertions:
     - result.code ShouldEqual 0
     - result.systemerr ShouldBeEmpty
+    - |
+      result.systemout ShouldEqual {"root":{"long":{"path":"ok"}}}
 
 - name: root null
   steps:
@@ -33,6 +35,8 @@ testcases:
     assertions:
     - result.code ShouldEqual 0
     - result.systemerr ShouldBeEmpty
+    - |
+      result.systemout ShouldEqual {"root":null}
 
 - name: intermediate null
   steps:
@@ -50,6 +54,8 @@ testcases:
     assertions:
     - result.code ShouldEqual 0
     - result.systemerr ShouldBeEmpty
+    - |
+      result.systemout ShouldEqual {"root":{"long":null}}
 
 - name: leaf null
   steps:
@@ -67,6 +73,8 @@ testcases:
     assertions:
     - result.code ShouldEqual 0
     - result.systemerr ShouldBeEmpty
+    - |
+      result.systemout ShouldEqual {"root":{"long":{"path":"ok"}}}
 
 - name: root array null
   steps:

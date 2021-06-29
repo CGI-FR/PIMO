@@ -90,13 +90,14 @@ func (s selector) applySub(root Dictionary, current Dictionary, appliers ...Appl
 		return false
 	}
 
-	if entry == nil {
-		return false
-	}
-
 	v := reflect.ValueOf(entry)
 	kind := v.Kind()
+
 	if s.sub != nil {
+		if entry == nil {
+			return false
+		}
+
 		switch kind {
 		case reflect.Slice:
 			for i := 0; i < v.Len(); i++ {
