@@ -1,0 +1,120 @@
+name: test protection against null path
+testcases:
+- name: nominal
+  steps:
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "root.long.path"
+          mask:
+            constant: "ok"
+      EOF
+  - script: |-
+      echo '{"root": {"long": {"path": ""}}}' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemerr ShouldBeEmpty
+
+- name: root null
+  steps:
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "root.long.path"
+          mask:
+            constant: "ok"
+      EOF
+  - script: |-
+      echo '{"root": null}' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemerr ShouldBeEmpty
+
+- name: intermediate null
+  steps:
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "root.long.path"
+          mask:
+            constant: "ok"
+      EOF
+  - script: |-
+      echo '{"root": {"long": null}}' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemerr ShouldBeEmpty
+
+- name: leaf null
+  steps:
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "root.long.path"
+          mask:
+            constant: "ok"
+      EOF
+  - script: |-
+      echo '{"root": {"long": {"path": null}}}' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemerr ShouldBeEmpty
+
+- name: root array null
+  steps:
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "root.long.path"
+          mask:
+            constant: "ok"
+      EOF
+  - script: |-
+      echo '{"root": [{"long": "ok"}, null]}' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemerr ShouldBeEmpty
+
+- name: intermediate array null
+  steps:
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "root.long.path"
+          mask:
+            constant: "ok"
+      EOF
+  - script: |-
+      echo '{"root": {"long": [{"path": "ok"}, null]}}' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemerr ShouldBeEmpty
+
+- name: all array null
+  steps:
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "root.long.path"
+          mask:
+            constant: "ok"
+      EOF
+  - script: |-
+      echo '{"root": [{"long": [{"path": "ok"}, null]}, null]}' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemerr ShouldBeEmpty
