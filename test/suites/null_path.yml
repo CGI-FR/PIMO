@@ -76,53 +76,41 @@ testcases:
     - |
       result.systemout ShouldEqual {"root":{"long":{"path":"ok"}}}
 
-- name: root array null
+- name: array null
   steps:
   - script: |-
       cat > masking.yml <<EOF
       version: "1"
       masking:
         - selector:
-            jsonpath: "root.long.path"
+            jsonpath: "array.value"
           mask:
             constant: "ok"
       EOF
   - script: |-
-      echo '{"root": [{"long": "ok"}, null]}' | pimo
+      echo '{"array": [{"value": ""}, null, {"value": ""}]}' | pimo
     assertions:
     - result.code ShouldEqual 0
     - result.systemerr ShouldBeEmpty
+    - |
+      result.systemout ShouldEqual {"array":[{"value":"ok"},null,{"value":"ok"}]}
 
-- name: intermediate array null
+- name: deep array null
   steps:
   - script: |-
       cat > masking.yml <<EOF
       version: "1"
       masking:
         - selector:
-            jsonpath: "root.long.path"
+            jsonpath: "array.middle.value"
           mask:
             constant: "ok"
       EOF
   - script: |-
-      echo '{"root": {"long": [{"path": "ok"}, null]}}' | pimo
+      echo '{"array":[{"middle":[{"value":""},null,{"value":""}]},null,{"middle":[{"value":""},null,{"value":""}]}]}' | pimo
     assertions:
     - result.code ShouldEqual 0
     - result.systemerr ShouldBeEmpty
+    - |
+      result.systemout ShouldEqual {"array":[{"middle":[{"value":"ok"},null,{"value":"ok"}]},null,{"middle":[{"value":"ok"},null,{"value":"ok"}]}]}
 
-- name: all array null
-  steps:
-  - script: |-
-      cat > masking.yml <<EOF
-      version: "1"
-      masking:
-        - selector:
-            jsonpath: "root.long.path"
-          mask:
-            constant: "ok"
-      EOF
-  - script: |-
-      echo '{"root": [{"long": [{"path": "ok"}, null]}, null]}' | pimo
-    assertions:
-    - result.code ShouldEqual 0
-    - result.systemerr ShouldBeEmpty

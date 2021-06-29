@@ -101,11 +101,28 @@ func (s selector) applySub(root Dictionary, current Dictionary, appliers ...Appl
 		switch kind {
 		case reflect.Slice:
 			for i := 0; i < v.Len(); i++ {
-				s.sub.applySub(root, v.Index(i).Interface().(Dictionary), appliers...)
+				switch typedV := v.Index(i).Interface().(type) {
+				case Dictionary:
+					s.sub.applySub(root, typedV, appliers...)
+				default:
+					// this handle the following cases, for the path "array.prop"
+					// - a null : "array":[{"prop": "ok"}, null, {"prop": "ok"}]
+					// - a scalar : "array":[{"prop": "ok"}, "hello", {"prop": "ok"}]
+					// in each case we do nothing, because we want the value to propagate in the output :
+					// - for null : "array":[{"prop": "masked"}, null, {"prop": "masked"}]
+					// - for scalar : "array":[{"prop": "masked"}, "hello", {"prop": "masked"}]
+				}
 			}
 			return true
-		default:
+		case reflect.Struct:
 			return s.sub.applySub(root, entry.(Dictionary), appliers...)
+		default:
+			// this handle the case where an intermediate path is a scalar or a null, instead of a dictionary
+			// e.g. :
+			// jsonpath: root.prop
+			// data : {"root": "value"} => output: {"root": "value"}
+			// data : {"root": {"prop": "value"}} => output: {"root": {"prop": "masked"}}
+			return false
 		}
 	}
 	switch kind {
