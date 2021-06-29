@@ -19,6 +19,8 @@ package model
 
 import (
 	"time"
+
+	"github.com/rs/zerolog/log"
 )
 
 // MaskEngine is a masking algorithm
@@ -427,6 +429,9 @@ func (p *ProcessPipeline) WithSource(source Source) Pipeline {
 }
 
 func (pipeline SimpleSinkedPipeline) Run() (err error) {
+	log.Trace().Msg("Enter SimpleSinkedPipeline.Run")
+	defer log.Trace().Msg("Exit SimpleSinkedPipeline.Run")
+
 	err = pipeline.source.Open()
 	if err != nil {
 		return err

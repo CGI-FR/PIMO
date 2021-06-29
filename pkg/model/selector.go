@@ -89,6 +89,11 @@ func (s selector) applySub(root Dictionary, current Dictionary, appliers ...Appl
 	if !ok {
 		return false
 	}
+
+	if entry == nil {
+		return false
+	}
+
 	v := reflect.ValueOf(entry)
 	kind := v.Kind()
 	if s.sub != nil {
