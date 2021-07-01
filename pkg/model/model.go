@@ -430,7 +430,7 @@ func (p *ProcessPipeline) WithSource(source Source) Pipeline {
 
 func (pipeline SimpleSinkedPipeline) Run() (err error) {
 	log.Trace().Msg("Enter SimpleSinkedPipeline.Run")
-	defer log.Trace().Msg("Exit SimpleSinkedPipeline.Run")
+	defer log.Trace().Err(err).Msg("Exit SimpleSinkedPipeline.Run")
 
 	err = pipeline.source.Open()
 	if err != nil {
