@@ -1,0 +1,38 @@
+name: fromjson features
+testcases:
+  - name: null value
+    steps:
+      - script: cp ../masking.yml masking.yml
+      - script: |-
+          echo '{"sourcefield": "null", "targetfield": ""}' | pimo
+        assertions:
+          - result.code ShouldEqual 0
+          - result.systemout ShouldEqual {"sourcefield": "null", "targetfield": null}
+          - result.systemerr ShouldBeEmpty
+  - name: integer value
+    steps:
+      - script: cp ../masking.yml masking.yml
+      - script: |-
+          echo '{"sourcefield": "1", "targetfield": ""}' | pimo
+        assertions:
+          - result.code ShouldEqual 0
+          - result.systemout ShouldEqual {"sourcefield": "1", "targetfield": 1}
+          - result.systemerr ShouldBeEmpty
+  - name: float value
+    steps:
+      - script: cp ../masking.yml masking.yml
+      - script: |-
+          echo '{"sourcefield": "1.2", "targetfield": ""}' | pimo
+        assertions:
+          - result.code ShouldEqual 0
+          - result.systemout ShouldContainSubstring {"sourcefield": "1.2", "targetfield": 1.2}
+          - result.systemerr ShouldBeEmpty
+  - name: float value
+    steps:
+      - script: cp ../masking.yml masking.yml
+      - script: |-
+          echo '{"sourcefield": "{\"property\": \"hello\"}", "targetfield": ""}' | pimo
+        assertions:
+          - result.code ShouldEqual 0
+          - result.systemout ShouldEqual {"sourcefield": "{\"property\": \"hello\"}", "targetfield": "hello"}
+          - result.systemerr ShouldBeEmpty
