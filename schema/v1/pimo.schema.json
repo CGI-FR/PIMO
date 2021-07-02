@@ -187,6 +187,9 @@
         "pipe": {
           "$schema": "http://json-schema.org/draft-04/schema#",
           "$ref": "#/definitions/PipeType"
+        },
+        "fromjson": {
+          "type": "string"
         }
       },
       "additionalProperties": false,
@@ -341,6 +344,12 @@
             "pipe"
           ],
           "title": "Pipe"
+        },
+        {
+          "required": [
+            "fromjson"
+          ],
+          "title": "FromJSON"
         }
       ]
     },
