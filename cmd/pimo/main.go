@@ -34,6 +34,7 @@ import (
 	"github.com/cgi-fr/pimo/pkg/duration"
 	"github.com/cgi-fr/pimo/pkg/ff1"
 	"github.com/cgi-fr/pimo/pkg/fluxuri"
+	"github.com/cgi-fr/pimo/pkg/fromjson"
 	"github.com/cgi-fr/pimo/pkg/hash"
 	"github.com/cgi-fr/pimo/pkg/increment"
 	"github.com/cgi-fr/pimo/pkg/jsonline"
@@ -232,6 +233,7 @@ func injectMaskContextFactories() []model.MaskContextFactory {
 		remove.Factory,
 		pipe.Factory,
 		templateeach.Factory,
+		fromjson.Factory,
 	}
 }
 

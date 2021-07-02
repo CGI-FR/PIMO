@@ -14,6 +14,10 @@ Types of changes
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [1.8.0]
+
+- `Added` new mask `fromjson` to convert a string to object model
+
 ## [1.7.0]
 
 - `Added` new mask `template-each` to mask each value of an array with a template

@@ -133,6 +133,7 @@ type MaskType struct {
 	FromCache         string               `yaml:"fromCache,omitempty" jsonschema:"oneof_required=FromCache"`
 	FF1               FF1Type              `yaml:"ff1,omitempty" jsonschema:"oneof_required=FF1"`
 	Pipe              PipeType             `yaml:"pipe,omitempty" jsonschema:"oneof_required=Pipe"`
+	FromJSON          string               `yaml:"fromjson,omitempty" jsonschema:"oneof_required=FromJSON"`
 }
 
 type Masking struct {
