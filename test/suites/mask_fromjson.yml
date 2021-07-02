@@ -29,9 +29,6 @@ testcases:
               mask:
                 fromjson: "sourcefield"
           EOF
-          echo '{"sourcefield": "null", "targetfield": ""}' | pimo
-        assertions:
-      - script: |-
           echo '{"sourcefield": "1", "targetfield": ""}' | pimo
         assertions:
           - result.code ShouldEqual 0
@@ -49,15 +46,12 @@ testcases:
               mask:
                 fromjson: "sourcefield"
           EOF
-          echo '{"sourcefield": "null", "targetfield": ""}' | pimo
-        assertions:
-      - script: |-
           echo '{"sourcefield": "1.2", "targetfield": ""}' | pimo
         assertions:
           - result.code ShouldEqual 0
-          - result.systemout ShouldContainSubstring {"sourcefield":"1.2","targetfield":1.2}
+          - result.systemout ShouldEqual {"sourcefield":"1.2","targetfield":1.2}
           - result.systemerr ShouldBeEmpty
-  - name: float value
+  - name: entry value
     steps:
       - script: rm -rf masking.yml
       - script: |-
@@ -69,11 +63,8 @@ testcases:
               mask:
                 fromjson: "sourcefield"
           EOF
-          echo '{"sourcefield": "null", "targetfield": ""}' | pimo
-        assertions:
-      - script: |-
           echo '{"sourcefield": "{\"property\": \"hello\"}", "targetfield": ""}' | pimo
         assertions:
           - result.code ShouldEqual 0
-          - result.systemout ShouldEqual {"sourcefield":{"property":"hello"},"targetfield":"hello"}
+          - result.systemout ShouldEqual {"sourcefield":"{\"property\":\"hello\"}","targetfield":{"property":"hello"}}
           - result.systemerr ShouldBeEmpty
