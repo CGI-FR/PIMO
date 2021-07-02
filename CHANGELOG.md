@@ -17,6 +17,7 @@ Types of changes
 ## [1.7.0]
 
 - `Added` new mask `template-each` to mask each value of an array with a template
+- `Fixed` pimo doesn't crash anymore when nulls values occurs in the middle of a path
 
 ## [1.6.2]
 
