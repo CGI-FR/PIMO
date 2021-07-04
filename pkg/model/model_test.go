@@ -20,8 +20,11 @@ package model
 import (
 	"encoding/json"
 	"fmt"
+	"sort"
 	"strings"
+	"sync"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -571,4 +574,151 @@ func TestCacheShouldProvide(t *testing.T) {
 	}
 
 	assert.Equal(t, wanted, result)
+}
+
+func NewCoRepeaterProcess(times int) CoProcessor {
+	return &CoRepeaterProcess{times, 0, nil}
+}
+
+type CoRepeaterProcess struct {
+	times  int
+	repeat int
+	source Source
+}
+
+func (p *CoRepeaterProcess) Open(source Source) error {
+	p.source = source
+	err := p.source.Open()
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (p *CoRepeaterProcess) Next() bool {
+	return p.repeat > 0 || p.source.Next()
+}
+
+func (p *CoRepeaterProcess) Value() Dictionary {
+	if p.repeat == 0 {
+		p.repeat = p.times
+	}
+	p.repeat--
+	return p.source.Value()
+}
+
+func TestPipelineWithCoProcessor(t *testing.T) {
+	mySlice := []Dictionary{
+		NewDictionary().With("v", 1),
+		NewDictionary().With("v", 2),
+		NewDictionary().With("v", 3),
+		NewDictionary().With("v", 4),
+	}
+	var result []Dictionary
+
+	pipeline := NewPipelineFromSlice(mySlice).
+		CoProcess(NewCoRepeaterProcess(2)).
+		AddSink(NewSinkToSlice(&result))
+	err := pipeline.Run()
+
+	assert.Nil(t, err)
+
+	wanted := []Dictionary{
+		NewDictionary().With("v", 1),
+		NewDictionary().With("v", 1),
+		NewDictionary().With("v", 2),
+		NewDictionary().With("v", 2),
+		NewDictionary().With("v", 3),
+		NewDictionary().With("v", 3),
+		NewDictionary().With("v", 4),
+		NewDictionary().With("v", 4),
+	}
+	assert.Equal(t, wanted, result)
+}
+
+func NewCoRepeaterAllProcess(times int) CoProcessor {
+	return &CoRepeaterAllProcess{times, Dictionary{}, nil, make(chan Dictionary)}
+}
+
+type CoRepeaterAllProcess struct {
+	times     int
+	lastValue Dictionary
+	source    Source
+	output    chan Dictionary
+}
+
+func (p *CoRepeaterAllProcess) Open(source Source) error {
+	p.source = source
+	err := p.source.Open()
+	if err != nil {
+		return err
+	}
+
+	go func() {
+		workers := sync.WaitGroup{}
+		for p.source.Next() {
+			workers.Add(1)
+			go func(d Dictionary) {
+				for i := 0; i < p.times; i++ {
+					time.Sleep(200 * time.Millisecond)
+					p.output <- d
+				}
+				workers.Done()
+			}(p.source.Value())
+		}
+		workers.Wait()
+		close(p.output)
+	}()
+
+	return nil
+}
+
+func (p *CoRepeaterAllProcess) Next() (ok bool) {
+	p.lastValue, ok = <-p.output
+	return
+}
+
+func (p *CoRepeaterAllProcess) Value() Dictionary {
+	return p.lastValue
+}
+
+func TestPipelineWithGoRoutine(t *testing.T) {
+	mySlice := []Dictionary{
+		NewDictionary().With("v", 1),
+		NewDictionary().With("v", 2),
+		NewDictionary().With("v", 3),
+		NewDictionary().With("v", 4),
+	}
+	var result []Dictionary
+
+	pipeline := NewPipelineFromSlice(mySlice).
+		CoProcess(NewCoRepeaterAllProcess(2)).
+		Process(NewMapProcess(func(d Dictionary) (Dictionary, error) {
+			res := d.Copy()
+			res.Set("v", d.Get("v").(int)*2)
+			return res, nil
+		})).
+		AddSink(NewSinkToSlice(&result))
+	err := pipeline.Run()
+
+	assert.Nil(t, err)
+
+	values := []int{}
+
+	for _, d := range result[:4] {
+		v, ok := d.GetValue("v")
+		assert.True(t, ok)
+		values = append(values, v.(int))
+	}
+	sort.Ints(values)
+	assert.Equal(t, []int{2, 4, 6, 8}, values)
+
+	values = []int{}
+	for _, d := range result[4:] {
+		v, ok := d.GetValue("v")
+		assert.True(t, ok)
+		values = append(values, v.(int))
+	}
+	sort.Ints(values)
+	assert.Equal(t, []int{2, 4, 6, 8}, values)
 }
