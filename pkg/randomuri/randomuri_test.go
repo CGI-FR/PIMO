@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with PIMO.  If not, see <http://www.gnu.org/licenses/>.
 
-package randomlist
+package randomuri
 
 import (
 	"testing"
@@ -24,39 +24,13 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestMaskingShouldReplaceSensitiveValueByRandomInList(t *testing.T) {
-	nameList := []model.Entry{"Michel", "Marc", "Matthias", "Youen", "Alexis"}
-
-	data := model.NewDictionary().With("name", "Benjamin")
-	result, err := NewMask(nameList, 0).Mask(data)
-	assert.Equal(t, nil, err, "error should be nil")
-	assert.NotEqual(t, data, result, "should be masked")
-
-	assert.Contains(t, nameList, result, "Should be in the list")
-}
-
-func TestMaskingShouldReplaceSensitiveValueByRandomAndDifferent(t *testing.T) {
-	nameList := []model.Entry{"Michel", "Marc", "Matthias", "Youen", "Alexis"}
-
-	mask := NewMask(nameList, 0)
-
-	diff := 0
-	for i := 0; i < 1000; i++ {
-		result, err := mask.Mask("Benjamin")
-		assert.Equal(t, nil, err, "error should be nil")
-		resultBis, err := mask.Mask("Benjamin")
-		assert.Equal(t, nil, err, "error should be nil")
-		if result != resultBis {
-			diff++
-		}
-	}
-	assert.True(t, diff >= 750, "Should be the same less than 250 times")
-}
-
-func TestFactoryShouldCreateAMask(t *testing.T) {
-	maskingConfig := model.Masking{Mask: model.MaskType{RandomChoice: []model.Entry{"Michael", "Paul", "Marc"}}}
-	_, present, err := Factory(maskingConfig, 0, nil)
+func TestFactoryShouldCreateAMaskFromAList(t *testing.T) {
+	maskingConfig := model.Masking{Mask: model.MaskType{RandomChoiceInURI: "file://../../test/names.txt"}}
+	mask, present, err := Factory(maskingConfig, 0, nil)
+	assert.Nil(t, err, "error should be nil")
 	assert.True(t, present, "should be true")
+	masked, err := mask.Mask("")
+	assert.Equal(t, masked, "Mickael", "should be equal")
 	assert.Nil(t, err, "error should be nil")
 }
 

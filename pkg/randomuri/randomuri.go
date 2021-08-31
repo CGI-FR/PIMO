@@ -15,13 +15,14 @@
 // You should have received a copy of the GNU General Public License
 // along with PIMO.  If not, see <http://www.gnu.org/licenses/>.
 
-package randomlist
+package randomuri
 
 import (
 	"hash/fnv"
 	"math/rand"
 
 	"github.com/cgi-fr/pimo/pkg/model"
+	"github.com/cgi-fr/pimo/pkg/uri"
 	"github.com/rs/zerolog/log"
 )
 
@@ -50,9 +51,9 @@ func Factory(conf model.Masking, seed int64, caches map[string]model.Cache) (mod
 	h.Write([]byte(conf.Selector.Jsonpath))
 	seed += int64(h.Sum64())
 
-	if len(conf.Mask.RandomChoice) != 0 {
-		return NewMask(conf.Mask.RandomChoice, seed), true, nil
+	if len(conf.Mask.RandomChoiceInURI) != 0 {
+		list, err := uri.Read(conf.Mask.RandomChoiceInURI)
+		return NewMask(list, seed), true, err
 	}
-
 	return nil, false, nil
 }
