@@ -18,8 +18,10 @@
 package randomuri
 
 import (
+	"bytes"
 	"hash/fnv"
 	"math/rand"
+	"text/template"
 
 	"github.com/cgi-fr/pimo/pkg/model"
 	"github.com/cgi-fr/pimo/pkg/uri"
@@ -28,20 +30,33 @@ import (
 
 // MaskEngine is a list of masking value and a rand init to mask
 type MaskEngine struct {
-	rand *rand.Rand
-	list []model.Entry
+	rand     *rand.Rand
+	template *template.Template
 }
 
 // NewMaskSeeded create a MaskRandomList with a seed
-func NewMask(list []model.Entry, seed int64) MaskEngine {
+func NewMask(templateSource string, seed int64) (MaskEngine, error) {
+	template, err := template.New("template-randomInUri").Parse(templateSource)
 	// nolint: gosec
-	return MaskEngine{rand.New(rand.NewSource(seed)), list}
+	return MaskEngine{rand.New(rand.NewSource(seed)), template}, err
 }
 
 // Mask choose a mask value randomly
 func (mrl MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Entry, error) {
 	log.Info().Msg("Mask randomChoice")
-	return mrl.list[mrl.rand.Intn(len(mrl.list))], nil
+	var output bytes.Buffer
+	if len(context) == 0 {
+		context = []model.Dictionary{model.NewDictionary()}
+	}
+	if err := mrl.template.Execute(&output, context[0].Unordered()); err != nil {
+		return nil, err
+	}
+	filename := output.String()
+	list, err := uri.Read(filename)
+	if err != nil {
+		return nil, err
+	}
+	return list[mrl.rand.Intn(len(list))], nil
 }
 
 // Factory create a mask from a yaml config
@@ -52,8 +67,8 @@ func Factory(conf model.Masking, seed int64, caches map[string]model.Cache) (mod
 	seed += int64(h.Sum64())
 
 	if len(conf.Mask.RandomChoiceInURI) != 0 {
-		list, err := uri.Read(conf.Mask.RandomChoiceInURI)
-		return NewMask(list, seed), true, err
+		mask, err := NewMask(conf.Mask.RandomChoiceInURI, seed)
+		return mask, true, err
 	}
 	return nil, false, nil
 }
