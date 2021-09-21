@@ -45,3 +45,37 @@ testcases:
     - result.systemoutjson.name ShouldEqual Mickael
     - result.systemoutjson.name2 ShouldEqual Marc
     - result.systemerr ShouldBeEmpty
+
+- name: random in uri with templated uri
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      seed: 3
+      masking:
+        - selector:
+            jsonpath: "name"
+          mask:
+            randomChoiceInUri: "file://../names_{{.gender}}.txt"
+      EOF
+  - script: |-
+      cat > input <<EOF
+      {"name": "Toto", "gender": "F"}
+      {"name": "Toto", "gender": "M"}
+      EOF
+  - script: |-
+      pimo < input | head -n 1
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemoutjson.name ShouldNotEqual Toto
+    - result.systemoutjson.name ShouldEqual Marie
+    - result.systemerr ShouldBeEmpty
+
+  - script: |-
+      pimo < input| tail -n 1
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemoutjson.name ShouldNotEqual Toto
+    - result.systemoutjson.name ShouldEqual Benjamin
+    - result.systemerr ShouldBeEmpty

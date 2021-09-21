@@ -45,6 +45,7 @@ import (
 	"github.com/cgi-fr/pimo/pkg/randomdecimal"
 	"github.com/cgi-fr/pimo/pkg/randomint"
 	"github.com/cgi-fr/pimo/pkg/randomlist"
+	"github.com/cgi-fr/pimo/pkg/randomuri"
 	"github.com/cgi-fr/pimo/pkg/rangemask"
 	"github.com/cgi-fr/pimo/pkg/regex"
 	"github.com/cgi-fr/pimo/pkg/remove"
@@ -242,6 +243,7 @@ func injectMaskFactories() []model.MaskFactory {
 		constant.Factory,
 		command.Factory,
 		randomlist.Factory,
+		randomuri.Factory,
 		randomint.Factory,
 		weightedchoice.Factory,
 		regex.Factory,
