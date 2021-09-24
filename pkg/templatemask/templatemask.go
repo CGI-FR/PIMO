@@ -19,12 +19,10 @@ package templatemask
 
 import (
 	"bytes"
-	"strings"
-	"text/template"
 	"unicode"
 
-	sprig "github.com/Masterminds/sprig/v3"
 	"github.com/cgi-fr/pimo/pkg/model"
+	"github.com/cgi-fr/pimo/pkg/template"
 	"github.com/rs/zerolog/log"
 	"golang.org/x/text/runes"
 	"golang.org/x/text/transform"
@@ -33,7 +31,7 @@ import (
 
 // MaskEngine is to mask a value thanks to a template
 type MaskEngine struct {
-	template *template.Template
+	template *template.Engine
 }
 
 // rmAcc removes accents from string
@@ -46,12 +44,7 @@ func rmAcc(s string) string {
 
 // NewMask create a MaskEngine
 func NewMask(text string) (MaskEngine, error) {
-	funcMap := template.FuncMap{
-		"ToUpper":  strings.ToUpper,
-		"ToLower":  strings.ToLower,
-		"NoAccent": rmAcc,
-	}
-	temp, err := template.New("template").Funcs(sprig.TxtFuncMap()).Funcs(funcMap).Parse(text)
+	temp, err := template.NewEngine(text)
 	return MaskEngine{temp}, err
 }
 

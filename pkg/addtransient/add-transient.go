@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with PIMO.  If not, see <http://www.gnu.org/licenses/>.
 
-package add
+package addtransient
 
 import (
 	"bytes"
@@ -61,9 +61,12 @@ func (am MaskEngine) MaskContext(context model.Dictionary, key string, contexts 
 
 // Create a mask from a configuration
 func Factory(conf model.Masking, seed int64, caches map[string]model.Cache) (model.MaskContextEngine, bool, error) {
-	if conf.Mask.Add != nil {
-		mask, err := NewMask(conf.Mask.Add)
-		return mask, true, err
+	if conf.Mask.AddTransient != nil {
+		mask, err := NewMask(conf.Mask.AddTransient)
+		if err != nil {
+			return nil, false, err
+		}
+		return mask, true, nil
 	}
 	return nil, false, nil
 }

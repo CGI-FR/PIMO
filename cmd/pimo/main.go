@@ -28,6 +28,7 @@ import (
 	over "github.com/Trendyol/overlog"
 	"github.com/cgi-fr/pimo/internal/app/pimo"
 	"github.com/cgi-fr/pimo/pkg/add"
+	"github.com/cgi-fr/pimo/pkg/addtransient"
 	"github.com/cgi-fr/pimo/pkg/command"
 	"github.com/cgi-fr/pimo/pkg/constant"
 	"github.com/cgi-fr/pimo/pkg/dateparser"
@@ -230,6 +231,7 @@ func injectMaskContextFactories() []model.MaskContextFactory {
 	return []model.MaskContextFactory{
 		fluxuri.Factory,
 		add.Factory,
+		addtransient.Factory,
 		remove.Factory,
 		pipe.Factory,
 		templateeach.Factory,

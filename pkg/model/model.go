@@ -109,6 +109,7 @@ type TemplateEachType struct {
 
 type MaskType struct {
 	Add               Entry                `yaml:"add,omitempty" jsonschema:"oneof_required=Add"`
+	AddTransient      Entry                `yaml:"add-transient,omitempty" jsonschema:"oneof_required=AddTransient"`
 	Constant          Entry                `yaml:"constant,omitempty" jsonschema:"oneof_required=Constant"`
 	RandomChoice      []Entry              `yaml:"randomChoice,omitempty" jsonschema:"oneof_required=RandomChoice"`
 	RandomChoiceInURI string               `yaml:"randomChoiceInUri,omitempty" jsonschema:"oneof_required=RandomChoiceInURI"`

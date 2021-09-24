@@ -14,6 +14,11 @@ Types of changes
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [1.9.0]
+
+- `Added` new mask `add-transient` same as `add` but the field is not exported in the jsonline output
+- `Added` possibility to use a template string directly with `add` mask
+
 ## [1.8.0]
 
 - `Added` new mask `fromjson` to convert a string to object model
