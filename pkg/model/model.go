@@ -154,7 +154,8 @@ type MaskType struct {
 
 type Masking struct {
 	Selector SelectorType `yaml:"selector"`
-	Mask     MaskType     `yaml:"mask"`
+	Mask     MaskType     `yaml:"mask" jsonschema:"oneof_required=Mask"`
+	Masks    []MaskType   `yaml:"masks" jsonschema:"oneof_required=Masks"`
 	Cache    string       `yaml:"cache,omitempty"`
 }
 

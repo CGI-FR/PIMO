@@ -16,5 +16,5 @@ testcases:
       echo '{"input":"world"}' | pimo
     assertions:
     - result.code ShouldEqual 0
-    - result.systemoutjson ShouldEqual {"input":"world","field":"hello world"}
+    - result.systemout ShouldEqual {"input":"world","field":"hello world"}
     - result.systemerr ShouldBeEmpty
