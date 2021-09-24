@@ -33,6 +33,11 @@ type MaskContextEngine interface {
 	MaskContext(Dictionary, string, ...Dictionary) (Dictionary, error)
 }
 
+// HasCleaner interface provides a function to apply on cleanup
+type HasCleaner interface {
+	GetCleaner() FunctionMaskContextEngine
+}
+
 // FunctionMaskEngine implements MaskEngine with a simple function
 type FunctionMaskEngine struct {
 	Function func(Entry, ...Dictionary) (Entry, error)
@@ -41,6 +46,16 @@ type FunctionMaskEngine struct {
 // Mask delegate mask algorithm to the function
 func (fme FunctionMaskEngine) Mask(e Entry, context ...Dictionary) (Entry, error) {
 	return fme.Function(e, context...)
+}
+
+// FunctionMaskContextEngine implements MaskContextEngine with a simple function
+type FunctionMaskContextEngine struct {
+	Function func(Dictionary, string, ...Dictionary) (Dictionary, error)
+}
+
+// MaskContext delegate mask algorithm to the function
+func (fme FunctionMaskContextEngine) MaskContext(e Dictionary, key string, context ...Dictionary) (Dictionary, error) {
+	return fme.Function(e, key, context...)
 }
 
 type MaskFactory func(Masking, int64, map[string]Cache) (MaskEngine, bool, error)

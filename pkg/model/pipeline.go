@@ -65,6 +65,7 @@ func BuildCaches(caches map[string]CacheDefinition, existing map[string]Cache) m
 
 func BuildPipeline(pipeline Pipeline, conf Definition, caches map[string]Cache) (Pipeline, map[string]Cache, error) {
 	caches = BuildCaches(conf.Caches, caches)
+	cleaners := []Processor{}
 	for _, v := range conf.Masking {
 		nbArg := 0
 
@@ -108,11 +109,17 @@ func BuildPipeline(pipeline Pipeline, conf Definition, caches map[string]Cache) 
 			if present {
 				pipeline = pipeline.Process(NewMaskContextEngineProcess(NewPathSelector(v.Selector.Jsonpath), mask))
 				nbArg++
+				if i, hasCleaner := mask.(HasCleaner); hasCleaner {
+					cleaners = append(cleaners, NewMaskContextEngineProcess(NewPathSelector(v.Selector.Jsonpath), i.GetCleaner()))
+				}
 			}
 		}
 		if nbArg != 1 {
 			return pipeline, nil, errors.New("Not the right number of argument for " + v.Selector.Jsonpath + ". There should be 1 and there is " + strconv.Itoa(nbArg))
 		}
+	}
+	for _, cleaner := range cleaners {
+		pipeline = pipeline.Process(cleaner)
 	}
 	return pipeline, caches, nil
 }
