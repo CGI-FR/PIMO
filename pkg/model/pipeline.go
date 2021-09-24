@@ -71,7 +71,6 @@ func BuildPipeline(pipeline Pipeline, conf Definition, caches map[string]Cache) 
 		allMasksDefinition := append([]MaskType{masking.Mask}, masking.Masks...)
 
 		for _, maskDefinition := range allMasksDefinition {
-
 			virtualMask := Masking{
 				Selector: masking.Selector,
 				Mask:     maskDefinition,

@@ -19,27 +19,15 @@ package templatemask
 
 import (
 	"bytes"
-	"unicode"
 
 	"github.com/cgi-fr/pimo/pkg/model"
 	"github.com/cgi-fr/pimo/pkg/template"
 	"github.com/rs/zerolog/log"
-	"golang.org/x/text/runes"
-	"golang.org/x/text/transform"
-	"golang.org/x/text/unicode/norm"
 )
 
 // MaskEngine is to mask a value thanks to a template
 type MaskEngine struct {
 	template *template.Engine
-}
-
-// rmAcc removes accents from string
-// Function derived from: http://blog.golang.org/normalization
-func rmAcc(s string) string {
-	t := transform.Chain(norm.NFD, runes.Remove(runes.In(unicode.Mn)), norm.NFC)
-	result, _, _ := transform.String(t, s)
-	return result
 }
 
 // NewMask create a MaskEngine
