@@ -17,13 +17,13 @@ testcases:
         - selector:
             jsonpath: "result"
           mask:
-            template: "{{.name}} {{.secret}}"
+            add: "{{.name}} {{.secret}}"
       EOF
   - script: |-
       pimo --empty-input
     assertions:
     - result.code ShouldEqual 0
-    - result.systemoutjson ShouldEqual {"name":"Dorothy","result":"Dorothy is the killer"}
+    - result.systemout ShouldEqual {"name":"Dorothy","result":"Dorothy is the killer"}
     - result.systemerr ShouldBeEmpty
 
 - name: mask add transient can use a template string as configuration
@@ -43,11 +43,11 @@ testcases:
         - selector:
             jsonpath: "result"
           mask:
-            template: "{{.secret}}"
+            add: "{{.secret}}"
       EOF
   - script: |-
       pimo --empty-input
     assertions:
     - result.code ShouldEqual 0
-    - result.systemoutjson ShouldEqual {"name":"Dorothy","result":"Dorothy is the killer"}
+    - result.systemout ShouldEqual {"name":"Dorothy","result":"Dorothy is the killer"}
     - result.systemerr ShouldBeEmpty
