@@ -97,6 +97,9 @@
         "add": {
           "additionalProperties": true
         },
+        "add-transient": {
+          "additionalProperties": true
+        },
         "constant": {
           "additionalProperties": true
         },
@@ -200,6 +203,12 @@
             "add"
           ],
           "title": "Add"
+        },
+        {
+          "required": [
+            "add-transient"
+          ],
+          "title": "AddTransient"
         },
         {
           "required": [
@@ -356,7 +365,8 @@
     "Masking": {
       "required": [
         "selector",
-        "mask"
+        "mask",
+        "masks"
       ],
       "properties": {
         "selector": {
@@ -367,12 +377,32 @@
           "$schema": "http://json-schema.org/draft-04/schema#",
           "$ref": "#/definitions/MaskType"
         },
+        "masks": {
+          "items": {
+            "$ref": "#/definitions/MaskType"
+          },
+          "type": "array"
+        },
         "cache": {
           "type": "string"
         }
       },
       "additionalProperties": false,
-      "type": "object"
+      "type": "object",
+      "oneOf": [
+        {
+          "required": [
+            "mask"
+          ],
+          "title": "Mask"
+        },
+        {
+          "required": [
+            "masks"
+          ],
+          "title": "Masks"
+        }
+      ]
     },
     "PipeType": {
       "properties": {

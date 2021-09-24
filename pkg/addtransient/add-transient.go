@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with PIMO.  If not, see <http://www.gnu.org/licenses/>.
 
-package add
+package addtransient
 
 import (
 	"bytes"
@@ -42,7 +42,7 @@ func NewMask(value model.Entry) (MaskEngine, error) {
 
 // MaskContext add the field
 func (am MaskEngine) MaskContext(context model.Dictionary, key string, contexts ...model.Dictionary) (model.Dictionary, error) {
-	log.Info().Msg("Mask add")
+	log.Info().Msg("Mask add-transient")
 	_, present := context.GetValue(key)
 	if !present {
 		if am.template != nil {
@@ -59,11 +59,26 @@ func (am MaskEngine) MaskContext(context model.Dictionary, key string, contexts 
 	return context, nil
 }
 
+// Cleanup removes the transient field
+func (am MaskEngine) Cleanup(e model.Dictionary, key string, contexts ...model.Dictionary) (model.Dictionary, error) {
+	log.Info().Msg("Cleanup add-transient")
+	e.Delete(key)
+	return e, nil
+}
+
+// GetCleaner returns the cleanup function
+func (am MaskEngine) GetCleaner() model.FunctionMaskContextEngine {
+	return model.FunctionMaskContextEngine{Function: am.Cleanup}
+}
+
 // Create a mask from a configuration
 func Factory(conf model.Masking, seed int64, caches map[string]model.Cache) (model.MaskContextEngine, bool, error) {
-	if conf.Mask.Add != nil {
-		mask, err := NewMask(conf.Mask.Add)
-		return mask, true, err
+	if conf.Mask.AddTransient != nil {
+		mask, err := NewMask(conf.Mask.AddTransient)
+		if err != nil {
+			return nil, false, err
+		}
+		return mask, true, nil
 	}
 	return nil, false, nil
 }

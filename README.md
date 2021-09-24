@@ -16,6 +16,13 @@ masking:
       type: "argument"
     # Optional cache (coherence preservation)
     cache: "cacheName"
+
+  # another mask on a different location
+  - selector:
+      jsonpath: "example.example2"
+    mask:
+      type: "argument"
+
 caches:
   cacheName:
     # Optional bijective cache (enable re-identification if the cache is dumped on disk)
@@ -29,6 +36,17 @@ caches:
 `jsonpath` defines the path of the entry that has to be masked in the json file.
 `mask` defines the mask that will be used for the entry defined by `selector`.
 `cache` is optional, if the current entry is already in the cache as key the associated value is returned without executing the mask. Otherwise the mask is executed and a new entry is added in the cache with the orignal content as `key` and the masked result as `value`. The cache have to be declared in the `caches` section of the YAML file.
+
+Multiple masks can be applied on the same jsonpath location, like in this example :
+
+```yaml
+  - selector:
+      jsonpath: "example"
+    masks:
+      - add: "hello"
+      - template: "{{.example}} World!"
+      - remove: true
+```
 
 ## Possible masks
 
@@ -58,6 +76,7 @@ The following types of masks can be used :
 * Data structure manipulation
   * [`remove`](#remove) is to mask a field by completely removing it.
   * [`add`](#add) is a mask to add a field to the jsonline.
+  * [`add-transient`](#add-transient) same as `add` but the field is not exported in the output jsonline.
 * Others
   * [`constant`](#constant) is to mask the value by a constant value given in argument.
   * [`command`](#command) is to mask with the output of a console command given in argument.
@@ -406,6 +425,23 @@ This field will mask the `useless-field` of the input jsonlines by completely de
 This example will create the field `newField` containing the value `newvalue`. This value can be a string, a number, a boolean...
 
 The field will be created in every input jsonline that doesn't already contains this field.
+
+[Return to list of masks](#possible-masks)
+
+### Add-Transient
+
+```yaml
+  - selector:
+      jsonpath: "newField"
+    mask:
+      add-transient: "newvalue"
+```
+
+This example will create the field `newField` containing the value `newvalue`. This value can be a string, a number, a boolean... It can also be a [template](#template).
+
+The field will be created in every input jsonline that doesn't already contains this field, and it will be removed from the final JSONLine output.
+
+This mask is used for temporary field that is only available to other fields during the execution.
 
 [Return to list of masks](#possible-masks)
 
