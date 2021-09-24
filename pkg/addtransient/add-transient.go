@@ -42,7 +42,7 @@ func NewMask(value model.Entry) (MaskEngine, error) {
 
 // MaskContext add the field
 func (am MaskEngine) MaskContext(context model.Dictionary, key string, contexts ...model.Dictionary) (model.Dictionary, error) {
-	log.Info().Msg("Mask add")
+	log.Info().Msg("Mask add-transient")
 	_, present := context.GetValue(key)
 	if !present {
 		if am.template != nil {
@@ -57,6 +57,18 @@ func (am MaskEngine) MaskContext(context model.Dictionary, key string, contexts 
 	}
 
 	return context, nil
+}
+
+// Cleanup removes the transient field
+func (am MaskEngine) Cleanup(e model.Dictionary, key string, contexts ...model.Dictionary) (model.Dictionary, error) {
+	log.Info().Msg("Cleanup add-transient")
+	e.Delete(key)
+	return e, nil
+}
+
+// GetCleaner returns the cleanup function
+func (am MaskEngine) GetCleaner() model.FunctionMaskContextEngine {
+	return model.FunctionMaskContextEngine{Function: am.Cleanup}
 }
 
 // Create a mask from a configuration
