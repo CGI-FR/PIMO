@@ -1,0 +1,20 @@
+name: Test of chaining of masks
+testcases:
+- name: the keyword masks instead of mask takes an array of mask
+  steps:
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+      - selector:
+          jsonpath: "field"
+        masks:
+          - add: ""
+          - template: "hello {{.input}}"
+      EOF
+  - script: |-
+      echo '{"input":"world"}' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldEqual {"input":"world","field":"hello world"}
+    - result.systemerr ShouldBeEmpty

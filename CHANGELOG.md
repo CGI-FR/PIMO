@@ -16,7 +16,10 @@ Types of changes
 
 ## [1.9.0]
 
-- `Added` support of template for uri parameter of randomInUri mask
+- `Added` possibility to use a template string with `randomChoiceInUri` mask
+- `Added` new mask `add-transient` same as `add` but the field is not exported in the jsonline output
+- `Added` possibility to use a template string directly with `add` mask
+- `Added` possibility to chain multiple masks in YAML configuration on the same jsonpath with the `masks` property
 
 ## [1.8.0]
 
