@@ -150,6 +150,8 @@ This example will mask the `name` field of the input jsonlines with random value
 
 This example will mask the `name` field of the input jsonlines with random values from the list contained in the name.txt file. The different URI usable with this selector are : `pimo`, `file` and `http`/`https`.
 
+A value can be injected in URI with the template syntax. For example, `file://name{{.gender}}.txt` select a line in `name_F.txt` if the current jsonline is `{gender : "F"}`.
+
 [Return to list of masks](#possible-masks)
 
 ### RandomInt

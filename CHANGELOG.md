@@ -14,6 +14,10 @@ Types of changes
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [1.9.0]
+
+- `Added` support of template for uri parameter of randomInUri mask
+
 ## [1.8.0]
 
 - `Added` new mask `fromjson` to convert a string to object model
