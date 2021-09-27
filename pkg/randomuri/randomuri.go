@@ -44,7 +44,7 @@ func NewMask(templateSource string, seed int64) (MaskEngine, error) {
 
 // Mask choose a mask value randomly
 func (mrl MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Entry, error) {
-	log.Info().Msg("Mask randomChoice")
+	log.Info().Msg("Mask randomChoiceInUri")
 	var output bytes.Buffer
 	if len(context) == 0 {
 		context = []model.Dictionary{model.NewDictionary()}
