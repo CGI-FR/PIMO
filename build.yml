@@ -254,6 +254,9 @@ targets:
       - ldflags = ldflags + " -s -w" # Omit the DWARF symbol table. Omit the symbol table and debug information.
       - call: compile
 
+  # to pass a single test use :
+  # neon -props '{testsuites: "<test suite filename>"}' test-int
+  # ex: neon -props '{testsuites: "mask_add_transient.yml"}' test-int
   test-int:
     doc: "Run all integration tests"
     depends: ["info", "refresh", "lint", "test", "release"]

@@ -1,0 +1,53 @@
+name: Test of add transient mask
+testcases:
+- name: mask add transient add a field that exists but is hidden in the output
+  steps:
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "name"
+          mask:
+            add: "Dorothy"
+        - selector:
+            jsonpath: "secret"
+          mask:
+            add-transient: "is the killer"
+        - selector:
+            jsonpath: "result"
+          mask:
+            add: "{{.name}} {{.secret}}"
+      EOF
+  - script: |-
+      pimo --empty-input
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldEqual {"name":"Dorothy","result":"Dorothy is the killer"}
+    - result.systemerr ShouldBeEmpty
+
+- name: mask add transient can use a template string as configuration
+  steps:
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "name"
+          mask:
+            add: "Dorothy"
+        - selector:
+            jsonpath: "secret"
+          mask:
+            add-transient: "{{.name}} is the killer"
+        - selector:
+            jsonpath: "result"
+          mask:
+            add: "{{.secret}}"
+      EOF
+  - script: |-
+      pimo --empty-input
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldEqual {"name":"Dorothy","result":"Dorothy is the killer"}
+    - result.systemerr ShouldBeEmpty
