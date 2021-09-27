@@ -15,32 +15,57 @@
 // You should have received a copy of the GNU General Public License
 // along with PIMO.  If not, see <http://www.gnu.org/licenses/>.
 
-package randomlist
+package randomuri
 
 import (
+	"bytes"
 	"hash/fnv"
 	"math/rand"
+	"text/template"
 
 	"github.com/cgi-fr/pimo/pkg/model"
+	"github.com/cgi-fr/pimo/pkg/uri"
 	"github.com/rs/zerolog/log"
 )
 
 // MaskEngine is a list of masking value and a rand init to mask
 type MaskEngine struct {
-	rand *rand.Rand
-	list []model.Entry
+	rand     *rand.Rand
+	template *template.Template
+	cache    map[string][]model.Entry
 }
 
 // NewMaskSeeded create a MaskRandomList with a seed
-func NewMask(list []model.Entry, seed int64) MaskEngine {
+func NewMask(templateSource string, seed int64) (MaskEngine, error) {
+	template, err := template.New("template-randomInUri").Parse(templateSource)
 	// nolint: gosec
-	return MaskEngine{rand.New(rand.NewSource(seed)), list}
+	return MaskEngine{rand.New(rand.NewSource(seed)), template, map[string][]model.Entry{}}, err
 }
 
 // Mask choose a mask value randomly
 func (mrl MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Entry, error) {
-	log.Info().Msg("Mask randomChoice")
-	return mrl.list[mrl.rand.Intn(len(mrl.list))], nil
+	log.Info().Msg("Mask randomChoiceInUri")
+	var output bytes.Buffer
+	if len(context) == 0 {
+		context = []model.Dictionary{model.NewDictionary()}
+	}
+	if err := mrl.template.Execute(&output, context[0].Unordered()); err != nil {
+		return nil, err
+	}
+	filename := output.String()
+	var list []model.Entry
+	if listFromCache, ok := mrl.cache[filename]; ok {
+		list = listFromCache
+	} else {
+		listFromFile, err := uri.Read(filename)
+		if err != nil {
+			return nil, err
+		}
+		mrl.cache[filename] = listFromFile
+		list = listFromFile
+	}
+
+	return list[mrl.rand.Intn(len(list))], nil
 }
 
 // Factory create a mask from a yaml config
@@ -50,9 +75,9 @@ func Factory(conf model.Masking, seed int64, caches map[string]model.Cache) (mod
 	h.Write([]byte(conf.Selector.Jsonpath))
 	seed += int64(h.Sum64())
 
-	if len(conf.Mask.RandomChoice) != 0 {
-		return NewMask(conf.Mask.RandomChoice, seed), true, nil
+	if len(conf.Mask.RandomChoiceInURI) != 0 {
+		mask, err := NewMask(conf.Mask.RandomChoiceInURI, seed)
+		return mask, true, err
 	}
-
 	return nil, false, nil
 }
