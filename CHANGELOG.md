@@ -14,6 +14,10 @@ Types of changes
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [1.9.1]
+
+- `Fixed` JSON Schema validation for `masks` property (only required if `mask` is not set).
+
 ## [1.9.0]
 
 - `Added` possibility to use a template string with `randomChoiceInUri` mask
