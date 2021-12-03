@@ -123,8 +123,7 @@ type TemplateEachType struct {
 }
 
 type LuhnType struct {
-	Mod uint   `yaml:"mod,omitempty"`
-	Map string `yaml:"map,omitempty"`
+	Universe string `yaml:"universe,omitempty"`
 }
 
 type MaskType struct {

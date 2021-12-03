@@ -18,31 +18,71 @@
 package luhn
 
 import (
+	"bytes"
+	"fmt"
+
 	"github.com/cgi-fr/pimo/pkg/model"
 	"github.com/rs/zerolog/log"
 )
 
 // MaskEngine is a struct to create incremental int
 type MaskEngine struct {
-	Mod uint
-	Map []rune
+	Universe []byte
 }
 
 // NewMask create an Luhn mask
-func NewMask(mod uint, mp []rune) MaskEngine {
-	return MaskEngine{mod, mp}
+func NewMask(universe []byte) MaskEngine {
+	return MaskEngine{universe}
 }
 
 // Mask return the value with luhn checksum
-func (incr MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Entry, error) {
+func (l MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Entry, error) {
+	if e == nil {
+		// Cannot use a nil value so we leave it untouched
+		log.Warn().Msg("Mask luhn - ignored null value")
+		return e, nil
+	}
+
 	log.Info().Msg("Mask luhn")
-	return "123456782", nil
+
+	factor := 2
+	sum := 0
+	n := len(l.Universe)
+	input := e.(string)
+
+	// Starting from the right and working leftwards is easier since
+	// the initial "factor" will always be "2".
+	for i := len(input) - 1; i >= 0; i-- {
+		codePoint := bytes.IndexByte(l.Universe, input[i])
+		addend := factor * codePoint
+
+		// Alternate the "factor" that each "codePoint" is multiplied by
+		if factor == 2 {
+			factor = 1
+		} else {
+			factor = 2
+		}
+
+		// Sum the digits of the "addend" as expressed in base "n"
+		addend = addend/n + (addend % n)
+		sum += addend
+	}
+
+	// Calculate the number that must be added to the "sum"
+	// to make it divisible by "n".
+	remainder := sum % n
+	checkCodePoint := (n - remainder) % n
+
+	return input + string(l.Universe[checkCodePoint]), nil
 }
 
 // Create a mask from a configuration
 func Factory(conf model.Masking, seed int64, caches map[string]model.Cache) (model.MaskEngine, bool, error) {
-	if conf.Mask.Luhn.Map != "" {
-		return NewMask(conf.Mask.Luhn.Mod, []rune(conf.Mask.Luhn.Map)), true, nil
+	if conf.Mask.Luhn.Universe != "" {
+		if len(conf.Mask.Luhn.Universe)%2 != 0 {
+			return nil, true, fmt.Errorf("luhn universe size must be divisible by 2")
+		}
+		return NewMask([]byte(conf.Mask.Luhn.Universe)), true, nil
 	}
-	return NewMask(conf.Mask.Luhn.Mod, []rune("0123456789")), true, nil
+	return NewMask([]byte("0123456789")), true, nil
 }
