@@ -84,6 +84,7 @@ The following types of masks can be used :
   * [`fluxUri`](#fluxUri) is to replace by a sequence of values defined in an external resource.
   * [`replacement`](#replacement) is to mask a data with another data from the jsonline.
   * [`pipe`](#pipe) is a mask to handle complex nested array structures, it can read an array as an object stream and process it with a sub-pipeline.
+  * [`luhn`](#luhn) can generate valid numbers using the Luhn algorithm (e.g. french SIRET or SIREN).
 
 A full `masking.yml` file example, using every kind of mask, is given with the source code.
 
