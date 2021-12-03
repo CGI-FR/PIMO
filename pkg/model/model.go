@@ -122,6 +122,11 @@ type TemplateEachType struct {
 	Template string `yaml:"template,omitempty"`
 }
 
+type LuhnType struct {
+	Mod uint   `yaml:"mod,omitempty"`
+	Map string `yaml:"map,omitempty"`
+}
+
 type MaskType struct {
 	Add               Entry                `yaml:"add,omitempty" jsonschema:"oneof_required=Add"`
 	AddTransient      Entry                `yaml:"add-transient,omitempty" jsonschema:"oneof_required=AddTransient"`
@@ -150,6 +155,7 @@ type MaskType struct {
 	FF1               FF1Type              `yaml:"ff1,omitempty" jsonschema:"oneof_required=FF1"`
 	Pipe              PipeType             `yaml:"pipe,omitempty" jsonschema:"oneof_required=Pipe"`
 	FromJSON          string               `yaml:"fromjson,omitempty" jsonschema:"oneof_required=FromJSON"`
+	Luhn              LuhnType             `yaml:"luhn,omitempty" jsonschema:"oneof_required=Luhn"`
 }
 
 type Masking struct {
