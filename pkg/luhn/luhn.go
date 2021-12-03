@@ -78,11 +78,14 @@ func (l MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Entr
 
 // Create a mask from a configuration
 func Factory(conf model.Masking, seed int64, caches map[string]model.Cache) (model.MaskEngine, bool, error) {
-	if conf.Mask.Luhn.Universe != "" {
-		if len(conf.Mask.Luhn.Universe)%2 != 0 {
-			return nil, true, fmt.Errorf("luhn universe size must be divisible by 2")
+	if conf.Mask.Luhn != nil {
+		if conf.Mask.Luhn.Universe != "" {
+			if len(conf.Mask.Luhn.Universe)%2 != 0 {
+				return nil, true, fmt.Errorf("luhn universe size must be divisible by 2")
+			}
+			return NewMask([]byte(conf.Mask.Luhn.Universe)), true, nil
 		}
-		return NewMask([]byte(conf.Mask.Luhn.Universe)), true, nil
+		return NewMask([]byte("0123456789")), true, nil
 	}
-	return NewMask([]byte("0123456789")), true, nil
+	return nil, false, nil
 }
