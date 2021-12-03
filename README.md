@@ -256,7 +256,7 @@ This example will mask the `town` field of the input jsonlines with a value from
   - selector:
       jsonpath: "name"
     mask:
-      hashInUri: "pimo://nameFR
+      hashInUri: "pimo://nameFR"
 ```
 
 This example will mask the `name` field of the input jsonlines with a value from the list nameFR contained in pimo, the same way as for `hash` mask. The different URI usable with this selector are : `pimo`, `file` and `http`/`https`.
