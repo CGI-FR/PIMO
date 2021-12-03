@@ -92,6 +92,15 @@
       "additionalProperties": false,
       "type": "object"
     },
+    "LuhnType": {
+      "properties": {
+        "universe": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
     "MaskType": {
       "properties": {
         "add": {
@@ -193,6 +202,10 @@
         },
         "fromjson": {
           "type": "string"
+        },
+        "luhn": {
+          "$schema": "http://json-schema.org/draft-04/schema#",
+          "$ref": "#/definitions/LuhnType"
         }
       },
       "additionalProperties": false,
@@ -359,6 +372,12 @@
             "fromjson"
           ],
           "title": "FromJSON"
+        },
+        {
+          "required": [
+            "luhn"
+          ],
+          "title": "Luhn"
         }
       ]
     },
