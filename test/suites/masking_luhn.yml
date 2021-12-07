@@ -1,0 +1,58 @@
+name: luhn mask
+testcases:
+- name: default universe
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "siret"
+          mask:
+            luhn: {}
+      EOF
+  - script: |-
+      echo '{"siret": "12345678"}' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemoutjson.siret ShouldEqual 123456782
+    - result.systemerr ShouldBeEmpty
+- name: custom universe
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "siret"
+          mask:
+            luhn:
+              universe: "abcdef"
+      EOF
+  - script: |-
+      echo '{"siret": "abcdef"}' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemoutjson.siret ShouldEqual abcdefe
+    - result.systemerr ShouldBeEmpty
+
+- name: default universe - additional test
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "siret"
+          mask:
+            luhn: {}
+      EOF
+  - script: |-
+      echo '{"siret": "1234567821234"}' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemoutjson.siret ShouldEqual 12345678212346
+    - result.systemerr ShouldBeEmpty

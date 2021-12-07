@@ -84,6 +84,7 @@ The following types of masks can be used :
   * [`fluxUri`](#fluxUri) is to replace by a sequence of values defined in an external resource.
   * [`replacement`](#replacement) is to mask a data with another data from the jsonline.
   * [`pipe`](#pipe) is a mask to handle complex nested array structures, it can read an array as an object stream and process it with a sub-pipeline.
+  * [`luhn`](#luhn) can generate valid numbers using the Luhn algorithm (e.g. french SIRET or SIREN).
 
 A full `masking.yml` file example, using every kind of mask, is given with the source code.
 
@@ -256,7 +257,7 @@ This example will mask the `town` field of the input jsonlines with a value from
   - selector:
       jsonpath: "name"
     mask:
-      hashInUri: "pimo://nameFR
+      hashInUri: "pimo://nameFR"
 ```
 
 This example will mask the `name` field of the input jsonlines with a value from the list nameFR contained in pimo, the same way as for `hash` mask. The different URI usable with this selector are : `pimo`, `file` and `http`/`https`.
@@ -513,6 +514,7 @@ This mask will replace an integer value `{"age": 27}` with a range like this `{"
 If the data structure contains arrays of object like in the example below, this mask can pipe the objects into a sub pipeline definition.
 
 **`data.jsonl`**
+
 ```json
 {
     "organizations": [
@@ -550,7 +552,33 @@ If the data structure contains arrays of object like in the example below, this 
 }
 ```
 
+### Luhn
+
+The [Luhn](https://en.wikipedia.org/wiki/Luhn_algorithm) algorithm is a simple checksum formula used to validate a variety of identification numbers.
+
+The `luhn` mask can calculate the checksum for any value.
+
+```yaml
+  - selector:
+      jsonpath: "siret"
+    mask:
+      luhn: {}
+```
+
+In this example, the `siret` value will be appended with the correct checksum, to create a valid SIRET number (french business identifier).
+
+The mask can be parametered to use a different universe of valid characters, internally using the [Luhn mod N](https://en.wikipedia.org/wiki/Luhn_mod_N_algorithm) algorithm.
+
+```yaml
+  - selector:
+      jsonpath: "siret"
+    mask:
+      luhn:
+        universe: "abcde"
+```
+
 **`masking.yml`**
+
 ```yaml
 version: "1"
 seed: 42
