@@ -126,6 +126,34 @@ func (mce MaskCacheEngine) Mask(e Entry, context ...Dictionary) (Entry, error) {
 	return value, err
 }
 
+// MaskContextCacheEngine is a struct to create a cahed mask with context
+type MaskContextCacheEngine struct {
+	Cache          Cache
+	OriginalEngine MaskContextEngine
+}
+
+// NewMaskContextCacheEngine create an MaskContextCacheEngine
+func NewMaskContextCacheEngine(cache Cache, original MaskContextEngine) MaskContextCacheEngine {
+	return MaskContextCacheEngine{cache, original}
+}
+
+// MaskContext masks run maskContext with cache
+func (mcce MaskContextCacheEngine) MaskContext(context Dictionary,
+	key string,
+	contexts ...Dictionary) (Dictionary, error) {
+	e, _ := context.GetValue(key)
+	if _, isInCache := mcce.Cache.Get(e); isInCache {
+		return context, nil
+	}
+	dict, err := mcce.OriginalEngine.MaskContext(context, key, contexts...)
+	if err == nil {
+		value, _ := dict.GetValue(key)
+		mcce.Cache.Put(e, value)
+	}
+
+	return dict, err
+}
+
 type UniqueMaskCacheEngine struct {
 	cache          UniqueCache
 	originalEngine MaskEngine
@@ -154,6 +182,39 @@ func (umce UniqueMaskCacheEngine) Mask(e Entry, context ...Dictionary) (Entry, e
 		}
 	}
 	return nil, fmt.Errorf("Unique value not found")
+}
+
+type UniqueMaskContextCacheEngine struct {
+	cache          UniqueCache
+	originalEngine MaskContextEngine
+	maxRetries     int
+}
+
+func NewUniqueMaskContextCacheEngine(cache UniqueCache, original MaskContextEngine) UniqueMaskContextCacheEngine {
+	return UniqueMaskContextCacheEngine{cache, original, 1000}
+}
+
+// MaskContext masks run mask with cache
+func (umcce UniqueMaskContextCacheEngine) MaskContext(context Dictionary,
+	key string,
+	contexts ...Dictionary) (Dictionary, error) {
+	e, _ := context.GetValue(key)
+	if _, isInCache := umcce.cache.Get(e); isInCache {
+		return context, nil
+	}
+	for retry := 0; retry < umcce.maxRetries; retry++ {
+		dict, err := umcce.originalEngine.MaskContext(context, key, contexts...)
+		if err == nil {
+			value := dict.Get(key)
+			ok := umcce.cache.PutUnique(e, value)
+			if ok {
+				return dict, nil
+			}
+		} else {
+			return dict, err
+		}
+	}
+	return Dictionary{}, fmt.Errorf("Unique value not found")
 }
 
 func NewFromCacheProcess(selector Selector, cache Cache) Processor {

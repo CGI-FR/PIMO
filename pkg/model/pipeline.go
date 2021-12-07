@@ -116,6 +116,18 @@ func BuildPipeline(pipeline Pipeline, conf Definition, caches map[string]Cache) 
 					return nil, nil, errors.New(err.Error() + " for " + virtualMask.Selector.Jsonpath)
 				}
 				if present {
+					if virtualMask.Cache != "" {
+						cache, ok := caches[virtualMask.Cache]
+						if !ok {
+							return nil, nil, errors.New("Cache '" + virtualMask.Cache + "' not found for '" + virtualMask.Selector.Jsonpath + "'")
+						}
+						switch typedCache := cache.(type) {
+						case UniqueCache:
+							mask = NewUniqueMaskContextCacheEngine(typedCache, mask)
+						default:
+							mask = NewMaskContextCacheEngine(typedCache, mask)
+						}
+					}
 					pipeline = pipeline.Process(NewMaskContextEngineProcess(NewPathSelector(virtualMask.Selector.Jsonpath), mask))
 					nbArg++
 					if i, hasCleaner := mask.(HasCleaner); hasCleaner {
