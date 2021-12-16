@@ -53,3 +53,23 @@ testcases:
     - result.code ShouldEqual 0
     - result.systemout ShouldBeEmpty
 
+- name: template with calls to other masks
+  steps:
+  - script: rm -f masking.yml
+  - script: cp ../masking_template_masks.yml masking.yml
+  - script: |-
+      pimo > result.json <<EOF
+      {"regex": ""}
+      EOF
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemerr ShouldBeEmpty
+  - script : |-
+      cat > expected.json <<EOF
+      {"regex":"05 30 85 92 14"}
+      EOF
+  - script: diff expected.json result.json
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldBeEmpty
+

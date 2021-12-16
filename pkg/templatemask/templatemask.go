@@ -31,8 +31,8 @@ type MaskEngine struct {
 }
 
 // NewMask create a MaskEngine
-func NewMask(text string) (MaskEngine, error) {
-	temp, err := template.NewEngine(text)
+func NewMask(text string, seed int64) (MaskEngine, error) {
+	temp, err := template.NewEngine(text, seed)
 	return MaskEngine{temp}, err
 }
 
@@ -47,7 +47,7 @@ func (tmpl MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.E
 // Factory create a mask from a yaml config
 func Factory(conf model.Masking, seed int64, caches map[string]model.Cache) (model.MaskEngine, bool, error) {
 	if len(conf.Mask.Template) != 0 {
-		mask, err := NewMask(conf.Mask.Template)
+		mask, err := NewMask(conf.Mask.Template, seed)
 		if err != nil {
 			return nil, false, err
 		}

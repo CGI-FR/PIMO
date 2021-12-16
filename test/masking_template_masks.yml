@@ -1,0 +1,67 @@
+version: "1"
+seed: 42
+masking:
+  - selector:
+      jsonpath: "regex"
+    mask:
+      template: '{{regex "0[1-7]( ([0-9]){2}){4}"}}'
+  # - selector:
+  #     jsonpath: "randomChoice"
+  #   mask:
+  #     template: '{{randomChoice (list "Mickael" "Mathieu" "Marcelle")}}'
+  # - selector:
+  #     jsonpath: "randomChoiceInUri"
+  #   mask:
+  #     template: '{{randomChoiceInUri "pimo://nameFR"}}'
+  # - selector:
+  #     jsonpath: "randomInt"
+  #   mask:
+  #     template: '{{randomInt 25 32}}'
+  # - selector:
+  #     jsonpath: "randomDecimal"
+  #   mask:
+  #     template: '{{randomDecimal 0 17.23 2}}'
+  # - selector:
+  #     jsonpath: "command"
+  #   mask:
+  #     template: '{{command "echo -n Dorothy"}}'
+  # - selector:
+  #     jsonpath: "weightedChoice"
+  #   mask:
+  #     template: '{{weightedChoice (list "Dupond" "Dupont") (list 1 9)}}'
+  # - selector:
+  #     jsonpath: "hash"
+  #   mask:
+  #     template: '{{hash (list "Emerald City" "Ruby City" "Sapphire City")}}'
+  # - selector:
+  #     jsonpath: "hashInUri"
+  #   mask:
+  #     template: '{{hashInUri "pimo://nameFR"}}'
+  # - selector:
+  #     jsonpath: "randDate"
+  #   mask:
+  #     template: '{{randDate "1970-01-01T00:00:00Z" "2020-01-01T00:00:00Z"}}'
+  # - selector:
+  #     jsonpath: "duration"
+  #   mask:
+  #     template: '{{duration "-P2D"}}'
+  # - selector:
+  #     jsonpath: "dateParser"
+  #   mask:
+  #     template: '{{dateParser "2006-01-02" "01/02/06"}}'
+  # - selector:
+  #     jsonpath: "randomDuration"
+  #   mask:
+  #     template: '{{randomDuration "-P2D" "-P27D"}}'
+  # - selector:
+  #     jsonpath: "incremental"
+  #   mask:
+  #     template: '{{incremental 1 1}}'
+  # - selector:
+  #     jsonpath: "ff1"
+  #   mask:
+  #     template: '{{ff1 10 "FF1_ENCRYPTION_KEY"}}'
+  # - selector:
+  #     jsonpath: "range"
+  #   mask:
+  #     template: '{{range 5}}'

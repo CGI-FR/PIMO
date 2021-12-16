@@ -32,9 +32,9 @@ type MaskEngine struct {
 }
 
 // NewMask return a MaskEngine from a value
-func NewMask(value model.Entry) (MaskEngine, error) {
+func NewMask(value model.Entry, seed int64) (MaskEngine, error) {
 	if tmplstr, ok := value.(string); ok {
-		temp, err := template.NewEngine(tmplstr)
+		temp, err := template.NewEngine(tmplstr, seed)
 		return MaskEngine{value, temp}, err
 	}
 	return MaskEngine{value, nil}, nil
@@ -74,7 +74,7 @@ func (am MaskEngine) GetCleaner() model.FunctionMaskContextEngine {
 // Create a mask from a configuration
 func Factory(conf model.Masking, seed int64, caches map[string]model.Cache) (model.MaskContextEngine, bool, error) {
 	if conf.Mask.AddTransient != nil {
-		mask, err := NewMask(conf.Mask.AddTransient)
+		mask, err := NewMask(conf.Mask.AddTransient, seed)
 		if err != nil {
 			return nil, false, err
 		}

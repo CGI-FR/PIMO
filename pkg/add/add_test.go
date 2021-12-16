@@ -25,7 +25,7 @@ import (
 )
 
 func TestMaskingShouldAddField(t *testing.T) {
-	addMask, err := NewMask("newvalue")
+	addMask, err := NewMask("newvalue", 0)
 	assert.NoError(t, err, "error should be nil")
 	data := model.NewDictionary().With("field", "SomeInformation")
 	result, err := addMask.MaskContext(data, "newfield", data)

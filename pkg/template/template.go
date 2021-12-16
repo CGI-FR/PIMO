@@ -6,6 +6,7 @@ import (
 	"unicode"
 
 	"github.com/Masterminds/sprig/v3"
+	"github.com/cgi-fr/pimo/pkg/regex"
 	"golang.org/x/text/runes"
 	"golang.org/x/text/transform"
 	"golang.org/x/text/unicode/norm"
@@ -25,11 +26,12 @@ func rmAcc(s string) string {
 }
 
 // NewEngine create a template Engine
-func NewEngine(text string) (*Engine, error) {
+func NewEngine(text string, seed int64) (*Engine, error) {
 	funcMap := template.FuncMap{
 		"ToUpper":  strings.ToUpper,
 		"ToLower":  strings.ToLower,
 		"NoAccent": rmAcc,
+		"regex":    regex.Func(seed),
 	}
 	temp, err := template.New("template").Funcs(sprig.TxtFuncMap()).Funcs(funcMap).Parse(text)
 	return &Engine{temp}, err

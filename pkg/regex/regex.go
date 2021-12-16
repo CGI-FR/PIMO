@@ -60,3 +60,13 @@ func Factory(conf model.Masking, seed int64, caches map[string]model.Cache) (mod
 	}
 	return nil, false, nil
 }
+
+func Func(seed int64) func(regex string) (model.Entry, error) {
+	return func(regex string) (model.Entry, error) {
+		mask, err := NewMask(regex, seed)
+		if err != nil {
+			return "", err
+		}
+		return mask.Mask(nil)
+	}
+}
