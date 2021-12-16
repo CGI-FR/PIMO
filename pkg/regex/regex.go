@@ -62,11 +62,13 @@ func Factory(conf model.Masking, seed int64, caches map[string]model.Cache) (mod
 }
 
 func Func(seed int64) func(regex string) (model.Entry, error) {
+	var callnumber int64
 	return func(regex string) (model.Entry, error) {
-		mask, err := NewMask(regex, seed)
+		mask, err := NewMask(regex, seed+callnumber)
 		if err != nil {
 			return "", err
 		}
+		callnumber++
 		return mask.Mask(nil)
 	}
 }
