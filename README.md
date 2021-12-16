@@ -552,31 +552,6 @@ If the data structure contains arrays of object like in the example below, this 
 }
 ```
 
-### Luhn
-
-The [Luhn](https://en.wikipedia.org/wiki/Luhn_algorithm) algorithm is a simple checksum formula used to validate a variety of identification numbers.
-
-The `luhn` mask can calculate the checksum for any value.
-
-```yaml
-  - selector:
-      jsonpath: "siret"
-    mask:
-      luhn: {}
-```
-
-In this example, the `siret` value will be appended with the correct checksum, to create a valid SIRET number (french business identifier).
-
-The mask can be parametered to use a different universe of valid characters, internally using the [Luhn mod N](https://en.wikipedia.org/wiki/Luhn_mod_N_algorithm) algorithm.
-
-```yaml
-  - selector:
-      jsonpath: "siret"
-    mask:
-      luhn:
-        universe: "abcde"
-```
-
 **`masking.yml`**
 
 ```yaml
@@ -625,6 +600,33 @@ masking:
 ```
 
 Be sure to check [demo](demo/demo8) to get more details about this mask.
+
+[Return to list of masks](#possible-masks)
+
+### Luhn
+
+The [Luhn](https://en.wikipedia.org/wiki/Luhn_algorithm) algorithm is a simple checksum formula used to validate a variety of identification numbers.
+
+The `luhn` mask can calculate the checksum for any value.
+
+```yaml
+  - selector:
+      jsonpath: "siret"
+    mask:
+      luhn: {}
+```
+
+In this example, the `siret` value will be appended with the correct checksum, to create a valid SIRET number (french business identifier).
+
+The mask can be parametered to use a different universe of valid characters, internally using the [Luhn mod N](https://en.wikipedia.org/wiki/Luhn_mod_N_algorithm) algorithm.
+
+```yaml
+  - selector:
+      jsonpath: "siret"
+    mask:
+      luhn:
+        universe: "abcde"
+```
 
 [Return to list of masks](#possible-masks)
 
