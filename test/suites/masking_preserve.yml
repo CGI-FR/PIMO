@@ -1,0 +1,124 @@
+name: preserve option
+testcases:
+- name: w/o preserve
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > expected.txt <<EOF
+      {"name":"maskedName"}
+      {"name":"maskedName"}
+      {"name":"maskedName"}
+      EOF
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "name"
+          mask:
+            constant: "maskedName"
+      EOF
+  - script: |-
+      echo -e '{"name":"paul"}\n{"name":""}\n{"name":null}' | pimo > output.txt
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemerr ShouldBeEmpty
+  - script: |-
+      diff expected.txt output.txt
+    assertions:
+    - result.systemout ShouldBeEmpty
+  - script: rm -f expected.txt
+  - script: rm -f output.txt
+
+- name: preserve null values
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > expected.txt <<EOF
+      {"name":"maskedName"}
+      {"name":"maskedName"}
+      {"name":null}
+      EOF
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "name"
+          preserve: "null"
+          mask:
+            constant: "maskedName"
+      EOF
+  - script: |-
+      echo -e '{"name":"paul"}\n{"name":""}\n{"name":null}' | pimo > output.txt
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemerr ShouldBeEmpty
+  - script: |-
+      diff expected.txt output.txt
+    assertions:
+    - result.systemout ShouldBeEmpty
+  - script: rm -f expected.txt
+  - script: rm -f output.txt
+
+- name: preserve empty values
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > expected.txt <<EOF
+      {"name":"maskedName"}
+      {"name":""}
+      {"name":"maskedName"}
+      EOF
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "name"
+          preserve: "empty"
+          mask:
+            constant: "maskedName"
+      EOF
+  - script: |-
+      echo -e '{"name":"paul"}\n{"name":""}\n{"name":null}' | pimo > output.txt
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemerr ShouldBeEmpty
+  - script: |-
+      diff expected.txt output.txt
+    assertions:
+    - result.systemout ShouldBeEmpty
+  - script: rm -f expected.txt
+  - script: rm -f output.txt
+
+- name: preserve blank values
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > expected.txt <<EOF
+      {"name":"maskedName"}
+      {"name":""}
+      {"name":null}
+      EOF
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "name"
+          preserve: "blank"
+          mask:
+            constant: "maskedName"
+      EOF
+  - script: |-
+      echo -e '{"name":"paul"}\n{"name":""}\n{"name":null}' | pimo > output.txt
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemerr ShouldBeEmpty
+  - script: |-
+      diff expected.txt output.txt
+    assertions:
+    - result.systemout ShouldBeEmpty
+  - script: rm -f expected.txt
+  - script: rm -f output.txt
