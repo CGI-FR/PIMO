@@ -81,7 +81,7 @@ func TestFromCacheProcessShouldWaitForValueProvide(t *testing.T) {
 	var result []Dictionary
 
 	pipeline := NewPipelineFromSlice(mySlice).
-		Process(NewMaskEngineProcess(NewPathSelector("id"), NewMaskCacheEngine(cache, idMasking))).
+		Process(NewMaskEngineProcess(NewPathSelector("id"), NewMaskCacheEngine(cache, idMasking), "")).
 		Process(NewFromCacheProcess(NewPathSelector("supervisor"), cache)).
 		AddSink(NewSinkToSlice(&result))
 	err := pipeline.Run()
@@ -110,7 +110,7 @@ func TestFromCacheProcessShouldWaitForLoopProvid(t *testing.T) {
 	var result []Dictionary
 
 	pipeline := NewPipelineFromSlice(mySlice).
-		Process(NewMaskEngineProcess(NewPathSelector("id"), NewMaskCacheEngine(cache, idMasking))).
+		Process(NewMaskEngineProcess(NewPathSelector("id"), NewMaskCacheEngine(cache, idMasking), "")).
 		Process(NewFromCacheProcess(NewPathSelector("supervisor"), cache)).
 		AddSink(NewSinkToSlice(&result))
 	err := pipeline.Run()
@@ -142,7 +142,7 @@ func TestFromCacheProcessShouldUsedPreviouslyCachedValue(t *testing.T) {
 	var result []Dictionary
 
 	pipeline := NewPipelineFromSlice(mySlice).
-		Process(NewMaskEngineProcess(NewPathSelector("id"), NewMaskCacheEngine(cache, idMasking))).
+		Process(NewMaskEngineProcess(NewPathSelector("id"), NewMaskCacheEngine(cache, idMasking), "")).
 		Process(NewFromCacheProcess(NewPathSelector("supervisor"), cache)).
 		AddSink(NewSinkToSlice(&result))
 	err := pipeline.Run()
@@ -174,7 +174,7 @@ func TestFromCacheProcessShouldReorderList(t *testing.T) {
 	var result []Dictionary
 
 	pipeline := NewPipelineFromSlice(mySlice).
-		Process(NewMaskEngineProcess(NewPathSelector("id"), NewMaskCacheEngine(cache, idMasking))).
+		Process(NewMaskEngineProcess(NewPathSelector("id"), NewMaskCacheEngine(cache, idMasking), "")).
 		Process(NewFromCacheProcess(NewPathSelector("supervisor"), cache)).
 		AddSink(NewSinkToSlice(&result))
 	err := pipeline.Run()
@@ -206,7 +206,7 @@ func TestFromCacheProcessShouldWaitWithUnique(t *testing.T) {
 	var result []Dictionary
 
 	pipeline := NewPipelineFromSlice(mySlice).
-		Process(NewMaskEngineProcess(NewPathSelector("id"), NewUniqueMaskCacheEngine(cache, idMasking))).
+		Process(NewMaskEngineProcess(NewPathSelector("id"), NewUniqueMaskCacheEngine(cache, idMasking), "")).
 		Process(NewFromCacheProcess(NewPathSelector("supervisor"), cache)).
 		AddSink(NewSinkToSlice(&result))
 	err := pipeline.Run()

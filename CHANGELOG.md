@@ -14,6 +14,10 @@ Types of changes
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [1.9.3]
+
+- `Added` option preserve in masking configuration
+
 ## [1.9.2]
 
 - `Fixed` cache with mask `fluxUri`.

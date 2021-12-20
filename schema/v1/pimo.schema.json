@@ -402,6 +402,9 @@
         },
         "cache": {
           "type": "string"
+        },
+        "preserve": {
+          "type": "string"
         }
       },
       "additionalProperties": false,

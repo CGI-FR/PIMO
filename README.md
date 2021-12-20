@@ -22,6 +22,7 @@ masking:
       jsonpath: "example.example2"
     mask:
       type: "argument"
+    preserve: "null"
 
 caches:
   cacheName:
@@ -36,6 +37,7 @@ caches:
 `jsonpath` defines the path of the entry that has to be masked in the json file.
 `mask` defines the mask that will be used for the entry defined by `selector`.
 `cache` is optional, if the current entry is already in the cache as key the associated value is returned without executing the mask. Otherwise the mask is executed and a new entry is added in the cache with the orignal content as `key` and the masked result as `value`. The cache have to be declared in the `caches` section of the YAML file.
+`preserve` is optional, and is used to keep some values unmasked in the json file. Allowed `preserve` options are: `"null"` (null values), `"empty"` (empty string `""`), and `"blank"` (both `empty` and `null` values).
 
 Multiple masks can be applied on the same jsonpath location, like in this example :
 
