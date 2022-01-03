@@ -14,13 +14,14 @@ Types of changes
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
-## [1.9.3]
+## [1.11.0]
 
-- `Added` option preserve in masking configuration
-
-## [1.9.2]
-
+- `Added` option preserve in masking configuration.
 - `Fixed` cache with mask `fluxUri`.
+
+## [1.10.0]
+
+- `Added` luhn mask to generate valid checksums using the Luhn algorithm.
 
 ## [1.9.1]
 
