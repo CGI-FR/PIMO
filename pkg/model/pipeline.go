@@ -76,6 +76,7 @@ func BuildPipeline(pipeline Pipeline, conf Definition, caches map[string]Cache) 
 				Mask:     maskDefinition,
 				Masks:    nil,
 				Cache:    masking.Cache,
+				Preserve: masking.Preserve,
 			}
 
 			if virtualMask.Mask.FromCache != "" {
@@ -105,7 +106,7 @@ func BuildPipeline(pipeline Pipeline, conf Definition, caches map[string]Cache) 
 							mask = NewMaskCacheEngine(typedCache, mask)
 						}
 					}
-					pipeline = pipeline.Process(NewMaskEngineProcess(NewPathSelector(virtualMask.Selector.Jsonpath), mask))
+					pipeline = pipeline.Process(NewMaskEngineProcess(NewPathSelector(virtualMask.Selector.Jsonpath), mask, virtualMask.Preserve))
 					nbArg++
 				}
 			}

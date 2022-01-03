@@ -162,6 +162,7 @@ type Masking struct {
 	Mask     MaskType     `yaml:"mask,omitempty" jsonschema:"oneof_required=Mask"`
 	Masks    []MaskType   `yaml:"masks,omitempty" jsonschema:"oneof_required=Masks"`
 	Cache    string       `yaml:"cache,omitempty"`
+	Preserve string       `yaml:"preserve,omitempty"`
 }
 
 type CacheDefinition struct {
