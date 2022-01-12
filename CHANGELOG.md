@@ -14,6 +14,10 @@ Types of changes
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [1.??.0]
+
+- `Added` command to export maskings as a mermaid flow chart
+
 ## [1.11.0]
 
 - `Added` option preserve in masking configuration.
