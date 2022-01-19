@@ -1,0 +1,24 @@
+name: flow chart feature
+testcases:
+  - name: export mermaid
+    steps:
+      - script: |-
+          cat > masking.yml <<EOF
+          version: "1"
+          masking:
+            - selector:
+                jsonpath: "name"
+              mask:
+                template: {{.TOTO}}
+          EOF
+      - script: pimo flow >  masking.mmd
+        assertions:
+          - result.code ShouldEqual 0
+      - script: |-
+          cat > expected.mmd <<EOF
+          flowchart LR
+              {{.TOTO}} --> name
+      - script: diff masking.mmd expected.mmd
+        assertions:
+          - result.code ShouldEqual 0
+          - result.systemout ShouldBeEmpty
