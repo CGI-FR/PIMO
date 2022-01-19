@@ -40,8 +40,8 @@ func TestExportTemplate(t *testing.T) {
 	}
 
 	wanted := `flowchart LR
-	{{.TOTO}} -->|Template| name
-	`
+    {{.TOTO}} -->|Template| name
+    `
 
 	exportedResult, err := flow.Export(definition)
 	assert.Nil(t, err)
@@ -63,8 +63,8 @@ func TestExportConstant(t *testing.T) {
 	}
 
 	wanted := `flowchart LR
-	1 -->|Constant| name
-	`
+    1 -->|Constant| name
+    `
 
 	exportedResult, err := flow.Export(definition)
 	assert.Nil(t, err)
@@ -86,8 +86,8 @@ func TestExportRegex(t *testing.T) {
 	}
 
 	wanted := `flowchart LR
-	Regex[[A-Z]oto([a-z]){3}] -->|Regex| name
-	`
+    Regex[[A-Z]oto([a-z]){3}] -->|Regex| name
+    `
 
 	exportedResult, err := flow.Export(definition)
 	assert.Nil(t, err)
@@ -109,8 +109,8 @@ func TestExportAdd(t *testing.T) {
 	}
 
 	wanted := `flowchart LR
-	Toto -->|Add| name
-	`
+    Toto -->|Add| name
+    `
 
 	exportedResult, err := flow.Export(definition)
 	assert.Nil(t, err)
@@ -132,8 +132,8 @@ func TestExportAddTransient(t *testing.T) {
 	}
 
 	wanted := `flowchart LR
-	Toto -->|AddTransient| name
-	`
+    Toto -->|AddTransient| name
+    `
 
 	exportedResult, err := flow.Export(definition)
 	assert.Nil(t, err)
@@ -155,8 +155,8 @@ func TestExportRandomChoice(t *testing.T) {
 	}
 
 	wanted := `flowchart LR
-	RandomChoice[[Toto,Tata]] -->|RandomChoice| name
-	`
+    RandomChoice[[Toto,Tata]] -->|RandomChoice| name
+    `
 
 	exportedResult, err := flow.Export(definition)
 	assert.Nil(t, err)
@@ -178,8 +178,8 @@ func TestExportRandomChoiceInURI(t *testing.T) {
 	}
 
 	wanted := `flowchart LR
-	file://../names.txt -->|RandomChoiceInURI| name
-	`
+    file://../names.txt -->|RandomChoiceInURI| name
+    `
 
 	exportedResult, err := flow.Export(definition)
 	assert.Nil(t, err)
@@ -201,8 +201,8 @@ func TestExportCommand(t *testing.T) {
 	}
 
 	wanted := `flowchart LR
-	cat file.json -->|Command| name
-	`
+    cat file.json -->|Command| name
+    `
 
 	exportedResult, err := flow.Export(definition)
 	assert.Nil(t, err)
@@ -227,8 +227,8 @@ func TestExportRandomInt(t *testing.T) {
 	}
 
 	wanted := `flowchart LR
-	RandomInt[10,25] -->|RandomInt| name
-	`
+    RandomInt[10,25] -->|RandomInt| name
+    `
 
 	exportedResult, err := flow.Export(definition)
 	assert.Nil(t, err)
@@ -259,8 +259,8 @@ func TestExportWeightedChoice(t *testing.T) {
 	}
 
 	wanted := `flowchart LR
-	WeightedChoice[[{Choice: toto, Weight: 8},{Choice: tutu, Weight: 1}]] -->|WeightedChoice| name
-	`
+    WeightedChoice[[{Choice: toto, Weight: 8},{Choice: tutu, Weight: 1}]] -->|WeightedChoice| name
+    `
 
 	exportedResult, err := flow.Export(definition)
 	assert.Nil(t, err)
@@ -282,8 +282,8 @@ func TestExportHash(t *testing.T) {
 	}
 
 	wanted := `flowchart LR
-	Hash[[Toto,Tutu]] -->|Hash| name
-	`
+    Hash[[Toto,Tutu]] -->|Hash| name
+    `
 
 	exportedResult, err := flow.Export(definition)
 	assert.Nil(t, err)
@@ -305,8 +305,8 @@ func TestExportHashInURI(t *testing.T) {
 	}
 
 	wanted := `flowchart LR
-	file://../names.txt -->|HashInURI| name
-	`
+    file://../names.txt -->|HashInURI| name
+    `
 
 	exportedResult, err := flow.Export(definition)
 	assert.Nil(t, err)
@@ -331,8 +331,8 @@ func TestExportRandDate(t *testing.T) {
 	}
 
 	wanted := `flowchart LR
-	RandDate[DateMin: 2022-01-14 16:14:00 +0000 UTC, DateMax: 2022-01-15 16:14:00 +0000 UTC] -->|RandDate| name
-	`
+    RandDate[DateMin: 2022-01-14 16:14:00 +0000 UTC, DateMax: 2022-01-15 16:14:00 +0000 UTC] -->|RandDate| name
+    `
 
 	exportedResult, err := flow.Export(definition)
 	assert.Nil(t, err)
@@ -357,8 +357,8 @@ func TestExportIncremental(t *testing.T) {
 	}
 
 	wanted := `flowchart LR
-	Incremental[Start: 10, Increment: 10] -->|Incremental| name
-	`
+    Incremental[Start: 10, Increment: 10] -->|Incremental| name
+    `
 
 	exportedResult, err := flow.Export(definition)
 	assert.Nil(t, err)
@@ -380,8 +380,8 @@ func TestExportReplacement(t *testing.T) {
 	}
 
 	wanted := `flowchart LR
-	name2 -->|Replacement| name
-	`
+    name2 -->|Replacement| name
+    `
 
 	exportedResult, err := flow.Export(definition)
 	assert.Nil(t, err)
@@ -407,8 +407,8 @@ func TestExportTemplateEach(t *testing.T) {
 	}
 
 	wanted := `flowchart LR
-	TemplateEach[Item: val, Index: idx, Template: {{title .val}} {{.idx}}] -->|TemplateEach| name
-	`
+    TemplateEach[Item: val, Index: idx, Template: {{title .val}} {{.idx}}] -->|TemplateEach| name
+    `
 
 	exportedResult, err := flow.Export(definition)
 	assert.Nil(t, err)
@@ -430,8 +430,8 @@ func TestExportDuration(t *testing.T) {
 	}
 
 	wanted := `flowchart LR
-	-P2D -->|Duration| name
-	`
+    -P2D -->|Duration| name
+    `
 
 	exportedResult, err := flow.Export(definition)
 	assert.Nil(t, err)
@@ -453,8 +453,8 @@ func TestExportRemove(t *testing.T) {
 	}
 
 	wanted := `flowchart LR
-	name -->|Remove| Trash[(Trash)]
-	`
+    name -->|Remove| Trash[(Trash)]
+    `
 
 	exportedResult, err := flow.Export(definition)
 	assert.Nil(t, err)
@@ -476,8 +476,8 @@ func TestExportRangeMask(t *testing.T) {
 	}
 
 	wanted := `flowchart LR
-	5 -->|RangeMask| name
-	`
+    5 -->|RangeMask| name
+    `
 
 	exportedResult, err := flow.Export(definition)
 	assert.Nil(t, err)
@@ -502,8 +502,8 @@ func TestExportRandomDuration(t *testing.T) {
 	}
 
 	wanted := `flowchart LR
-	RandomDuration[Min: -P2D, Max: -P27D] -->|RandomDuration| name
-	`
+    RandomDuration[Min: -P2D, Max: -P27D] -->|RandomDuration| name
+    `
 
 	exportedResult, err := flow.Export(definition)
 	assert.Nil(t, err)
@@ -525,8 +525,8 @@ func TestExportFluxURI(t *testing.T) {
 	}
 
 	wanted := `flowchart LR
-	file://../names.txt -->|FluxURI| name
-	`
+    file://../names.txt -->|FluxURI| name
+    `
 
 	exportedResult, err := flow.Export(definition)
 	assert.Nil(t, err)
@@ -552,8 +552,8 @@ func TestExportRandomDecimal(t *testing.T) {
 	}
 
 	wanted := `flowchart LR
-	RandomDecimal[Min: 0.000E+00, Max: 9.000E+00, Precision: 3] -->|RandomDecimal| name
-	`
+    RandomDecimal[Min: 0.000E+00, Max: 9.000E+00, Precision: 3] -->|RandomDecimal| name
+    `
 
 	exportedResult, err := flow.Export(definition)
 	assert.Nil(t, err)
@@ -578,8 +578,8 @@ func TestExportDateParser(t *testing.T) {
 	}
 
 	wanted := `flowchart LR
-	DateParser[InputFormat: 2006-01-02, OutputFormat: 01/02/06] -->|DateParser| name
-	`
+    DateParser[InputFormat: 2006-01-02, OutputFormat: 01/02/06] -->|DateParser| name
+    `
 
 	exportedResult, err := flow.Export(definition)
 	assert.Nil(t, err)
@@ -601,8 +601,8 @@ func TestExportFromCache(t *testing.T) {
 	}
 
 	wanted := `flowchart LR
-	surname -->|FromCache| name
-	`
+    surname -->|FromCache| name
+    `
 
 	exportedResult, err := flow.Export(definition)
 	assert.Nil(t, err)
@@ -629,8 +629,8 @@ func TestExportFF1(t *testing.T) {
 	}
 
 	wanted := `flowchart LR
-	FF1[KeyFromEnv: FF1_ENCRYPTION_KEY, TweakField: tweak, Radix: 62, Decrypt: false] -->|FF1| name
-	`
+    FF1[KeyFromEnv: FF1_ENCRYPTION_KEY, TweakField: tweak, Radix: 62, Decrypt: false] -->|FF1| name
+    `
 
 	exportedResult, err := flow.Export(definition)
 	assert.Nil(t, err)
@@ -664,10 +664,10 @@ func TestExportPipe(t *testing.T) {
 	}
 
 	wanted := `flowchart LR
-	Pipe[DefinitionFile: , InjectParent: , InjectRoot: ] -->|Pipe| name
-	name --> Tutu -->|Add| surname
-	
-	`
+    Pipe[DefinitionFile: , InjectParent: , InjectRoot: ] -->|Pipe| name
+    name --> Tutu -->|Add| surname
+    
+    `
 
 	exportedResult, err := flow.Export(definition)
 	assert.Nil(t, err)
@@ -689,8 +689,8 @@ func TestExportFromJSON(t *testing.T) {
 	}
 
 	wanted := `flowchart LR
-	nom -->|FromJSON| name
-	`
+    nom -->|FromJSON| name
+    `
 
 	exportedResult, err := flow.Export(definition)
 	assert.Nil(t, err)
@@ -714,8 +714,8 @@ func TestExportLuhn(t *testing.T) {
 	}
 
 	wanted := `flowchart LR
-	abcdef -->|Luhn| name
-	`
+    abcdef -->|Luhn| name
+    `
 
 	exportedResult, err := flow.Export(definition)
 	assert.Nil(t, err)
@@ -738,9 +738,9 @@ func TestExportMasks(t *testing.T) {
 	}
 
 	wanted := `flowchart LR
-	abcdef -->|Add| name
-	nom -->|FromJSON| name
-	`
+    abcdef -->|Add| name
+    nom -->|FromJSON| name
+    `
 
 	exportedResult, err := flow.Export(definition)
 	assert.Nil(t, err)

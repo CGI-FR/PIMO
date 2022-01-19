@@ -2,6 +2,7 @@ name: flow chart feature
 testcases:
   - name: export mermaid
     steps:
+      - script: rm -f masking.yml
       - script: |-
           cat > masking.yml <<EOF
           version: "1"
@@ -9,7 +10,34 @@ testcases:
             - selector:
                 jsonpath: "name"
               mask:
-                template: {{.TOTO}}
+                add: "toto"
+          EOF
+      - script: pimo flow > masking.mmd
+        assertions:
+          - result.code ShouldEqual 0
+      - script: |-
+          cat > expected.mmd <<EOF
+          flowchart LR
+              toto -->|Add| name
+              
+          EOF
+      - script: diff masking.mmd expected.mmd
+        assertions:
+          - result.code ShouldEqual 0
+          - result.systemout ShouldBeEmpty
+
+  - name: export mermaid multiple masks
+    steps:
+      - script: rm -f masking.yml
+      - script: |-
+          cat > masking.yml <<EOF
+          version: "1"
+          masking:
+            - selector:
+                jsonpath: "name"
+              masks:
+                - add: ""
+                - template: "hello {{.input}}"
           EOF
       - script: pimo flow >  masking.mmd
         assertions:
@@ -17,7 +45,10 @@ testcases:
       - script: |-
           cat > expected.mmd <<EOF
           flowchart LR
-              {{.TOTO}} --> name
+               -->|Add| name
+              hello {{.input}} -->|Template| name
+              
+          EOF
       - script: diff masking.mmd expected.mmd
         assertions:
           - result.code ShouldEqual 0

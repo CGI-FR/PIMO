@@ -30,15 +30,15 @@ func Export(masking model.Definition) (string, error) {
 		return "", nil
 	}
 	res := `flowchart LR
-	`
+    `
 	for i := 0; i < len(maskingDef); i++ {
 		if maskingDef[i].Masks != nil {
 			for _, v := range maskingDef[i].Masks {
-				res += exportMask(maskingDef[i], v) + "\n\t"
+				res += exportMask(maskingDef[i], v) + "\n    "
 			}
 			return res, nil
 		}
-		res += exportMask(maskingDef[i], maskingDef[i].Mask) + "\n\t"
+		res += exportMask(maskingDef[i], maskingDef[i].Mask) + "\n    "
 	}
 	return res, nil
 }
@@ -123,9 +123,9 @@ func exportMask(masking model.Masking, mask model.MaskType) string {
 		return "FF1[KeyFromEnv: " + mask.FF1.KeyFromEnv + ", TweakField: " + mask.FF1.TweakField + ", Radix: " + strconv.FormatUint(uint64(mask.FF1.Radix), 10) + ", Decrypt: " + strconv.FormatBool(mask.FF1.Decrypt) + "] -->|FF1| " + masking.Selector.Jsonpath
 	}
 	if mask.Pipe.Masking != nil {
-		str := "Pipe[DefinitionFile: " + mask.Pipe.DefinitionFile + ", InjectParent: " + mask.Pipe.InjectParent + ", InjectRoot: " + mask.Pipe.InjectRoot + "] -->|Pipe| " + masking.Selector.Jsonpath + "\n\t"
+		str := "Pipe[DefinitionFile: " + mask.Pipe.DefinitionFile + ", InjectParent: " + mask.Pipe.InjectParent + ", InjectRoot: " + mask.Pipe.InjectRoot + "] -->|Pipe| " + masking.Selector.Jsonpath + "\n    "
 		for _, v := range mask.Pipe.Masking {
-			str += masking.Selector.Jsonpath + " --> " + exportMask(v, v.Mask) + "\n\t"
+			str += masking.Selector.Jsonpath + " --> " + exportMask(v, v.Mask) + "\n    "
 		}
 		return str
 	}
