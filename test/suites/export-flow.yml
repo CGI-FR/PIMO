@@ -53,3 +53,62 @@ testcases:
         assertions:
           - result.code ShouldEqual 0
           - result.systemout ShouldBeEmpty
+
+  - name: export multiple maskings
+    steps:
+      - script: rm -f masking.yml
+      - script: |-
+          cat > masking.yml <<EOF
+          version: "1"
+          seed: 42
+          masking:
+            - selector:
+                jsonpath: "name"
+              mask:
+                hashInUri: "pimo://nameFR"
+            - selector:
+                jsonpath: "familyName"
+              mask:
+                hashInUri: "pimo://surnameFR"
+            - selector:
+                jsonpath: "domaine"
+              masks:
+                - add: ""
+                - randomChoice:
+                  - "gmail.com"
+                  - "msn.com"
+            - selector:
+                jsonpath: "email"
+              mask:
+                hashInUri: "{{.name}}.{{.familyName}}@{{.domaine}}"
+            - selector:
+                jsonpath: "domaine"
+              mask:
+                delete: true
+          EOF
+      - script: pimo flow > masking.mmd
+        asertions:
+          - result.code ShouldEqual 0
+      - script: |-
+          cat > expected.mmd <<EOF
+          flowchart LR
+            !input --> name
+            name -->|"hashInUri(pimo://nameFR)"| name_1
+            !input --> familyName
+            familyName -->|"hashInUri(pimo://surnameFR)"| familyName_1
+            !add --> domaine
+            domaine -->|"randomChoice(gmail.com,msn.com)"| domaine_1
+            !input --> email
+            email -->|"template{{.name}}.{{.familyName}}@{{.domaine}}"| email_1
+            name_1 -->|"template{{.name}}.{{.familyName}}@{{.domaine}}"| email_1
+            domaine_1 -->|"template{{.name}}.{{.familyName}}@{{.domaine}}"| email_1
+            domaine_1 --> !delete
+            email_1 --> !output
+            name_1 --> !output
+            familyName_1 --> !output
+
+          EOF
+      - script: diff masking.mmd expected.mmd
+        assertions:
+          - result.code ShouldEqual 0
+          - result.systemout ShouldBeEmpty
