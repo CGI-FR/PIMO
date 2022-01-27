@@ -18,6 +18,7 @@
 package flow
 
 import (
+	"regexp"
 	"strconv"
 	"strings"
 
@@ -31,21 +32,33 @@ func Export(masking model.Definition) (string, error) {
 	}
 	res := `flowchart LR
     `
+	input := make(map[string]struct{})
+	variables := make(map[string]interface{})
 	for i := 0; i < len(maskingDef); i++ {
 		if maskingDef[i].Masks != nil {
 			for _, v := range maskingDef[i].Masks {
-				res += exportMask(maskingDef[i], v) + "\n    "
+				res += exportMask(maskingDef[i], v, input, variables) + "\n    "
 			}
-			return res, nil
 		}
-		res += exportMask(maskingDef[i], maskingDef[i].Mask) + "\n    "
+		mask := exportMask(maskingDef[i], maskingDef[i].Mask, input, variables)
+		if mask != "" {
+			res += mask + "\n    "
+		}
 	}
+	res += addInputValues(input)
+	res += addOutputValues(variables)
 	return res, nil
 }
 
-func exportMask(masking model.Masking, mask model.MaskType) string {
+func exportMask(masking model.Masking, mask model.MaskType, input map[string]struct{}, variables map[string]interface{}) string {
 	if mask.Add != nil {
-		return mask.Add.(string) + " -->|Add| " + masking.Selector.Jsonpath
+		str := "!add --> " + masking.Selector.Jsonpath
+		key := masking.Selector.Jsonpath + "_1"
+		variables[key] = mask.Add
+		if mask.Add.(string) != "" {
+			return str + "\n    " + mask.Add.(string) + " --> " + masking.Selector.Jsonpath
+		}
+		return str
 	}
 	if mask.AddTransient != nil {
 		return mask.AddTransient.(string) + " -->|AddTransient| " + masking.Selector.Jsonpath
@@ -54,7 +67,7 @@ func exportMask(masking model.Masking, mask model.MaskType) string {
 		return mask.Constant.(string) + " -->|Constant| " + masking.Selector.Jsonpath
 	}
 	if mask.RandomChoice != nil {
-		return "RandomChoice[[" + flattenChoices(mask) + "]] -->|RandomChoice| " + masking.Selector.Jsonpath
+		return masking.Selector.Jsonpath + " -->|\"RandomChoice(" + flattenChoices(mask) + ")\"| " + masking.Selector.Jsonpath + "_1"
 	}
 	if mask.RandomChoiceInURI != "" {
 		return mask.RandomChoiceInURI + " -->|RandomChoiceInURI| " + masking.Selector.Jsonpath
@@ -75,7 +88,8 @@ func exportMask(masking model.Masking, mask model.MaskType) string {
 		return "Hash[[" + flattenHash(mask) + "]] -->|Hash| " + masking.Selector.Jsonpath
 	}
 	if mask.HashInURI != "" {
-		return mask.HashInURI + " -->|HashInURI| " + masking.Selector.Jsonpath
+		input[masking.Selector.Jsonpath] = struct{}{}
+		return masking.Selector.Jsonpath + " -->|\"HashInURI(" + mask.HashInURI + ")\"| " + masking.Selector.Jsonpath + "_1"
 	}
 	if mask.RandDate != (model.RandDateType{}) {
 		return "RandDate[DateMin: " + mask.RandDate.DateMin.String() + ", DateMax: " + mask.RandDate.DateMax.String() + "] -->|RandDate| " + masking.Selector.Jsonpath
@@ -87,7 +101,13 @@ func exportMask(masking model.Masking, mask model.MaskType) string {
 		return mask.Replacement + " -->|Replacement| " + masking.Selector.Jsonpath
 	}
 	if mask.Template != "" {
-		return mask.Template + " -->|Template| " + masking.Selector.Jsonpath
+		input[masking.Selector.Jsonpath] = struct{}{}
+		key := masking.Selector.Jsonpath + "_1"
+		variables[key] = ""
+		definitionString := " -->|\"Template(" + mask.Template + ")\"| " + masking.Selector.Jsonpath + "_1\n    "
+		res := masking.Selector.Jsonpath + definitionString
+		res += unescapeTemplateValues(mask.Template, definitionString, variables)
+		return res
 	}
 	if mask.TemplateEach != (model.TemplateEachType{}) {
 		return "TemplateEach[Item: " + mask.TemplateEach.Item + ", Index: " + mask.TemplateEach.Index + ", Template: " + mask.TemplateEach.Template + "] -->|TemplateEach| " + masking.Selector.Jsonpath
@@ -96,7 +116,7 @@ func exportMask(masking model.Masking, mask model.MaskType) string {
 		return mask.Duration + " -->|Duration| " + masking.Selector.Jsonpath
 	}
 	if mask.Remove {
-		return masking.Selector.Jsonpath + " -->|Remove| Trash[(Trash)]"
+		return checkValueToRemove(masking, input, variables)
 	}
 	if mask.RangeMask != 0 {
 		return strconv.Itoa(mask.RangeMask) + " -->|RangeMask| " + masking.Selector.Jsonpath
@@ -124,15 +144,13 @@ func exportMask(masking model.Masking, mask model.MaskType) string {
 	}
 	if mask.Pipe.Masking != nil {
 		str := "Pipe[DefinitionFile: " + mask.Pipe.DefinitionFile + ", InjectParent: " + mask.Pipe.InjectParent + ", InjectRoot: " + mask.Pipe.InjectRoot + "] -->|Pipe| " + masking.Selector.Jsonpath + "\n    "
-		for _, v := range mask.Pipe.Masking {
-			str += masking.Selector.Jsonpath + " --> " + exportMask(v, v.Mask) + "\n    "
-		}
+		str += flattenPipe(mask.Pipe, masking, input, variables)
 		return str
 	}
 	if mask.FromJSON != "" {
 		return mask.FromJSON + " -->|FromJSON| " + masking.Selector.Jsonpath
 	}
-	if mask.Luhn != (&model.LuhnType{}) {
+	if mask.Luhn != nil {
 		return mask.Luhn.Universe + " -->|Luhn| " + masking.Selector.Jsonpath
 	}
 
@@ -163,4 +181,54 @@ func flattenHash(mask model.MaskType) string {
 		choices[i] = v.(string)
 	}
 	return strings.Join(choices, ",")
+}
+
+func unescapeTemplateValues(templateValue, definitionString string, variables map[string]interface{}) string {
+	res := ""
+	regex := regexp.MustCompile(`(?:{{\.)([0-z]+)(?:}})`)
+	splittedTemplate := regex.FindAllString(templateValue, -1)
+	for i := range splittedTemplate {
+		value := splittedTemplate[i][3:len(splittedTemplate[i])-2] + "_1"
+		variables[value] = ""
+		res += value + definitionString
+	}
+	return res[:len(res)-5]
+}
+
+func flattenPipe(mask model.PipeType, masking model.Masking, input map[string]struct{}, variables map[string]interface{}) string {
+	str := make([]string, len(mask.Masking))
+	for i, v := range mask.Masking {
+		str[i] = masking.Selector.Jsonpath + " --> " + exportMask(v, v.Mask, input, variables) + "\n    "
+	}
+	return strings.Join(str, "\n    ")
+}
+
+func checkValueToRemove(masking model.Masking, input map[string]struct{}, variables map[string]interface{}) string {
+	_, ok := input[masking.Selector.Jsonpath]
+	keyVar := masking.Selector.Jsonpath + "_1"
+	_, okVar := variables[keyVar]
+	if ok {
+		delete(input, masking.Selector.Jsonpath)
+	}
+	if okVar {
+		delete(variables, keyVar)
+		return keyVar + " --> !remove"
+	}
+	return masking.Selector.Jsonpath + " --> !remove"
+}
+
+func addInputValues(input map[string]struct{}) string {
+	res := ""
+	for k, _ := range input {
+		res += "input[(input)] --> " + k + "\n    "
+	}
+	return res
+}
+
+func addOutputValues(variables map[string]interface{}) string {
+	res := ""
+	for k, _ := range variables {
+		res += k + " --> output>output]\n    "
+	}
+	return res
 }

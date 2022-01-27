@@ -80,11 +80,11 @@ testcases:
             - selector:
                 jsonpath: "email"
               mask:
-                hashInUri: "{{.name}}.{{.familyName}}@{{.domaine}}"
+                template: "{{.name}}.{{.familyName}}@{{.domaine}}"
             - selector:
                 jsonpath: "domaine"
               mask:
-                delete: true
+                remove: true
           EOF
       - script: pimo flow > masking.mmd
         asertions:

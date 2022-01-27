@@ -40,7 +40,11 @@ func TestExportTemplate(t *testing.T) {
 	}
 
 	wanted := `flowchart LR
-    {{.TOTO}} -->|Template| name
+    name -->|"Template({{.TOTO}})"| name_1
+    TOTO_1 -->|"Template({{.TOTO}})"| name_1
+    input[(input)] --> name
+    name_1 --> output>output]
+    TOTO_1 --> output>output]
     `
 
 	exportedResult, err := flow.Export(definition)
@@ -109,7 +113,9 @@ func TestExportAdd(t *testing.T) {
 	}
 
 	wanted := `flowchart LR
-    Toto -->|Add| name
+    !add --> name
+    Toto --> name
+    name --> output>output]
     `
 
 	exportedResult, err := flow.Export(definition)
@@ -155,7 +161,7 @@ func TestExportRandomChoice(t *testing.T) {
 	}
 
 	wanted := `flowchart LR
-    RandomChoice[[Toto,Tata]] -->|RandomChoice| name
+    name -->|"RandomChoice(Toto,Tata)"| name_1
     `
 
 	exportedResult, err := flow.Export(definition)
@@ -305,7 +311,8 @@ func TestExportHashInURI(t *testing.T) {
 	}
 
 	wanted := `flowchart LR
-    file://../names.txt -->|HashInURI| name
+    name -->|"HashInURI(file://../names.txt)"| name_1
+    input[(input)] --> name
     `
 
 	exportedResult, err := flow.Export(definition)
@@ -453,7 +460,7 @@ func TestExportRemove(t *testing.T) {
 	}
 
 	wanted := `flowchart LR
-    name -->|Remove| Trash[(Trash)]
+    name --> !remove
     `
 
 	exportedResult, err := flow.Export(definition)
@@ -738,8 +745,71 @@ func TestExportMasks(t *testing.T) {
 	}
 
 	wanted := `flowchart LR
-    abcdef -->|Add| name
+    !add --> name
     nom -->|FromJSON| name
+    
+    `
+
+	exportedResult, err := flow.Export(definition)
+	assert.Nil(t, err)
+
+	assert.Equal(t, wanted, exportedResult)
+}
+
+func TestExportMasking(t *testing.T) {
+	definition := model.Definition{
+		Version: "1",
+		Masking: []model.Masking{
+			{
+				Selector: model.SelectorType{Jsonpath: "name"},
+				Mask: model.MaskType{
+					HashInURI: "pimo://nameFR",
+				},
+			},
+			{
+				Selector: model.SelectorType{Jsonpath: "familyName"},
+				Mask: model.MaskType{
+					HashInURI: "pimo://surnameFR",
+				},
+			},
+			{
+				Selector: model.SelectorType{Jsonpath: "domaine"},
+				Masks: []model.MaskType{
+					{Add: ""},
+					{RandomChoice: []model.Entry{"gmail.com", "msn.com"}},
+				},
+			},
+			{
+				Selector: model.SelectorType{Jsonpath: "email"},
+				Mask: model.MaskType{
+					Template: "{{.name}}.{{.familyName}}@{{.domaine}}",
+				},
+			},
+			{
+				Selector: model.SelectorType{Jsonpath: "domaine"},
+				Mask: model.MaskType{
+					Remove: true,
+				},
+			},
+		},
+	}
+
+	wanted := `flowchart LR
+    name -->|"HashInURI(pimo://nameFR)"| name_1
+    familyName -->|"HashInURI(pimo://surnameFR)"| familyName_1
+    !add --> domaine
+    domaine -->|"RandomChoice(gmail.com,msn.com)"| domaine_1
+    email -->|"Template({{.name}}.{{.familyName}}@{{.domaine}})"| email_1
+    name_1 -->|"Template({{.name}}.{{.familyName}}@{{.domaine}})"| email_1
+    familyName_1 -->|"Template({{.name}}.{{.familyName}}@{{.domaine}})"| email_1
+    domaine_1 -->|"Template({{.name}}.{{.familyName}}@{{.domaine}})"| email_1
+    domaine_1 --> !remove
+    input[(input)] --> name
+    input[(input)] --> familyName
+    input[(input)] --> email
+    email_1 --> output>output]
+    name_1 --> output>output]
+    familyName_1 --> output>output]
     `
 
 	exportedResult, err := flow.Export(definition)
