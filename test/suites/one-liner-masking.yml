@@ -1,0 +1,32 @@
+name: one-liner features
+testcases:
+- name: one-liner
+  steps:
+  - script: |-
+      echo '{"value": ""}' | pimo --mask "value=[{fluxUri: 'pimo://nameFR'}]"
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemoutjson ShouldContainKey value
+    - result.systemoutjson.value ShouldEqual Aaron
+    - result.systemerr ShouldBeEmpty
+
+- name: one-liner with multiple masks
+  steps:
+  - script: |-
+      echo '{"value": ""}' | pimo --mask "value=[{fluxUri: 'pimo://nameFR'},{template: '{{.value}}{{.value}}'}]"
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemoutjson ShouldContainKey value
+    - result.systemoutjson.value ShouldEqual AaronAaron
+    - result.systemerr ShouldBeEmpty
+
+- name: one-liner for multiple attributes
+  steps:
+  - script: |-
+      echo '{"value1": ""}' | pimo --mask "value1=[{fluxUri: 'pimo://nameFR'}],value2=[{add: "const"}]"
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemoutjson ShouldContainKey value2
+    - result.systemoutjson.value1 ShouldEqual Aaron
+    - result.systemoutjson.value2 ShouldEqual const
+    - result.systemerr ShouldBeEmpty
