@@ -162,3 +162,28 @@ func LoadPipelineDefinitionFromYAML(filename string) (Definition, error) {
 	}
 	return conf, nil
 }
+
+func LoadMaskDefintionFromOneLiner(oneLine map[string]string) (Definition, error) {
+	var conf Definition
+	conf.Masking = []Masking{}
+	for key, value := range oneLine {
+		masking := Masking{}
+		var mask []MaskType
+		err := yaml.Unmarshal([]byte(value), &mask)
+		if err != nil {
+			return conf, err
+		}
+		if len(mask) == 1 {
+			masking.Mask = mask[0]
+		} else {
+			masking.Masks = mask
+		}
+		masking.Selector = SelectorType{Jsonpath: key}
+
+		conf.Masking = append(conf.Masking, masking)
+	}
+	if conf.Seed == 0 {
+		conf.Seed = time.Now().UnixNano()
+	}
+	return conf, nil
+}
