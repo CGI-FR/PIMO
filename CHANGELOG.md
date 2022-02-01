@@ -16,6 +16,10 @@ Types of changes
 
 ## [1.11.0]
 
+- `Added` flag to declare a simple mask definition in command line
+
+## [1.11.0]
+
 - `Added` option preserve in masking configuration.
 - `Fixed` cache with mask `fluxUri`.
 
