@@ -40,11 +40,13 @@ func TestExportTemplate(t *testing.T) {
 	}
 
 	wanted := `flowchart LR
-    name -->|"Template({{.TOTO}})"| name_1
-    TOTO_1 -->|"Template({{.TOTO}})"| name_1
-    input[(input)] --> name
-    name_1 --> output>output]
-    TOTO_1 --> output>output]
+    !input[(input)] --> name
+    subgraph name_sg
+        name -->|"Template({{.TOTO}})"| name_1
+        !input[(input)] --> TOTO
+        TOTO -->|"Template({{.TOTO}})"| name_1
+    end
+    name_1 --> !output>Output]
     `
 
 	exportedResult, err := flow.Export(definition)
@@ -67,7 +69,11 @@ func TestExportConstant(t *testing.T) {
 	}
 
 	wanted := `flowchart LR
-    1 -->|Constant| name
+    !input[(input)] --> name
+    subgraph name_sg
+        name -->|"Constant(1)"| name_1
+    end
+    name_1 --> !output>Output]
     `
 
 	exportedResult, err := flow.Export(definition)
@@ -90,7 +96,11 @@ func TestExportRegex(t *testing.T) {
 	}
 
 	wanted := `flowchart LR
-    Regex[[A-Z]oto([a-z]){3}] -->|Regex| name
+    !input[(input)] --> name
+    subgraph name_sg
+        name -->|"Regex([A-Z]oto([a-z]){3})"| name_1
+    end
+    name_1 --> !output>Output]
     `
 
 	exportedResult, err := flow.Export(definition)
@@ -113,9 +123,40 @@ func TestExportAdd(t *testing.T) {
 	}
 
 	wanted := `flowchart LR
-    !add --> name
-    Toto --> name
-    name --> output>output]
+    !add[/Add/] --> name
+    subgraph name_sg
+        name -->|"Add(Toto)"| name_1
+    end
+    name_1 --> !output>Output]
+    `
+
+	exportedResult, err := flow.Export(definition)
+	assert.Nil(t, err)
+
+	assert.Equal(t, wanted, exportedResult)
+}
+
+func TestExportTemplateAdd(t *testing.T) {
+	definition := model.Definition{
+		Version: "test",
+		Masking: []model.Masking{
+			{
+				Selector: model.SelectorType{Jsonpath: "name"},
+				Mask: model.MaskType{
+					Add: "{{.surname}}",
+				},
+			},
+		},
+	}
+
+	wanted := `flowchart LR
+    !add[/Add/] --> name
+    subgraph name_sg
+        name -->|"Add({{.surname}})"| name_1
+        !input[(input)] --> surname
+        surname -->|"Add({{.surname}})"| name_1
+    end
+    name_1 --> !output>Output]
     `
 
 	exportedResult, err := flow.Export(definition)
@@ -138,7 +179,11 @@ func TestExportAddTransient(t *testing.T) {
 	}
 
 	wanted := `flowchart LR
-    Toto -->|AddTransient| name
+    !add[/Add/] --> name
+    subgraph name_sg
+        name -->|"AddTransient(Toto)"| name_1
+    end
+    name_1 --> !remove[\Remove\]
     `
 
 	exportedResult, err := flow.Export(definition)
@@ -161,7 +206,11 @@ func TestExportRandomChoice(t *testing.T) {
 	}
 
 	wanted := `flowchart LR
-    name -->|"RandomChoice(Toto,Tata)"| name_1
+    !input[(input)] --> name
+    subgraph name_sg
+        name -->|"RandomChoice(Toto,Tata)"| name_1
+    end
+    name_1 --> !output>Output]
     `
 
 	exportedResult, err := flow.Export(definition)
@@ -184,7 +233,11 @@ func TestExportRandomChoiceInURI(t *testing.T) {
 	}
 
 	wanted := `flowchart LR
-    file://../names.txt -->|RandomChoiceInURI| name
+    !input[(input)] --> name
+    subgraph name_sg
+        name -->|"RandomChoiceInURI(file://../names.txt)"| name_1
+    end
+    name_1 --> !output>Output]
     `
 
 	exportedResult, err := flow.Export(definition)
@@ -207,7 +260,11 @@ func TestExportCommand(t *testing.T) {
 	}
 
 	wanted := `flowchart LR
-    cat file.json -->|Command| name
+    !input[(input)] --> name
+    subgraph name_sg
+        name -->|"Command(cat file.json)"| name_1
+    end
+    name_1 --> !output>Output]
     `
 
 	exportedResult, err := flow.Export(definition)
@@ -233,7 +290,11 @@ func TestExportRandomInt(t *testing.T) {
 	}
 
 	wanted := `flowchart LR
-    RandomInt[10,25] -->|RandomInt| name
+    !input[(input)] --> name
+    subgraph name_sg
+        name -->|"RandomInt(Min: 10, Max: 25)"| name_1
+    end
+    name_1 --> !output>Output]
     `
 
 	exportedResult, err := flow.Export(definition)
@@ -265,7 +326,11 @@ func TestExportWeightedChoice(t *testing.T) {
 	}
 
 	wanted := `flowchart LR
-    WeightedChoice[[{Choice: toto, Weight: 8},{Choice: tutu, Weight: 1}]] -->|WeightedChoice| name
+    !input[(input)] --> name
+    subgraph name_sg
+        name -->|"WeightedChoice(toto @ 8,tutu @ 1)"| name_1
+    end
+    name_1 --> !output>Output]
     `
 
 	exportedResult, err := flow.Export(definition)
@@ -288,7 +353,11 @@ func TestExportHash(t *testing.T) {
 	}
 
 	wanted := `flowchart LR
-    Hash[[Toto,Tutu]] -->|Hash| name
+    !input[(input)] --> name
+    subgraph name_sg
+        name -->|"Hash(Toto,Tutu)"| name_1
+    end
+    name_1 --> !output>Output]
     `
 
 	exportedResult, err := flow.Export(definition)
@@ -311,8 +380,11 @@ func TestExportHashInURI(t *testing.T) {
 	}
 
 	wanted := `flowchart LR
-    name -->|"HashInURI(file://../names.txt)"| name_1
-    input[(input)] --> name
+    !input[(input)] --> name
+    subgraph name_sg
+        name -->|"HashInURI(file://../names.txt)"| name_1
+    end
+    name_1 --> !output>Output]
     `
 
 	exportedResult, err := flow.Export(definition)
@@ -338,7 +410,11 @@ func TestExportRandDate(t *testing.T) {
 	}
 
 	wanted := `flowchart LR
-    RandDate[DateMin: 2022-01-14 16:14:00 +0000 UTC, DateMax: 2022-01-15 16:14:00 +0000 UTC] -->|RandDate| name
+    !input[(input)] --> name
+    subgraph name_sg
+        name -->|"RandDate(DateMin: 2022-01-14 16:14:00 +0000 UTC, DateMax: 2022-01-15 16:14:00 +0000 UTC)"| name_1
+    end
+    name_1 --> !output>Output]
     `
 
 	exportedResult, err := flow.Export(definition)
@@ -364,7 +440,11 @@ func TestExportIncremental(t *testing.T) {
 	}
 
 	wanted := `flowchart LR
-    Incremental[Start: 10, Increment: 10] -->|Incremental| name
+    !input[(input)] --> name
+    subgraph name_sg
+        name -->|"Incremental(Start: 10, Increment: 10)"| name_1
+    end
+    name_1 --> !output>Output]
     `
 
 	exportedResult, err := flow.Export(definition)
@@ -380,14 +460,18 @@ func TestExportReplacement(t *testing.T) {
 			{
 				Selector: model.SelectorType{Jsonpath: "name"},
 				Mask: model.MaskType{
-					Replacement: "name2",
+					Replacement: "surname",
 				},
 			},
 		},
 	}
 
 	wanted := `flowchart LR
-    name2 -->|Replacement| name
+    !input[(input)] --> name
+    subgraph name_sg
+        name -->|"Replacement(surname)"| name_1
+    end
+    name_1 --> !output>Output]
     `
 
 	exportedResult, err := flow.Export(definition)
@@ -414,7 +498,13 @@ func TestExportTemplateEach(t *testing.T) {
 	}
 
 	wanted := `flowchart LR
-    TemplateEach[Item: val, Index: idx, Template: {{title .val}} {{.idx}}] -->|TemplateEach| name
+    !input[(input)] --> name
+    subgraph name_sg
+        name -->|"TemplateEach(Item: val, Index: idx, Template: {{title .val}} {{.idx}})"| name_1
+        !input[(input)] --> idx
+        idx -->|"TemplateEach({{title .val}} {{.idx}})"| name_1
+    end
+    name_1 --> !output>Output]
     `
 
 	exportedResult, err := flow.Export(definition)
@@ -437,7 +527,11 @@ func TestExportDuration(t *testing.T) {
 	}
 
 	wanted := `flowchart LR
-    -P2D -->|Duration| name
+    !input[(input)] --> name
+    subgraph name_sg
+        name -->|"Duration(-P2D)"| name_1
+    end
+    name_1 --> !output>Output]
     `
 
 	exportedResult, err := flow.Export(definition)
@@ -460,7 +554,8 @@ func TestExportRemove(t *testing.T) {
 	}
 
 	wanted := `flowchart LR
-    name --> !remove
+    !input[(input)] --> name
+    name --> !remove[\Remove\]
     `
 
 	exportedResult, err := flow.Export(definition)
@@ -483,7 +578,11 @@ func TestExportRangeMask(t *testing.T) {
 	}
 
 	wanted := `flowchart LR
-    5 -->|RangeMask| name
+    !input[(input)] --> name
+    subgraph name_sg
+        name -->|"RangeMask(5)"| name_1
+    end
+    name_1 --> !output>Output]
     `
 
 	exportedResult, err := flow.Export(definition)
@@ -509,7 +608,11 @@ func TestExportRandomDuration(t *testing.T) {
 	}
 
 	wanted := `flowchart LR
-    RandomDuration[Min: -P2D, Max: -P27D] -->|RandomDuration| name
+    !input[(input)] --> name
+    subgraph name_sg
+        name -->|"RandomDuration(Min: -P2D, Max: -P27D)"| name_1
+    end
+    name_1 --> !output>Output]
     `
 
 	exportedResult, err := flow.Export(definition)
@@ -532,7 +635,11 @@ func TestExportFluxURI(t *testing.T) {
 	}
 
 	wanted := `flowchart LR
-    file://../names.txt -->|FluxURI| name
+    !input[(input)] --> name
+    subgraph name_sg
+        name -->|"FluxURI(file://../names.txt)"| name_1
+    end
+    name_1 --> !output>Output]
     `
 
 	exportedResult, err := flow.Export(definition)
@@ -559,7 +666,11 @@ func TestExportRandomDecimal(t *testing.T) {
 	}
 
 	wanted := `flowchart LR
-    RandomDecimal[Min: 0.000E+00, Max: 9.000E+00, Precision: 3] -->|RandomDecimal| name
+    !input[(input)] --> name
+    subgraph name_sg
+        name -->|"RandomDecimal(Min: 0.000E+00, Max: 9.000E+00, Precision: 3)"| name_1
+    end
+    name_1 --> !output>Output]
     `
 
 	exportedResult, err := flow.Export(definition)
@@ -585,7 +696,11 @@ func TestExportDateParser(t *testing.T) {
 	}
 
 	wanted := `flowchart LR
-    DateParser[InputFormat: 2006-01-02, OutputFormat: 01/02/06] -->|DateParser| name
+    !input[(input)] --> name
+    subgraph name_sg
+        name -->|"DateParser(InputFormat: 2006-01-02, OutputFormat: 01/02/06)"| name_1
+    end
+    name_1 --> !output>Output]
     `
 
 	exportedResult, err := flow.Export(definition)
@@ -608,7 +723,11 @@ func TestExportFromCache(t *testing.T) {
 	}
 
 	wanted := `flowchart LR
-    surname -->|FromCache| name
+    !input[(input)] --> name
+    subgraph name_sg
+        name -->|"FromCache(surname)"| name_1
+    end
+    name_1 --> !output>Output]
     `
 
 	exportedResult, err := flow.Export(definition)
@@ -636,7 +755,11 @@ func TestExportFF1(t *testing.T) {
 	}
 
 	wanted := `flowchart LR
-    FF1[KeyFromEnv: FF1_ENCRYPTION_KEY, TweakField: tweak, Radix: 62, Decrypt: false] -->|FF1| name
+    !input[(input)] --> name
+    subgraph name_sg
+        name -->|"FF1(KeyFromEnv: FF1_ENCRYPTION_KEY, TweakField: tweak, Radix: 62, Decrypt: false)"| name_1
+    end
+    name_1 --> !output>Output]
     `
 
 	exportedResult, err := flow.Export(definition)
@@ -671,9 +794,11 @@ func TestExportPipe(t *testing.T) {
 	}
 
 	wanted := `flowchart LR
-    Pipe[DefinitionFile: , InjectParent: , InjectRoot: ] -->|Pipe| name
-    name --> Tutu -->|Add| surname
-    
+    !input[(input)] --> name
+    subgraph name_sg
+        name -->|"Pipe(DefinitionFile: , InjectParent: , InjectRoot: )"| name_1
+    end
+    name_1 --> !output>Output]
     `
 
 	exportedResult, err := flow.Export(definition)
@@ -696,7 +821,11 @@ func TestExportFromJSON(t *testing.T) {
 	}
 
 	wanted := `flowchart LR
-    nom -->|FromJSON| name
+    !input[(input)] --> name
+    subgraph name_sg
+        name -->|"FromJSON(nom)"| name_1
+    end
+    name_1 --> !output>Output]
     `
 
 	exportedResult, err := flow.Export(definition)
@@ -721,7 +850,11 @@ func TestExportLuhn(t *testing.T) {
 	}
 
 	wanted := `flowchart LR
-    abcdef -->|Luhn| name
+    !input[(input)] --> name
+    subgraph name_sg
+        name -->|"Luhn(abcdef)"| name_1
+    end
+    name_1 --> !output>Output]
     `
 
 	exportedResult, err := flow.Export(definition)
@@ -745,9 +878,12 @@ func TestExportMasks(t *testing.T) {
 	}
 
 	wanted := `flowchart LR
-    !add --> name
-    nom -->|FromJSON| name
-    
+    !add[/Add/] --> name
+    subgraph name_sg
+        name -->|"Add(abcdef)"| name_1
+        name_1 -->|"FromJSON(nom)"| name_2
+    end
+    name_2 --> !output>Output]
     `
 
 	exportedResult, err := flow.Export(definition)
@@ -795,21 +931,29 @@ func TestExportMasking(t *testing.T) {
 	}
 
 	wanted := `flowchart LR
-    name -->|"HashInURI(pimo://nameFR)"| name_1
-    familyName -->|"HashInURI(pimo://surnameFR)"| familyName_1
-    !add --> domaine
-    domaine -->|"RandomChoice(gmail.com,msn.com)"| domaine_1
-    email -->|"Template({{.name}}.{{.familyName}}@{{.domaine}})"| email_1
-    name_1 -->|"Template({{.name}}.{{.familyName}}@{{.domaine}})"| email_1
-    familyName_1 -->|"Template({{.name}}.{{.familyName}}@{{.domaine}})"| email_1
-    domaine_1 -->|"Template({{.name}}.{{.familyName}}@{{.domaine}})"| email_1
-    domaine_1 --> !remove
-    input[(input)] --> name
-    input[(input)] --> familyName
-    input[(input)] --> email
-    email_1 --> output>output]
-    name_1 --> output>output]
-    familyName_1 --> output>output]
+    !input[(input)] --> name
+    subgraph name_sg
+        name -->|"HashInURI(pimo://nameFR)"| name_1
+    end
+    name_1 --> !output>Output]
+    !input[(input)] --> familyName
+    subgraph familyName_sg
+        familyName -->|"HashInURI(pimo://surnameFR)"| familyName_1
+    end
+    familyName_1 --> !output>Output]
+    !add[/Add/] --> domaine
+    subgraph domaine_sg
+        domaine -->|"RandomChoice(gmail.com,msn.com)"| domaine_1
+    end
+    domaine_1 --> !remove[\Remove\]
+    !input[(input)] --> email
+    subgraph email_sg
+        email -->|"Template({{.name}}.{{.familyName}}@{{.domaine}})"| email_1
+        name_1 -->|"Template({{.name}}.{{.familyName}}@{{.domaine}})"| email_1
+        familyName_1 -->|"Template({{.name}}.{{.familyName}}@{{.domaine}})"| email_1
+        domaine_1 -->|"Template({{.name}}.{{.familyName}}@{{.domaine}})"| email_1
+    end
+    email_1 --> !output>Output]
     `
 
 	exportedResult, err := flow.Export(definition)

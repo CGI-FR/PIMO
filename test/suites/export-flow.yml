@@ -18,8 +18,11 @@ testcases:
       - script: |-
           cat > expected.mmd <<EOF
           flowchart LR
-              toto -->|Add| name
-              
+              !add[/Add/] --> name
+              subgraph name_sg
+                  name -->|"Add(toto)"| name_1
+              end
+              name_1 --> !output>Output]
           EOF
       - script: diff masking.mmd expected.mmd
         assertions:
@@ -45,9 +48,13 @@ testcases:
       - script: |-
           cat > expected.mmd <<EOF
           flowchart LR
-               -->|Add| name
-              hello {{.input}} -->|Template| name
-              
+              !add[/Add/] --> name
+              subgraph name_sg
+                  name -->|"Template(hello {{.input}})"| name_1
+                  !input[(input)] --> input
+                  input -->|"Template(hello {{.input}})"| name_1
+              end
+              name_1 --> !output>Output]              
           EOF
       - script: diff masking.mmd expected.mmd
         assertions:
@@ -92,21 +99,29 @@ testcases:
       - script: |-
           cat > expected.mmd <<EOF
           flowchart LR
-            !input --> name
-            name -->|"hashInUri(pimo://nameFR)"| name_1
-            !input --> familyName
-            familyName -->|"hashInUri(pimo://surnameFR)"| familyName_1
-            !add --> domaine
-            domaine -->|"randomChoice(gmail.com,msn.com)"| domaine_1
-            !input --> email
-            email -->|"template{{.name}}.{{.familyName}}@{{.domaine}}"| email_1
-            name_1 -->|"template{{.name}}.{{.familyName}}@{{.domaine}}"| email_1
-            domaine_1 -->|"template{{.name}}.{{.familyName}}@{{.domaine}}"| email_1
-            domaine_1 --> !delete
-            email_1 --> !output
-            name_1 --> !output
-            familyName_1 --> !output
-
+            !input[(input)] --> name
+            subgraph name_sg
+                name -->|"HashInURI(pimo://nameFR)"| name_1
+            end
+            name_1 --> !output>Output]
+            !input[(input)] --> familyName
+            subgraph familyName_sg
+                familyName -->|"HashInURI(pimo://surnameFR)"| familyName_1
+            end
+            familyName_1 --> !output>Output]
+            !add[/Add/] --> domaine
+            subgraph domaine_sg
+                domaine -->|"RandomChoice(gmail.com,msn.com)"| domaine_1
+            end
+            domaine_1 --> !remove[\Remove\]
+            !input[(input)] --> email
+            subgraph email_sg
+                email -->|"Template({{.name}}.{{.familyName}}@{{.domaine}})"| email_1
+                name_1 -->|"Template({{.name}}.{{.familyName}}@{{.domaine}})"| email_1
+                familyName_1 -->|"Template({{.name}}.{{.familyName}}@{{.domaine}})"| email_1
+                domaine_1 -->|"Template({{.name}}.{{.familyName}}@{{.domaine}})"| email_1
+            end
+            email_1 --> !output>Output]
           EOF
       - script: diff masking.mmd expected.mmd
         assertions:
