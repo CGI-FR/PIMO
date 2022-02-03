@@ -68,84 +68,93 @@ func BuildPipeline(pipeline Pipeline, conf Definition, caches map[string]Cache) 
 	caches = BuildCaches(conf.Caches, caches)
 	cleaners := []Processor{}
 	for _, masking := range conf.Masking {
-		nbArg := 0
-
-		allMasksDefinition := append([]MaskType{masking.Mask}, masking.Masks...)
-
-		for _, maskDefinition := range allMasksDefinition {
-			virtualMask := Masking{
-				Selector: masking.Selector,
-				Mask:     maskDefinition,
-				Masks:    nil,
-				Cache:    masking.Cache,
-				Preserve: masking.Preserve,
-			}
-
-			if virtualMask.Mask.FromCache != "" {
-				cache, ok := caches[virtualMask.Mask.FromCache]
-				if !ok {
-					return nil, nil, errors.New("Cache '" + virtualMask.Cache + "' not found for '" + virtualMask.Selector.Jsonpath + "'")
-				}
-				pipeline = pipeline.Process(NewFromCacheProcess(NewPathSelector(virtualMask.Selector.Jsonpath), cache))
-				nbArg++
-			}
-
-			for _, factory := range maskFactories {
-				mask, present, err := factory(virtualMask, conf.Seed, caches)
-				if err != nil {
-					return nil, nil, errors.New(err.Error() + " for " + virtualMask.Selector.Jsonpath)
-				}
-				if present {
-					if virtualMask.Cache != "" {
-						cache, ok := caches[virtualMask.Cache]
-						if !ok {
-							return nil, nil, errors.New("Cache '" + virtualMask.Cache + "' not found for '" + virtualMask.Selector.Jsonpath + "'")
-						}
-						switch typedCache := cache.(type) {
-						case UniqueCache:
-							mask = NewUniqueMaskCacheEngine(typedCache, mask)
-						default:
-							mask = NewMaskCacheEngine(typedCache, mask)
-						}
-					}
-					pipeline = pipeline.Process(NewMaskEngineProcess(NewPathSelector(virtualMask.Selector.Jsonpath), mask, virtualMask.Preserve))
-					nbArg++
-				}
-			}
-
-			for _, factory := range maskContextFactories {
-				mask, present, err := factory(virtualMask, conf.Seed, caches)
-				if err != nil {
-					return nil, nil, errors.New(err.Error() + " for " + virtualMask.Selector.Jsonpath)
-				}
-				if present {
-					if virtualMask.Cache != "" {
-						cache, ok := caches[virtualMask.Cache]
-						if !ok {
-							return nil, nil, errors.New("Cache '" + virtualMask.Cache + "' not found for '" + virtualMask.Selector.Jsonpath + "'")
-						}
-						switch typedCache := cache.(type) {
-						case UniqueCache:
-							mask = NewUniqueMaskContextCacheEngine(typedCache, mask)
-						default:
-							mask = NewMaskContextCacheEngine(typedCache, mask)
-						}
-					}
-					pipeline = pipeline.Process(NewMaskContextEngineProcess(NewPathSelector(virtualMask.Selector.Jsonpath), mask))
-					nbArg++
-					if i, hasCleaner := mask.(HasCleaner); hasCleaner {
-						cleaners = append(cleaners, NewMaskContextEngineProcess(NewPathSelector(virtualMask.Selector.Jsonpath), i.GetCleaner()))
-					}
-				}
-			}
+		allJsonpath := masking.Selector.Jsonpaths
+		if j := masking.Selector.Jsonpath; j != "" {
+			allJsonpath = append(allJsonpath, j)
 		}
-		if nbArg == 0 {
-			return pipeline, nil, errors.New("No masks defined for " + masking.Selector.Jsonpath)
+
+		for _, jsonpath := range allJsonpath {
+			nbArg := 0
+
+			allMasksDefinition := append([]MaskType{masking.Mask}, masking.Masks...)
+
+			for _, maskDefinition := range allMasksDefinition {
+				virtualMask := Masking{
+					Selector: SelectorType{Jsonpath: jsonpath},
+					Mask:     maskDefinition,
+					Masks:    nil,
+					Cache:    masking.Cache,
+					Preserve: masking.Preserve,
+				}
+
+				if virtualMask.Mask.FromCache != "" {
+					cache, ok := caches[virtualMask.Mask.FromCache]
+					if !ok {
+						return nil, nil, errors.New("Cache '" + virtualMask.Cache + "' not found for '" + virtualMask.Selector.Jsonpath + "'")
+					}
+					pipeline = pipeline.Process(NewFromCacheProcess(NewPathSelector(virtualMask.Selector.Jsonpath), cache))
+					nbArg++
+				}
+
+				for _, factory := range maskFactories {
+					mask, present, err := factory(virtualMask, conf.Seed, caches)
+					if err != nil {
+						return nil, nil, errors.New(err.Error() + " for " + virtualMask.Selector.Jsonpath)
+					}
+					if present {
+						if virtualMask.Cache != "" {
+							cache, ok := caches[virtualMask.Cache]
+							if !ok {
+								return nil, nil, errors.New("Cache '" + virtualMask.Cache + "' not found for '" + virtualMask.Selector.Jsonpath + "'")
+							}
+							switch typedCache := cache.(type) {
+							case UniqueCache:
+								mask = NewUniqueMaskCacheEngine(typedCache, mask)
+							default:
+								mask = NewMaskCacheEngine(typedCache, mask)
+							}
+						}
+						pipeline = pipeline.Process(NewMaskEngineProcess(NewPathSelector(virtualMask.Selector.Jsonpath), mask, virtualMask.Preserve))
+						nbArg++
+					}
+				}
+
+				for _, factory := range maskContextFactories {
+					mask, present, err := factory(virtualMask, conf.Seed, caches)
+					if err != nil {
+						return nil, nil, errors.New(err.Error() + " for " + virtualMask.Selector.Jsonpath)
+					}
+					if present {
+						if virtualMask.Cache != "" {
+							cache, ok := caches[virtualMask.Cache]
+							if !ok {
+								return nil, nil, errors.New("Cache '" + virtualMask.Cache + "' not found for '" + virtualMask.Selector.Jsonpath + "'")
+							}
+							switch typedCache := cache.(type) {
+							case UniqueCache:
+								mask = NewUniqueMaskContextCacheEngine(typedCache, mask)
+							default:
+								mask = NewMaskContextCacheEngine(typedCache, mask)
+							}
+						}
+						pipeline = pipeline.Process(NewMaskContextEngineProcess(NewPathSelector(virtualMask.Selector.Jsonpath), mask))
+						nbArg++
+						if i, hasCleaner := mask.(HasCleaner); hasCleaner {
+							cleaners = append(cleaners, NewMaskContextEngineProcess(NewPathSelector(virtualMask.Selector.Jsonpath), i.GetCleaner()))
+						}
+					}
+				}
+			}
+			if nbArg == 0 {
+				return pipeline, nil, errors.New("No masks defined for " + masking.Selector.Jsonpath)
+			}
 		}
 	}
+
 	for _, cleaner := range cleaners {
 		pipeline = pipeline.Process(cleaner)
 	}
+
 	return pipeline, caches, nil
 }
 
