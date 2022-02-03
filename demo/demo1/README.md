@@ -20,6 +20,8 @@ The `masking.yml` file contains the following configuration:
 * A hash mask to replace the `town` field by either "Emerald City", "Ruby City" or "Sapphire City".
 * A randomInt mask to replace `age` field by a random number contained between 18 and 90.
 
+[![](https://mermaid.ink/img/pako:eNqVks9rwjAUgP-VmFOFCvO29eBhKmwwGehxlfFsos1oX0r6ghP1f19-1EHLdjCX9_L1veRL0jMvtJA84_tKH4sSDLG3dY7MjZHCxtJHEsJ4yyaTGUOoZfza2t3BQFMG9NkeIvXDA198yflcY0uAlDxL_IJa4Tjnl9gxjQ0SRUwiDJuMtCW35ew9hO3_Nq01fwh1tOfUsU5rDSh0PS-1KmSysI1GSkMQwe-2wFDxl99nSfqIA0WPen4edHIv0JbJspYGKsHmik7p2u5OMdtA05TKyDALrmGloWiE91nCYXiPjvQc3bx3f6_uXVcKMzZ9TNkKvjP29BCcfONQKbC_jHjK3VlrUML9hGdfnHMqpXtVnrlUyD3YinKe49WV2kYAyaVQpA3P9lC1MuVgSW9OWPCMjJW3ooUCd466q7r-AI4Y8J8)](https://mermaid.live/edit/#pako:eNqVks9rwjAUgP-VmFOFCvO29eBhKmwwGehxlfFsos1oX0r6ghP1f19-1EHLdjCX9_L1veRL0jMvtJA84_tKH4sSDLG3dY7MjZHCxtJHEsJ4yyaTGUOoZfza2t3BQFMG9NkeIvXDA198yflcY0uAlDxL_IJa4Tjnl9gxjQ0SRUwiDJuMtCW35ew9hO3_Nq01fwh1tOfUsU5rDSh0PS-1KmSysI1GSkMQwe-2wFDxl99nSfqIA0WPen4edHIv0JbJspYGKsHmik7p2u5OMdtA05TKyDALrmGloWiE91nCYXiPjvQc3bx3f6_uXVcKMzZ9TNkKvjP29BCcfONQKbC_jHjK3VlrUML9hGdfnHMqpXtVnrlUyD3YinKe49WV2kYAyaVQpA3P9lC1MuVgSW9OWPCMjJW3ooUCd466q7r-AI4Y8J8)
+
 #### **`masking.yml`**
 ```yaml
 version: "1"
