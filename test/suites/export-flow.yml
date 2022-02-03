@@ -2,6 +2,7 @@ name: flow chart feature
 testcases:
   - name: export mermaid
     steps:
+      - script: rm -f masking.yml
       - script: |-
           cat > masking.yml <<EOF
           version: "1"
@@ -9,7 +10,37 @@ testcases:
             - selector:
                 jsonpath: "name"
               mask:
-                template: {{.TOTO}}
+                add: "toto"
+          EOF
+      - script: pimo flow > masking.mmd
+        assertions:
+          - result.code ShouldEqual 0
+      - script: |-
+          cat > expected.mmd <<EOF
+          flowchart LR
+              !add[/Add/] --> name
+              subgraph name_sg
+                  name -->|"Add(toto)"| name_1
+              end
+              name_1 --> !output>Output]
+          EOF
+      - script: diff masking.mmd expected.mmd
+        assertions:
+          - result.code ShouldEqual 0
+          - result.systemout ShouldBeEmpty
+
+  - name: export mermaid multiple masks
+    steps:
+      - script: rm -f masking.yml
+      - script: |-
+          cat > masking.yml <<EOF
+          version: "1"
+          masking:
+            - selector:
+                jsonpath: "name"
+              masks:
+                - add: ""
+                - template: "hello {{.input}}"
           EOF
       - script: pimo flow >  masking.mmd
         assertions:
@@ -17,7 +48,81 @@ testcases:
       - script: |-
           cat > expected.mmd <<EOF
           flowchart LR
-              TOTO --> name
+              !add[/Add/] --> name
+              subgraph name_sg
+                  name -->|"Template(hello {{.input}})"| name_1
+                  !input[(input)] --> input
+                  input -->|"Template(hello {{.input}})"| name_1
+              end
+              name_1 --> !output>Output]              
+          EOF
+      - script: diff masking.mmd expected.mmd
+        assertions:
+          - result.code ShouldEqual 0
+          - result.systemout ShouldBeEmpty
+
+  - name: export multiple maskings
+    steps:
+      - script: rm -f masking.yml
+      - script: |-
+          cat > masking.yml <<EOF
+          version: "1"
+          seed: 42
+          masking:
+            - selector:
+                jsonpath: "name"
+              mask:
+                hashInUri: "pimo://nameFR"
+            - selector:
+                jsonpath: "familyName"
+              mask:
+                hashInUri: "pimo://surnameFR"
+            - selector:
+                jsonpath: "domaine"
+              masks:
+                - add: ""
+                - randomChoice:
+                  - "gmail.com"
+                  - "msn.com"
+            - selector:
+                jsonpath: "email"
+              mask:
+                template: "{{.name}}.{{.familyName}}@{{.domaine}}"
+            - selector:
+                jsonpath: "domaine"
+              mask:
+                remove: true
+          EOF
+      - script: pimo flow > masking.mmd
+        asertions:
+          - result.code ShouldEqual 0
+      - script: |-
+          cat > expected.mmd <<EOF
+          flowchart LR
+            !input[(input)] --> name
+            subgraph name_sg
+                name -->|"HashInURI(pimo://nameFR)"| name_1
+            end
+            name_1 --> !output>Output]
+            !input[(input)] --> familyName
+            subgraph familyName_sg
+                familyName -->|"HashInURI(pimo://surnameFR)"| familyName_1
+            end
+            familyName_1 --> !output>Output]
+            !add[/Add/] --> domaine
+            subgraph domaine_sg
+                domaine -->|"RandomChoice(gmail.com,msn.com)"| domaine_1
+            end
+            domaine_1 --> !remove[\Remove\]
+            !input[(input)] --> email
+            subgraph email_sg
+                email -->|"Template({{.name}}.{{.familyName}}@{{.domaine}})"| email_1
+                name_1 -->|"Template({{.name}}.{{.familyName}}@{{.domaine}})"| email_1
+                familyName_1 -->|"Template({{.name}}.{{.familyName}}@{{.domaine}})"| email_1
+                domaine_1 -->|"Template({{.name}}.{{.familyName}}@{{.domaine}})"| email_1
+            end
+            email_1 --> !output>Output]
+          EOF
       - script: diff masking.mmd expected.mmd
         assertions:
           - result.code ShouldEqual 0
