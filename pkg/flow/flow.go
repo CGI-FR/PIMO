@@ -37,6 +37,7 @@ type edge struct {
 	destination string
 	mask        string
 	param       string
+	key         string
 }
 
 func Export(masking model.Definition) (string, error) {
@@ -72,6 +73,7 @@ func exportMask(masking model.Masking, mask model.MaskType, variables map[string
 		masks:   make([]edge, 0, 10),
 	}
 	edgeToAdd := edge{}
+	edgeToAdd.key = masking.Selector.Jsonpath
 	edgeToAdd.source = masking.Selector.Jsonpath
 	edgeToAdd.destination = masking.Selector.Jsonpath + "_1"
 	if elem, ok := variables[masking.Selector.Jsonpath]; ok {
@@ -327,6 +329,9 @@ func unescapeTemplateValues(templateValue, mask, jsonpath string, variables map[
 		}
 
 		value := splittedTemplate[i][3 : len(splittedTemplate[i])-2]
+
+		templateEdge.key = value
+
 		maskNumber := len(variables[value].masks)
 
 		if maskNumber == 0 {
@@ -368,14 +373,13 @@ func printSubgraphs(variables map[string]subgraph, maskOrder []string) string {
 			subgraphText += " --> !output>Output]\n    "
 		}
 	}
-	return subgraphText
+	return strings.TrimSpace(subgraphText)
 }
 
 func printMask(subgraphText string, mask edge, variables map[string]subgraph) string {
-	key := strings.Split(mask.source, "_")[0]
-	_, ok := variables[key]
+	_, ok := variables[mask.key]
 	if !ok {
-		subgraphText += "\n        !input[(input)] --> " + key
+		subgraphText += "\n        !input[(input)] --> " + mask.key
 	}
 	subgraphText += "\n        " + mask.source + " -->|\"" + mask.mask + "(" + mask.param + ")\"| " + mask.destination
 	return subgraphText
