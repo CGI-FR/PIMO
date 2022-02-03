@@ -46,8 +46,7 @@ func TestExportTemplate(t *testing.T) {
         !input[(input)] --> TOTO
         TOTO -->|"Template({{.TOTO}})"| name_1
     end
-    name_1 --> !output>Output]
-    `
+    name_1 --> !output>Output]`
 
 	exportedResult, err := flow.Export(definition)
 	assert.Nil(t, err)
@@ -73,8 +72,7 @@ func TestExportConstant(t *testing.T) {
     subgraph name_sg
         name -->|"Constant(1)"| name_1
     end
-    name_1 --> !output>Output]
-    `
+    name_1 --> !output>Output]`
 
 	exportedResult, err := flow.Export(definition)
 	assert.Nil(t, err)
@@ -100,8 +98,7 @@ func TestExportRegex(t *testing.T) {
     subgraph name_sg
         name -->|"Regex([A-Z]oto([a-z]){3})"| name_1
     end
-    name_1 --> !output>Output]
-    `
+    name_1 --> !output>Output]`
 
 	exportedResult, err := flow.Export(definition)
 	assert.Nil(t, err)
@@ -127,8 +124,7 @@ func TestExportAdd(t *testing.T) {
     subgraph name_sg
         name -->|"Add(Toto)"| name_1
     end
-    name_1 --> !output>Output]
-    `
+    name_1 --> !output>Output]`
 
 	exportedResult, err := flow.Export(definition)
 	assert.Nil(t, err)
@@ -156,8 +152,7 @@ func TestExportTemplateAdd(t *testing.T) {
         !input[(input)] --> surname
         surname -->|"Add({{.surname}})"| name_1
     end
-    name_1 --> !output>Output]
-    `
+    name_1 --> !output>Output]`
 
 	exportedResult, err := flow.Export(definition)
 	assert.Nil(t, err)
@@ -183,8 +178,7 @@ func TestExportAddTransient(t *testing.T) {
     subgraph name_sg
         name -->|"AddTransient(Toto)"| name_1
     end
-    name_1 --> !remove[\Remove\]
-    `
+    name_1 --> !remove[\Remove\]`
 
 	exportedResult, err := flow.Export(definition)
 	assert.Nil(t, err)
@@ -210,8 +204,7 @@ func TestExportRandomChoice(t *testing.T) {
     subgraph name_sg
         name -->|"RandomChoice(Toto,Tata)"| name_1
     end
-    name_1 --> !output>Output]
-    `
+    name_1 --> !output>Output]`
 
 	exportedResult, err := flow.Export(definition)
 	assert.Nil(t, err)
@@ -237,8 +230,7 @@ func TestExportRandomChoiceInURI(t *testing.T) {
     subgraph name_sg
         name -->|"RandomChoiceInURI(file://../names.txt)"| name_1
     end
-    name_1 --> !output>Output]
-    `
+    name_1 --> !output>Output]`
 
 	exportedResult, err := flow.Export(definition)
 	assert.Nil(t, err)
@@ -264,8 +256,7 @@ func TestExportCommand(t *testing.T) {
     subgraph name_sg
         name -->|"Command(cat file.json)"| name_1
     end
-    name_1 --> !output>Output]
-    `
+    name_1 --> !output>Output]`
 
 	exportedResult, err := flow.Export(definition)
 	assert.Nil(t, err)
@@ -294,8 +285,7 @@ func TestExportRandomInt(t *testing.T) {
     subgraph name_sg
         name -->|"RandomInt(Min: 10, Max: 25)"| name_1
     end
-    name_1 --> !output>Output]
-    `
+    name_1 --> !output>Output]`
 
 	exportedResult, err := flow.Export(definition)
 	assert.Nil(t, err)
@@ -330,8 +320,7 @@ func TestExportWeightedChoice(t *testing.T) {
     subgraph name_sg
         name -->|"WeightedChoice(toto @ 8,tutu @ 1)"| name_1
     end
-    name_1 --> !output>Output]
-    `
+    name_1 --> !output>Output]`
 
 	exportedResult, err := flow.Export(definition)
 	assert.Nil(t, err)
@@ -357,8 +346,7 @@ func TestExportHash(t *testing.T) {
     subgraph name_sg
         name -->|"Hash(Toto,Tutu)"| name_1
     end
-    name_1 --> !output>Output]
-    `
+    name_1 --> !output>Output]`
 
 	exportedResult, err := flow.Export(definition)
 	assert.Nil(t, err)
@@ -384,8 +372,7 @@ func TestExportHashInURI(t *testing.T) {
     subgraph name_sg
         name -->|"HashInURI(file://../names.txt)"| name_1
     end
-    name_1 --> !output>Output]
-    `
+    name_1 --> !output>Output]`
 
 	exportedResult, err := flow.Export(definition)
 	assert.Nil(t, err)
@@ -414,8 +401,7 @@ func TestExportRandDate(t *testing.T) {
     subgraph name_sg
         name -->|"RandDate(DateMin: 2022-01-14 16:14:00 +0000 UTC, DateMax: 2022-01-15 16:14:00 +0000 UTC)"| name_1
     end
-    name_1 --> !output>Output]
-    `
+    name_1 --> !output>Output]`
 
 	exportedResult, err := flow.Export(definition)
 	assert.Nil(t, err)
@@ -444,8 +430,7 @@ func TestExportIncremental(t *testing.T) {
     subgraph name_sg
         name -->|"Incremental(Start: 10, Increment: 10)"| name_1
     end
-    name_1 --> !output>Output]
-    `
+    name_1 --> !output>Output]`
 
 	exportedResult, err := flow.Export(definition)
 	assert.Nil(t, err)
@@ -471,8 +456,7 @@ func TestExportReplacement(t *testing.T) {
     subgraph name_sg
         name -->|"Replacement(surname)"| name_1
     end
-    name_1 --> !output>Output]
-    `
+    name_1 --> !output>Output]`
 
 	exportedResult, err := flow.Export(definition)
 	assert.Nil(t, err)
@@ -504,8 +488,7 @@ func TestExportTemplateEach(t *testing.T) {
         !input[(input)] --> idx
         idx -->|"TemplateEach({{title .val}} {{.idx}})"| name_1
     end
-    name_1 --> !output>Output]
-    `
+    name_1 --> !output>Output]`
 
 	exportedResult, err := flow.Export(definition)
 	assert.Nil(t, err)
@@ -531,8 +514,7 @@ func TestExportDuration(t *testing.T) {
     subgraph name_sg
         name -->|"Duration(-P2D)"| name_1
     end
-    name_1 --> !output>Output]
-    `
+    name_1 --> !output>Output]`
 
 	exportedResult, err := flow.Export(definition)
 	assert.Nil(t, err)
@@ -555,8 +537,7 @@ func TestExportRemove(t *testing.T) {
 
 	wanted := `flowchart LR
     !input[(input)] --> name
-    name --> !remove[\Remove\]
-    `
+    name --> !remove[\Remove\]`
 
 	exportedResult, err := flow.Export(definition)
 	assert.Nil(t, err)
@@ -582,8 +563,7 @@ func TestExportRangeMask(t *testing.T) {
     subgraph name_sg
         name -->|"RangeMask(5)"| name_1
     end
-    name_1 --> !output>Output]
-    `
+    name_1 --> !output>Output]`
 
 	exportedResult, err := flow.Export(definition)
 	assert.Nil(t, err)
@@ -612,8 +592,7 @@ func TestExportRandomDuration(t *testing.T) {
     subgraph name_sg
         name -->|"RandomDuration(Min: -P2D, Max: -P27D)"| name_1
     end
-    name_1 --> !output>Output]
-    `
+    name_1 --> !output>Output]`
 
 	exportedResult, err := flow.Export(definition)
 	assert.Nil(t, err)
@@ -639,8 +618,7 @@ func TestExportFluxURI(t *testing.T) {
     subgraph name_sg
         name -->|"FluxURI(file://../names.txt)"| name_1
     end
-    name_1 --> !output>Output]
-    `
+    name_1 --> !output>Output]`
 
 	exportedResult, err := flow.Export(definition)
 	assert.Nil(t, err)
@@ -670,8 +648,7 @@ func TestExportRandomDecimal(t *testing.T) {
     subgraph name_sg
         name -->|"RandomDecimal(Min: 0.000E+00, Max: 9.000E+00, Precision: 3)"| name_1
     end
-    name_1 --> !output>Output]
-    `
+    name_1 --> !output>Output]`
 
 	exportedResult, err := flow.Export(definition)
 	assert.Nil(t, err)
@@ -700,8 +677,7 @@ func TestExportDateParser(t *testing.T) {
     subgraph name_sg
         name -->|"DateParser(InputFormat: 2006-01-02, OutputFormat: 01/02/06)"| name_1
     end
-    name_1 --> !output>Output]
-    `
+    name_1 --> !output>Output]`
 
 	exportedResult, err := flow.Export(definition)
 	assert.Nil(t, err)
@@ -727,8 +703,7 @@ func TestExportFromCache(t *testing.T) {
     subgraph name_sg
         name -->|"FromCache(surname)"| name_1
     end
-    name_1 --> !output>Output]
-    `
+    name_1 --> !output>Output]`
 
 	exportedResult, err := flow.Export(definition)
 	assert.Nil(t, err)
@@ -759,8 +734,7 @@ func TestExportFF1(t *testing.T) {
     subgraph name_sg
         name -->|"FF1(KeyFromEnv: FF1_ENCRYPTION_KEY, TweakField: tweak, Radix: 62, Decrypt: false)"| name_1
     end
-    name_1 --> !output>Output]
-    `
+    name_1 --> !output>Output]`
 
 	exportedResult, err := flow.Export(definition)
 	assert.Nil(t, err)
@@ -798,8 +772,7 @@ func TestExportPipe(t *testing.T) {
     subgraph name_sg
         name -->|"Pipe(DefinitionFile: , InjectParent: , InjectRoot: )"| name_1
     end
-    name_1 --> !output>Output]
-    `
+    name_1 --> !output>Output]`
 
 	exportedResult, err := flow.Export(definition)
 	assert.Nil(t, err)
@@ -825,8 +798,7 @@ func TestExportFromJSON(t *testing.T) {
     subgraph name_sg
         name -->|"FromJSON(nom)"| name_1
     end
-    name_1 --> !output>Output]
-    `
+    name_1 --> !output>Output]`
 
 	exportedResult, err := flow.Export(definition)
 	assert.Nil(t, err)
@@ -854,8 +826,7 @@ func TestExportLuhn(t *testing.T) {
     subgraph name_sg
         name -->|"Luhn(abcdef)"| name_1
     end
-    name_1 --> !output>Output]
-    `
+    name_1 --> !output>Output]`
 
 	exportedResult, err := flow.Export(definition)
 	assert.Nil(t, err)
@@ -883,8 +854,7 @@ func TestExportMasks(t *testing.T) {
         name -->|"Add(abcdef)"| name_1
         name_1 -->|"FromJSON(nom)"| name_2
     end
-    name_2 --> !output>Output]
-    `
+    name_2 --> !output>Output]`
 
 	exportedResult, err := flow.Export(definition)
 	assert.Nil(t, err)
@@ -953,8 +923,7 @@ func TestExportMasking(t *testing.T) {
         familyName_1 -->|"Template({{.name}}.{{.familyName}}@{{.domaine}})"| email_1
         domaine_1 -->|"Template({{.name}}.{{.familyName}}@{{.domaine}})"| email_1
     end
-    email_1 --> !output>Output]
-    `
+    email_1 --> !output>Output]`
 
 	exportedResult, err := flow.Export(definition)
 	assert.Nil(t, err)
