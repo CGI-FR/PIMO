@@ -257,6 +257,9 @@ func exportMask(masking model.Masking, mask model.MaskType, variables map[string
 		maskSubgraph.masks = append(maskSubgraph.masks, edgeToAdd)
 		variables[masking.Selector.Jsonpath] = maskSubgraph
 	}
+
+	maskSubgraph.masks = append(maskSubgraph.masks, edgeToAdd)
+	variables[masking.Selector.Jsonpath] = maskSubgraph
 }
 
 func checkSourceAndDestination(edgeToAdd edge, maskCount int, maskSubgraph subgraph, masking model.Masking) edge {
@@ -348,19 +351,21 @@ func unescapeTemplateValues(templateValue, mask, jsonpath string, variables map[
 }
 
 func printSubgraphs(variables map[string]subgraph, maskOrder []string) string {
+	inputText := ""
 	subgraphText := ""
+	outputText := ""
 	for _, key := range maskOrder {
 		if variables[key].added {
-			subgraphText += "!add[/Add/] --> " + key + "\n    "
+			inputText += "!add[/Add/] --> " + key + "\n    "
 		} else {
-			subgraphText += "!input[(input)] --> " + key + "\n    "
+			inputText += "!input[(input)] --> " + key + "\n    "
 		}
 
 		count := len(variables[key].masks)
 		if count > 0 {
 			subgraphText += "subgraph " + variables[key].name
 			for j := range variables[key].masks {
-				subgraphText = printMask(subgraphText, variables[key].masks[j], variables)
+				subgraphText, inputText = printMask(subgraphText, inputText, variables[key].masks[j], variables)
 			}
 			subgraphText += "\n    end\n    "
 			subgraphText += variables[key].masks[count-1].destination
@@ -368,19 +373,20 @@ func printSubgraphs(variables map[string]subgraph, maskOrder []string) string {
 			subgraphText += key
 		}
 		if variables[key].removed {
-			subgraphText += " --> !remove[\\Remove\\]\n    "
+			outputText += " --> !remove[\\Remove\\]\n    "
 		} else {
-			subgraphText += " --> !output>Output]\n    "
+			outputText += " --> !output>Output]\n    "
 		}
 	}
-	return strings.TrimSpace(subgraphText)
+	return strings.TrimSpace(inputText + subgraphText + outputText)
 }
 
-func printMask(subgraphText string, mask edge, variables map[string]subgraph) string {
-	_, ok := variables[mask.key]
+func printMask(subgraphText, inputText string, mask edge, variables map[string]subgraph) (string, string) {
+	key := strings.Split(mask.source, "_")[0]
+	_, ok := variables[key]
 	if !ok {
-		subgraphText += "\n        !input[(input)] --> " + mask.key
+		inputText += "!input[(input)] --> " + key + "\n    "
 	}
 	subgraphText += "\n        " + mask.source + " -->|\"" + mask.mask + "(" + mask.param + ")\"| " + mask.destination
-	return subgraphText
+	return subgraphText, inputText
 }

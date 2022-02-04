@@ -41,9 +41,9 @@ func TestExportTemplate(t *testing.T) {
 
 	wanted := `flowchart LR
     !input[(input)] --> name
+    !input[(input)] --> TOTO
     subgraph name_sg
         name -->|"Template({{.TOTO}})"| name_1
-        !input[(input)] --> TOTO
         TOTO -->|"Template({{.TOTO}})"| name_1
     end
     name_1 --> !output>Output]`
@@ -147,9 +147,9 @@ func TestExportTemplateAdd(t *testing.T) {
 
 	wanted := `flowchart LR
     !add[/Add/] --> name
+    !input[(input)] --> surname
     subgraph name_sg
         name -->|"Add({{.surname}})"| name_1
-        !input[(input)] --> surname
         surname -->|"Add({{.surname}})"| name_1
     end
     name_1 --> !output>Output]`
@@ -483,9 +483,9 @@ func TestExportTemplateEach(t *testing.T) {
 
 	wanted := `flowchart LR
     !input[(input)] --> name
+    !input[(input)] --> idx
     subgraph name_sg
         name -->|"TemplateEach(Item: val, Index: idx, Template: {{title .val}} {{.idx}})"| name_1
-        !input[(input)] --> idx
         idx -->|"TemplateEach({{title .val}} {{.idx}})"| name_1
     end
     name_1 --> !output>Output]`
@@ -902,27 +902,27 @@ func TestExportMasking(t *testing.T) {
 
 	wanted := `flowchart LR
     !input[(input)] --> name
+    !input[(input)] --> familyName
+    !add[/Add/] --> domaine
+    !input[(input)] --> email
     subgraph name_sg
         name -->|"HashInURI(pimo://nameFR)"| name_1
     end
-    name_1 --> !output>Output]
-    !input[(input)] --> familyName
     subgraph familyName_sg
         familyName -->|"HashInURI(pimo://surnameFR)"| familyName_1
     end
-    familyName_1 --> !output>Output]
-    !add[/Add/] --> domaine
     subgraph domaine_sg
         domaine -->|"RandomChoice(gmail.com,msn.com)"| domaine_1
     end
-    domaine_1 --> !remove[\Remove\]
-    !input[(input)] --> email
     subgraph email_sg
         email -->|"Template({{.name}}.{{.familyName}}@{{.domaine}})"| email_1
         name_1 -->|"Template({{.name}}.{{.familyName}}@{{.domaine}})"| email_1
         familyName_1 -->|"Template({{.name}}.{{.familyName}}@{{.domaine}})"| email_1
         domaine_1 -->|"Template({{.name}}.{{.familyName}}@{{.domaine}})"| email_1
     end
+    name_1 --> !output>Output]
+    familyName_1 --> !output>Output]
+    domaine_1 --> !remove[\Remove\]
     email_1 --> !output>Output]`
 
 	exportedResult, err := flow.Export(definition)
