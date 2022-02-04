@@ -19,7 +19,9 @@ package model
 
 import (
 	"errors"
+	"fmt"
 	"io/ioutil"
+	"strings"
 	"time"
 
 	"github.com/goccy/go-yaml"
@@ -156,6 +158,32 @@ func LoadPipelineDefinitionFromYAML(filename string) (Definition, error) {
 	err = yaml.Unmarshal(source, &conf)
 	if err != nil {
 		return conf, err
+	}
+	if conf.Seed == 0 {
+		conf.Seed = time.Now().UnixNano()
+	}
+	return conf, nil
+}
+
+func LoadPipelineDefintionFromOneLiner(oneLine []string) (Definition, error) {
+	var conf Definition
+	conf.Masking = []Masking{}
+	for _, value := range oneLine {
+		i := strings.Index(value, "=")
+		if i == -1 {
+			return conf, fmt.Errorf("%s is not of the form 'jsonpath={mask}'", value)
+		}
+		jsonpath, maskString := value[:i], value[(i+1):]
+
+		masking := Masking{Selector: SelectorType{Jsonpath: jsonpath}}
+
+		if err := yaml.Unmarshal([]byte(maskString), &masking.Mask); err != nil {
+			if err2 := yaml.Unmarshal([]byte(maskString), &masking.Masks); err2 != nil {
+				return conf, err
+			}
+		}
+
+		conf.Masking = append(conf.Masking, masking)
 	}
 	if conf.Seed == 0 {
 		conf.Seed = time.Now().UnixNano()
