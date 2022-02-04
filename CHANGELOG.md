@@ -17,6 +17,7 @@ Types of changes
 ## [1.12.0]
 
 - `Added` flag to declare a simple mask definition in command line
+- `Added` possibility to declare multiple jsonpath locations for a masking definition
 
 ## [1.11.0]
 
