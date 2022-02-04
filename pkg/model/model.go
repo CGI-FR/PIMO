@@ -63,7 +63,7 @@ type MaskFactory func(Masking, int64, map[string]Cache) (MaskEngine, bool, error
 type MaskContextFactory func(Masking, int64, map[string]Cache) (MaskContextEngine, bool, error)
 
 type SelectorType struct {
-	Jsonpath string `yaml:"jsonpath,omitempty" jsonschema:"oneof_required=Jsonpath"`
+	Jsonpath string `yaml:"jsonpath"`
 }
 
 type IncrementalType struct {
@@ -162,7 +162,7 @@ type Masking struct {
 	// Case1: One selector, One mask
 	// Case2: One selector, Multiple masks
 	// Case3: Multiple selectors, One mask
-	// Case3: Multiple selectors, Multiple masks
+	// Case4: Multiple selectors, Multiple masks
 	Selector  SelectorType   `yaml:"selector,omitempty" jsonschema:"oneof_required=case1,oneof_required=case2"`
 	Selectors []SelectorType `yaml:"selectors,omitempty" jsonschema:"oneof_required=case3,oneof_required=case4"`
 	Mask      MaskType       `yaml:"mask,omitempty" jsonschema:"oneof_required=case1,oneof_required=case3"`
