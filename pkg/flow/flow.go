@@ -316,7 +316,7 @@ func flattenHash(mask model.MaskType) string {
 }
 
 func unescapeTemplateValues(templateValue, mask, jsonpath string, variables map[string]subgraph, maskSubgraph subgraph) subgraph {
-	regex := regexp.MustCompile(`\.([0-z]+)`)
+	regex := regexp.MustCompile(`\.([0-z,\_,-]+)`)
 	splittedTemplate := regex.FindAllSubmatch([]byte(templateValue), -1)
 	edges := make([]edge, 0, 10)
 	copyarray := make([]edge, 0, 10)
@@ -328,16 +328,18 @@ func unescapeTemplateValues(templateValue, mask, jsonpath string, variables map[
 			param: sanitizeParam(templateValue),
 		}
 
-		value := splittedTemplate[i][1]
+		value := string(splittedTemplate[i][1])
+		// to avoid confusion with intermediate steps (i.e. "name_1")
+		value = strings.ReplaceAll(value, "_", "#underscore;")
 
-		templateEdge.key = string(value)
+		templateEdge.key = value
 
-		maskNumber := len(variables[string(value)].masks)
+		maskNumber := len(variables[value].masks)
 
 		if maskNumber == 0 {
-			templateEdge.source = string(value)
+			templateEdge.source = value
 		} else {
-			templateEdge.source = string(value) + "_" + strconv.Itoa(maskNumber)
+			templateEdge.source = value + "_" + strconv.Itoa(maskNumber)
 		}
 
 		templateEdge.destination = jsonpath + "_" + strconv.Itoa(jsonpathMaskCount+1)
@@ -383,7 +385,15 @@ func printSubgraphs(variables map[string]subgraph, maskOrder []string) string {
 }
 
 func printMask(subgraphText, inputText string, mask edge, variables map[string]subgraph) (string, string) {
-	key := strings.Split(mask.source, "_")[0]
+	lastUnderscore := strings.LastIndex(mask.source, "_")
+	var key string
+	if lastUnderscore == -1 {
+		key = mask.source
+	} else {
+		key = mask.source[0:strings.LastIndex(mask.source, "_")]
+	}
+
+	key = strings.ReplaceAll(key, "#underscore;", "_")
 	_, ok := variables[key]
 	if !ok {
 		inputText += "!input[(input)] --> " + key + "\n    "
