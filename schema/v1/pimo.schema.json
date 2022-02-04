@@ -535,21 +535,16 @@
       "type": "object"
     },
     "SelectorType": {
+      "required": [
+        "jsonpath"
+      ],
       "properties": {
         "jsonpath": {
           "type": "string"
         }
       },
       "additionalProperties": false,
-      "type": "object",
-      "oneOf": [
-        {
-          "required": [
-            "jsonpath"
-          ],
-          "title": "Jsonpath"
-        }
-      ]
+      "type": "object"
     },
     "TemplateEachType": {
       "properties": {
