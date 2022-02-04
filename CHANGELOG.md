@@ -14,7 +14,7 @@ Types of changes
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
-## [1.11.0]
+## [1.12.0]
 
 - `Added` flag to declare a simple mask definition in command line
 
