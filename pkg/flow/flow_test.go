@@ -483,9 +483,11 @@ func TestExportTemplateEach(t *testing.T) {
 
 	wanted := `flowchart LR
     !input[(input)] --> name
+    !input[(input)] --> val
     !input[(input)] --> idx
     subgraph name_sg
         name -->|"TemplateEach(Item: val, Index: idx, Template: {{title .val}} {{.idx}})"| name_1
+        val -->|"TemplateEach({{title .val}} {{.idx}})"| name_1
         idx -->|"TemplateEach({{title .val}} {{.idx}})"| name_1
     end
     name_1 --> !output>Output]`
