@@ -236,7 +236,7 @@ func exportMask(masking model.Masking, mask model.MaskType, variables map[string
 	if mask.FF1 != (model.FF1Type{}) {
 		edgeToAdd.mask = "FF1"
 		edgeToAdd.param = sanitizeParam("KeyFromEnv: " + mask.FF1.KeyFromEnv + ", TweakField: " + mask.FF1.TweakField + ", Radix: " + strconv.FormatUint(uint64(mask.FF1.Radix), 10) + ", Decrypt: " + strconv.FormatBool(mask.FF1.Decrypt))
-		maskSubgraph.masks = append(maskSubgraph.masks, edgeToAdd)
+		maskSubgraph = exportFF1(maskSubgraph, edgeToAdd, mask, variables)
 		variables[masking.Selector.Jsonpath] = maskSubgraph
 	}
 	if mask.Pipe.Masking != nil {
@@ -286,6 +286,18 @@ func exportAddTransient(maskSubgraph subgraph, addEdge edge, mask model.MaskType
 		maskSubgraph = unescapeTemplateValues(mask.AddTransient.(string), "AddTransient", masking.Selector.Jsonpath, variables, maskSubgraph)
 	}
 	maskSubgraph.added = true
+	return maskSubgraph
+}
+
+func exportFF1(maskSubgraph subgraph, addEdge edge, mask model.MaskType, variables map[string]subgraph) subgraph {
+	edgeTweakField := edge{mask: "FF1", destination: addEdge.destination, param: addEdge.param}
+	tweakFieldMaskCount := len(variables[mask.FF1.TweakField].masks)
+	if tweakFieldMaskCount > 0 {
+		edgeTweakField.source = mask.FF1.TweakField + "_" + strconv.Itoa(tweakFieldMaskCount)
+	} else {
+		edgeTweakField.source = mask.FF1.TweakField
+	}
+	maskSubgraph.masks = append(maskSubgraph.masks, addEdge, edgeTweakField)
 	return maskSubgraph
 }
 
