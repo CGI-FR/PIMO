@@ -15,6 +15,8 @@ The `masking.yml` file contains the following configuration :
 * A replacement mask that replace the `fieldToReplace` field with the `replacement` field.
 * A template mask that replace the `compositeField` with the expression `{{.field1}}+{{.field2}}`, this expression will replace the original data with a created data containing the data from `field1` and `field2` fields separated by a + sign.
 
+[![](https://mermaid.ink/img/pako:eNqtUj1PwzAQ_SvpTaloKyVjhk7AhITUdsMVMvalsYjtyLGFUOr_jvNRUCxQB3rLnfXevftyB0xzhALKWn-wihqbPO2ISoIthGqcfUkHtzwm6_U2KQXW_KB32NSU4d88pmWjW2HxsU-4opddwfMRb93bydCmipp4bU8j3tsc6iXOBKaXRGVT8xMvCZxjrakVVDyqOR9oVnMOTTUPKIOixbTrNuOQ3t9d4tz7oXgkmkVzZDfUyv-v9b2UeGfDpRba2XC37fPgjiMzFvqNCSuQaCQVPPzCrs8jYKtwIQJFCDk17wSI8oHnGh5af-DCagNFSesWV0Cd1ftPxaCwxuGFdC9oOJycWP4Lagn6Rg)](https://mermaid.live/edit/#pako:eNqtUj1PwzAQ_SvpTaloKyVjhk7AhITUdsMVMvalsYjtyLGFUOr_jvNRUCxQB3rLnfXevftyB0xzhALKWn-wihqbPO2ISoIthGqcfUkHtzwm6_U2KQXW_KB32NSU4d88pmWjW2HxsU-4opddwfMRb93bydCmipp4bU8j3tsc6iXOBKaXRGVT8xMvCZxjrakVVDyqOR9oVnMOTTUPKIOixbTrNuOQ3t9d4tz7oXgkmkVzZDfUyv-v9b2UeGfDpRba2XC37fPgjiMzFvqNCSuQaCQVPPzCrs8jYKtwIQJFCDk17wSI8oHnGh5af-DCagNFSesWV0Cd1ftPxaCwxuGFdC9oOJycWP4Lagn6Rg)
+
 #### **`masking.yml`**
 ```yaml
 version: "1"
