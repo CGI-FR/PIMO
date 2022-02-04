@@ -1,9 +1,19 @@
 name: one-liner features
 testcases:
-- name: one-liner
+- name: one-liner one mask
   steps:
   - script: |-
-      echo '{"value": ""}' | pimo --mask "value=[{fluxUri: 'pimo://nameFR'}]"
+      echo '{"value": ""}' | pimo --mask "value={fluxUri: 'pimo://nameFR'}"
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemoutjson ShouldContainKey value
+    - result.systemoutjson.value ShouldEqual Aaron
+    - result.systemerr ShouldBeEmpty
+
+- name: one-liner with array
+  steps:
+  - script: |-
+      echo '{"value": ""}' | pimo --mask "value={fluxUri: 'pimo://nameFR'}"
     assertions:
     - result.code ShouldEqual 0
     - result.systemoutjson ShouldContainKey value
