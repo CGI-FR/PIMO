@@ -23,7 +23,7 @@ testcases:
 - name: one-liner for multiple attributes
   steps:
   - script: |-
-      echo '{"value1": ""}' | pimo --mask "value1=[{fluxUri: 'pimo://nameFR'}],value2=[{add: "const"}]"
+      echo '{"value1": ""}' | pimo --mask "value1=[{fluxUri: 'pimo://nameFR'}]" --mask "value2=[{add: "const"}]"
     assertions:
     - result.code ShouldEqual 0
     - result.systemoutjson ShouldContainKey value2
