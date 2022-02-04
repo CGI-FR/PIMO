@@ -50,6 +50,16 @@ Multiple masks can be applied on the same jsonpath location, like in this exampl
       - remove: true
 ```
 
+Masks can be applied on multiple selectors, like in this example:
+
+```yaml
+  - selectors:
+      - jsonpath: "example"
+      - jsonpath: "example2"
+    mask:
+      add: "hello"
+```
+
 ## Possible masks
 
 The following types of masks can be used :
