@@ -538,12 +538,6 @@
       "properties": {
         "jsonpath": {
           "type": "string"
-        },
-        "jsonpaths": {
-          "items": {
-            "type": "string"
-          },
-          "type": "array"
         }
       },
       "additionalProperties": false,
@@ -551,8 +545,7 @@
       "oneOf": [
         {
           "required": [
-            "jsonpath",
-            "jsonpaths"
+            "jsonpath"
           ],
           "title": "Jsonpath"
         }
