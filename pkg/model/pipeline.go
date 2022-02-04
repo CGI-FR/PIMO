@@ -176,15 +176,11 @@ func LoadPipelineDefintionFromOneLiner(oneLine []string) (Definition, error) {
 		jsonpath, maskString := value[:i], value[(i+1):]
 
 		masking := Masking{Selector: SelectorType{Jsonpath: jsonpath}}
-		var mask []MaskType
-		err := yaml.Unmarshal([]byte(maskString), &mask)
-		if err != nil {
-			return conf, err
-		}
-		if len(mask) == 1 {
-			masking.Mask = mask[0]
-		} else {
-			masking.Masks = mask
+
+		if err := yaml.Unmarshal([]byte(maskString), &masking.Mask); err != nil {
+			if err2 := yaml.Unmarshal([]byte(maskString), &masking.Masks); err2 != nil {
+				return conf, err
+			}
 		}
 
 		conf.Masking = append(conf.Masking, masking)
