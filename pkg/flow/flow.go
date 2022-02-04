@@ -316,8 +316,8 @@ func flattenHash(mask model.MaskType) string {
 }
 
 func unescapeTemplateValues(templateValue, mask, jsonpath string, variables map[string]subgraph, maskSubgraph subgraph) subgraph {
-	regex := regexp.MustCompile(`(?:{{\.)([0-z]+)(?:}})`)
-	splittedTemplate := regex.FindAllString(templateValue, -1)
+	regex := regexp.MustCompile(`\.([0-z]+)`)
+	splittedTemplate := regex.FindAllSubmatch([]byte(templateValue), -1)
 	edges := make([]edge, 0, 10)
 	copyarray := make([]edge, 0, 10)
 	copy(copyarray, variables[jsonpath].masks)
@@ -328,16 +328,16 @@ func unescapeTemplateValues(templateValue, mask, jsonpath string, variables map[
 			param: sanitizeParam(templateValue),
 		}
 
-		value := splittedTemplate[i][3 : len(splittedTemplate[i])-2]
+		value := splittedTemplate[i][1]
 
-		templateEdge.key = value
+		templateEdge.key = string(value)
 
-		maskNumber := len(variables[value].masks)
+		maskNumber := len(variables[string(value)].masks)
 
 		if maskNumber == 0 {
-			templateEdge.source = value
+			templateEdge.source = string(value)
 		} else {
-			templateEdge.source = value + "_" + strconv.Itoa(maskNumber)
+			templateEdge.source = string(value) + "_" + strconv.Itoa(maskNumber)
 		}
 
 		templateEdge.destination = jsonpath + "_" + strconv.Itoa(jsonpathMaskCount+1)
