@@ -382,13 +382,16 @@
       ]
     },
     "Masking": {
-      "required": [
-        "selector"
-      ],
       "properties": {
         "selector": {
           "$schema": "http://json-schema.org/draft-04/schema#",
           "$ref": "#/definitions/SelectorType"
+        },
+        "selectors": {
+          "items": {
+            "$ref": "#/definitions/SelectorType"
+          },
+          "type": "array"
         },
         "mask": {
           "$schema": "http://json-schema.org/draft-04/schema#",
@@ -412,15 +415,31 @@
       "oneOf": [
         {
           "required": [
+            "selector",
             "mask"
           ],
-          "title": "Mask"
+          "title": "case1"
         },
         {
           "required": [
+            "selector",
             "masks"
           ],
-          "title": "Masks"
+          "title": "case2"
+        },
+        {
+          "required": [
+            "selectors",
+            "mask"
+          ],
+          "title": "case3"
+        },
+        {
+          "required": [
+            "selectors",
+            "masks"
+          ],
+          "title": "case4"
         }
       ]
     },
