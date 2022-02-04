@@ -13,7 +13,7 @@ testcases:
 - name: one-liner with array
   steps:
   - script: |-
-      echo '{"value": ""}' | pimo --mask "value={fluxUri: 'pimo://nameFR'}"
+      echo '{"value": ""}' | pimo --mask "value=[{fluxUri: 'pimo://nameFR'}]"
     assertions:
     - result.code ShouldEqual 0
     - result.systemoutjson ShouldContainKey value
