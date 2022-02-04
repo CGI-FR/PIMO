@@ -83,14 +83,14 @@ func exportMask(masking model.Masking, mask model.MaskType, variables map[string
 
 	if mask.Add != nil {
 		edgeToAdd.mask = "Add"
-		edgeToAdd.param = mask.Add.(string)
+		edgeToAdd.param = sanitizeParam(mask.Add.(string))
 		maskSubgraph = exportAdd(maskSubgraph, edgeToAdd, mask, masking, variables)
 		maskSubgraph.added = true
 		variables[masking.Selector.Jsonpath] = maskSubgraph
 	}
 	if mask.AddTransient != nil {
 		edgeToAdd.mask = "AddTransient"
-		edgeToAdd.param = mask.AddTransient.(string)
+		edgeToAdd.param = sanitizeParam(mask.AddTransient.(string))
 		maskSubgraph = exportAddTransient(maskSubgraph, edgeToAdd, mask, masking, variables)
 		maskSubgraph.added = true
 		maskSubgraph.removed = true
@@ -98,117 +98,117 @@ func exportMask(masking model.Masking, mask model.MaskType, variables map[string
 	}
 	if mask.Constant != nil {
 		edgeToAdd.mask = "Constant"
-		edgeToAdd.param = mask.Constant.(string)
+		edgeToAdd.param = sanitizeParam(mask.Constant.(string))
 		maskSubgraph.masks = append(maskSubgraph.masks, edgeToAdd)
 		variables[masking.Selector.Jsonpath] = maskSubgraph
 	}
 	if mask.RandomChoice != nil {
 		edgeToAdd.mask = "RandomChoice"
-		edgeToAdd.param = flattenChoices(mask)
+		edgeToAdd.param = sanitizeParam(flattenChoices(mask))
 		maskSubgraph.masks = append(maskSubgraph.masks, edgeToAdd)
 		variables[masking.Selector.Jsonpath] = maskSubgraph
 	}
 	if mask.RandomChoiceInURI != "" {
 		edgeToAdd.mask = "RandomChoiceInURI"
-		edgeToAdd.param = mask.RandomChoiceInURI
+		edgeToAdd.param = sanitizeParam(mask.RandomChoiceInURI)
 		maskSubgraph.masks = append(maskSubgraph.masks, edgeToAdd)
 		variables[masking.Selector.Jsonpath] = maskSubgraph
 	}
 	if mask.Command != "" {
 		edgeToAdd.mask = "Command"
-		edgeToAdd.param = mask.Command
+		edgeToAdd.param = sanitizeParam(mask.Command)
 		maskSubgraph.masks = append(maskSubgraph.masks, edgeToAdd)
 		variables[masking.Selector.Jsonpath] = maskSubgraph
 	}
 	if mask.RandomInt != (model.RandIntType{}) {
 		edgeToAdd.mask = "RandomInt"
-		edgeToAdd.param = "Min: " + strconv.Itoa(mask.RandomInt.Min) + ", Max: " + strconv.Itoa(mask.RandomInt.Max)
+		edgeToAdd.param = sanitizeParam("Min: " + strconv.Itoa(mask.RandomInt.Min) + ", Max: " + strconv.Itoa(mask.RandomInt.Max))
 		maskSubgraph.masks = append(maskSubgraph.masks, edgeToAdd)
 		variables[masking.Selector.Jsonpath] = maskSubgraph
 	}
 	if len(mask.WeightedChoice) > 0 {
 		edgeToAdd.mask = "WeightedChoice"
-		edgeToAdd.param = flattenWeightedChoices(mask)
+		edgeToAdd.param = sanitizeParam(flattenWeightedChoices(mask))
 		maskSubgraph.masks = append(maskSubgraph.masks, edgeToAdd)
 		variables[masking.Selector.Jsonpath] = maskSubgraph
 	}
 	if mask.Regex != "" {
 		edgeToAdd.mask = "Regex"
-		edgeToAdd.param = mask.Regex
+		edgeToAdd.param = sanitizeParam(mask.Regex)
 		maskSubgraph.masks = append(maskSubgraph.masks, edgeToAdd)
 		variables[masking.Selector.Jsonpath] = maskSubgraph
 	}
 	if mask.Hash != nil {
 		edgeToAdd.mask = "Hash"
-		edgeToAdd.param = flattenHash(mask)
+		edgeToAdd.param = sanitizeParam(flattenHash(mask))
 		maskSubgraph.masks = append(maskSubgraph.masks, edgeToAdd)
 		variables[masking.Selector.Jsonpath] = maskSubgraph
 	}
 	if mask.HashInURI != "" {
 		edgeToAdd.mask = "HashInURI"
-		edgeToAdd.param = mask.HashInURI
+		edgeToAdd.param = sanitizeParam(mask.HashInURI)
 		maskSubgraph.masks = append(maskSubgraph.masks, edgeToAdd)
 		variables[masking.Selector.Jsonpath] = maskSubgraph
 	}
 	if mask.RandDate != (model.RandDateType{}) {
 		edgeToAdd.mask = "RandDate"
-		edgeToAdd.param = "DateMin: " + mask.RandDate.DateMin.String() + ", DateMax: " + mask.RandDate.DateMax.String()
+		edgeToAdd.param = sanitizeParam("DateMin: " + mask.RandDate.DateMin.String() + ", DateMax: " + mask.RandDate.DateMax.String())
 		maskSubgraph.masks = append(maskSubgraph.masks, edgeToAdd)
 		variables[masking.Selector.Jsonpath] = maskSubgraph
 	}
 	if mask.Incremental != (model.IncrementalType{}) {
 		edgeToAdd.mask = "Incremental"
-		edgeToAdd.param = "Start: " + strconv.Itoa(mask.Incremental.Start) + ", Increment: " + strconv.Itoa(mask.Incremental.Increment)
+		edgeToAdd.param = sanitizeParam("Start: " + strconv.Itoa(mask.Incremental.Start) + ", Increment: " + strconv.Itoa(mask.Incremental.Increment))
 		maskSubgraph.masks = append(maskSubgraph.masks, edgeToAdd)
 		variables[masking.Selector.Jsonpath] = maskSubgraph
 	}
 	if mask.Replacement != "" {
 		edgeToAdd.mask = "Replacement"
-		edgeToAdd.param = mask.Replacement
+		edgeToAdd.param = sanitizeParam(mask.Replacement)
 		maskSubgraph.masks = append(maskSubgraph.masks, edgeToAdd)
 		variables[masking.Selector.Jsonpath] = maskSubgraph
 	}
 	if mask.Template != "" {
 		edgeToAdd.mask = "Template"
-		edgeToAdd.param = mask.Template
+		edgeToAdd.param = sanitizeParam(mask.Template)
 		maskSubgraph.masks = append(maskSubgraph.masks, edgeToAdd)
 		maskSubgraph = unescapeTemplateValues(mask.Template, "Template", masking.Selector.Jsonpath, variables, maskSubgraph)
 		variables[masking.Selector.Jsonpath] = maskSubgraph
 	}
 	if mask.TemplateEach != (model.TemplateEachType{}) {
 		edgeToAdd.mask = "TemplateEach"
-		edgeToAdd.param = "Item: " + mask.TemplateEach.Item + ", Index: " + mask.TemplateEach.Index + ", Template: " + mask.TemplateEach.Template
+		edgeToAdd.param = sanitizeParam("Item: " + mask.TemplateEach.Item + ", Index: " + mask.TemplateEach.Index + ", Template: " + mask.TemplateEach.Template)
 		maskSubgraph.masks = append(maskSubgraph.masks, edgeToAdd)
 		maskSubgraph = unescapeTemplateValues(mask.TemplateEach.Template, "TemplateEach", masking.Selector.Jsonpath, variables, maskSubgraph)
 		variables[masking.Selector.Jsonpath] = maskSubgraph
 	}
 	if mask.Duration != "" {
 		edgeToAdd.mask = "Duration"
-		edgeToAdd.param = mask.Duration
+		edgeToAdd.param = sanitizeParam(mask.Duration)
 		maskSubgraph.masks = append(maskSubgraph.masks, edgeToAdd)
 		variables[masking.Selector.Jsonpath] = maskSubgraph
 	}
 	if mask.Remove {
 		edgeToAdd.mask = "Remove"
-		edgeToAdd.param = strconv.FormatBool(true)
+		edgeToAdd.param = sanitizeParam(strconv.FormatBool(true))
 		maskSubgraph.removed = true
 		variables[masking.Selector.Jsonpath] = maskSubgraph
 	}
 	if mask.RangeMask != 0 {
 		edgeToAdd.mask = "RangeMask"
-		edgeToAdd.param = strconv.Itoa(mask.RangeMask)
+		edgeToAdd.param = sanitizeParam(strconv.Itoa(mask.RangeMask))
 		maskSubgraph.masks = append(maskSubgraph.masks, edgeToAdd)
 		variables[masking.Selector.Jsonpath] = maskSubgraph
 	}
 	if mask.RandomDuration != (model.RandomDurationType{}) {
 		edgeToAdd.mask = "RandomDuration"
-		edgeToAdd.param = "Min: " + mask.RandomDuration.Min + ", Max: " + mask.RandomDuration.Max
+		edgeToAdd.param = sanitizeParam("Min: " + mask.RandomDuration.Min + ", Max: " + mask.RandomDuration.Max)
 		maskSubgraph.masks = append(maskSubgraph.masks, edgeToAdd)
 		variables[masking.Selector.Jsonpath] = maskSubgraph
 	}
 	if mask.FluxURI != "" {
 		edgeToAdd.mask = "FluxURI"
-		edgeToAdd.param = mask.FluxURI
+		edgeToAdd.param = sanitizeParam(mask.FluxURI)
 		maskSubgraph.masks = append(maskSubgraph.masks, edgeToAdd)
 		variables[masking.Selector.Jsonpath] = maskSubgraph
 	}
@@ -217,49 +217,46 @@ func exportMask(masking model.Masking, mask model.MaskType, variables map[string
 		min := strconv.FormatFloat(mask.RandomDecimal.Min, 'E', mask.RandomDecimal.Precision, 64)
 		max := strconv.FormatFloat(mask.RandomDecimal.Max, 'E', mask.RandomDecimal.Precision, 64)
 		precision := strconv.Itoa(mask.RandomDecimal.Precision)
-		edgeToAdd.param = "Min: " + min + ", Max: " + max + ", Precision: " + precision
+		edgeToAdd.param = sanitizeParam("Min: " + min + ", Max: " + max + ", Precision: " + precision)
 		maskSubgraph.masks = append(maskSubgraph.masks, edgeToAdd)
 		variables[masking.Selector.Jsonpath] = maskSubgraph
 	}
 	if mask.DateParser != (model.DateParserType{}) {
 		edgeToAdd.mask = "DateParser"
-		edgeToAdd.param = "InputFormat: " + mask.DateParser.InputFormat + ", OutputFormat: " + mask.DateParser.OutputFormat
+		edgeToAdd.param = sanitizeParam("InputFormat: " + mask.DateParser.InputFormat + ", OutputFormat: " + mask.DateParser.OutputFormat)
 		maskSubgraph.masks = append(maskSubgraph.masks, edgeToAdd)
 		variables[masking.Selector.Jsonpath] = maskSubgraph
 	}
 	if mask.FromCache != "" {
 		edgeToAdd.mask = "FromCache"
-		edgeToAdd.param = mask.FromCache
+		edgeToAdd.param = sanitizeParam(mask.FromCache)
 		maskSubgraph.masks = append(maskSubgraph.masks, edgeToAdd)
 		variables[masking.Selector.Jsonpath] = maskSubgraph
 	}
 	if mask.FF1 != (model.FF1Type{}) {
 		edgeToAdd.mask = "FF1"
-		edgeToAdd.param = "KeyFromEnv: " + mask.FF1.KeyFromEnv + ", TweakField: " + mask.FF1.TweakField + ", Radix: " + strconv.FormatUint(uint64(mask.FF1.Radix), 10) + ", Decrypt: " + strconv.FormatBool(mask.FF1.Decrypt)
+		edgeToAdd.param = sanitizeParam("KeyFromEnv: " + mask.FF1.KeyFromEnv + ", TweakField: " + mask.FF1.TweakField + ", Radix: " + strconv.FormatUint(uint64(mask.FF1.Radix), 10) + ", Decrypt: " + strconv.FormatBool(mask.FF1.Decrypt))
 		maskSubgraph.masks = append(maskSubgraph.masks, edgeToAdd)
 		variables[masking.Selector.Jsonpath] = maskSubgraph
 	}
 	if mask.Pipe.Masking != nil {
 		edgeToAdd.mask = "Pipe"
-		edgeToAdd.param = "DefinitionFile: " + mask.Pipe.DefinitionFile + ", InjectParent: " + mask.Pipe.InjectParent + ", InjectRoot: " + mask.Pipe.InjectRoot
+		edgeToAdd.param = sanitizeParam("DefinitionFile: " + mask.Pipe.DefinitionFile + ", InjectParent: " + mask.Pipe.InjectParent + ", InjectRoot: " + mask.Pipe.InjectRoot)
 		maskSubgraph.masks = append(maskSubgraph.masks, edgeToAdd)
 		variables[masking.Selector.Jsonpath] = maskSubgraph
 	}
 	if mask.FromJSON != "" {
 		edgeToAdd.mask = "FromJSON"
-		edgeToAdd.param = mask.FromJSON
+		edgeToAdd.param = sanitizeParam(mask.FromJSON)
 		maskSubgraph.masks = append(maskSubgraph.masks, edgeToAdd)
 		variables[masking.Selector.Jsonpath] = maskSubgraph
 	}
 	if mask.Luhn != nil {
 		edgeToAdd.mask = "Luhn"
-		edgeToAdd.param = mask.Luhn.Universe
+		edgeToAdd.param = sanitizeParam(mask.Luhn.Universe)
 		maskSubgraph.masks = append(maskSubgraph.masks, edgeToAdd)
 		variables[masking.Selector.Jsonpath] = maskSubgraph
 	}
-
-	maskSubgraph.masks = append(maskSubgraph.masks, edgeToAdd)
-	variables[masking.Selector.Jsonpath] = maskSubgraph
 }
 
 func checkSourceAndDestination(edgeToAdd edge, maskCount int, maskSubgraph subgraph, masking model.Masking) edge {
@@ -295,7 +292,7 @@ func exportAddTransient(maskSubgraph subgraph, addEdge edge, mask model.MaskType
 func flattenChoices(mask model.MaskType) string {
 	choices := make([]string, len(mask.RandomChoice))
 	for i, v := range mask.RandomChoice {
-		choices[i] = v.(string)
+		choices[i] = sanitizeParam(v.(string))
 	}
 	return strings.Join(choices, ",")
 }
@@ -328,7 +325,7 @@ func unescapeTemplateValues(templateValue, mask, jsonpath string, variables map[
 	for i := range splittedTemplate {
 		templateEdge := edge{
 			mask:  mask,
-			param: templateValue,
+			param: sanitizeParam(templateValue),
 		}
 
 		value := splittedTemplate[i][3 : len(splittedTemplate[i])-2]
@@ -350,6 +347,10 @@ func unescapeTemplateValues(templateValue, mask, jsonpath string, variables map[
 	return maskSubgraph
 }
 
+func sanitizeParam(param string) string {
+	return strings.ReplaceAll(param, `"`, "#quot;")
+}
+
 func printSubgraphs(variables map[string]subgraph, maskOrder []string) string {
 	inputText := ""
 	subgraphText := ""
@@ -368,9 +369,9 @@ func printSubgraphs(variables map[string]subgraph, maskOrder []string) string {
 				subgraphText, inputText = printMask(subgraphText, inputText, variables[key].masks[j], variables)
 			}
 			subgraphText += "\n    end\n    "
-			subgraphText += variables[key].masks[count-1].destination
+			outputText += variables[key].masks[count-1].destination
 		} else {
-			subgraphText += key
+			outputText += key
 		}
 		if variables[key].removed {
 			outputText += " --> !remove[\\Remove\\]\n    "
