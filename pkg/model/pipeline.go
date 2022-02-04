@@ -67,24 +67,26 @@ func BuildCaches(caches map[string]CacheDefinition, existing map[string]Cache) m
 func BuildPipeline(pipeline Pipeline, conf Definition, caches map[string]Cache) (Pipeline, map[string]Cache, error) {
 	caches = BuildCaches(conf.Caches, caches)
 	cleaners := []Processor{}
+
 	for _, masking := range conf.Masking {
-		allJsonpath := masking.Selector.Jsonpaths
-		if j := masking.Selector.Jsonpath; j != "" {
-			allJsonpath = append(allJsonpath, j)
+		allSelectors := masking.Selectors
+		if sel := masking.Selector; sel.Jsonpath != "" {
+			allSelectors = append(allSelectors, sel)
 		}
 
-		for _, jsonpath := range allJsonpath {
+		for _, sel := range allSelectors {
 			nbArg := 0
 
 			allMasksDefinition := append([]MaskType{masking.Mask}, masking.Masks...)
 
 			for _, maskDefinition := range allMasksDefinition {
 				virtualMask := Masking{
-					Selector: SelectorType{Jsonpath: jsonpath},
-					Mask:     maskDefinition,
-					Masks:    nil,
-					Cache:    masking.Cache,
-					Preserve: masking.Preserve,
+					Selector:  sel,
+					Selectors: nil,
+					Mask:      maskDefinition,
+					Masks:     nil,
+					Cache:     masking.Cache,
+					Preserve:  masking.Preserve,
 				}
 
 				if virtualMask.Mask.FromCache != "" {
@@ -150,7 +152,6 @@ func BuildPipeline(pipeline Pipeline, conf Definition, caches map[string]Cache) 
 			}
 		}
 	}
-
 	for _, cleaner := range cleaners {
 		pipeline = pipeline.Process(cleaner)
 	}
