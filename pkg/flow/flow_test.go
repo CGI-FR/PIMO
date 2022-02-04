@@ -733,8 +733,10 @@ func TestExportFF1(t *testing.T) {
 
 	wanted := `flowchart LR
     !input[(input)] --> name
+    !input[(input)] --> tweak
     subgraph name_sg
         name -->|"FF1(KeyFromEnv: FF1_ENCRYPTION_KEY, TweakField: tweak, Radix: 62, Decrypt: false)"| name_1
+        tweak -->|"FF1(KeyFromEnv: FF1_ENCRYPTION_KEY, TweakField: tweak, Radix: 62, Decrypt: false)"| name_1
     end
     name_1 --> !output>Output]`
 
