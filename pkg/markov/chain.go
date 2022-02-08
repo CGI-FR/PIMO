@@ -70,8 +70,10 @@ func (chain *Chain) Generate(current NGram) (string, error) {
 	}
 
 	keys := make([]string, len(freqMap))
-	for k, i := range freqMap {
-		keys[i] = k
+	idx := 0
+	for k := range freqMap {
+		keys[idx] = k
+		idx++
 	}
 	sort.Slice(keys, func(i, j int) bool {
 		return freqMap[keys[i]] < freqMap[keys[j]]
