@@ -82,6 +82,7 @@ var (
 	cachesToLoad     map[string]string
 	skipLineOnError  bool
 	skipFieldOnError bool
+	maskingOneLiner  []string
 )
 
 func main() {
@@ -110,6 +111,7 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 	rootCmd.PersistentFlags().StringToStringVar(&cachesToLoad, "load-cache", map[string]string{}, "path for loading cache from file")
 	rootCmd.PersistentFlags().BoolVar(&skipLineOnError, "skip-line-on-error", false, "skip a line if an error occurs while masking a field")
 	rootCmd.PersistentFlags().BoolVar(&skipFieldOnError, "skip-field-on-error", false, "remove a field if an error occurs while masking this field")
+	rootCmd.PersistentFlags().StringArrayVarP(&maskingOneLiner, "mask", "m", []string{}, "one liner masking")
 
 	rootCmd.AddCommand(&cobra.Command{
 		Use: "jsonschema",
@@ -174,13 +176,19 @@ func run() {
 	var (
 		err    error
 		caches map[string]model.Cache
+		pdef   model.Definition
 	)
 
 	model.InjectMaskContextFactories(injectMaskContextFactories())
 	model.InjectMaskFactories(injectMaskFactories())
 	model.InjectConfig(skipLineOnError, skipFieldOnError)
 
-	pdef, err := model.LoadPipelineDefinitionFromYAML(maskingFile)
+	if len(maskingOneLiner) > 0 {
+		pdef, err = model.LoadPipelineDefintionFromOneLiner(maskingOneLiner)
+	} else {
+		pdef, err = model.LoadPipelineDefinitionFromYAML(maskingFile)
+	}
+
 	if err != nil {
 		log.Err(err).Msg("Cannot load pipeline definition from file")
 		log.Warn().Int("return", 1).Msg("End PIMO")
