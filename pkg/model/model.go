@@ -18,6 +18,8 @@
 package model
 
 import (
+	"bytes"
+	"html/template"
 	"time"
 
 	"github.com/rs/zerolog/log"
@@ -257,6 +259,65 @@ func (source *SourceFromSlice) Err() error {
 func (source *SourceFromSlice) Open() error {
 	source.offset = 0
 	return nil
+}
+
+func NewRepeaterUntilProcess(source *TempSource, text string) Processor {
+	tmpl, _ := template.New("template").Parse(text)
+
+	return RepeaterUntilProcess{tmpl, source}
+}
+
+type RepeaterUntilProcess struct {
+	tmpl *template.Template
+	tmp  *TempSource
+}
+
+func (p RepeaterUntilProcess) Open() error {
+	return nil
+}
+
+func (p RepeaterUntilProcess) ProcessDictionary(dictionary Dictionary, out Collector) error {
+	out.Collect(dictionary)
+	var output bytes.Buffer
+	err := p.tmpl.Execute(&output, dictionary.Unordered())
+	if err != nil {
+		return err
+	}
+	if output.String() == "false" {
+		p.tmp.collector.Collect(dictionary)
+	}
+
+	return nil
+}
+
+func NewTempSource(sourceValue Source) Source {
+	return &TempSource{collector: NewCollector(), source: sourceValue}
+}
+
+type TempSource struct {
+	collector *QueueCollector
+	value     Dictionary
+	source    Source
+}
+
+func (s *TempSource) Open() error { return s.source.Open() }
+
+func (s *TempSource) Next() bool {
+	if s.collector.Next() {
+		s.value = s.collector.value
+		return true
+	}
+	if s.source.Next() {
+		s.value = s.source.Value()
+		return true
+	}
+	return false
+}
+
+func (s *TempSource) Err() error { return s.source.Err() }
+
+func (s *TempSource) Value() Dictionary {
+	return s.value
 }
 
 func NewRepeaterProcess(times int) Processor {

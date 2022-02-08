@@ -82,6 +82,7 @@ var (
 	skipLineOnError  bool
 	skipFieldOnError bool
 	maskingOneLiner  []string
+	repeatUntil      string
 )
 
 func main() {
@@ -111,6 +112,7 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 	rootCmd.PersistentFlags().BoolVar(&skipLineOnError, "skip-line-on-error", false, "skip a line if an error occurs while masking a field")
 	rootCmd.PersistentFlags().BoolVar(&skipFieldOnError, "skip-field-on-error", false, "remove a field if an error occurs while masking this field")
 	rootCmd.PersistentFlags().StringArrayVarP(&maskingOneLiner, "mask", "m", []string{}, "one liner masking")
+	rootCmd.PersistentFlags().StringVar(&repeatUntil, "repeat-until", "", "one liner masking")
 
 	rootCmd.AddCommand(&cobra.Command{
 		Use: "jsonschema",
@@ -150,11 +152,14 @@ func run() {
 		over.MDC().Set("context", "stdin")
 		source = jsonline.NewSource(os.Stdin)
 	}
+	if repeatUntil != "" {
+		source = model.NewTempSource(source)
+	}
+
 	pipeline := model.NewPipeline(source).
 		Process(model.NewCounterProcessWithCallback("input-line", 0, updateContext)).
 		Process(model.NewRepeaterProcess(iteration))
 	over.AddGlobalFields("input-line")
-
 	var (
 		err    error
 		caches map[string]model.Cache
@@ -178,6 +183,10 @@ func run() {
 	}
 
 	pipeline, caches, err = model.BuildPipeline(pipeline, pdef, nil)
+	if repeatUntil != "" {
+		pipeline = pipeline.Process(model.NewRepeaterUntilProcess(source.(*model.TempSource), repeatUntil))
+	}
+
 	if err != nil {
 		log.Error().Err(err).Msg("Cannot build pipeline")
 		log.Warn().Int("return", 1).Msg("End PIMO")
