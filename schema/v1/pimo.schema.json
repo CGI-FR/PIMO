@@ -101,6 +101,21 @@
       "additionalProperties": false,
       "type": "object"
     },
+    "MarkovType": {
+      "properties": {
+        "max-size": {
+          "type": "integer"
+        },
+        "sample": {
+          "type": "string"
+        },
+        "separator": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
     "MaskType": {
       "properties": {
         "add": {
@@ -206,6 +221,10 @@
         "luhn": {
           "$schema": "http://json-schema.org/draft-04/schema#",
           "$ref": "#/definitions/LuhnType"
+        },
+        "markov": {
+          "$schema": "http://json-schema.org/draft-04/schema#",
+          "$ref": "#/definitions/MarkovType"
         }
       },
       "additionalProperties": false,
@@ -378,6 +397,12 @@
             "luhn"
           ],
           "title": "Luhn"
+        },
+        {
+          "required": [
+            "markov"
+          ],
+          "title": "Markov"
         }
       ]
     },
