@@ -331,9 +331,7 @@ func unescapeTemplateValues(templateValue, mask, jsonpath string, variables map[
 	regex := regexp.MustCompile(`\.([0-z,\_,-]+)`)
 	splittedTemplate := regex.FindAllSubmatch([]byte(templateValue), -1)
 	edges := make([]edge, 0, 10)
-	copyarray := make([]edge, 0, 10)
-	copy(copyarray, variables[jsonpath].masks)
-	jsonpathMaskCount := len(copyarray)
+	jsonpathMaskCount := len(variables[jsonpath].masks)
 	for i := range splittedTemplate {
 		templateEdge := edge{
 			mask:  mask,
@@ -342,7 +340,9 @@ func unescapeTemplateValues(templateValue, mask, jsonpath string, variables map[
 
 		value := string(splittedTemplate[i][1])
 		// to avoid confusion with intermediate steps (i.e. "name_1")
-		value = strings.ReplaceAll(value, "_", "#underscore;")
+		if strings.Contains(value, "#underscore;") {
+			value = value[0:strings.LastIndex(value, "#underscore;")]
+		}
 
 		templateEdge.key = value
 
@@ -351,10 +351,10 @@ func unescapeTemplateValues(templateValue, mask, jsonpath string, variables map[
 		if maskNumber == 0 {
 			templateEdge.source = value
 		} else {
-			templateEdge.source = value + "_" + strconv.Itoa(maskNumber)
+			templateEdge.source = value + "#underscore;" + strconv.Itoa(maskNumber)
 		}
 
-		templateEdge.destination = jsonpath + "_" + strconv.Itoa(jsonpathMaskCount+1)
+		templateEdge.destination = jsonpath + "#underscore;" + strconv.Itoa(jsonpathMaskCount+1)
 		edges = append(edges, templateEdge)
 	}
 	maskSubgraph.masks = append(maskSubgraph.masks, edges...)
@@ -383,7 +383,7 @@ func printSubgraphs(variables map[string]subgraph, maskOrder []string) string {
 				subgraphText, inputText = printMask(subgraphText, inputText, variables[key].masks[j], variables)
 			}
 			subgraphText += "\n    end\n    "
-			outputText += variables[key].masks[count-1].destination
+			outputText += strings.Replace(variables[key].masks[count-1].destination, "#underscore;", "_", 1)
 		} else {
 			outputText += key
 		}
@@ -397,19 +397,25 @@ func printSubgraphs(variables map[string]subgraph, maskOrder []string) string {
 }
 
 func printMask(subgraphText, inputText string, mask edge, variables map[string]subgraph) (string, string) {
-	lastUnderscore := strings.LastIndex(mask.source, "_")
+	source := strings.Replace(mask.source, "#underscore;", "_", 1)
+	lastUnderscore := strings.LastIndex(source, "_")
 	var key string
 	if lastUnderscore == -1 {
-		key = mask.source
+		key = source
 	} else {
-		key = mask.source[0:strings.LastIndex(mask.source, "_")]
+		if _, notNumeric := strconv.Atoi(source[lastUnderscore+1:]); notNumeric != nil {
+			key = source
+		} else {
+			key = source[0:lastUnderscore]
+		}
 	}
 
-	key = strings.ReplaceAll(key, "#underscore;", "_")
 	_, ok := variables[key]
-	if !ok {
+	if !ok && strings.TrimSpace(key) != "" {
 		inputText += "!input[(input)] --> " + key + "\n    "
 	}
-	subgraphText += "\n        " + mask.source + " -->|\"" + mask.mask + "(" + mask.param + ")\"| " + mask.destination
+
+	destination := strings.Replace(mask.destination, "#underscore;", "_", 1)
+	subgraphText += "\n        " + source + " -->|\"" + mask.mask + "(" + mask.param + ")\"| " + destination
 	return subgraphText, inputText
 }
