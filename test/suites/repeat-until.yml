@@ -31,3 +31,39 @@ testcases:
   - script: rm -f expected.txt
   - script: rm -f result.txt
 
+- name: repeat-until with flag --skip-line-on-error should not interrupt pipeline
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "value"
+          mask:
+            constant: "invalid_value"
+  - script: |-
+      echo '{"value": 0}' | pimo -vinfo --log-json --skip-line-on-error --repeat-until "{{eq .age 3}}"
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemerr ShouldNotContainSubstring "level":"error"
+    - result.systemerr ShouldContainSubstring Line skipped
+
+- name: repeat-until with flag --skip-field-on-error should not interrupt pipeline
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "value"
+          mask:
+            constant: "invalid_value"
+  - script: |-
+      echo '{"value": 0}' | pimo -vinfo --log-json --skip-field-on-error --repeat-until "{{eq .age 3}}"
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemerr ShouldNotContainSubstring "level":"error"
+    - result.systemerr ShouldContainSubstring Field skipped
+
