@@ -278,33 +278,32 @@ func (p RepeaterUntilProcess) Open() error {
 
 func (p RepeaterUntilProcess) ProcessDictionary(dictionary Dictionary, out Collector) error {
 	out.Collect(dictionary)
+
 	var output bytes.Buffer
+
 	err := p.tmpl.Execute(&output, dictionary.Unordered())
 	if err != nil {
 		return err
 	}
-	if output.String() == "false" {
-		p.tmp.collector.Collect(dictionary)
-	}
+	p.tmp.repeat = output.String() == "false"
 
 	return nil
 }
 
 func NewTempSource(sourceValue Source) Source {
-	return &TempSource{collector: NewCollector(), source: sourceValue}
+	return &TempSource{repeat: false, source: sourceValue, value: NewDictionary()}
 }
 
 type TempSource struct {
-	collector *QueueCollector
-	value     Dictionary
-	source    Source
+	repeat bool
+	value  Dictionary
+	source Source
 }
 
 func (s *TempSource) Open() error { return s.source.Open() }
 
 func (s *TempSource) Next() bool {
-	if s.collector.Next() {
-		s.value = s.collector.value
+	if s.repeat {
 		return true
 	}
 	if s.source.Next() {
