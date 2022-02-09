@@ -183,8 +183,19 @@ func run() {
 	}
 
 	pipeline, caches, err = model.BuildPipeline(pipeline, pdef, nil)
+	if err != nil {
+		log.Error().Err(err).Msg("Cannot build pipeline")
+		log.Warn().Int("return", 1).Msg("End PIMO")
+		os.Exit(1)
+	}
 	if repeatUntil != "" {
-		pipeline = pipeline.Process(model.NewRepeaterUntilProcess(source.(*model.TempSource), repeatUntil))
+		processor, err := model.NewRepeaterUntilProcess(source.(*model.TempSource), repeatUntil)
+		if err != nil {
+			log.Error().Err(err).Msg("Cannot build template")
+			log.Warn().Int("return", 1).Msg("End PIMO")
+			os.Exit(1)
+		}
+		pipeline = pipeline.Process(processor)
 	}
 
 	if err != nil {

@@ -19,9 +19,10 @@ package model
 
 import (
 	"bytes"
-	"html/template"
+	"fmt"
 	"time"
 
+	ptemplate "github.com/cgi-fr/pimo/pkg/template"
 	"github.com/rs/zerolog/log"
 )
 
@@ -261,14 +262,14 @@ func (source *SourceFromSlice) Open() error {
 	return nil
 }
 
-func NewRepeaterUntilProcess(source *TempSource, text string) Processor {
-	tmpl, _ := template.New("template").Parse(text)
+func NewRepeaterUntilProcess(source *TempSource, text string) (Processor, error) {
+	eng, err := ptemplate.NewEngine(text)
 
-	return RepeaterUntilProcess{tmpl, source}
+	return RepeaterUntilProcess{eng, source}, err
 }
 
 type RepeaterUntilProcess struct {
-	tmpl *template.Template
+	tmpl *ptemplate.Engine
 	tmp  *TempSource
 }
 
@@ -280,10 +281,15 @@ func (p RepeaterUntilProcess) ProcessDictionary(dictionary Dictionary, out Colle
 	out.Collect(dictionary)
 
 	var output bytes.Buffer
-
-	err := p.tmpl.Execute(&output, dictionary.Unordered())
+	var err error
+	defer func() {
+		if r := recover(); r != nil {
+			err = fmt.Errorf("Cannot execute template, error: %v", r)
+		}
+	}()
+	err = p.tmpl.Execute(&output, dictionary.Unordered())
 	if err != nil {
-		return err
+		log.Err(err).Msg("Error while executing template")
 	}
 	p.tmp.repeat = output.String() == "false"
 
