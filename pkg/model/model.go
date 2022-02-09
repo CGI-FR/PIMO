@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/cgi-fr/pimo/pkg/statistics"
 	ptemplate "github.com/cgi-fr/pimo/pkg/template"
 	"github.com/rs/zerolog/log"
 )
@@ -288,12 +289,24 @@ func (p RepeaterUntilProcess) ProcessDictionary(dictionary Dictionary, out Colle
 		}
 	}()
 	err = p.tmpl.Execute(&output, dictionary.Unordered())
-	if err != nil {
-		log.Err(err).Msg("Error while executing template")
-	}
-	p.tmp.repeat = output.String() == "false"
 
-	return nil
+	if err != nil && skipLineOnError {
+		log.Warn().AnErr("error", err).Msg("Line skipped")
+		statistics.IncIgnoredLinesCount()
+		return nil
+	}
+
+	if err != nil && skipFieldOnError {
+		log.Warn().AnErr("error", err).Msg("Field skipped")
+		statistics.IncIgnoredFieldsCount()
+		return nil
+	}
+
+	if err == nil {
+		p.tmp.repeat = output.String() == "false"
+	}
+
+	return err
 }
 
 func NewTempSource(sourceValue Source) Source {
