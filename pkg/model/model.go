@@ -23,7 +23,7 @@ import (
 	"time"
 
 	"github.com/cgi-fr/pimo/pkg/statistics"
-	ptemplate "github.com/cgi-fr/pimo/pkg/template"
+	"github.com/cgi-fr/pimo/pkg/template"
 	"github.com/rs/zerolog/log"
 )
 
@@ -264,13 +264,13 @@ func (source *SourceFromSlice) Open() error {
 }
 
 func NewRepeaterUntilProcess(source *TempSource, text string) (Processor, error) {
-	eng, err := ptemplate.NewEngine(text)
+	eng, err := template.NewEngine(text)
 
 	return RepeaterUntilProcess{eng, source}, err
 }
 
 type RepeaterUntilProcess struct {
-	tmpl *ptemplate.Engine
+	tmpl *template.Engine
 	tmp  *TempSource
 }
 
@@ -293,12 +293,6 @@ func (p RepeaterUntilProcess) ProcessDictionary(dictionary Dictionary, out Colle
 	if err != nil && skipLineOnError {
 		log.Warn().AnErr("error", err).Msg("Line skipped")
 		statistics.IncIgnoredLinesCount()
-		return nil
-	}
-
-	if err != nil && skipFieldOnError {
-		log.Warn().AnErr("error", err).Msg("Field skipped")
-		statistics.IncIgnoredFieldsCount()
 		return nil
 	}
 
