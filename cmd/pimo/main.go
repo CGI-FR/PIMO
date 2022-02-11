@@ -160,7 +160,15 @@ func run() {
 		log.Warn().Int("return", 1).Msg("End PIMO")
 		os.Exit(1)
 	}
-	if repeatUntil != "" || repeatWhile != "" {
+
+	repeatCondition := repeatWhile
+	repeatConditionMode := "while"
+	if repeatUntil != "" {
+		repeatCondition = repeatUntil
+		repeatConditionMode = "until"
+	}
+
+	if repeatCondition != "" {
 		source = model.NewTempSource(source)
 	}
 
@@ -197,18 +205,8 @@ func run() {
 		os.Exit(1)
 	}
 
-	if repeatUntil != "" {
-		processor, err := model.NewRepeaterUntilProcess(source.(*model.TempSource), repeatUntil, "until")
-		if err != nil {
-			log.Error().Err(err).Msg("Cannot build template")
-			log.Warn().Int("return", 1).Msg("End PIMO")
-			os.Exit(1)
-		}
-		pipeline = pipeline.Process(processor)
-	}
-
-	if repeatWhile != "" {
-		processor, err := model.NewRepeaterUntilProcess(source.(*model.TempSource), repeatWhile, "while")
+	if repeatCondition != "" {
+		processor, err := model.NewRepeaterUntilProcess(source.(*model.TempSource), repeatCondition, repeatConditionMode)
 		if err != nil {
 			log.Error().Err(err).Msg("Cannot build template")
 			log.Warn().Int("return", 1).Msg("End PIMO")
