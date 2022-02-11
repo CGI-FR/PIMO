@@ -1,4 +1,4 @@
-name: repeat-until features
+name: repeat-until/repeat-while features
 testcases:
 - name: repeat-until simple
   steps:
@@ -23,6 +23,36 @@ testcases:
       EOF
   - script: |-
       echo '{"age": 0}' | pimo --repeat-until "{{eq .age 3}}" > result.txt
+    assertions:
+    - result.code ShouldEqual 0
+  - script: diff expected.txt result.txt
+    assertions:
+      - result.systemout ShouldBeEmpty
+  - script: rm -f expected.txt
+  - script: rm -f result.txt
+
+- name: repeat-while simple
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "age"
+          mask:
+            incremental:
+              start: 0
+              increment: 1
+      EOF
+  - script: |-
+      cat > expected.txt <<EOF
+      {"age":0}
+      {"age":1}
+      {"age":2}
+      EOF
+  - script: |-
+      echo '{"age": 0}' | pimo --repeat-while "{{eq .age 3}}" > result.txt
     assertions:
     - result.code ShouldEqual 0
   - script: diff expected.txt result.txt
