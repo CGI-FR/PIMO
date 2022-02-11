@@ -263,15 +263,16 @@ func (source *SourceFromSlice) Open() error {
 	return nil
 }
 
-func NewRepeaterUntilProcess(source *TempSource, text string) (Processor, error) {
+func NewRepeaterUntilProcess(source *TempSource, text, mode string) (Processor, error) {
 	eng, err := template.NewEngine(text)
 
-	return RepeaterUntilProcess{eng, source}, err
+	return RepeaterUntilProcess{eng, source, mode}, err
 }
 
 type RepeaterUntilProcess struct {
 	tmpl *template.Engine
 	tmp  *TempSource
+	mode string
 }
 
 func (p RepeaterUntilProcess) Open() error {
@@ -279,8 +280,6 @@ func (p RepeaterUntilProcess) Open() error {
 }
 
 func (p RepeaterUntilProcess) ProcessDictionary(dictionary Dictionary, out Collector) error {
-	out.Collect(dictionary)
-
 	var output bytes.Buffer
 	var err error
 	defer func() {
@@ -297,7 +296,20 @@ func (p RepeaterUntilProcess) ProcessDictionary(dictionary Dictionary, out Colle
 	}
 
 	if err == nil {
-		p.tmp.repeat = output.String() == "false"
+		b := output.String()
+		switch p.mode {
+		case "while":
+			p.tmp.repeat = b == "true"
+			if p.tmp.repeat {
+				out.Collect(dictionary)
+			}
+		case "until":
+			p.tmp.repeat = b == "false"
+			out.Collect(dictionary)
+		default:
+			p.tmp.repeat = false
+			out.Collect(dictionary)
+		}
 	}
 
 	return err

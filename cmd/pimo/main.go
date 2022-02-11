@@ -83,6 +83,7 @@ var (
 	skipFieldOnError bool
 	maskingOneLiner  []string
 	repeatUntil      string
+	repeatWhile      string
 )
 
 func main() {
@@ -112,7 +113,8 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 	rootCmd.PersistentFlags().BoolVar(&skipLineOnError, "skip-line-on-error", false, "skip a line if an error occurs while masking a field")
 	rootCmd.PersistentFlags().BoolVar(&skipFieldOnError, "skip-field-on-error", false, "remove a field if an error occurs while masking this field")
 	rootCmd.PersistentFlags().StringArrayVarP(&maskingOneLiner, "mask", "m", []string{}, "one liner masking")
-	rootCmd.PersistentFlags().StringVar(&repeatUntil, "repeat-until", "", "mask each input repeatedly until a condition the given condition met")
+	rootCmd.PersistentFlags().StringVar(&repeatUntil, "repeat-until", "", "mask each input repeatedly until the given condition is met")
+	rootCmd.PersistentFlags().StringVar(&repeatWhile, "repeat-while", "", "mask each input repeatedly while the given condition is met")
 
 	rootCmd.AddCommand(&cobra.Command{
 		Use: "jsonschema",
@@ -155,6 +157,9 @@ func run() {
 	if repeatUntil != "" {
 		source = model.NewTempSource(source)
 	}
+	if repeatWhile != "" {
+		source = model.NewTempSource(source)
+	}
 
 	pipeline := model.NewPipeline(source).
 		Process(model.NewCounterProcessWithCallback("input-line", 0, updateContext)).
@@ -189,7 +194,16 @@ func run() {
 		os.Exit(1)
 	}
 	if repeatUntil != "" {
-		processor, err := model.NewRepeaterUntilProcess(source.(*model.TempSource), repeatUntil)
+		processor, err := model.NewRepeaterUntilProcess(source.(*model.TempSource), repeatUntil, "until")
+		if err != nil {
+			log.Error().Err(err).Msg("Cannot build template")
+			log.Warn().Int("return", 1).Msg("End PIMO")
+			os.Exit(1)
+		}
+		pipeline = pipeline.Process(processor)
+	}
+	if repeatWhile != "" {
+		processor, err := model.NewRepeaterUntilProcess(source.(*model.TempSource), repeatWhile, "while")
 		if err != nil {
 			log.Error().Err(err).Msg("Cannot build template")
 			log.Warn().Int("return", 1).Msg("End PIMO")
