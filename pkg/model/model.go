@@ -287,7 +287,7 @@ func (p RepeaterUntilProcess) ProcessDictionary(dictionary Dictionary, out Colle
 			err = fmt.Errorf("Cannot execute template, error: %v", r)
 		}
 	}()
-	err = p.tmpl.Execute(&output, dictionary.Unordered())
+	err = p.tmpl.Execute(&output, dictionary.Untyped())
 
 	if err != nil && skipLineOnError {
 		log.Warn().AnErr("error", err).Msg("Line skipped")
