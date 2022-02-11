@@ -82,6 +82,8 @@ var (
 	skipLineOnError  bool
 	skipFieldOnError bool
 	maskingOneLiner  []string
+	repeatUntil      string
+	repeatWhile      string
 )
 
 func main() {
@@ -111,6 +113,8 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 	rootCmd.PersistentFlags().BoolVar(&skipLineOnError, "skip-line-on-error", false, "skip a line if an error occurs while masking a field")
 	rootCmd.PersistentFlags().BoolVar(&skipFieldOnError, "skip-field-on-error", false, "remove a field if an error occurs while masking this field")
 	rootCmd.PersistentFlags().StringArrayVarP(&maskingOneLiner, "mask", "m", []string{}, "one liner masking")
+	rootCmd.PersistentFlags().StringVar(&repeatUntil, "repeat-until", "", "mask each input repeatedly until the given condition is met")
+	rootCmd.PersistentFlags().StringVar(&repeatWhile, "repeat-while", "", "mask each input repeatedly while the given condition is met")
 
 	rootCmd.AddCommand(&cobra.Command{
 		Use: "jsonschema",
@@ -150,11 +154,28 @@ func run() {
 		over.MDC().Set("context", "stdin")
 		source = jsonline.NewSource(os.Stdin)
 	}
+
+	if repeatUntil != "" && repeatWhile != "" {
+		log.Error().Msg("Cannot use repeatUntil and repeatWhile flags together")
+		log.Warn().Int("return", 1).Msg("End PIMO")
+		os.Exit(1)
+	}
+
+	repeatCondition := repeatWhile
+	repeatConditionMode := "while"
+	if repeatUntil != "" {
+		repeatCondition = repeatUntil
+		repeatConditionMode = "until"
+	}
+
+	if repeatCondition != "" {
+		source = model.NewTempSource(source)
+	}
+
 	pipeline := model.NewPipeline(source).
 		Process(model.NewCounterProcessWithCallback("input-line", 0, updateContext)).
 		Process(model.NewRepeaterProcess(iteration))
 	over.AddGlobalFields("input-line")
-
 	var (
 		err    error
 		caches map[string]model.Cache
@@ -182,6 +203,16 @@ func run() {
 		log.Error().Err(err).Msg("Cannot build pipeline")
 		log.Warn().Int("return", 1).Msg("End PIMO")
 		os.Exit(1)
+	}
+
+	if repeatCondition != "" {
+		processor, err := model.NewRepeaterUntilProcess(source.(*model.TempSource), repeatCondition, repeatConditionMode)
+		if err != nil {
+			log.Error().Err(err).Msg("Cannot build pipeline")
+			log.Warn().Int("return", 1).Msg("End PIMO")
+			os.Exit(1)
+		}
+		pipeline = pipeline.Process(processor)
 	}
 
 	for name, path := range cachesToLoad {

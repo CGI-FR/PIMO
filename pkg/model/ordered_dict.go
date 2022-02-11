@@ -118,6 +118,74 @@ func CleanDictionarySlice(dictSlice interface{}) []Dictionary {
 	return result
 }
 
+func Untyped(inter interface{}) interface{} {
+	switch typedInter := inter.(type) {
+	case map[string]Entry:
+		cleanmap := map[string]interface{}{}
+		for k, v := range typedInter {
+			cleanmap[k] = Untyped(v)
+		}
+		return cleanmap
+	case *Dictionary:
+		iter := typedInter.EntriesIter()
+		cleanmap := map[string]interface{}{}
+		for pair, ok := iter(); ok; pair, ok = iter() {
+			cleanmap[pair.Key] = Untyped(pair.Value)
+		}
+		return cleanmap
+	case Dictionary:
+		iter := typedInter.EntriesIter()
+		cleanmap := map[string]interface{}{}
+		for pair, ok := iter(); ok; pair, ok = iter() {
+			cleanmap[pair.Key] = Untyped(pair.Value)
+		}
+		return cleanmap
+	case *ordered.OrderedMap:
+		iter := typedInter.EntriesIter()
+		cleanmap := map[string]interface{}{}
+		for pair, ok := iter(); ok; pair, ok = iter() {
+			cleanmap[pair.Key] = Untyped(pair.Value)
+		}
+		return cleanmap
+	case ordered.OrderedMap:
+		iter := typedInter.EntriesIter()
+		cleanmap := map[string]interface{}{}
+		for pair, ok := iter(); ok; pair, ok = iter() {
+			cleanmap[pair.Key] = Untyped(pair.Value)
+		}
+		return cleanmap
+	case []interface{}:
+		tab := []Entry{}
+
+		for _, item := range typedInter {
+			tab = append(tab, Untyped(item))
+		}
+
+		return tab
+
+	case []Dictionary:
+		tab := []interface{}{}
+
+		for _, item := range typedInter {
+			tab = append(tab, Untyped(item))
+		}
+
+		return tab
+
+	case []Entry:
+		tab := []interface{}{}
+
+		for _, item := range typedInter {
+			tab = append(tab, Untyped(item))
+		}
+
+		return tab
+
+	default:
+		return inter
+	}
+}
+
 // UnorderedTypes a composition of map[string]Entry
 func UnorderedTypes(inter interface{}) interface{} {
 	switch typedInter := inter.(type) {
@@ -193,6 +261,10 @@ func (d Dictionary) Copy() Dictionary {
 
 func (d Dictionary) Unordered() map[string]Entry {
 	return UnorderedTypes(d).(map[string]Entry)
+}
+
+func (d Dictionary) Untyped() map[string]interface{} {
+	return Untyped(d).(map[string]interface{})
 }
 
 func (d Dictionary) String() string {
