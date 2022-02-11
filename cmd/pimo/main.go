@@ -163,9 +163,6 @@ func run() {
 	if repeatUntil != "" || repeatWhile != "" {
 		source = model.NewTempSource(source)
 	}
-	if repeatWhile != "" {
-		source = model.NewTempSource(source)
-	}
 
 	pipeline := model.NewPipeline(source).
 		Process(model.NewCounterProcessWithCallback("input-line", 0, updateContext)).
