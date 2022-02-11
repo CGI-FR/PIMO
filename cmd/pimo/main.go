@@ -154,7 +154,13 @@ func run() {
 		over.MDC().Set("context", "stdin")
 		source = jsonline.NewSource(os.Stdin)
 	}
-	if repeatUntil != "" {
+
+	if repeatUntil != "" && repeatWhile != "" {
+		log.Error().Msg("Cannot use repeatUntil and repeatWhile flags together")
+		log.Warn().Int("return", 1).Msg("End PIMO")
+		os.Exit(1)
+	}
+	if repeatUntil != "" || repeatWhile != "" {
 		source = model.NewTempSource(source)
 	}
 	if repeatWhile != "" {
@@ -193,6 +199,7 @@ func run() {
 		log.Warn().Int("return", 1).Msg("End PIMO")
 		os.Exit(1)
 	}
+
 	if repeatUntil != "" {
 		processor, err := model.NewRepeaterUntilProcess(source.(*model.TempSource), repeatUntil, "until")
 		if err != nil {
@@ -202,6 +209,7 @@ func run() {
 		}
 		pipeline = pipeline.Process(processor)
 	}
+
 	if repeatWhile != "" {
 		processor, err := model.NewRepeaterUntilProcess(source.(*model.TempSource), repeatWhile, "while")
 		if err != nil {

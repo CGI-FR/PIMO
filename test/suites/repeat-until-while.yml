@@ -52,7 +52,7 @@ testcases:
       {"age":2}
       EOF
   - script: |-
-      echo '{"age": 0}' | pimo --repeat-while "{{eq .age 3}}" > result.txt
+      echo '{"age": 0}' | pimo --repeat-while "{{lt .age 3}}" > result.txt
     assertions:
     - result.code ShouldEqual 0
   - script: diff expected.txt result.txt
@@ -78,3 +78,10 @@ testcases:
     - result.code ShouldEqual 0
     - result.systemerr ShouldNotContainSubstring "level":"error"
     - result.systemerr ShouldContainSubstring Line skipped
+
+- name: repeat-until && repeat-while not compatible
+  steps:
+  - script: |-
+      pimo --empty-input --repeat-while "not_empty" --repeat-until  "not_empty"
+    assertions:
+    - result.code ShouldEqual 1
