@@ -16,6 +16,7 @@ Types of changes
 
 ## [1.12.0]
 
+- `Added` flag to mask input while a declared condition is met
 - `Added` flag to mask input until a declared condition is met
 - `Added` flag to declare a simple mask definition in command line
 - `Added` possibility to declare multiple selectors for a masking definition
