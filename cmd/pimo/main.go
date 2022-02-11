@@ -208,17 +208,11 @@ func run() {
 	if repeatCondition != "" {
 		processor, err := model.NewRepeaterUntilProcess(source.(*model.TempSource), repeatCondition, repeatConditionMode)
 		if err != nil {
-			log.Error().Err(err).Msg("Cannot build template")
+			log.Error().Err(err).Msg("Cannot build pipeline")
 			log.Warn().Int("return", 1).Msg("End PIMO")
 			os.Exit(1)
 		}
 		pipeline = pipeline.Process(processor)
-	}
-
-	if err != nil {
-		log.Error().Err(err).Msg("Cannot build pipeline")
-		log.Warn().Int("return", 1).Msg("End PIMO")
-		os.Exit(1)
 	}
 
 	for name, path := range cachesToLoad {
