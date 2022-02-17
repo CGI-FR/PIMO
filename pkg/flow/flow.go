@@ -328,7 +328,7 @@ func flattenHash(mask model.MaskType) string {
 }
 
 func unescapeTemplateValues(templateValue, mask, jsonpath string, variables map[string]subgraph, maskSubgraph subgraph) subgraph {
-	regex := regexp.MustCompile(`\.([0-z,\_,-]+)`)
+	regex := regexp.MustCompile(`((?:({{)|\s)\.([0-z,\_,-]+))`)
 	splittedTemplate := regex.FindAllSubmatch([]byte(templateValue), -1)
 	edges := make([]edge, 0, 10)
 	jsonpathMaskCount := len(variables[jsonpath].masks)
@@ -339,6 +339,12 @@ func unescapeTemplateValues(templateValue, mask, jsonpath string, variables map[
 		}
 
 		value := string(splittedTemplate[i][1])
+		if strings.Contains(value, "{{") {
+			value = strings.TrimSpace(value[3:])
+		} else if strings.Contains(value, " ") {
+			value = strings.TrimSpace(value)
+			value = value[1:]
+		}
 		// to avoid confusion with intermediate steps (i.e. "name_1")
 		if strings.Contains(value, "#underscore;") {
 			value = value[0:strings.LastIndex(value, "#underscore;")]
