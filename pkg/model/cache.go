@@ -245,11 +245,13 @@ func (p *FromCacheProcess) ProcessDictionary(dictionary Dictionary, out Collecto
 func (p *FromCacheProcess) processDictionary(dictionary Dictionary, out Collector) {
 	key, ok := p.selector.Read(dictionary)
 	if !ok {
+		if p.preserve == "notInCache" {
+			out.Collect(dictionary)
+		}
 		return
 	}
 
 	value, inCache := p.cache.Get(key)
-
 	switch {
 	case inCache:
 		out.Collect(p.selector.Write(dictionary, value))
