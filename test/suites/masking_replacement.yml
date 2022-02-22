@@ -18,3 +18,22 @@ testcases:
     - result.code ShouldEqual 0
     - result.systemoutjson.name ShouldEqual Benjamin
     - result.systemerr ShouldBeEmpty
+
+- name: replacement mask with nested selector
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "fk.name"
+          mask:
+            replacement: "fk.name2"
+      EOF
+  - script: |-
+      echo '{"fk":{"name": "Toto", "name2": "Benjamin"}}' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemoutjson.fk.name ShouldEqual Benjamin
+    - result.systemerr ShouldBeEmpty
