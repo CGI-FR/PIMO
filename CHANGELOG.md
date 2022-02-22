@@ -16,6 +16,7 @@ Types of changes
 
 ## [1.12.0]
 
+- `Fixed` mask `replacement` with nested selectors
 - `Added` flag to mask input while a declared condition is met
 - `Added` flag to mask input until a declared condition is met
 - `Added` flag to declare a simple mask definition in command line
