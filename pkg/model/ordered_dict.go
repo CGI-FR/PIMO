@@ -106,17 +106,17 @@ func CleanDictionarySlice(dictSlice interface{}) []Dictionary {
 	switch typedInter := dictSlice.(type) {
 	case []interface{}:
 		for _, d := range typedInter {
-			result = append(result, CleanDictionary(CleanTypes(d)))
+			result = append(result, CleanDictionary(d))
 		}
 
 	case []Dictionary:
 		for _, d := range typedInter {
-			result = append(result, CleanDictionary(CleanTypes(d)))
+			result = append(result, CleanDictionary(d))
 		}
 
 	case []Entry:
 		for _, d := range typedInter {
-			result = append(result, CleanDictionary(CleanTypes(d)))
+			result = append(result, CleanDictionary(d))
 		}
 	}
 
