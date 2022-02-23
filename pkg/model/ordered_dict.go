@@ -49,6 +49,12 @@ func CleanTypes(inter interface{}) interface{} {
 			dict.Set(k, CleanTypes(v))
 		}
 		return dict
+	case map[string]interface{}:
+		dict := NewDictionary()
+		for k, v := range typedInter {
+			dict.Set(k, CleanTypes(v))
+		}
+		return dict
 	case *Dictionary:
 		iter := typedInter.EntriesIter()
 		dict := NewDictionary()
@@ -97,21 +103,20 @@ func CleanDictionary(dict interface{}) Dictionary {
 
 func CleanDictionarySlice(dictSlice interface{}) []Dictionary {
 	result := []Dictionary{}
-
 	switch typedInter := dictSlice.(type) {
 	case []interface{}:
 		for _, d := range typedInter {
-			result = append(result, CleanDictionary(d))
+			result = append(result, CleanDictionary(CleanTypes(d)))
 		}
 
 	case []Dictionary:
 		for _, d := range typedInter {
-			result = append(result, CleanDictionary(d))
+			result = append(result, CleanDictionary(CleanTypes(d)))
 		}
 
 	case []Entry:
 		for _, d := range typedInter {
-			result = append(result, CleanDictionary(d))
+			result = append(result, CleanDictionary(CleanTypes(d)))
 		}
 	}
 
