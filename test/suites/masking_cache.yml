@@ -317,7 +317,7 @@ testcases:
     - result.systemout ShouldContainSubstring '{"name":"Marcel","id":1,"supervisor":"Mathieu"}'
     - result.systemout ShouldContainSubstring '{"name":"Mickael","id":5,"supervisor":"Mickael"}'
     - result.systemout ShouldContainSubstring '{"name":"Mathieu","id":2,"supervisor":"Mickael"}'
-    
+
     - result.systemerr ShouldBeEmpty
 
 - name: masking with other key
@@ -357,7 +357,7 @@ testcases:
     - result.systemout ShouldContainSubstring '{"name":"Marcel","id":1}'
     - result.systemout ShouldContainSubstring '{"name":"Mickael","id":5}'
     - result.systemout ShouldContainSubstring '{"name":"Mathieu","id":2}'
-    
+
     - result.systemerr ShouldBeEmpty
   - script: cat name.jsonl
     assertions:
@@ -405,7 +405,7 @@ testcases:
     - result.systemout ShouldContainSubstring {"MATRI":"FTTO4452","PRENOM":"Marcel"}
     - result.systemout ShouldContainSubstring {"MATRI":"FJUS4442","PRENOM":"Mickael"}
     - result.systemout ShouldContainSubstring {"MATRI":"FDDO8965","PRENOM":"Mathieu"}
-    
+
     - result.systemerr ShouldBeEmpty
   - script: cat name.jsonl
     assertions:
@@ -413,3 +413,24 @@ testcases:
     - result.systemout ShouldContainSubstring {"key":"FDDO8965","value":"Mathieu"}
     - result.systemout ShouldContainSubstring {"key":"FTTO4452","value":"Marcel"}
     - result.systemout ShouldContainSubstring {"key":"FJUS4442","value":"Mickael"}
+
+- name: line not removed if key not present in json
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      seed: 1
+      masking:
+        - selector:
+            jsonpath: "name"
+          mask:
+            fromCache: mycache
+      caches:
+        mycache : {}
+      EOF
+  - script: |-
+      echo '{"othervalue":18}' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldEqual {"othervalue":18}
