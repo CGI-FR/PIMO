@@ -34,6 +34,7 @@ import (
 	"github.com/cgi-fr/pimo/pkg/dateparser"
 	"github.com/cgi-fr/pimo/pkg/duration"
 	"github.com/cgi-fr/pimo/pkg/ff1"
+	"github.com/cgi-fr/pimo/pkg/flow"
 	"github.com/cgi-fr/pimo/pkg/fluxuri"
 	"github.com/cgi-fr/pimo/pkg/fromjson"
 	"github.com/cgi-fr/pimo/pkg/hash"
@@ -124,6 +125,23 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 				os.Exit(8)
 			}
 			fmt.Println(jsonschema)
+		},
+	})
+
+	rootCmd.AddCommand(&cobra.Command{
+		Use: "flow",
+		Run: func(cmd *cobra.Command, args []string) {
+			pdef, err := model.LoadPipelineDefinitionFromYAML(maskingFile)
+			if err != nil {
+				log.Err(err).Msg("Cannot load pipeline definition from file")
+				log.Warn().Int("return", 1).Msg("End PIMO")
+				os.Exit(1)
+			}
+			flow, err := flow.Export(pdef)
+			if err != nil {
+				os.Exit(9)
+			}
+			fmt.Println(flow)
 		},
 	})
 
