@@ -16,13 +16,15 @@ Types of changes
 
 ## [1.12.0]
 
+- `Fixed` using fromCache, the line is not deleted if the jsonpath in not present in the document
+- `Added` possibility to use option `preserve: notInCache` with mask `fromCache`
 - `Fixed` pimo doesn't panic anymore with fromjson and pipe mask
 - `Fixed` mask `replacement` with nested selectors
 - `Added` flag to mask input while a declared condition is met
 - `Added` flag to mask input until a declared condition is met
 - `Added` flag to declare a simple mask definition in command line
 - `Added` possibility to declare multiple selectors for a masking definition
-- `Added` possibility to use option `preserve: notInCache` with mask `fromCache`
+
 ## [1.11.0]
 
 - `Added` option preserve in masking configuration.
