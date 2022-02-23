@@ -16,6 +16,7 @@ Types of changes
 
 ## [1.12.0]
 
+- `Fixed` pimo doesn't panic anymore with fromjson and pipe mask
 - `Fixed` mask `replacement` with nested selectors
 - `Added` flag to mask input while a declared condition is met
 - `Added` flag to mask input until a declared condition is met
