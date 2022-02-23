@@ -21,7 +21,7 @@ Types of changes
 - `Added` flag to mask input until a declared condition is met
 - `Added` flag to declare a simple mask definition in command line
 - `Added` possibility to declare multiple selectors for a masking definition
-- `Fixed` pimo doesn't panic anymore with fromjson and pipe mask
+- `Fixed` pimo doesn't panic anymore with fromjson combined with pipe mask, or fromjson combined with another fromjson mask with nested selectors
 - `Fixed` mask `replacement` with nested selectors
 - `Fixed` using fromCache, the line is not deleted if the jsonpath in not present in the document
 
