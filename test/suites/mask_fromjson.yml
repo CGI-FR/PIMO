@@ -68,3 +68,41 @@ testcases:
           - result.code ShouldEqual 0
           - result.systemout ShouldEqual {"sourcefield":"{\"property\":\"hello\"}","targetfield":{"property":"hello"}}
           - result.systemerr ShouldBeEmpty
+  - name: nested selectors
+    steps:
+      - script: rm -rf masking.yml
+      - script: |-
+          cat > masking.yml <<EOF
+          version: "1"
+          masking:
+            - selector:
+                jsonpath: "sourcefield.property"
+              mask:
+                fromjson: "sourcefield.property"
+          EOF
+          echo '{"sourcefield": {"property": "1.2"}}' | pimo
+        assertions:
+          - result.code ShouldEqual 0
+          - result.systemout ShouldEqual {"sourcefield":{"property":1.2}}
+          - result.systemerr ShouldBeEmpty
+  - name: successive fromjson
+    steps:
+      - script: rm -rf masking.yml
+      - script: |-
+          cat > masking.yml <<EOF
+          version: "v1"
+          masking:
+            - selector:
+                jsonpath: "targetfield"
+              mask:
+                fromjson: "sourcefield"
+            - selector:
+                jsonpath: "targetfield.property"
+              mask:
+                fromjson: "targetfield.property"
+          EOF
+          echo '{"sourcefield": "{\"property\":\"1.2\"}", "targetfield": ""}' | pimo
+        assertions:
+          - result.code ShouldEqual 0
+          - result.systemout ShouldEqual {"sourcefield":"{\"property\":\"1.2\"}","targetfield":{"property":1.2}}
+          - result.systemerr ShouldBeEmpty
