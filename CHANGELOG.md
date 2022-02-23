@@ -16,6 +16,7 @@ Types of changes
 
 ## [1.12.0]
 
+- `Added` command to export maskings as a mermaid flow chart
 - `Fixed` pimo doesn't panic anymore with fromjson combined with pipe mask, or fromjson combined with another fromjson mask with nested selectors
 - `Fixed` mask `replacement` with nested selectors
 - `Added` flag to mask input while a declared condition is met
