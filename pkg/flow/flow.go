@@ -352,7 +352,7 @@ func unescapeTemplateValues(templateValue, mask, jsonpath string, variables map[
 		if maskNumber == 0 {
 			templateEdge.source = value
 		} else {
-			templateEdge.source = value + "#underscore;" + strconv.Itoa(maskNumber)
+			templateEdge.source = variables[value].masks[maskNumber-1].destination
 		}
 
 		templateEdge.destination = jsonpath + "#underscore;" + strconv.Itoa(jsonpathMaskCount+1)
