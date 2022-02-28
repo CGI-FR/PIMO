@@ -5,6 +5,7 @@ import (
 	"math/rand"
 	"sort"
 	"strings"
+	"unicode"
 )
 
 const (
@@ -44,7 +45,7 @@ type Chain struct {
 func (chain *Chain) Add(input []string) {
 	var tokens []string
 	tokens = append(tokens, array(StartToken, chain.order)...)
-	tokens = append(tokens, input...)
+	tokens = append(tokens, splitPunct(input...)...)
 	tokens = append(tokens, array(EndToken, chain.order)...)
 	links := makeLinks(tokens, chain.order)
 	for _, link := range links {
@@ -108,4 +109,57 @@ func array(input string, order int) (result []string) {
 		result[i] = input
 	}
 	return
+}
+
+func splitPunct(list ...string) []string {
+	result := []string{}
+	for _, el := range list {
+		result = append(result, splitFunc(el, unicode.IsPunct)...)
+	}
+	return result
+}
+
+func splitFunc(s string, f func(rune) bool) []string {
+	// A span is used to record a slice of s of the form s[start:end].
+	// The start index is inclusive and the end index is exclusive.
+	type span struct {
+		start int
+		end   int
+	}
+	spans := make([]span, 0, 32)
+
+	// Find the field start and end indices.
+	// Doing this in a separate pass (rather than slicing the string s
+	// and collecting the result substrings right away) is significantly
+	// more efficient, possibly due to cache effects.
+	start := -1 // valid span start if >= 0
+	for end, rune := range s {
+		if f(rune) {
+			if start >= 0 {
+				spans = append(spans, span{start, end})
+				spans = append(spans, span{end, end + 1})
+				// Set start to a negative value.
+				// Note: using -1 here consistently and reproducibly
+				// slows down this code by a several percent on amd64.
+				start = ^start
+			}
+		} else {
+			if start < 0 {
+				start = end
+			}
+		}
+	}
+
+	// Last field might end at EOF.
+	if start >= 0 {
+		spans = append(spans, span{start, len(s)})
+	}
+
+	// Create strings from recorded field indices.
+	a := make([]string, len(spans))
+	for i, span := range spans {
+		a[i] = s[span.start:span.end]
+	}
+
+	return a
 }
