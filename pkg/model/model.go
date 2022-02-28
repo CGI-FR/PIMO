@@ -130,6 +130,7 @@ type MarkovType struct {
 	MaxSize   int    `yaml:"max-size,omitempty"`
 	Sample    string `yaml:"sample,omitempty"`
 	Separator string `yaml:"separator,omitempty"`
+	Order     int    `yaml:"order,omitempty"`
 }
 
 type MaskType struct {

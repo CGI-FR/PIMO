@@ -111,6 +111,9 @@
         },
         "separator": {
           "type": "string"
+        },
+        "order": {
+          "type": "integer"
         }
       },
       "additionalProperties": false,

@@ -34,13 +34,16 @@ type MaskEngine struct {
 }
 
 // NewMask create a MaskEngine with a seed
-func NewMask(seed int64, name, separator string, maxSize int) (MaskEngine, error) {
+func NewMask(seed int64, name, separator string, maxSize, order int) (MaskEngine, error) {
 	list, err := uri.Read(name)
 	if err != nil {
 		return MaskEngine{}, err
 	}
-	// nolint: gosec
-	chain := NewChain(2, rand.New(rand.NewSource(seed)), separator)
+	if order == 0 {
+		order = 2
+	}
+	//nolint: gosec
+	chain := NewChain(order, rand.New(rand.NewSource(seed)), separator)
 	for _, el := range list {
 		s := strings.Split(el.(string), separator)
 		chain.Add(s)
@@ -74,7 +77,10 @@ func Factory(conf model.Masking, seed int64, caches map[string]model.Cache) (mod
 		h := fnv.New64a()
 		h.Write([]byte(conf.Selector.Jsonpath))
 		seed += int64(h.Sum64())
-		mask, err := NewMask(seed, conf.Mask.Markov.Sample, conf.Mask.Markov.Separator, conf.Mask.Markov.MaxSize)
+		mask, err := NewMask(seed, conf.Mask.Markov.Sample,
+			conf.Mask.Markov.Separator,
+			conf.Mask.Markov.MaxSize,
+			conf.Mask.Markov.Order)
 		return mask, true, err
 	}
 	return nil, false, nil
