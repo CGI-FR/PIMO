@@ -78,7 +78,7 @@ var (
 	colormode        string
 	iteration        int
 	emptyInput       bool
-	maskingFile      string
+	maskingFiles     []string
 	cachesToDump     map[string]string
 	cachesToLoad     map[string]string
 	skipLineOnError  bool
@@ -109,7 +109,7 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 	rootCmd.PersistentFlags().StringVar(&colormode, "color", "auto", "use colors in log outputs : yes, no or auto")
 	rootCmd.PersistentFlags().IntVarP(&iteration, "repeat", "r", 1, "number of iteration to mask each input")
 	rootCmd.PersistentFlags().BoolVar(&emptyInput, "empty-input", false, "generate data without any input, to use with repeat flag")
-	rootCmd.PersistentFlags().StringVarP(&maskingFile, "config", "c", "masking.yml", "name and location of the masking-config file")
+	rootCmd.PersistentFlags().StringArrayVarP(&maskingFiles, "config", "c", []string{"masking.yml"}, "name and location of the masking-config file")
 	rootCmd.PersistentFlags().StringToStringVar(&cachesToDump, "dump-cache", map[string]string{}, "path for dumping cache into file")
 	rootCmd.PersistentFlags().StringToStringVar(&cachesToLoad, "load-cache", map[string]string{}, "path for loading cache from file")
 	rootCmd.PersistentFlags().BoolVar(&skipLineOnError, "skip-line-on-error", false, "skip a line if an error occurs while masking a field")
@@ -132,7 +132,7 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 	rootCmd.AddCommand(&cobra.Command{
 		Use: "flow",
 		Run: func(cmd *cobra.Command, args []string) {
-			pdef, err := model.LoadPipelineDefinitionFromYAML(maskingFile)
+			pdef, err := model.LoadPipelineDefinitionFromYAML(maskingFiles...)
 			if err != nil {
 				log.Err(err).Msg("Cannot load pipeline definition from file")
 				log.Warn().Int("return", 1).Msg("End PIMO")
@@ -208,7 +208,7 @@ func run() {
 	if len(maskingOneLiner) > 0 {
 		pdef, err = model.LoadPipelineDefintionFromOneLiner(maskingOneLiner)
 	} else {
-		pdef, err = model.LoadPipelineDefinitionFromYAML(maskingFile)
+		pdef, err = model.LoadPipelineDefinitionFromYAML(maskingFiles...)
 	}
 
 	if err != nil {
@@ -364,7 +364,7 @@ func initLog() {
 	default:
 		zerolog.SetGlobalLevel(zerolog.Disabled)
 	}
-	over.MDC().Set("config", maskingFile)
+	over.MDC().Set("config", maskingFiles)
 	over.SetGlobalFields([]string{"config"})
 }
 

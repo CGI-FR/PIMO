@@ -159,15 +159,30 @@ func BuildPipeline(pipeline Pipeline, conf Definition, caches map[string]Cache) 
 	return pipeline, caches, nil
 }
 
-func LoadPipelineDefinitionFromYAML(filename string) (Definition, error) {
-	source, err := ioutil.ReadFile(filename)
-	if err != nil {
-		return Definition{}, err
-	}
+func LoadPipelineDefinitionFromYAML(filenames ...string) (Definition, error) {
 	var conf Definition
-	err = yaml.Unmarshal(source, &conf)
-	if err != nil {
-		return conf, err
+	for _, filename := range filenames {
+		source, err := ioutil.ReadFile(filename)
+		if err != nil {
+			return Definition{}, err
+		}
+		var conf_temp Definition
+		err = yaml.Unmarshal(source, &conf_temp)
+		if err != nil {
+			return conf, err
+		}
+		if conf.Masking == nil && conf_temp.Masking != nil {
+			conf.Masking = []Masking{}
+		}
+		if conf.Caches == nil && conf_temp.Caches != nil {
+			conf.Caches = map[string]CacheDefinition{}
+		}
+		conf.Masking = append(conf.Masking, conf_temp.Masking...)
+		for key, val := range conf_temp.Caches {
+			conf.Caches[key] = val
+		}
+		conf.Seed += conf_temp.Seed
+		conf.Version += conf_temp.Version
 	}
 	if conf.Seed == 0 {
 		conf.Seed = time.Now().UnixNano()
