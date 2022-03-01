@@ -182,7 +182,9 @@ func LoadPipelineDefinitionFromYAML(filenames ...string) (Definition, error) {
 			conf.Caches[key] = val
 		}
 		conf.Seed += conf_temp.Seed
-		conf.Version += conf_temp.Version
+		if v := conf_temp.Version; v != "1" {
+			return Definition{}, fmt.Errorf("Version of %s is V%s. Incompatible with current PIMO version", filename, v)
+		}
 	}
 	if conf.Seed == 0 {
 		conf.Seed = time.Now().UnixNano()

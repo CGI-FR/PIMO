@@ -5,7 +5,7 @@ testcases:
   - script: rm -f masking.yml
   - script: |-
       cat > masking.yml <<EOF
-      version: v1
+      version: "1"
       masking:
         - selectors:
             - jsonpath: name1
