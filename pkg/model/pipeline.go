@@ -94,7 +94,7 @@ func BuildPipeline(pipeline Pipeline, conf Definition, caches map[string]Cache) 
 					if !ok {
 						return nil, nil, errors.New("Cache '" + virtualMask.Cache + "' not found for '" + virtualMask.Selector.Jsonpath + "'")
 					}
-					pipeline = pipeline.Process(NewFromCacheProcess(NewPathSelector(virtualMask.Selector.Jsonpath), cache))
+					pipeline = pipeline.Process(NewFromCacheProcess(NewPathSelector(virtualMask.Selector.Jsonpath), cache, virtualMask.Preserve))
 					nbArg++
 				}
 

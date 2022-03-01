@@ -18,8 +18,12 @@
 package model
 
 import (
+	"bytes"
+	"fmt"
 	"time"
 
+	"github.com/cgi-fr/pimo/pkg/statistics"
+	"github.com/cgi-fr/pimo/pkg/template"
 	"github.com/rs/zerolog/log"
 )
 
@@ -265,6 +269,87 @@ func (source *SourceFromSlice) Err() error {
 func (source *SourceFromSlice) Open() error {
 	source.offset = 0
 	return nil
+}
+
+func NewRepeaterUntilProcess(source *TempSource, text, mode string) (Processor, error) {
+	eng, err := template.NewEngine(text)
+
+	return RepeaterUntilProcess{eng, source, mode}, err
+}
+
+type RepeaterUntilProcess struct {
+	tmpl *template.Engine
+	tmp  *TempSource
+	mode string
+}
+
+func (p RepeaterUntilProcess) Open() error {
+	return nil
+}
+
+func (p RepeaterUntilProcess) ProcessDictionary(dictionary Dictionary, out Collector) error {
+	var output bytes.Buffer
+	var err error
+	defer func() {
+		if r := recover(); r != nil {
+			err = fmt.Errorf("Cannot execute template, error: %v", r)
+		}
+	}()
+	err = p.tmpl.Execute(&output, dictionary.Untyped())
+
+	if err != nil && skipLineOnError {
+		log.Warn().AnErr("error", err).Msg("Line skipped")
+		statistics.IncIgnoredLinesCount()
+		return nil
+	}
+
+	if err == nil {
+		b := output.String()
+		switch p.mode {
+		case "while":
+			p.tmp.repeat = b == "true"
+			if p.tmp.repeat {
+				out.Collect(dictionary)
+			}
+		case "until":
+			p.tmp.repeat = b == "false"
+			out.Collect(dictionary)
+		default:
+			p.tmp.repeat = false
+			out.Collect(dictionary)
+		}
+	}
+
+	return err
+}
+
+func NewTempSource(sourceValue Source) Source {
+	return &TempSource{repeat: false, source: sourceValue, value: NewDictionary()}
+}
+
+type TempSource struct {
+	repeat bool
+	value  Dictionary
+	source Source
+}
+
+func (s *TempSource) Open() error { return s.source.Open() }
+
+func (s *TempSource) Next() bool {
+	if s.repeat {
+		return true
+	}
+	if s.source.Next() {
+		s.value = s.source.Value()
+		return true
+	}
+	return false
+}
+
+func (s *TempSource) Err() error { return s.source.Err() }
+
+func (s *TempSource) Value() Dictionary {
+	return s.value
 }
 
 func NewRepeaterProcess(times int) Processor {

@@ -122,3 +122,45 @@ testcases:
     - result.systemout ShouldBeEmpty
   - script: rm -f expected.txt
   - script: rm -f output.txt
+
+- name: preserve notInCache values
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > expected.txt <<EOF
+      {"id":11,"name":"Aaron"}
+      {"id":2,"name":"Abel"}
+      {"id":13,"name":"Abel-François"}
+      EOF
+  - script: |-
+      cat > masking.yml <<EOF
+      version: 1
+      masking:
+        - selector:
+            jsonpath: id
+          mask:
+            fromCache: mycache
+          preserve: "notInCache"
+        - selector:
+            jsonpath: name
+          mask:
+            fluxUri: "pimo://nameFR"
+      caches:
+        mycache: {}
+  - script: |-
+      cat > cache.jsonl <<EOF
+      {"key":1,"value":11}
+      {"key":3,"value":13}
+      EOF
+  - script: |-
+      echo -e '{"id":1,"name":"Pierre"}\n{"id":2,"name":"Paul"}\n{"id":3,"name":"Jacques"}' | pimo --load-cache mycache=cache.jsonl > output.txt
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemerr ShouldBeEmpty
+  - script: |-
+      diff expected.txt output.txt
+    assertions:
+    - result.systemout ShouldBeEmpty
+  - script: rm -f cache.jsonl
+  - script: rm -f expected.txt
+  - script: rm -f output.txt

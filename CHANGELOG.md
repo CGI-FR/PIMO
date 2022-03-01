@@ -16,9 +16,16 @@ Types of changes
 
 ## [1.12.0]
 
+- `Added` markov mask to generate pseudo text based on a sample text
+- `Added` command to export maskings as a mermaid flow chart
+- `Added` possibility to use option `preserve: notInCache` with mask `fromCache`
+- `Added` flag to mask input while a declared condition is met
+- `Added` flag to mask input until a declared condition is met
 - `Added` flag to declare a simple mask definition in command line
 - `Added` possibility to declare multiple selectors for a masking definition
-- `Added` markov mask to generate pseudo text based on a sample text
+- `Fixed` pimo doesn't panic anymore with fromjson combined with pipe mask, or fromjson combined with another fromjson mask with nested selectors
+- `Fixed` mask `replacement` with nested selectors
+- `Fixed` using fromCache, the line is not deleted if the jsonpath in not present in the document
 
 ## [1.11.0]
 

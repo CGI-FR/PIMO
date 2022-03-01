@@ -217,8 +217,8 @@ func (umcce UniqueMaskContextCacheEngine) MaskContext(context Dictionary,
 	return Dictionary{}, fmt.Errorf("Unique value not found")
 }
 
-func NewFromCacheProcess(selector Selector, cache Cache) Processor {
-	return &FromCacheProcess{selector, cache, &QueueCollector{}, map[Entry]*QueueCollector{}}
+func NewFromCacheProcess(selector Selector, cache Cache, preserve string) Processor {
+	return &FromCacheProcess{selector, cache, &QueueCollector{}, map[Entry]*QueueCollector{}, preserve}
 }
 
 type FromCacheProcess struct {
@@ -226,6 +226,7 @@ type FromCacheProcess struct {
 	cache     Cache
 	readiness *QueueCollector
 	waiting   map[Entry]*QueueCollector
+	preserve  string
 }
 
 func (p *FromCacheProcess) Open() error {
@@ -244,13 +245,17 @@ func (p *FromCacheProcess) ProcessDictionary(dictionary Dictionary, out Collecto
 func (p *FromCacheProcess) processDictionary(dictionary Dictionary, out Collector) {
 	key, ok := p.selector.Read(dictionary)
 	if !ok {
+		out.Collect(dictionary)
 		return
 	}
 
 	value, inCache := p.cache.Get(key)
-	if inCache {
+	switch {
+	case inCache:
 		out.Collect(p.selector.Write(dictionary, value))
-	} else {
+	case p.preserve == "notInCache":
+		out.Collect(dictionary)
+	default:
 		collector, exist := p.waiting[key]
 		if !exist {
 			collector = &QueueCollector{}
