@@ -186,14 +186,20 @@ type Definition struct {
 	Caches  map[string]CacheDefinition `yaml:"caches,omitempty"`
 }
 
-/***************
- * REFACTORING *
- ***************/
-
-// Processor process Dictionary and none, one or many element
+// Processor process Dictionary and produce none, one or many element
 type Processor interface {
 	Open() error
 	ProcessDictionary(Dictionary, Collector) error
+}
+
+// CoProcessor process many Dictionary from source and produce none, one or many element
+type CoProcessor interface {
+	// Open CoProcessor before process.
+	Open(Source) error
+	// Next return true if CoProcessor have more output.
+	Next() bool
+	// Value is the last output of CoProcessor.
+	Value() Dictionary
 }
 
 // Collector collect Dictionary generate by Process
@@ -208,7 +214,10 @@ type SinkProcess interface {
 }
 
 type Pipeline interface {
+	// Process transform each Dictionary from the source with a Processor
 	Process(Processor) Pipeline
+	// CoProcess delegat the source processing to a co processor
+	CoProcess(CoProcessor) Pipeline
 	WithSource(Source) Pipeline
 	AddSink(SinkProcess) SinkedPipeline
 }
@@ -226,10 +235,6 @@ type Source interface {
 }
 
 type Mapper func(Dictionary) (Dictionary, error)
-
-/******************
- * IMPLEMENTATION *
- ******************/
 
 func NewPipelineFromSlice(dictionaries []Dictionary) Pipeline {
 	return SimplePipeline{source: &SourceFromSlice{dictionaries: dictionaries, offset: 0}}
@@ -438,6 +443,10 @@ func (pipeline SimplePipeline) Process(process Processor) Pipeline {
 	return NewProcessPipeline(pipeline.source, process)
 }
 
+func (pipeline SimplePipeline) CoProcess(coProcess CoProcessor) Pipeline {
+	return NewCoProcessPipeline(pipeline.source, coProcess)
+}
+
 func (pipeline SimplePipeline) AddSink(sink SinkProcess) SinkedPipeline {
 	return SimpleSinkedPipeline{pipeline, sink}
 }
@@ -520,6 +529,14 @@ func (p *ProcessPipeline) Next() bool {
 	return false
 }
 
+func (p *ProcessPipeline) Open() (err error) {
+	err = p.source.Open()
+	if err != nil {
+		return
+	}
+	return p.Processor.Open()
+}
+
 func (p *ProcessPipeline) Value() Dictionary {
 	return CopyDictionary(p.collector.Value())
 }
@@ -536,11 +553,65 @@ func (p *ProcessPipeline) Process(process Processor) Pipeline {
 	return NewProcessPipeline(p, process)
 }
 
+func (p *ProcessPipeline) CoProcess(process CoProcessor) Pipeline {
+	return NewCoProcessPipeline(p, process)
+}
+
 func (p *ProcessPipeline) WithSource(source Source) Pipeline {
 	if s, ok := p.source.(*ProcessPipeline); ok {
 		return &ProcessPipeline{NewCollector(), s.WithSource(source).(Source), p.Processor, nil}
 	}
 	return &ProcessPipeline{NewCollector(), source, p.Processor, nil}
+}
+
+func NewCoProcessPipeline(source Source, coProcess CoProcessor) Pipeline {
+	return &CoProcessPipeline{source, coProcess, nil}
+}
+
+type CoProcessPipeline struct {
+	source    Source
+	coProcess CoProcessor
+	err       error
+}
+
+func (p *CoProcessPipeline) Open() error {
+	err := p.coProcess.Open(p.source)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (p *CoProcessPipeline) Next() bool {
+	return p.coProcess.Next()
+}
+
+func (p *CoProcessPipeline) Value() Dictionary {
+	return CopyDictionary(p.coProcess.Value())
+}
+
+func (p *CoProcessPipeline) Err() error {
+	return p.err
+}
+
+func (p *CoProcessPipeline) AddSink(sink SinkProcess) SinkedPipeline {
+	return SimpleSinkedPipeline{p, sink}
+}
+
+func (p *CoProcessPipeline) Process(process Processor) Pipeline {
+	return NewProcessPipeline(p, process)
+}
+
+func (p *CoProcessPipeline) CoProcess(process CoProcessor) Pipeline {
+	return NewCoProcessPipeline(p, process)
+}
+
+func (p *CoProcessPipeline) WithSource(source Source) Pipeline {
+	if s, ok := p.source.(*ProcessPipeline); ok {
+		return &CoProcessPipeline{s.WithSource(source).(Source), p.coProcess, nil}
+	}
+	return &CoProcessPipeline{source, p.coProcess, nil}
 }
 
 func (pipeline SimpleSinkedPipeline) Run() (err error) {
