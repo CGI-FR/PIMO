@@ -16,6 +16,7 @@ Types of changes
 
 ## [1.12.0]
 
+- `Added` markov mask to generate pseudo text based on a sample text
 - `Added` command to export maskings as a mermaid flow chart
 - `Added` possibility to use option `preserve: notInCache` with mask `fromCache`
 - `Added` flag to mask input while a declared condition is met

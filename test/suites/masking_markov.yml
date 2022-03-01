@@ -1,0 +1,49 @@
+name: markov features
+testcases:
+- name: markov generation
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "comment"
+          mask:
+            markov:
+              max-size: 20
+              sample: "file://../sample.txt"
+              separator: " "
+      EOF
+  - script: |-
+      echo '{"comment":""}' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemoutjson.comment ShouldBeIn "I need a cheese cake" "I want a cheese cake" "I need a cheese burger" "I want a cheese burger"
+    - result.systemerr ShouldBeEmpty
+
+- name: markov should not always mask the same way
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "comment"
+          mask:
+            markov:
+              max-size: 20
+              sample: "file://../sample.txt"
+              separator: " "
+      EOF
+  - script: |-
+      echo '{"comment": ""}' | pimo --repeat=10 > first.txt
+  - script: |-
+      echo '{"comment": ""}' | pimo --repeat=10 > second.txt
+  - script: |-
+      diff first.txt second.txt
+    assertions:
+    - result.systemout ShouldNotBeEmpty
+  - script: rm -f first.txt
+  - script: rm -f second.txt

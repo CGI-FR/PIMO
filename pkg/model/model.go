@@ -130,6 +130,13 @@ type LuhnType struct {
 	Universe string `yaml:"universe,omitempty"`
 }
 
+type MarkovType struct {
+	MaxSize   int    `yaml:"max-size,omitempty"`
+	Sample    string `yaml:"sample,omitempty"`
+	Separator string `yaml:"separator,omitempty"`
+	Order     int    `yaml:"order,omitempty"`
+}
+
 type MaskType struct {
 	Add               Entry                `yaml:"add,omitempty" jsonschema:"oneof_required=Add"`
 	AddTransient      Entry                `yaml:"add-transient,omitempty" jsonschema:"oneof_required=AddTransient"`
@@ -159,6 +166,7 @@ type MaskType struct {
 	Pipe              PipeType             `yaml:"pipe,omitempty" jsonschema:"oneof_required=Pipe"`
 	FromJSON          string               `yaml:"fromjson,omitempty" jsonschema:"oneof_required=FromJSON"`
 	Luhn              *LuhnType            `yaml:"luhn,omitempty" jsonschema:"oneof_required=Luhn"`
+	Markov            MarkovType           `yaml:"markov,omitempty" jsonschema:"oneof_required=Markov"`
 }
 
 type Masking struct {

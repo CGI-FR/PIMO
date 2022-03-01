@@ -41,6 +41,7 @@ import (
 	"github.com/cgi-fr/pimo/pkg/increment"
 	"github.com/cgi-fr/pimo/pkg/jsonline"
 	"github.com/cgi-fr/pimo/pkg/luhn"
+	"github.com/cgi-fr/pimo/pkg/markov"
 	"github.com/cgi-fr/pimo/pkg/model"
 	"github.com/cgi-fr/pimo/pkg/pipe"
 	"github.com/cgi-fr/pimo/pkg/randdate"
@@ -319,6 +320,7 @@ func injectMaskFactories() []model.MaskFactory {
 		dateparser.Factory,
 		ff1.Factory,
 		luhn.Factory,
+		markov.Factory,
 	}
 }
 
