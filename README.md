@@ -117,7 +117,7 @@ This takes the `data.json` file, masks the data contained inside it and put the 
 * `--skip-line-on-error` This flag will totally skip a line if an error occurs masking a field.
 * `--skip-field-on-error` This flag will return output without a field if an error occurs masking this field.
 * `--empty-input` This flag will give PIMO a `{}` input, usable with `--repeat` flag.
-* `--config=filename.yml` This flag allow to use another file for config than the default `masking.yml`.
+* `--config=filename.yml` This flag allow to use another file for config than the default `masking.yml`. It's possible to pass multiple yaml configuration, that will be applied in the order provided by command line arguments: `--config=masking1.yml --config=masking2.yml`
 * `--load-cache cacheName=filename.json` This flag load an initial cache content from a file (json line format `{"key":"a", "value":"b"}`).
 * `--dump-cache cacheName=filename.json` This flag dump final cache content to a file (json line format `{"key":"a", "value":"b"}`).
 * `--verbosity <level>` or `-v<level>` This flag increase verbosity on the stderr output, possible values: none (0), error (1), warn (2), info (3), debug (4), trace (5).
