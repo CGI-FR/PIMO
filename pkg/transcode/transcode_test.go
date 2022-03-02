@@ -38,7 +38,7 @@ func TestMaskingShouldTranscodeValue(t *testing.T) {
 }
 
 func TestFactoryShouldCreateAMask(t *testing.T) {
-	maskingChoice := []model.TranscodeType{{Input: "01234", Output: "56789"}, {Input: "ABCDE", Output: "abcde"}}
+	maskingChoice := model.TranscodeType{Classes: []model.Class{{Input: "01234", Output: "56789"}, {Input: "ABCDE", Output: "abcde"}}}
 	maskingConfig := model.Masking{Mask: model.MaskType{Transcode: maskingChoice}}
 	_, present, err := Factory(maskingConfig, 0, nil)
 	assert.True(t, present, "should be true")

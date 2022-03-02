@@ -11,6 +11,22 @@
       "additionalProperties": false,
       "type": "object"
     },
+    "Class": {
+      "required": [
+        "input",
+        "output"
+      ],
+      "properties": {
+        "input": {
+          "type": "string"
+        },
+        "output": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
     "DateParserType": {
       "properties": {
         "inputFormat": {
@@ -228,6 +244,10 @@
         "markov": {
           "$schema": "http://json-schema.org/draft-04/schema#",
           "$ref": "#/definitions/MarkovType"
+        },
+        "transcode": {
+          "$schema": "http://json-schema.org/draft-04/schema#",
+          "$ref": "#/definitions/TranscodeType"
         }
       },
       "additionalProperties": false,
@@ -406,6 +426,12 @@
             "markov"
           ],
           "title": "Markov"
+        },
+        {
+          "required": [
+            "transcode"
+          ],
+          "title": "Transcode"
         }
       ]
     },
@@ -584,6 +610,19 @@
         },
         "template": {
           "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "TranscodeType": {
+      "properties": {
+        "classes": {
+          "items": {
+            "$schema": "http://json-schema.org/draft-04/schema#",
+            "$ref": "#/definitions/Class"
+          },
+          "type": "array"
         }
       },
       "additionalProperties": false,

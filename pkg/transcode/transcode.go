@@ -69,7 +69,7 @@ func Factory(conf model.Masking, seed int64, caches map[string]model.Cache) (mod
 	h.Write([]byte(conf.Selector.Jsonpath))
 	seed += int64(h.Sum64())
 	classes := []class{}
-	for _, c := range conf.Mask.Transcode {
+	for _, c := range conf.Mask.Transcode.Classes {
 		input := strings.Split(c.Input, "")
 		output := strings.Split(c.Output, "")
 		classes = append(classes, class{input, output})
