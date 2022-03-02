@@ -176,7 +176,7 @@ type MaskType struct {
 	FromJSON          string               `yaml:"fromjson,omitempty" jsonschema:"oneof_required=FromJSON"`
 	Luhn              *LuhnType            `yaml:"luhn,omitempty" jsonschema:"oneof_required=Luhn"`
 	Markov            MarkovType           `yaml:"markov,omitempty" jsonschema:"oneof_required=Markov"`
-	Transcode         TranscodeType        `yaml:"transcode,omitempty" jsonschema:"oneof_required=Transcode"`
+	Transcode         *TranscodeType       `yaml:"transcode,omitempty" jsonschema:"oneof_required=Transcode"`
 }
 
 type Masking struct {

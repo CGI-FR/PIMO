@@ -18,7 +18,6 @@
 package transcode
 
 import (
-	"strings"
 	"testing"
 
 	"github.com/cgi-fr/pimo/pkg/model"
@@ -28,8 +27,8 @@ import (
 func TestMaskingShouldTranscodeValue(t *testing.T) {
 	Input := "abcdefghijklmnopqrstuvwxyz"
 	Output := "*"
-	Class := class{strings.Split(Input, ""), strings.Split(Output, "")}
-	transcodeMask := NewMask([]class{Class}, 0)
+	Class := model.Class{Input: Input, Output: Output}
+	transcodeMask := NewMask([]model.Class{Class}, 0)
 
 	result, err := transcodeMask.Mask("mark_23")
 
@@ -39,7 +38,7 @@ func TestMaskingShouldTranscodeValue(t *testing.T) {
 
 func TestFactoryShouldCreateAMask(t *testing.T) {
 	maskingChoice := model.TranscodeType{Classes: []model.Class{{Input: "01234", Output: "56789"}, {Input: "ABCDE", Output: "abcde"}}}
-	maskingConfig := model.Masking{Mask: model.MaskType{Transcode: maskingChoice}}
+	maskingConfig := model.Masking{Mask: model.MaskType{Transcode: &maskingChoice}}
 	_, present, err := Factory(maskingConfig, 0, nil)
 	assert.True(t, present, "should be true")
 	assert.Nil(t, err, "error should be nil")

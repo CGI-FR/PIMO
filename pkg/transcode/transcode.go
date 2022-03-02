@@ -26,19 +26,14 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-type class struct {
-	Input  []string
-	Output []string
-}
-
 // MaskEngine is a list of masking value and a rand init to mask
 type MaskEngine struct {
 	rand    *rand.Rand
-	Classes []class
+	Classes []model.Class
 }
 
 // NewMaskSeeded create a MaskRandomList with a seed
-func NewMask(list []class, seed int64) MaskEngine {
+func NewMask(list []model.Class, seed int64) MaskEngine {
 	// nolint: gosec
 	return MaskEngine{rand.New(rand.NewSource(seed)), list}
 }
@@ -51,7 +46,7 @@ func (mrl MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.En
 		eSplit := strings.Split(eString, "")
 		for i, c := range eSplit {
 			for _, class := range mrl.Classes {
-				if in(class.Input, c) {
+				if strings.Contains(class.Input, c) {
 					eSplit[i] = pick(class.Output, mrl.rand)
 				}
 			}
@@ -65,30 +60,26 @@ func (mrl MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.En
 // Factory create a mask from a yaml config
 func Factory(conf model.Masking, seed int64, caches map[string]model.Cache) (model.MaskEngine, bool, error) {
 	// set differents seeds for differents jsonpath
-	h := fnv.New64a()
-	h.Write([]byte(conf.Selector.Jsonpath))
-	seed += int64(h.Sum64())
-	classes := []class{}
-	for _, c := range conf.Mask.Transcode.Classes {
-		input := strings.Split(c.Input, "")
-		output := strings.Split(c.Output, "")
-		classes = append(classes, class{input, output})
+	if conf.Mask.Transcode != nil {
+		h := fnv.New64a()
+		h.Write([]byte(conf.Selector.Jsonpath))
+		seed += int64(h.Sum64())
+		if classes := conf.Mask.Transcode.Classes; len(classes) > 0 {
+			return NewMask(classes, seed), true, nil
+		}
+		return NewMask(defaultClasses(), seed), true, nil
 	}
-	if len(classes) > 0 {
-		return NewMask(classes, seed), true, nil
-	}
+
 	return nil, false, nil
 }
 
-func pick(output []string, rand *rand.Rand) string {
-	return output[rand.Intn(len(output))]
+func pick(output string, rand *rand.Rand) string {
+	return strings.Split(output, "")[rand.Intn(len(output))]
 }
 
-func in(input []string, e string) bool {
-	for _, i := range input {
-		if e == i {
-			return true
-		}
-	}
-	return false
+func defaultClasses() []model.Class {
+	lower := "abcdefghijklmnopqrstuvwxyz"
+	upper := "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+	digits := "0123456789"
+	return []model.Class{{Input: lower, Output: lower}, {Input: upper, Output: upper}, {Input: digits, Output: digits}}
 }
