@@ -181,6 +181,11 @@ type Masking struct {
 	Masks     []MaskType     `yaml:"masks,omitempty" jsonschema:"oneof_required=case2,oneof_required=case4"`
 	Cache     string         `yaml:"cache,omitempty"`
 	Preserve  string         `yaml:"preserve,omitempty"`
+	Seed      SeedType       `yaml:"seed,omitempty"`
+}
+
+type SeedType struct {
+	Field string `yaml:"field,omitempty"`
 }
 
 type CacheDefinition struct {
@@ -572,3 +577,5 @@ func (pipeline SimpleSinkedPipeline) Run() (err error) {
 	}
 	return pipeline.source.Err()
 }
+
+type Seeder func(Dictionary) (int64, bool, error)

@@ -87,6 +87,7 @@ func BuildPipeline(pipeline Pipeline, conf Definition, caches map[string]Cache) 
 					Masks:     nil,
 					Cache:     masking.Cache,
 					Preserve:  masking.Preserve,
+					Seed:      masking.Seed,
 				}
 
 				if virtualMask.Mask.FromCache != "" {

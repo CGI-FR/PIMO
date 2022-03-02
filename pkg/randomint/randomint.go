@@ -18,6 +18,7 @@
 package randomint
 
 import (
+	"encoding/json"
 	"hash/fnv"
 	"math/rand"
 
@@ -27,20 +28,30 @@ import (
 
 // MaskEngine is a list of number to mask randomly
 type MaskEngine struct {
-	rand *rand.Rand
-	min  int
-	max  int
+	rand   *rand.Rand
+	min    int
+	max    int
+	seeder model.Seeder
 }
 
 // NewMask create a MaskEngine with a seed
-func NewMask(min int, max int, seed int64) MaskEngine {
+func NewMask(min int, max int, seed int64, seeder model.Seeder) MaskEngine {
 	// nolint: gosec
-	return MaskEngine{rand.New(rand.NewSource(seed)), min, max}
+	return MaskEngine{rand.New(rand.NewSource(seed)), min, max, seeder}
 }
 
 // Mask choose a mask int randomly within boundary
 func (rim MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Entry, error) {
 	log.Info().Msg("Mask randomInt")
+	if len(context) > 0 {
+		seed, ok, err := rim.seeder(context[0])
+		if err != nil {
+			return nil, err
+		}
+		if ok {
+			rim.rand.Seed(seed)
+		}
+	}
 	return rim.rand.Intn(rim.max+1-rim.min) + rim.min, nil
 }
 
@@ -51,7 +62,29 @@ func Factory(conf model.Masking, seed int64, caches map[string]model.Cache) (mod
 		h := fnv.New64a()
 		h.Write([]byte(conf.Selector.Jsonpath))
 		seed += int64(h.Sum64())
-		return NewMask(conf.Mask.RandomInt.Min, conf.Mask.RandomInt.Max, seed), true, nil
+
+		var seeder model.Seeder
+		if jpath := conf.Seed.Field; jpath != "" {
+			sel := model.NewPathSelector(jpath)
+			seeder = func(context model.Dictionary) (int64, bool, error) {
+				e, ok := sel.Read(context)
+				if !ok {
+					return 0, ok, nil
+				}
+				switch t := e.(type) {
+				case json.Number:
+					v, err := t.Int64()
+					return v, true, err
+				default:
+					return 0, false, nil
+				}
+			}
+		} else {
+			seeder = func(context model.Dictionary) (int64, bool, error) {
+				return 0, false, nil
+			}
+		}
+		return NewMask(conf.Mask.RandomInt.Min, conf.Mask.RandomInt.Max, seed, seeder), true, nil
 	}
 	return nil, false, nil
 }
