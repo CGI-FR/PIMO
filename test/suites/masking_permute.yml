@@ -1,0 +1,62 @@
+name: permute features
+testcases:
+- name: permute mask should permute values
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      seed: 1 #seed known to permute values
+      masking:
+        - selector:
+            jsonpath: "name"
+          mask:
+            permute: true
+      EOF
+  - script: |-
+      cat > expected.txt <<EOF
+      {"id":1,"name":"Paul"}
+      {"id":2,"name":"Marie"}
+      EOF
+  - script: |-
+      echo -e '{"id":1,"name":"Marie"}\n{"id":2,"name":"Paul"}' | pimo > output.txt
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemerr ShouldBeEmpty
+  - script: |-
+      diff expected.txt output.txt
+    assertions:
+    - result.systemout ShouldBeEmpty
+  - script: rm -f expected.txt
+  - script: rm -f output.txt
+
+- name: permute should ignore when field is absent
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      seed: 1 #seed known to permute values
+      masking:
+        - selector:
+            jsonpath: "name"
+          mask:
+            permute: true
+      EOF
+  - script: |-
+      cat > expected.txt <<EOF
+      {"id":1}
+      {"id":2,"name":"Paul"}
+      EOF
+  - script: |-
+      echo -e '{"id":1}\n{"id":2,"name":"Paul"}' | pimo > output.txt
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemerr ShouldBeEmpty
+  - script: |-
+      diff expected.txt output.txt
+    assertions:
+    - result.systemout ShouldBeEmpty
+  - script: rm -f expected.txt
+  - script: rm -f output.txt
+
