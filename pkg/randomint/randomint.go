@@ -18,7 +18,7 @@
 package randomint
 
 import (
-	"encoding/json"
+	"fmt"
 	"hash/fnv"
 	"math/rand"
 
@@ -58,28 +58,24 @@ func (rim MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.En
 // Factory create a mask from a yaml config
 func Factory(conf model.Masking, seed int64, caches map[string]model.Cache) (model.MaskEngine, bool, error) {
 	if conf.Mask.RandomInt.Min != 0 || conf.Mask.RandomInt.Max != 0 {
-		// set differents seeds for differents jsonpath
-		h := fnv.New64a()
-		h.Write([]byte(conf.Selector.Jsonpath))
-		seed += int64(h.Sum64())
-
 		var seeder model.Seeder
 		if jpath := conf.Seed.Field; jpath != "" {
 			sel := model.NewPathSelector(jpath)
+			h := fnv.New64a()
 			seeder = func(context model.Dictionary) (int64, bool, error) {
 				e, ok := sel.Read(context)
 				if !ok {
 					return 0, ok, nil
 				}
-				switch t := e.(type) {
-				case json.Number:
-					v, err := t.Int64()
-					return v, true, err
-				default:
-					return 0, false, nil
-				}
+				h.Reset()
+				_, err := h.Write([]byte(fmt.Sprintf("%v", e)))
+				return int64(h.Sum64()), true, err
 			}
 		} else {
+			// set differents seeds for differents jsonpath
+			h := fnv.New64a()
+			h.Write([]byte(conf.Selector.Jsonpath))
+			seed += int64(h.Sum64())
 			seeder = func(context model.Dictionary) (int64, bool, error) {
 				return 0, false, nil
 			}
