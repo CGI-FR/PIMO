@@ -98,7 +98,7 @@ The following types of masks can be used :
   * [`pipe`](#pipe) is a mask to handle complex nested array structures, it can read an array as an object stream and process it with a sub-pipeline.
   * [`luhn`](#luhn) can generate valid numbers using the Luhn algorithm (e.g. french SIRET or SIREN).
   * [`markov`](#markov) can generate pseudo text based on a sample text.
-  * [`permute`](#permute) can permute all values in the chosen JSON path.
+  * [`permute`](#permute) randomly permutes all values in the chosen JSON path.
 
 A full `masking.yml` file example, using every kind of mask, is given with the source code.
 
@@ -683,7 +683,7 @@ The `separator` field defines the way the sample text will be split (`""` for sp
 
 ### Permute
 
-The permute mask permutes all values along the chosen JSON path.
+The permute mask randomly permutes all values along the chosen JSON path.
 
 **masking.yml**
 ```yaml
