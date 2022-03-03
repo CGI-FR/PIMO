@@ -228,6 +228,9 @@
         "markov": {
           "$schema": "http://json-schema.org/draft-04/schema#",
           "$ref": "#/definitions/MarkovType"
+        },
+        "permute": {
+          "type": "boolean"
         }
       },
       "additionalProperties": false,
@@ -406,6 +409,12 @@
             "markov"
           ],
           "title": "Markov"
+        },
+        {
+          "required": [
+            "permute"
+          ],
+          "title": "Permute"
         }
       ]
     },

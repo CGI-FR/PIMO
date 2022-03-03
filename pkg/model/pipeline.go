@@ -97,6 +97,10 @@ func BuildPipeline(pipeline Pipeline, conf Definition, caches map[string]Cache) 
 					pipeline = pipeline.Process(NewFromCacheProcess(NewPathSelector(virtualMask.Selector.Jsonpath), cache, virtualMask.Preserve))
 					nbArg++
 				}
+				if virtualMask.Mask.Permute {
+					pipeline = pipeline.Process(NewPermuteProcess(conf.Seed, NewPathSelector(virtualMask.Selector.Jsonpath)))
+					nbArg++
+				}
 
 				for _, factory := range maskFactories {
 					mask, present, err := factory(virtualMask, conf.Seed, caches)

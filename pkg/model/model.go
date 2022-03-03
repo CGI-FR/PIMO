@@ -167,6 +167,7 @@ type MaskType struct {
 	FromJSON          string               `yaml:"fromjson,omitempty" jsonschema:"oneof_required=FromJSON"`
 	Luhn              *LuhnType            `yaml:"luhn,omitempty" jsonschema:"oneof_required=Luhn"`
 	Markov            MarkovType           `yaml:"markov,omitempty" jsonschema:"oneof_required=Markov"`
+	Permute           bool                 `yaml:"permute,omitempty" jsonschema:"oneof_required=Permute"`
 }
 
 type Masking struct {
@@ -520,6 +521,12 @@ func (p *ProcessPipeline) Next() bool {
 		if p.err != nil {
 			return false
 		}
+		if p.collector.Next() {
+			return true
+		}
+	}
+	if perm, ok := p.Processor.(*PermuteProcess); ok {
+		perm.ShufflePick(p.collector)
 		if p.collector.Next() {
 			return true
 		}
