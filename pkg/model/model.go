@@ -20,6 +20,7 @@ package model
 import (
 	"bytes"
 	"fmt"
+	"hash/fnv"
 	"time"
 
 	"github.com/cgi-fr/pimo/pkg/statistics"
@@ -579,3 +580,25 @@ func (pipeline SimpleSinkedPipeline) Run() (err error) {
 }
 
 type Seeder func(Dictionary) (int64, bool, error)
+
+func NewSeeder(conf Masking, seed int64) Seeder {
+	var seeder Seeder
+	if jpath := conf.Seed.Field; jpath != "" {
+		sel := NewPathSelector(jpath)
+		h := fnv.New64a()
+		seeder = func(context Dictionary) (int64, bool, error) {
+			e, ok := sel.Read(context)
+			if !ok {
+				return 0, ok, nil
+			}
+			h.Reset()
+			_, err := h.Write([]byte(fmt.Sprintf("%v", e)))
+			return int64(h.Sum64()), true, err
+		}
+	} else {
+		seeder = func(context Dictionary) (int64, bool, error) {
+			return seed, false, nil
+		}
+	}
+	return seeder
+}
