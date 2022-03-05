@@ -69,11 +69,11 @@ testcases:
       version: "1"
       masking:
         - selector:
-            jsonpath: "value"
+            jsonpath: "age"
           mask:
             constant: "invalid_value"
   - script: |-
-      echo '{"value": 0}' | pimo -vinfo --log-json --skip-line-on-error --repeat-until "{{eq .age 3}}"
+      echo '{"age": 0}' | pimo -vinfo --log-json --skip-line-on-error --repeat-until "{{eq .age 3}}"
     assertions:
     - result.code ShouldEqual 0
     - result.systemerr ShouldNotContainSubstring "level":"error"
