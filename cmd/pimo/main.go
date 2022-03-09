@@ -241,7 +241,7 @@ func run() {
 			log.Warn().Int("return", 2).Msg("End PIMO")
 			os.Exit(2)
 		}
-		err = pimo.LoadCache(name, cache, path)
+		err = pimo.LoadCache(name, cache, path, pdef.Caches[name].Reverse)
 		if err != nil {
 			log.Err(err).Str("cache-name", name).Str("cache-path", path).Msg("Cannot load cache")
 			log.Warn().Int("return", 3).Msg("End PIMO")
@@ -275,7 +275,7 @@ func run() {
 			log.Warn().RawJSON("stats", stats.ToJSON()).Int("return", 2).Msg("End PIMO")
 			os.Exit(2)
 		}
-		err = pimo.DumpCache(name, cache, path)
+		err = pimo.DumpCache(name, cache, path, pdef.Caches[name].Reverse)
 		if err != nil {
 			log.Err(err).Str("cache-name", name).Str("cache-path", path).Msg("Cannot dump cache")
 			log.Warn().RawJSON("stats", stats.ToJSON()).Int("return", 3).Msg("End PIMO")

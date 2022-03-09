@@ -29,14 +29,39 @@ import (
 
 type CachedMaskEngineFactories func(model.MaskEngine) model.MaskEngine
 
-func DumpCache(name string, cache model.Cache, path string) error {
+func DumpCache(name string, cache model.Cache, path string, reverse bool) error {
 	file, err := os.Create(path)
 	if err != nil {
 		return fmt.Errorf("Cache %s not dump : %s", name, err.Error())
 	}
 
 	defer file.Close()
-	err = model.NewPipeline(cache.Iterate()).AddSink(jsonline.NewSink(file)).Run()
+
+	pipe := model.NewPipeline(cache.Iterate())
+
+	if reverse {
+		reverseFunc := func(d model.Dictionary) (model.Dictionary, error) {
+			reverse := model.NewDictionary()
+			iter := d.EntriesReverseIter()
+			for {
+				pair, ok := iter()
+				if !ok {
+					break
+				}
+				if pair.Key == "value" {
+					reverse.Set("key", pair.Value)
+				} else {
+					reverse.Set("value", pair.Value)
+				}
+			}
+			return reverse, nil
+		}
+
+		pipe = pipe.Process(model.NewMapProcess(reverseFunc))
+	}
+
+	err = pipe.AddSink(jsonline.NewSink(file)).Run()
+
 	if err != nil {
 		return fmt.Errorf("Cache %s not dump : %s", name, err.Error())
 	}
@@ -44,13 +69,38 @@ func DumpCache(name string, cache model.Cache, path string) error {
 	return nil
 }
 
-func LoadCache(name string, cache model.Cache, path string) error {
+func LoadCache(name string, cache model.Cache, path string, reverse bool) error {
 	file, err := os.Open(path)
 	if err != nil {
 		return fmt.Errorf("Cache %s not loaded : %s", name, err.Error())
 	}
 	defer file.Close()
-	err = model.NewPipeline(jsonline.NewSource(file)).AddSink(model.NewSinkToCache(cache)).Run()
+
+	pipe := model.NewPipeline(jsonline.NewSource(file))
+
+	if reverse {
+		reverseFunc := func(d model.Dictionary) (model.Dictionary, error) {
+			reverse := model.NewDictionary()
+			iter := d.EntriesReverseIter()
+			for {
+				pair, ok := iter()
+				if !ok {
+					break
+				}
+				if pair.Key == "value" {
+					reverse.Set("key", pair.Value)
+				} else {
+					reverse.Set("value", pair.Value)
+				}
+			}
+			return reverse, nil
+		}
+
+		pipe = pipe.Process(model.NewMapProcess(reverseFunc))
+	}
+
+	err = pipe.AddSink(model.NewSinkToCache(cache)).Run()
+
 	if err != nil {
 		return fmt.Errorf("Cache %s not loaded : %s", name, err.Error())
 	}

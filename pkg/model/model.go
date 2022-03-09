@@ -184,7 +184,8 @@ type Masking struct {
 }
 
 type CacheDefinition struct {
-	Unique bool `yaml:"unique,omitempty"`
+	Unique  bool `yaml:"unique,omitempty"`
+	Reverse bool `yaml:"reverse,omitempty"`
 }
 
 type Definition struct {

@@ -572,3 +572,41 @@ func TestCacheShouldProvide(t *testing.T) {
 
 	assert.Equal(t, wanted, result)
 }
+
+func TestPipelineWithReverseProcessor(t *testing.T) {
+	mySlice := []Dictionary{
+		NewDictionary().With("key", "Animal").With("value", 1),
+		NewDictionary().With("key", "Food").With("value", 2),
+		NewDictionary().With("key", "IT").With("value", 3),
+	}
+	var result []Dictionary
+
+	pipeline := NewPipelineFromSlice(mySlice).
+		Process(NewMapProcess(func(d Dictionary) (Dictionary, error) {
+			reverse := NewDictionary()
+			iter := d.EntriesReverseIter()
+			for {
+				pair, ok := iter()
+				if !ok {
+					break
+				}
+				if pair.Key == "value" {
+					reverse.Set("key", pair.Value)
+				} else {
+					reverse.Set("value", pair.Value)
+				}
+			}
+			return reverse, nil
+		})).
+		AddSink(NewSinkToSlice(&result))
+	err := pipeline.Run()
+
+	assert.Nil(t, err)
+
+	wanted := []Dictionary{
+		NewDictionary().With("key", 1).With("value", "Animal"),
+		NewDictionary().With("key", 2).With("value", "Food"),
+		NewDictionary().With("key", 3).With("value", "IT"),
+	}
+	assert.Equal(t, wanted, result)
+}

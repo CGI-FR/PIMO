@@ -6,6 +6,9 @@
       "properties": {
         "unique": {
           "type": "boolean"
+        },
+        "reverse": {
+          "type": "boolean"
         }
       },
       "additionalProperties": false,
