@@ -28,6 +28,8 @@ caches:
   cacheName:
     # Optional bijective cache (enable re-identification if the cache is dumped on disk)
     unique: true
+    # Use reverse cache dictionnary
+    reverse: true
 ```
 
 `version` is the version of the masking file.
@@ -487,11 +489,13 @@ This example will create an `id` field in every output jsonline. The values will
   caches:
     fakeId :
       unique: true
+      reverse: false
 ```
 
 This example will replace the content of `id` field by the matching content in the cache `fakeId`. Cache have to be declared in the `caches` section.
 Cache content can be loaded from jsonfile with the `--load-cache fakeId=fakeId.jsonl` option or by the `cache` option on another field.
 If no matching is found in the cache, `fromCache` block the current line and the next lines are processing until a matching content go into the cache.
+A `reverse` option is available in the `caches` section to use the reverse cache dictionary.
 
 [Return to list of masks](#possible-masks)
 
