@@ -26,6 +26,7 @@ Types of changes
 - `Fixed` pimo doesn't panic anymore with fromjson combined with pipe mask, or fromjson combined with another fromjson mask with nested selectors
 - `Fixed` mask `replacement` with nested selectors
 - `Fixed` using fromCache, the line is not deleted if the jsonpath in not present in the document
+- `Added` option in `caches`section for use reverse cache
 
 ## [1.11.0]
 

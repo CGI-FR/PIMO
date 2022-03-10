@@ -42,18 +42,8 @@ func DumpCache(name string, cache model.Cache, path string, reverse bool) error 
 	if reverse {
 		reverseFunc := func(d model.Dictionary) (model.Dictionary, error) {
 			reverse := model.NewDictionary()
-			iter := d.EntriesReverseIter()
-			for {
-				pair, ok := iter()
-				if !ok {
-					break
-				}
-				if pair.Key == "value" {
-					reverse.Set("key", pair.Value)
-				} else {
-					reverse.Set("value", pair.Value)
-				}
-			}
+			reverse.Set("key", d.Get("value"))
+			reverse.Set("value", d.Get("key"))
 			return reverse, nil
 		}
 
@@ -81,18 +71,8 @@ func LoadCache(name string, cache model.Cache, path string, reverse bool) error 
 	if reverse {
 		reverseFunc := func(d model.Dictionary) (model.Dictionary, error) {
 			reverse := model.NewDictionary()
-			iter := d.EntriesReverseIter()
-			for {
-				pair, ok := iter()
-				if !ok {
-					break
-				}
-				if pair.Key == "value" {
-					reverse.Set("key", pair.Value)
-				} else {
-					reverse.Set("value", pair.Value)
-				}
-			}
+			reverse.Set("key", d.Get("value"))
+			reverse.Set("value", d.Get("key"))
 			return reverse, nil
 		}
 
