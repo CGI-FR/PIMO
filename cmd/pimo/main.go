@@ -101,7 +101,7 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 	rootCmd.AddCommand(&cobra.Command{
 		Use: "flow",
 		Run: func(cmd *cobra.Command, args []string) {
-			pdef, err := model.LoadPipelineDefinitionFromYAML(maskingFile)
+			pdef, err := model.LoadPipelineDefinitionFromFile(maskingFile)
 			if err != nil {
 				log.Err(err).Msg("Cannot load pipeline definition from file")
 				log.Warn().Int("return", 1).Msg("End PIMO")
@@ -112,6 +112,18 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 				os.Exit(9)
 			}
 			fmt.Println(flow)
+		},
+	})
+
+	rootCmd.AddCommand(&cobra.Command{
+		Use: "play",
+		Run: func(cmd *cobra.Command, args []string) {
+			router := pimo.Play()
+			port := ":3010"
+
+			if err := router.Start(port); err != nil {
+				os.Exit(8)
+			}
 		},
 	})
 
@@ -140,7 +152,7 @@ func run() {
 	if len(maskingOneLiner) > 0 {
 		pdef, err = model.LoadPipelineDefintionFromOneLiner(maskingOneLiner)
 	} else {
-		pdef, err = model.LoadPipelineDefinitionFromYAML(maskingFile)
+		pdef, err = model.LoadPipelineDefinitionFromFile(maskingFile)
 	}
 
 	if err != nil {

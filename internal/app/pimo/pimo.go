@@ -63,6 +63,7 @@ import (
 type CachedMaskEngineFactories func(model.MaskEngine) model.MaskEngine
 
 type Config struct {
+	SingleInput      *model.Dictionary
 	EmptyInput       bool
 	RepeatUntil      string
 	RepeatWhile      string
@@ -100,10 +101,14 @@ func (ctx *Context) Configure(cfg Config) error {
 	ctx.cfg = cfg
 
 	over.AddGlobalFields("context")
-	if cfg.EmptyInput {
+	switch {
+	case cfg.EmptyInput:
 		over.MDC().Set("context", "empty-input")
 		ctx.source = model.NewSourceFromSlice([]model.Dictionary{{}})
-	} else {
+	case cfg.SingleInput != nil:
+		over.MDC().Set("context", "single-input")
+		ctx.source = model.NewSourceFromSlice([]model.Dictionary{*cfg.SingleInput})
+	default:
 		over.MDC().Set("context", "stdin")
 		ctx.source = jsonline.NewSource(os.Stdin)
 	}
