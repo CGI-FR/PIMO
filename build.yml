@@ -120,7 +120,7 @@ targets:
         then:
           - $: "git describe --tags --exact-match 2>/dev/null || git symbolic-ref -q --short HEAD"
             1=: "tag"
-            3x: true
+            #3x: true
         else:
           - $: "echo -n ={tag}"
             1=: "tag"
