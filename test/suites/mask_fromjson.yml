@@ -90,7 +90,7 @@ testcases:
       - script: rm -rf masking.yml
       - script: |-
           cat > masking.yml <<EOF
-          version: "v1"
+          version: "1"
           masking:
             - selector:
                 jsonpath: "targetfield"

@@ -1,0 +1,32 @@
+name: multiple masking files features
+testcases:
+- name: should mask
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking1.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "name"
+          mask:
+            constant: "Dorothy"
+      EOF
+  - script: |-
+      cat > masking2.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "age"
+          mask:
+            constant: 20
+      EOF
+  - script: |-
+      echo '{"name": "Toto","age":11}' | pimo --config=masking1.yml --config=masking2.yml
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemoutjson.name ShouldEqual Dorothy
+    - result.systemoutjson.age ShouldEqual 20
+    - result.systemerr ShouldBeEmpty
+  - script: rm -f masking1.yml
+  - script: rm -f masking2.yml
