@@ -63,14 +63,14 @@ import (
 type CachedMaskEngineFactories func(model.MaskEngine) model.MaskEngine
 
 type Config struct {
-	emptyInput       bool
-	repeatUntil      string
-	repeatWhile      string
-	iteration        int
-	skipLineOnError  bool
-	skipFieldOnError bool
-	cachesToDump     map[string]string
-	cachesToLoad     map[string]string
+	EmptyInput       bool
+	RepeatUntil      string
+	RepeatWhile      string
+	Iteration        int
+	SkipLineOnError  bool
+	SkipFieldOnError bool
+	CachesToDump     map[string]string
+	CachesToLoad     map[string]string
 }
 
 type Context struct {
@@ -87,20 +87,20 @@ func NewContext(pdef model.Definition) Context {
 	return Context{pdef: pdef}
 }
 
-func (ctx Context) Configure(cfg Config) error {
+func (ctx *Context) Configure(cfg Config) error {
 	log.Info().
-		Bool("skipLineOnError", cfg.skipLineOnError).
-		Bool("skipFieldOnError", cfg.skipFieldOnError).
-		Int("repeat", cfg.iteration).
-		Bool("empty-input", cfg.emptyInput).
-		Interface("dump-cache", cfg.cachesToDump).
-		Interface("load-cache", cfg.cachesToLoad).
+		Bool("skipLineOnError", cfg.SkipLineOnError).
+		Bool("skipFieldOnError", cfg.SkipFieldOnError).
+		Int("repeat", cfg.Iteration).
+		Bool("empty-input", cfg.EmptyInput).
+		Interface("dump-cache", cfg.CachesToDump).
+		Interface("load-cache", cfg.CachesToLoad).
 		Msg("Start PIMO")
 
 	ctx.cfg = cfg
 
 	over.AddGlobalFields("context")
-	if cfg.emptyInput {
+	if cfg.EmptyInput {
 		over.MDC().Set("context", "empty-input")
 		ctx.source = model.NewSourceFromSlice([]model.Dictionary{{}})
 	} else {
@@ -108,14 +108,14 @@ func (ctx Context) Configure(cfg Config) error {
 		ctx.source = jsonline.NewSource(os.Stdin)
 	}
 
-	if cfg.repeatUntil != "" && cfg.repeatWhile != "" {
+	if cfg.RepeatUntil != "" && cfg.RepeatWhile != "" {
 		return fmt.Errorf("Cannot use repeatUntil and repeatWhile options together")
 	}
 
-	ctx.repeatCondition = cfg.repeatWhile
+	ctx.repeatCondition = cfg.RepeatWhile
 	ctx.repeatConditionMode = "while"
-	if cfg.repeatUntil != "" {
-		ctx.repeatCondition = cfg.repeatUntil
+	if cfg.RepeatUntil != "" {
+		ctx.repeatCondition = cfg.RepeatUntil
 		ctx.repeatConditionMode = "until"
 	}
 
@@ -125,12 +125,12 @@ func (ctx Context) Configure(cfg Config) error {
 
 	ctx.pipeline = model.NewPipeline(ctx.source).
 		Process(model.NewCounterProcessWithCallback("input-line", 0, updateContext)).
-		Process(model.NewRepeaterProcess(cfg.iteration))
+		Process(model.NewRepeaterProcess(cfg.Iteration))
 	over.AddGlobalFields("input-line")
 
 	model.InjectMaskContextFactories(injectMaskContextFactories())
 	model.InjectMaskFactories(injectMaskFactories())
-	model.InjectConfig(cfg.skipLineOnError, cfg.skipFieldOnError)
+	model.InjectConfig(cfg.SkipLineOnError, cfg.SkipFieldOnError)
 
 	var err error
 	ctx.pipeline, ctx.caches, err = model.BuildPipeline(ctx.pipeline, ctx.pdef, nil)
@@ -149,8 +149,8 @@ func (ctx Context) Configure(cfg Config) error {
 	return nil
 }
 
-func (ctx Context) Execute(out io.Writer) (statistics.ExecutionStats, error) {
-	for name, path := range ctx.cfg.cachesToLoad {
+func (ctx *Context) Execute(out io.Writer) (statistics.ExecutionStats, error) {
+	for name, path := range ctx.cfg.CachesToLoad {
 		cache, ok := ctx.caches[name]
 		if !ok {
 			return statistics.WithErrorCode(2), fmt.Errorf("Cache not found: %v", name)
@@ -177,7 +177,7 @@ func (ctx Context) Execute(out io.Writer) (statistics.ExecutionStats, error) {
 		return stats.WithErrorCode(4), fmt.Errorf("Pipeline didn't complete run: %v", err)
 	}
 
-	for name, path := range ctx.cfg.cachesToDump {
+	for name, path := range ctx.cfg.CachesToDump {
 		cache, ok := ctx.caches[name]
 		if !ok {
 			return stats.WithErrorCode(2), fmt.Errorf("Cache not found: %v", name)

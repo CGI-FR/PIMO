@@ -124,7 +124,16 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 func run() {
 	initLog()
 
-	config := pimo.Config{}
+	config := pimo.Config{
+		EmptyInput:       emptyInput,
+		RepeatUntil:      repeatUntil,
+		RepeatWhile:      repeatWhile,
+		Iteration:        iteration,
+		SkipLineOnError:  skipLineOnError,
+		SkipFieldOnError: skipFieldOnError,
+		CachesToDump:     cachesToDump,
+		CachesToLoad:     cachesToLoad,
+	}
 
 	var pdef model.Definition
 	var err error
