@@ -172,7 +172,7 @@ func run() {
 	stats, err := ctx.Execute(os.Stdout)
 	if err != nil {
 		log.Err(err).Msg("Cannot execute pipeline")
-		log.Warn().Int("return", 1).Msg("End PIMO")
+		log.Warn().Int("return", stats.GetErrorCode()).Msg("End PIMO")
 		os.Exit(stats.GetErrorCode())
 	}
 
