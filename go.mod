@@ -12,7 +12,7 @@ require (
 	github.com/mattn/go-isatty v0.0.14
 	github.com/rs/zerolog v1.26.1
 	github.com/spf13/cobra v1.4.0
-	github.com/stretchr/testify v1.7.0
+	github.com/stretchr/testify v1.7.1
 	github.com/zach-klippenstein/goregen v0.0.0-20160303162051-795b5e3961ea
 	gitlab.com/c0b/go-ordered-json v0.0.0-20201030195603-febf46534d5a
 	golang.org/x/text v0.3.7
