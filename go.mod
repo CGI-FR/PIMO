@@ -8,7 +8,7 @@ require (
 	github.com/alecthomas/jsonschema v0.0.0-20210526225647-edb03dcab7bc
 	github.com/capitalone/fpe v1.2.1
 	github.com/goccy/go-yaml v1.9.5
-	github.com/labstack/echo/v4 v4.7.0
+	github.com/labstack/echo/v4 v4.7.1
 	github.com/mattn/go-isatty v0.0.14
 	github.com/rs/zerolog v1.26.1
 	github.com/spf13/cobra v1.4.0
