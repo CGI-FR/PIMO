@@ -199,8 +199,6 @@ func TestPipelineWithDeleteMaskEngine(t *testing.T) {
 		NewDictionary().With("city", "Nantes"),
 	}
 	assert.Equal(t, wanted, result)
-
-	assert.NotEqual(t, wanted, mySlice)
 }
 
 func TestMaskEngineShouldNotCreateField(t *testing.T) {
