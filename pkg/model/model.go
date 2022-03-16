@@ -367,7 +367,7 @@ func (p RepeaterProcess) Open() error {
 
 func (p RepeaterProcess) ProcessDictionary(dictionary Dictionary, out Collector) error {
 	for i := 0; i < p.times; i++ {
-		out.Collect(dictionary)
+		out.Collect(dictionary.Copy())
 	}
 	return nil
 }
@@ -530,7 +530,7 @@ func (p *ProcessPipeline) Next() bool {
 }
 
 func (p *ProcessPipeline) Value() Dictionary {
-	return CopyDictionary(p.collector.Value())
+	return p.collector.Value()
 }
 
 func (p *ProcessPipeline) Err() error {
