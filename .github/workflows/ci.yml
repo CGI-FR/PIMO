@@ -53,4 +53,4 @@ jobs:
           tool: 'go'
           output-file-path: bin/benchstats.txt
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          auto-push: ${{GITHUB_REF_NAME == 'main' }}
+          auto-push: ${{ env.GITHUB_REF_NAME == 'main' }}
