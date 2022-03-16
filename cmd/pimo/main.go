@@ -23,6 +23,8 @@ import (
 	"runtime"
 	"strings"
 
+	"github.com/pkg/profile"
+
 	over "github.com/Trendyol/overlog"
 	"github.com/cgi-fr/pimo/internal/app/pimo"
 	"github.com/cgi-fr/pimo/pkg/flow"
@@ -55,6 +57,7 @@ var (
 	maskingOneLiner  []string
 	repeatUntil      string
 	repeatWhile      string
+	profiling        bool
 )
 
 func main() {
@@ -86,6 +89,7 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 	rootCmd.PersistentFlags().StringArrayVarP(&maskingOneLiner, "mask", "m", []string{}, "one liner masking")
 	rootCmd.PersistentFlags().StringVar(&repeatUntil, "repeat-until", "", "mask each input repeatedly until the given condition is met")
 	rootCmd.PersistentFlags().StringVar(&repeatWhile, "repeat-while", "", "mask each input repeatedly while the given condition is met")
+	rootCmd.PersistentFlags().BoolVar(&profiling, "profiling", false, "Start pimo with profiling and generate a cpu.pprof file (debug)")
 
 	rootCmd.AddCommand(&cobra.Command{
 		Use: "jsonschema",
@@ -169,7 +173,18 @@ func run() {
 		os.Exit(1)
 	}
 
+	var cpuProfiler interface{ Stop() }
+
+	if profiling {
+		cpuProfiler = profile.Start(profile.ProfilePath("."))
+	}
+
 	stats, err := ctx.Execute(os.Stdout)
+
+	if profiling {
+		cpuProfiler.Stop()
+	}
+
 	if err != nil {
 		log.Err(err).Msg("Cannot execute pipeline")
 		log.Warn().Int("return", stats.GetErrorCode()).Msg("End PIMO")
