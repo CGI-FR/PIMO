@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1647463331876,
+  "lastUpdate": 1647467130143,
   "repoUrl": "https://github.com/CGI-FR/PIMO",
   "entries": {
     "Benchmark": [
@@ -56,6 +56,36 @@ window.BENCHMARK_DATA = {
             "value": 203084,
             "unit": "ns/op\t   16491 B/op\t     343 allocs/op",
             "extra": "54726 times\n2 procs"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "youen.peron@cgi.com",
+            "name": "Youen Péron",
+            "username": "youen"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "6b19a21674026c71e56306cf212872786f7fcbf7",
+          "message": "perf(pipe): remove useless dict copy (#104)",
+          "timestamp": "2022-03-16T22:42:56+01:00",
+          "tree_id": "6205484a3d55ce250e797b0faa3e1152b28414c8",
+          "url": "https://github.com/CGI-FR/PIMO/commit/6b19a21674026c71e56306cf212872786f7fcbf7"
+        },
+        "date": 1647467129749,
+        "tool": "go",
+        "benches": [
+          {
+            "name": "BenchmarkPimoRun",
+            "value": 199277,
+            "unit": "ns/op\t    4050 B/op\t     120 allocs/op",
+            "extra": "60043 times\n2 procs"
           }
         ]
       }
