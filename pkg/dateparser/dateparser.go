@@ -18,6 +18,7 @@
 package dateparser
 
 import (
+	"encoding/json"
 	"fmt"
 	"time"
 
@@ -44,21 +45,20 @@ func (me MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Ent
 	}
 	var t time.Time
 	var err error
-	if  me.inputFormat == "unixEpoch" {
+	switch {
+	case me.inputFormat == "unixEpoch":
 		i, err := e.(json.Number).Int64()
 		if err != nil {
 			return nil, err
 		}
-		t = time.Unix(i, 0)	
-	}
-	else if me.inputFormat != "" {
-		
+		t = time.Unix(i, 0)
+	case me.inputFormat != "":
 		timestring := fmt.Sprintf("%v", e)
 		t, err = time.Parse(me.inputFormat, timestring)
 		if err != nil {
 			return nil, err
 		}
-	} else {
+	default:
 		switch v := e.(type) {
 		case string:
 			t, err = time.Parse(time.RFC3339, v)
@@ -71,12 +71,13 @@ func (me MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Ent
 			return nil, err
 		}
 	}
-	if  me.outputFormat == "unixEpoch" {
+
+	if me.outputFormat == "unixEpoch" {
 		return t.Unix(), nil
-	}
-	else if me.outputFormat != "" {
+	} else if me.outputFormat != "" {
 		return t.Format(me.outputFormat), nil
 	}
+
 	return t, nil
 }
 

@@ -27,6 +27,7 @@ Types of changes
 - `Fixed` mask `replacement` with nested selectors
 - `Fixed` using fromCache, the line is not deleted if the jsonpath in not present in the document
 - `Added` option in `caches`section for use reverse cache
+- `Added` unixEpoch format with mask `dateParser`
 
 ## [1.11.0]
 
