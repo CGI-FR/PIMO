@@ -44,7 +44,15 @@ func (me MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Ent
 	}
 	var t time.Time
 	var err error
-	if me.inputFormat != "" {
+	if  me.inputFormat == "unixEpoch" {
+		i, err := e.(json.Number).Int64()
+		if err != nil {
+			return nil, err
+		}
+		t = time.Unix(i, 0)	
+	}
+	else if me.inputFormat != "" {
+		
 		timestring := fmt.Sprintf("%v", e)
 		t, err = time.Parse(me.inputFormat, timestring)
 		if err != nil {
@@ -63,7 +71,10 @@ func (me MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Ent
 			return nil, err
 		}
 	}
-	if me.outputFormat != "" {
+	if  me.outputFormat == "unixEpoch" {
+		return t.Unix(), nil
+	}
+	else if me.outputFormat != "" {
 		return t.Format(me.outputFormat), nil
 	}
 	return t, nil
