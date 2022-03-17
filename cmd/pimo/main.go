@@ -89,7 +89,7 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 	rootCmd.PersistentFlags().StringArrayVarP(&maskingOneLiner, "mask", "m", []string{}, "one liner masking")
 	rootCmd.PersistentFlags().StringVar(&repeatUntil, "repeat-until", "", "mask each input repeatedly until the given condition is met")
 	rootCmd.PersistentFlags().StringVar(&repeatWhile, "repeat-while", "", "mask each input repeatedly while the given condition is met")
-	rootCmd.PersistentFlags().BoolVar(&profiling, "profiling", false, "Start pimo with profiling and generate a cpu.pprof file (debug)")
+	rootCmd.PersistentFlags().BoolVar(&profiling, "profiling", false, "start pimo with profiling and generate a cpu.pprof file (debug)")
 
 	rootCmd.AddCommand(&cobra.Command{
 		Use: "jsonschema",
