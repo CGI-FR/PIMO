@@ -515,3 +515,70 @@ testcases:
     - result.systemout ShouldContainSubstring {"key":"Mathieu","value":"FDDO8965"}
     - result.systemout ShouldContainSubstring {"key":"Marcel","value":"FTTO4452"}
     - result.systemout ShouldContainSubstring {"key":"Mickael","value":"FJUS4442"}
+
+- name: bug fromCache with calculated value 1
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      seed: 42
+      masking:
+        - selector:
+            jsonpath: "sexe"
+          masks:
+            - constant: 2
+            - fromCache: "cacheSex"
+
+      caches:
+        cacheSex :
+          unique: true
+          reverse:  true
+      EOF
+  - script: |-
+      cat > cacheSex.jsonl <<EOF
+      {"key": "M", "value": 2}
+      {"key": "F", "value": 1}
+      EOF
+  - script: |-
+      pimo --load-cache cacheSex=./cacheSex.jsonl <<EOF
+      {"sexe": 2.4}
+      EOF
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldContainSubstring '{"sexe":"M"}'
+    - result.systemerr ShouldBeEmpty
+
+- name: bug fromCache with calculated value 2
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      seed: 42
+      masking:
+        - selector:
+            jsonpath: "sexe"
+          masks:
+            - template : '{{ round (toString .sexe) 0  }}'
+            - fromjson: "sexe"
+            - fromCache: "cacheSex"
+
+      caches:
+        cacheSex :
+          unique: true
+          reverse:  true
+      EOF
+  - script: |-
+      cat > cacheSex.jsonl <<EOF
+      {"key": "M", "value": 2}
+      {"key": "F", "value": 1}
+      EOF
+  - script: |-
+      pimo --load-cache cacheSex=./cacheSex.jsonl <<EOF
+      {"sexe": 2.4}
+      EOF
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldContainSubstring '{"sexe":"M"}'
+    - result.systemerr ShouldBeEmpty
