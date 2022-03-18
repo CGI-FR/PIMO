@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1647499524818,
+  "lastUpdate": 1647596236350,
   "repoUrl": "https://github.com/CGI-FR/PIMO",
   "entries": {
     "Benchmark": [
@@ -116,6 +116,36 @@ window.BENCHMARK_DATA = {
             "value": 213660,
             "unit": "ns/op\t    4013 B/op\t     106 allocs/op",
             "extra": "53143 times\n2 procs"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "89643755+giraud10@users.noreply.github.com",
+            "name": "giraud10",
+            "username": "giraud10"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "76cca7006bfd5b631ac08fc98244d75db88e3b93",
+          "message": "feat(dateParser): add unixEpoch format (#108)\n\n* feat(dateParser): add unixEpoch format\r\n\r\n* test: add dateParser test for unixEpoch format\r\n\r\nCo-authored-by: Youen Péron <youen.peron@cgi.com>",
+          "timestamp": "2022-03-18T10:34:40+01:00",
+          "tree_id": "14de4783d5e5c8ced2ea053225736e3cc7dc3850",
+          "url": "https://github.com/CGI-FR/PIMO/commit/76cca7006bfd5b631ac08fc98244d75db88e3b93"
+        },
+        "date": 1647596236004,
+        "tool": "go",
+        "benches": [
+          {
+            "name": "BenchmarkPimoRun",
+            "value": 182353,
+            "unit": "ns/op\t    3988 B/op\t     106 allocs/op",
+            "extra": "69640 times\n2 procs"
           }
         ]
       }
