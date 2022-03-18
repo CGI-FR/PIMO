@@ -422,7 +422,7 @@ func (sink *SinkToCache) Open() error {
 }
 
 func (sink *SinkToCache) ProcessDictionary(dictionary Dictionary) error {
-	sink.cache.Put(dictionary.Get("key"), dictionary.Get("value"))
+	sink.cache.Put(CleanTypes(dictionary.Get("key")), CleanTypes(dictionary.Get("value")))
 	return nil
 }
 

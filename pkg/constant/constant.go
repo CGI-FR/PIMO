@@ -29,7 +29,7 @@ type MaskEngine struct {
 
 // NewMask return a MaskEngine from a value
 func NewMask(data model.Entry) MaskEngine {
-	return MaskEngine{data}
+	return MaskEngine{model.CleanTypes(data)}
 }
 
 // Mask return a Constant from a MaskEngine

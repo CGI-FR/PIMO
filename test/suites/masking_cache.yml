@@ -553,22 +553,23 @@ testcases:
   steps:
   - script: rm -f masking.yml
   - script: |-
-      cat > masking.yml <<EOF
+      cat  > masking.yml <<EOF
       version: "1"
       seed: 42
       masking:
         - selector:
             jsonpath: "sexe"
           masks:
-            - template : '{{ round (toString .sexe) 0  }}'
+            - template : '[[ round (toString .sexe) 0  ]]'
             - fromjson: "sexe"
             - fromCache: "cacheSex"
-
       caches:
         cacheSex :
           unique: true
           reverse:  true
       EOF
+  - script: sed -i  "s/\[\[/\{\{/g"  masking.yml
+  - script: sed -i  "s/\]\]/\}\}/g"  masking.yml
   - script: |-
       cat > cacheSex.jsonl <<EOF
       {"key": "M", "value": 2}
