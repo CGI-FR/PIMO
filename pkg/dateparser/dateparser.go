@@ -18,12 +18,12 @@
 package dateparser
 
 import (
-	"encoding/json"
 	"fmt"
 	"time"
 
 	"github.com/cgi-fr/pimo/pkg/model"
 	"github.com/rs/zerolog/log"
+	"github.com/spf13/cast"
 )
 
 // MaskEngine is a type to change a date format
@@ -47,7 +47,7 @@ func (me MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Ent
 	var err error
 	switch {
 	case me.inputFormat == "unixEpoch":
-		i, err := e.(json.Number).Int64()
+		i, err := cast.ToInt64E(e)
 		if err != nil {
 			return nil, err
 		}

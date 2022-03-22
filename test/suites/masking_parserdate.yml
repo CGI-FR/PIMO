@@ -50,3 +50,25 @@ testcases:
     - result.code ShouldEqual 0
     - result.systemoutjson.date ShouldEqual "2020-07-17"
     - result.systemerr ShouldBeEmpty
+
+- name: casting value
+  steps:
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "year"
+          masks:
+            - template: "{{round (toString .year) 0 }}"
+            - fromjson: "year"
+            - dateParser:
+                inputFormat: "unixEpoch"
+                outputFormat: "2006"
+      EOF
+  - script: |-
+      echo '{"year": 1199747258.18}' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemoutjson.date ShouldEqual "2008"
+    - result.systemerr ShouldBeEmpty
