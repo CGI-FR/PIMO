@@ -72,5 +72,5 @@ testcases:
       echo '{"year": 1199747258.18}' | pimo
     assertions:
     - result.code ShouldEqual 0
-    - result.systemoutjson.date ShouldEqual "2008"
+    - result.systemoutjson.year ShouldEqual "2008"
     - result.systemerr ShouldBeEmpty
