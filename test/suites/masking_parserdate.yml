@@ -60,12 +60,14 @@ testcases:
         - selector:
             jsonpath: "year"
           masks:
-            - template: "{{round (toString .year) 0 }}"
+            - template: "[[ round (toString .year) 0 ]]"
             - fromjson: "year"
             - dateParser:
                 inputFormat: "unixEpoch"
                 outputFormat: "2006"
       EOF
+  - script: sed -i  "s/\[\[/\{\{/g"  masking.yml
+  - script: sed -i  "s/\]\]/\}\}/g"  masking.yml
   - script: |-
       echo '{"year": 1199747258.18}' | pimo
     assertions:
