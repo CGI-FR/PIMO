@@ -220,6 +220,42 @@ func BenchmarkPimoRunLarge(b *testing.B) {
 				Selector: model.SelectorType{Jsonpath: "base.ref"},
 				Mask:     model.MaskType{RandomChoiceInURI: "pimo://surnameFR"},
 			},
+			{
+				Selector: model.SelectorType{Jsonpath: "base.repo.stargazers_count"},
+				Mask:     model.MaskType{RangeMask: 6},
+			},
+			{
+				Selector: model.SelectorType{Jsonpath: "auto_merge"},
+				Mask:     model.MaskType{Regex: "0[1-7]( ([0-9]){2}){4}"},
+			},
+			{
+				Selector: model.SelectorType{Jsonpath: "add"},
+				Mask:     model.MaskType{Remove: true},
+			},
+			{
+				Selector: model.SelectorType{Jsonpath: "head.repo.owner.events_url"},
+				Mask:     model.MaskType{Replacement: "_links.statuses.href"},
+			},
+			{
+				Selector: model.SelectorType{Jsonpath: "body"},
+				Mask:     model.MaskType{Template: "ID = {{.id}}"},
+			},
+			{
+				Selector: model.SelectorType{Jsonpath: "head.repo.topics"},
+				Mask: model.MaskType{TemplateEach: model.TemplateEachType{
+					Item:     "topic",
+					Index:    "topic_idx",
+					Template: "the topic {{.topic}} is in position {{.topic_idx}}",
+				}},
+			},
+			{
+				Selector: model.SelectorType{Jsonpath: "milestone"},
+				Mask: model.MaskType{WeightedChoice: []model.WeightedChoiceType{
+					{Choice: "Mickael", Weight: 10},
+					{Choice: "Mathieu", Weight: 1},
+					{Choice: "Marcelle", Weight: 76},
+				}},
+			},
 		},
 	}
 
