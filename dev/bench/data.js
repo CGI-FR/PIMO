@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1647596236350,
+  "lastUpdate": 1648634529533,
   "repoUrl": "https://github.com/CGI-FR/PIMO",
   "entries": {
     "Benchmark": [
@@ -146,6 +146,36 @@ window.BENCHMARK_DATA = {
             "value": 182353,
             "unit": "ns/op\t    3988 B/op\t     106 allocs/op",
             "extra": "69640 times\n2 procs"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "youen.peron@cgi.com",
+            "name": "Youen Péron",
+            "username": "youen"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "6c5569849771d0985739f3f2b9a6acb454232cb4",
+          "message": "fix: use fromcache after a mask which causes a change in the type of the value (#110)\n\n* test: add bug in venom test\r\n\r\n* fix(fromCache): bad number type in cache\r\n\r\n* fix: regression on dataParser mask\r\n\r\n* test: fix test clean type\r\n\r\n* test: fix template notation\r\n\r\n* test: fix venom test\r\n\r\n* docs: update changelog\r\n\r\nCo-authored-by: Marie Giraud <marie.giraud@cgi.com>\r\nCo-authored-by: adrienaury <adrien.aury@cgi.com>",
+          "timestamp": "2022-03-30T11:59:24+02:00",
+          "tree_id": "f15141e45c5074e407babc35456f92c731223fa3",
+          "url": "https://github.com/CGI-FR/PIMO/commit/6c5569849771d0985739f3f2b9a6acb454232cb4"
+        },
+        "date": 1648634528754,
+        "tool": "go",
+        "benches": [
+          {
+            "name": "BenchmarkPimoRun",
+            "value": 185464,
+            "unit": "ns/op\t    4044 B/op\t     106 allocs/op",
+            "extra": "63253 times\n2 procs"
           }
         ]
       }
