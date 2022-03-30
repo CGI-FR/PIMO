@@ -206,7 +206,24 @@ targets:
     steps:
       # - $: "rm -f go.mod go.sum"
       # - $: "go mod init ={mod}"
-      - $: "go mod tidy"
+      - if: "!exists('web/play/node_modules')"
+        then:
+          - $: cd web/play/ && yarn install
+      - if: "!exists('internal/app/pimo/client/')"
+        then:
+          - $: cd internal/app/pimo/ && mkdir client && neon build-web
+          - $: "go mod tidy"
+          - $: "echo > web/play/node_modules/go.mod"
+          - if: "!exists('go.mod')"
+            then:
+              - $: "go mod init ={mod}"
+
+  build-web:
+    doc: "Build website and copy it to play.go path"
+    depends: "info"
+    steps:
+      - $: cd web/play && yarn build
+      - $: cp -r web/play/build/* internal/app/pimo/client
 
   # run "neon -props '{buildpaths: ["path/to/main/package1","path/to/main/package2"]}' compile" to compile specific targets
   # example : neon -props '{buildpaths: ["cmd/cli"]}' compile

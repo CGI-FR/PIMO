@@ -1,6 +1,9 @@
 package pimo
 
 import (
+	"embed"
+	"fmt"
+	"io/fs"
 	"net/http"
 	"strings"
 
@@ -11,6 +14,9 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+//go:embed client
+var content embed.FS
+
 func Play() *echo.Echo {
 	router := echo.New()
 
@@ -20,7 +26,7 @@ func Play() *echo.Echo {
 			" err=${error}\n",
 	}))
 
-	// router.GET("/*", echo.WrapHandler(handleClient()))
+	router.GET("/*", echo.WrapHandler(handleClient()))
 	router.POST("/play", play)
 
 	return router
@@ -39,8 +45,18 @@ func play(ctx echo.Context) error {
 		CachesToLoad:     map[string]string{},
 	}
 
-	yaml := ctx.FormValue("masking")
-	data := ctx.FormValue("data")
+	var dataInput map[string]interface{}
+
+	err := ctx.Bind(&dataInput)
+	if err != nil {
+		log.Err(err).Msg("Failed to bind client data")
+		return err
+	}
+
+	//yaml := ctx.FormValue("masking")
+	//data := ctx.FormValue("data")
+	yaml := fmt.Sprintf("%v", dataInput["masking"])
+	data := fmt.Sprintf("%v", dataInput["data"])
 
 	pdef, err := model.LoadPipelineDefinitionFromYAML([]byte(yaml))
 	if err != nil {
@@ -72,4 +88,12 @@ func play(ctx echo.Context) error {
 
 	log.Info().Interface("stats", stats).Msg("Input masked")
 	return ctx.JSONBlob(http.StatusOK, []byte(result.String()))
+}
+
+func handleClient() http.Handler {
+	fSys, err := fs.Sub(content, "client")
+	if err != nil {
+		log.Err(err).Msg("cannot find subtree")
+	}
+	return http.FileServer(http.FS(fSys))
 }

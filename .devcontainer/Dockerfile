@@ -5,7 +5,7 @@ USER root
 ADD cgi_ca_root.crt /usr/local/share/ca-certificates/cgi_ca_root.crt
 RUN chmod 644 /usr/local/share/ca-certificates/cgi_ca_root.crt && update-ca-certificates
 
-RUN apk add --update --progress --no-cache make gomplate
+RUN apk add --update --progress --no-cache make gomplate yarn
 
 ARG VERSION_GOLICENSE=0.2.0
 ARG VERSION_MILLER=5.10.2
