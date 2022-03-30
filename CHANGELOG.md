@@ -14,6 +14,10 @@ Types of changes
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [1.12.1]
+
+- `Fixed` use fromcache after a mask which causes a change in the type of the value
+
 ## [1.12.0]
 
 - `Added` markov mask to generate pseudo text based on a sample text

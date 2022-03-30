@@ -96,7 +96,7 @@ func TestFactoryShouldCreateAMask(t *testing.T) {
 func TestMaskingShouldReplaceUnixEpochByDateString(t *testing.T) {
 	outputFormat := "02/01/06"
 	dateMask := NewMask("unixEpoch", outputFormat)
-	data := json.Number("1647512434")
+	data := model.CleanTypes(json.Number("1647512434"))
 	resulttime, err := dateMask.Mask(data)
 	assert.Equal(t, nil, err, "error should be nil")
 	assert.Equal(t, "17/03/22", resulttime, "Should return the same time")
