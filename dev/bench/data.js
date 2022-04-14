@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1648817449403,
+  "lastUpdate": 1649928716082,
   "repoUrl": "https://github.com/CGI-FR/PIMO",
   "entries": {
     "Benchmark": [
@@ -212,6 +212,42 @@ window.BENCHMARK_DATA = {
             "value": 3798171,
             "unit": "ns/op\t  628178 B/op\t    5431 allocs/op",
             "extra": "2995 times\n2 procs"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "49699333+dependabot[bot]@users.noreply.github.com",
+            "name": "dependabot[bot]",
+            "username": "dependabot[bot]"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "ff0dfac8af91a29dafebc126a01ef3da07b7da26",
+          "message": "chore(deps): bump github.com/Trendyol/overlog from 0.1.0 to 0.1.1 (#113)\n\nBumps [github.com/Trendyol/overlog](https://github.com/Trendyol/overlog) from 0.1.0 to 0.1.1.\r\n- [Release notes](https://github.com/Trendyol/overlog/releases)\r\n- [Commits](https://github.com/Trendyol/overlog/compare/v0.1.0...v0.1.1)\r\n\r\n---\r\nupdated-dependencies:\r\n- dependency-name: github.com/Trendyol/overlog\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-patch\r\n...\r\n\r\nSigned-off-by: dependabot[bot] <support@github.com>\r\n\r\nCo-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>",
+          "timestamp": "2022-04-14T11:29:06+02:00",
+          "tree_id": "063f2f6c5d2083b589ae1fdee34d3731fb424baf",
+          "url": "https://github.com/CGI-FR/PIMO/commit/ff0dfac8af91a29dafebc126a01ef3da07b7da26"
+        },
+        "date": 1649928715573,
+        "tool": "go",
+        "benches": [
+          {
+            "name": "BenchmarkPimoRun",
+            "value": 182511,
+            "unit": "ns/op\t    4149 B/op\t     120 allocs/op",
+            "extra": "63230 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge",
+            "value": 3168194,
+            "unit": "ns/op\t  628550 B/op\t    5489 allocs/op",
+            "extra": "3843 times\n2 procs"
           }
         ]
       }
