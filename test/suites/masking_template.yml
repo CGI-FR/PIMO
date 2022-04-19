@@ -53,3 +53,26 @@ testcases:
     - result.code ShouldEqual 0
     - result.systemout ShouldBeEmpty
 
+- name: template with range over slice of map
+  steps:
+    - script: rm -f masking.yml
+    - script: |-
+        cat > masking.yml <<EOF
+        version: "1"
+        masking:
+          - selector:
+              jsonpath: "CLE_V2_DOCUMENT.LIEN"
+            mask :
+              template: '[[if eq (int .CLE_V2_DOCUMENT.ID_LOC) (int "1") ]]OB=2016001-0/0 PDF[[else if has (int .CLE_V2_DOCUMENT.ID_LOC) (list 10 12 13 14 15 16 17 18 19 20 21 22) ]]29Z3lvv1r3a90ULQmGfiwddPPWq5W4fd[[else]][[.CLE_V2_DOCUMENT.LIEN]][[end]]'
+        EOF
+    - script: sed -i  "s/\[\[/\{\{/g"  masking.yml
+    - script: sed -i  "s/\]\]/\}\}/g"  masking.yml
+    - script: |-
+        pimo <<EOF
+        {"CODE_FAMILLE":"DOCDE","ID_DN":"1320000522255","NOM_CLE":"idRCI","TYPE_DOC":"AEMP","VALEUR_CLE":"1003468703","CLE_V2_DOCUMENT":[{"CODE_ERREUR_INTEGRATION":"","DATE_CREATION":"2020-03-11T19:42:12+01:00","DATE_MODIFICATION":null,"ID_DN":"1320000522255","ID_LOC":1,"LIEN":"OB=2020025-328/2272 PDF","METAS":"{\"idDoc\":1320000522255,\"cDoc\":\"AEMP\",\"idGED\":\"22003111942005580020370050331894\",\"cReg\":\"025\",\"taill\":204,\"tFlux\":\"UGUD\",\"idDE\":\"3997529\",\"dtArc\":\"20200310\",\"dtArr\":\"20200310\",\"dtDif\":\"20200310\",\"icon\":\"3997529\",\"cle\":\"R\",\"nbPag\":3,\"sTypo\":\"407\",\"idRCI\":1003468703,\"cCont\":1,\"cStaW\":3,\"caRec\":\"R1\",\"cFac\":\"W\",\"dses\":\"20200310\",\"dStaW\":\"20200311\",\"hDiff\":\"12:04:22\",\"typo\":\"40\",\"cAgen\":\"02012\",\"dtTrt\":\"20200311\",\"iGedO\":\"22003102003101204234489627952860\",\"corb\":\"TORECORD\",\"cSite\":\"25906\"}","STATUT_DN":2,"SUPPRIME":0,"TYPE_DOC":"AEMP","TYPE_MIME":"application/pdf"}]}
+        EOF
+      assertions:
+        - result.code ShouldEqual 0
+        - result.systemerr ShouldBeEmpty
+        - result.systemoutjson.CLE_V2_DOCUMENT.0.LIEN ShouldEqual OB=2016001-0/0 PDF
+
