@@ -90,6 +90,7 @@ The following types of masks can be used :
   * [`dateParser`](#dateParser) is to change a date format.
   * [`template`](#template) is to mask a data with a template using other values from the jsonline.
   * [`template-each`](#template-each) is like template but will apply on each value of an array.
+  * [`fromjson`] is to mask a field with another field by changing the format to json number.
 * Data structure manipulation
   * [`remove`](#remove) is to mask a field by completely removing it.
   * [`add`](#add) is a mask to add a field to the jsonline.
@@ -421,6 +422,19 @@ The `item` property is optional and defines the name of the current item in the 
 The format for the template should respect the `text/template` package : <https://golang.org/pkg/text/template/>
 
 See also the [Template mask](#template) for other options, all functions are applicable on template-each.
+
+[Return to list of masks](#possible-masks)
+
+### Fromjson
+
+```yaml
+  - selector:
+      jsonpath: "targetfield"
+    mask:
+      fromjson: "sourcefield"
+```
+
+This example will mask the `targetfield` field of the input jsonlines with the field `sourcefield` of the jsonline. This mask changes the type of the input to json number.
 
 [Return to list of masks](#possible-masks)
 
