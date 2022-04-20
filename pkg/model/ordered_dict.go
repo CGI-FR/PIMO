@@ -247,6 +247,15 @@ func UnorderedTypes(inter interface{}) interface{} {
 		}
 		return cleanmap
 	case []interface{}:
+		// cleanmap := map[string]Entry{}
+
+		// for _, item := range typedInter {
+		// 	for key, val := range UnorderedTypes(item).(map[string]Entry) {
+		// 		cleanmap[key] = val
+		// 	}
+		// }
+		// return cleanmap
+
 		tab := []Entry{}
 
 		for _, item := range typedInter {
@@ -256,6 +265,15 @@ func UnorderedTypes(inter interface{}) interface{} {
 		return tab
 
 	case []Dictionary:
+		// cleanmap := map[string]Entry{}
+
+		// for _, item := range typedInter {
+		// 	for key, val := range UnorderedTypes(item).(map[string]Entry) {
+		// 		cleanmap[key] = val
+		// 	}
+		// }
+		// return cleanmap
+
 		tab := []Entry{}
 
 		for _, item := range typedInter {
@@ -265,6 +283,15 @@ func UnorderedTypes(inter interface{}) interface{} {
 		return tab
 
 	case []Entry:
+		// cleanmap := map[string]Entry{}
+
+		// for _, item := range typedInter {
+		// 	for key, val := range UnorderedTypes(item).(map[string]Entry) {
+		// 		cleanmap[key] = val
+		// 	}
+		// }
+		// return cleanmap
+
 		tab := []Entry{}
 
 		for _, item := range typedInter {
