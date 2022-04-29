@@ -228,7 +228,7 @@ func (s selector) ReadContext(dictionary Dictionary) (sub Dictionary, subkey str
 }
 
 func (s selector) WriteContext(dictionary Dictionary, masked Entry) Dictionary {
-	result := CopyDictionary(dictionary)
+	result := dictionary
 	v := reflect.ValueOf(masked)
 	s.ApplyContext(result, func(rootContext, parentContext Dictionary, key string, value Entry) (Action, Entry) {
 		if key == "" || value == nil {
@@ -252,7 +252,7 @@ func (s selector) Read(dictionary Dictionary) (match Entry, found bool) {
 }
 
 func (s selector) Write(dictionary Dictionary, masked Entry) Dictionary {
-	result := CopyDictionary(dictionary)
+	result := dictionary
 	s.Apply(result, func(rootContext, parentContext Dictionary, key string, value Entry) (Action, Entry) {
 		return WRITE, masked
 	})

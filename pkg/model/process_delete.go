@@ -39,7 +39,7 @@ func (dp *DeleteMaskEngineProcess) ProcessDictionary(dictionary Dictionary, out 
 	over.AddGlobalFields("path")
 	over.MDC().Set("path", dp.selector)
 	defer func() { over.MDC().Remove("path") }()
-	result := CopyDictionary(dictionary)
+	result := dictionary
 	applied := dp.selector.Apply(result, func(rootContext, parentContext Dictionary, key string, value Entry) (Action, Entry) {
 		return DELETE, nil
 	})

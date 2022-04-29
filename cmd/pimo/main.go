@@ -20,44 +20,13 @@ package main
 import (
 	"fmt"
 	"os"
-	"regexp"
 	"runtime"
 	"strings"
-	"time"
 
 	over "github.com/Trendyol/overlog"
 	"github.com/cgi-fr/pimo/internal/app/pimo"
-	"github.com/cgi-fr/pimo/pkg/add"
-	"github.com/cgi-fr/pimo/pkg/addtransient"
-	"github.com/cgi-fr/pimo/pkg/command"
-	"github.com/cgi-fr/pimo/pkg/constant"
-	"github.com/cgi-fr/pimo/pkg/dateparser"
-	"github.com/cgi-fr/pimo/pkg/duration"
-	"github.com/cgi-fr/pimo/pkg/ff1"
 	"github.com/cgi-fr/pimo/pkg/flow"
-	"github.com/cgi-fr/pimo/pkg/fluxuri"
-	"github.com/cgi-fr/pimo/pkg/fromjson"
-	"github.com/cgi-fr/pimo/pkg/hash"
-	"github.com/cgi-fr/pimo/pkg/increment"
-	"github.com/cgi-fr/pimo/pkg/jsonline"
-	"github.com/cgi-fr/pimo/pkg/luhn"
-	"github.com/cgi-fr/pimo/pkg/markov"
 	"github.com/cgi-fr/pimo/pkg/model"
-	"github.com/cgi-fr/pimo/pkg/pipe"
-	"github.com/cgi-fr/pimo/pkg/randdate"
-	"github.com/cgi-fr/pimo/pkg/randdura"
-	"github.com/cgi-fr/pimo/pkg/randomdecimal"
-	"github.com/cgi-fr/pimo/pkg/randomint"
-	"github.com/cgi-fr/pimo/pkg/randomlist"
-	"github.com/cgi-fr/pimo/pkg/randomuri"
-	"github.com/cgi-fr/pimo/pkg/rangemask"
-	"github.com/cgi-fr/pimo/pkg/regex"
-	"github.com/cgi-fr/pimo/pkg/remove"
-	"github.com/cgi-fr/pimo/pkg/replacement"
-	"github.com/cgi-fr/pimo/pkg/statistics"
-	"github.com/cgi-fr/pimo/pkg/templateeach"
-	"github.com/cgi-fr/pimo/pkg/templatemask"
-	"github.com/cgi-fr/pimo/pkg/weightedchoice"
 	"github.com/mattn/go-isatty"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
@@ -132,7 +101,7 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 	rootCmd.AddCommand(&cobra.Command{
 		Use: "flow",
 		Run: func(cmd *cobra.Command, args []string) {
-			pdef, err := model.LoadPipelineDefinitionFromYAML(maskingFile)
+			pdef, err := model.LoadPipelineDefinitionFromFile(maskingFile)
 			if err != nil {
 				log.Err(err).Msg("Cannot load pipeline definition from file")
 				log.Warn().Int("return", 1).Msg("End PIMO")
@@ -146,6 +115,18 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 		},
 	})
 
+	rootCmd.AddCommand(&cobra.Command{
+		Use: "play",
+		Run: func(cmd *cobra.Command, args []string) {
+			router := pimo.Play()
+			port := ":3010"
+
+			if err := router.Start(port); err != nil {
+				os.Exit(8)
+			}
+		},
+	})
+
 	if err := rootCmd.Execute(); err != nil {
 		log.Err(err).Msg("Error when executing command")
 		os.Exit(1)
@@ -155,60 +136,23 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 func run() {
 	initLog()
 
-	log.Info().
-		Bool("skipLineOnError", skipLineOnError).
-		Bool("skipFieldOnError", skipFieldOnError).
-		Int("repeat", iteration).
-		Bool("empty-input", emptyInput).
-		Interface("dump-cache", cachesToDump).
-		Interface("load-cache", cachesToLoad).
-		Msg("Start PIMO")
-
-	var source model.Source
-	over.AddGlobalFields("context")
-	if emptyInput {
-		over.MDC().Set("context", "empty-input")
-		source = model.NewSourceFromSlice([]model.Dictionary{{}})
-	} else {
-		over.MDC().Set("context", "stdin")
-		source = jsonline.NewSource(os.Stdin)
+	config := pimo.Config{
+		EmptyInput:       emptyInput,
+		RepeatUntil:      repeatUntil,
+		RepeatWhile:      repeatWhile,
+		Iteration:        iteration,
+		SkipLineOnError:  skipLineOnError,
+		SkipFieldOnError: skipFieldOnError,
+		CachesToDump:     cachesToDump,
+		CachesToLoad:     cachesToLoad,
 	}
 
-	if repeatUntil != "" && repeatWhile != "" {
-		log.Error().Msg("Cannot use repeatUntil and repeatWhile flags together")
-		log.Warn().Int("return", 1).Msg("End PIMO")
-		os.Exit(1)
-	}
-
-	repeatCondition := repeatWhile
-	repeatConditionMode := "while"
-	if repeatUntil != "" {
-		repeatCondition = repeatUntil
-		repeatConditionMode = "until"
-	}
-
-	if repeatCondition != "" {
-		source = model.NewTempSource(source)
-	}
-
-	pipeline := model.NewPipeline(source).
-		Process(model.NewCounterProcessWithCallback("input-line", 0, updateContext)).
-		Process(model.NewRepeaterProcess(iteration))
-	over.AddGlobalFields("input-line")
-	var (
-		err    error
-		caches map[string]model.Cache
-		pdef   model.Definition
-	)
-
-	model.InjectMaskContextFactories(injectMaskContextFactories())
-	model.InjectMaskFactories(injectMaskFactories())
-	model.InjectConfig(skipLineOnError, skipFieldOnError)
-
+	var pdef model.Definition
+	var err error
 	if len(maskingOneLiner) > 0 {
 		pdef, err = model.LoadPipelineDefintionFromOneLiner(maskingOneLiner)
 	} else {
-		pdef, err = model.LoadPipelineDefinitionFromYAML(maskingFile)
+		pdef, err = model.LoadPipelineDefinitionFromFile(maskingFile)
 	}
 
 	if err != nil {
@@ -217,111 +161,23 @@ func run() {
 		os.Exit(1)
 	}
 
-	pipeline, caches, err = model.BuildPipeline(pipeline, pdef, nil)
-	if err != nil {
-		log.Error().Err(err).Msg("Cannot build pipeline")
+	ctx := pimo.NewContext(pdef)
+
+	if err := ctx.Configure(config); err != nil {
+		log.Err(err).Msg("Cannot configure pipeline")
 		log.Warn().Int("return", 1).Msg("End PIMO")
 		os.Exit(1)
 	}
 
-	if repeatCondition != "" {
-		processor, err := model.NewRepeaterUntilProcess(source.(*model.TempSource), repeatCondition, repeatConditionMode)
-		if err != nil {
-			log.Error().Err(err).Msg("Cannot build pipeline")
-			log.Warn().Int("return", 1).Msg("End PIMO")
-			os.Exit(1)
-		}
-		pipeline = pipeline.Process(processor)
-	}
-
-	for name, path := range cachesToLoad {
-		cache, ok := caches[name]
-		if !ok {
-			log.Error().Str("cache-name", name).Msg("Cache not found")
-			log.Warn().Int("return", 2).Msg("End PIMO")
-			os.Exit(2)
-		}
-		err = pimo.LoadCache(name, cache, path)
-		if err != nil {
-			log.Err(err).Str("cache-name", name).Str("cache-path", path).Msg("Cannot load cache")
-			log.Warn().Int("return", 3).Msg("End PIMO")
-			os.Exit(3)
-		}
-	}
-
-	// init stats and time measure to zero
-	statistics.Reset()
-	startTime := time.Now()
-
-	over.AddGlobalFields("output-line")
-	err = pipeline.AddSink(jsonline.NewSinkWithContext(os.Stdout, "output-line")).Run()
-
-	// include duration info and stats in log output
-	duration := time.Since(startTime)
-	over.MDC().Set("duration", duration)
-	stats := statistics.Compute()
-
-	over.SetGlobalFields([]string{"config", "output-line", "input-line", "duration"})
+	stats, err := ctx.Execute(os.Stdout)
 	if err != nil {
-		log.Err(err).Msg("Pipeline didn't complete run")
-		log.Warn().RawJSON("stats", stats.ToJSON()).Int("return", 4).Msg("End PIMO")
-		os.Exit(4)
-	}
-
-	for name, path := range cachesToDump {
-		cache, ok := caches[name]
-		if !ok {
-			log.Error().Str("cache-name", name).Msg("Cache not found")
-			log.Warn().RawJSON("stats", stats.ToJSON()).Int("return", 2).Msg("End PIMO")
-			os.Exit(2)
-		}
-		err = pimo.DumpCache(name, cache, path)
-		if err != nil {
-			log.Err(err).Str("cache-name", name).Str("cache-path", path).Msg("Cannot dump cache")
-			log.Warn().RawJSON("stats", stats.ToJSON()).Int("return", 3).Msg("End PIMO")
-			os.Exit(3)
-		}
+		log.Err(err).Msg("Cannot execute pipeline")
+		log.Warn().Int("return", stats.GetErrorCode()).Msg("End PIMO")
+		os.Exit(stats.GetErrorCode())
 	}
 
 	log.Info().RawJSON("stats", stats.ToJSON()).Int("return", 0).Msg("End PIMO")
 	os.Exit(0)
-}
-
-func injectMaskContextFactories() []model.MaskContextFactory {
-	return []model.MaskContextFactory{
-		fluxuri.Factory,
-		add.Factory,
-		addtransient.Factory,
-		remove.Factory,
-		pipe.Factory,
-		templateeach.Factory,
-		fromjson.Factory,
-	}
-}
-
-func injectMaskFactories() []model.MaskFactory {
-	return []model.MaskFactory{
-		constant.Factory,
-		command.Factory,
-		randomlist.Factory,
-		randomuri.Factory,
-		randomint.Factory,
-		weightedchoice.Factory,
-		regex.Factory,
-		hash.Factory,
-		randdate.Factory,
-		increment.Factory,
-		replacement.Factory,
-		duration.Factory,
-		templatemask.Factory,
-		rangemask.Factory,
-		randdura.Factory,
-		randomdecimal.Factory,
-		dateparser.Factory,
-		ff1.Factory,
-		luhn.Factory,
-		markov.Factory,
-	}
 }
 
 func initLog() {
@@ -366,11 +222,4 @@ func initLog() {
 	}
 	over.MDC().Set("config", maskingFile)
 	over.SetGlobalFields([]string{"config"})
-}
-
-var re = regexp.MustCompile(`(\[\d*\])?$`)
-
-func updateContext(counter int) {
-	context := over.MDC().GetString("context")
-	over.MDC().Set("context", re.ReplaceAllString(context, fmt.Sprintf("[%d]", counter)))
 }

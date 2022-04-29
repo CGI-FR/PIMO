@@ -190,7 +190,8 @@ type SeedType struct {
 }
 
 type CacheDefinition struct {
-	Unique bool `yaml:"unique,omitempty"`
+	Unique  bool `yaml:"unique,omitempty"`
+	Reverse bool `yaml:"reverse,omitempty"`
 }
 
 type Definition struct {
@@ -372,7 +373,7 @@ func (p RepeaterProcess) Open() error {
 
 func (p RepeaterProcess) ProcessDictionary(dictionary Dictionary, out Collector) error {
 	for i := 0; i < p.times; i++ {
-		out.Collect(dictionary)
+		out.Collect(dictionary.Copy())
 	}
 	return nil
 }
@@ -427,7 +428,7 @@ func (sink *SinkToCache) Open() error {
 }
 
 func (sink *SinkToCache) ProcessDictionary(dictionary Dictionary) error {
-	sink.cache.Put(dictionary.Get("key"), dictionary.Get("value"))
+	sink.cache.Put(CleanTypes(dictionary.Get("key")), CleanTypes(dictionary.Get("value")))
 	return nil
 }
 
@@ -535,7 +536,7 @@ func (p *ProcessPipeline) Next() bool {
 }
 
 func (p *ProcessPipeline) Value() Dictionary {
-	return CopyDictionary(p.collector.Value())
+	return p.collector.Value()
 }
 
 func (p *ProcessPipeline) Err() error {
