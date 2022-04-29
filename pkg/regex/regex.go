@@ -28,33 +28,31 @@ import (
 
 // MaskEngine is a value that mask thanks to a regular expression
 type MaskEngine struct {
-	exp    string
-	seed   int64
-	seeder model.Seeder
+	exp       string
+	rngsource rand.Source
+	seeder    model.Seeder
 }
 
 // NewMask return a RegexMask from a regexp
 func NewMask(exp string, seed int64, seeder model.Seeder) (MaskEngine, error) {
-	return MaskEngine{exp, seed, seeder}, nil
+	return MaskEngine{exp, rand.NewSource(seed), seeder}, nil
 }
 
 // Mask returns a string thanks to a regular expression
 func (rm MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Entry, error) {
 	log.Info().Msg("Mask regex")
 
-	seed := rm.seed
-
 	if len(context) > 0 {
-		oseed, ok, err := rm.seeder(context[0])
+		seed, ok, err := rm.seeder(context[0])
 		if err != nil {
 			return nil, err
 		}
 		if ok {
-			seed = oseed
+			rm.rngsource.Seed(seed)
 		}
 	}
 
-	args := regen.GeneratorArgs{RngSource: rand.NewSource(seed)}
+	args := regen.GeneratorArgs{RngSource: rm.rngsource}
 	if generator, err := regen.NewGenerator(rm.exp, &args); err != nil {
 		return nil, err
 	} else {
