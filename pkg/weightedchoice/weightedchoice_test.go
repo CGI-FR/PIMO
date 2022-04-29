@@ -26,7 +26,7 @@ import (
 
 func TestMaskingShouldReplaceSensitiveValueByWeightedRandom(t *testing.T) {
 	NameWeighted := []model.WeightedChoiceType{{Choice: "Michel", Weight: 4}, {Choice: "Marc", Weight: 1}}
-	weightMask := NewMask(NameWeighted, 0)
+	weightMask := NewMask(NameWeighted, 0, nil)
 
 	wait := "Michel"
 	equal := 0

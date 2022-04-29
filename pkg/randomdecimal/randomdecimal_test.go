@@ -32,7 +32,7 @@ func TestMaskingShouldReplaceSensitiveValueByRandomNumber(t *testing.T) {
 	min := float64(0)
 	max := float64(10)
 	precision := 2
-	randomMask := NewMask(min, max, precision, time.Now().UnixNano())
+	randomMask := NewMask(min, max, precision, time.Now().UnixNano(), nil)
 
 	result, err := randomMask.Mask(20)
 	assert.Equal(t, nil, err, "error should be nil")
