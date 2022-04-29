@@ -16,6 +16,9 @@ masking:
       type: "argument"
     # Optional cache (coherence preservation)
     cache: "cacheName"
+    # Optional custom seed for this mask
+    seed:
+      field: "example.example"
 
   # another mask on a different location
   - selector:

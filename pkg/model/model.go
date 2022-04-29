@@ -20,6 +20,7 @@ package model
 import (
 	"bytes"
 	"fmt"
+	"hash/fnv"
 	"time"
 
 	"github.com/cgi-fr/pimo/pkg/statistics"
@@ -181,6 +182,11 @@ type Masking struct {
 	Masks     []MaskType     `yaml:"masks,omitempty" jsonschema:"oneof_required=case2,oneof_required=case4"`
 	Cache     string         `yaml:"cache,omitempty"`
 	Preserve  string         `yaml:"preserve,omitempty"`
+	Seed      SeedType       `yaml:"seed,omitempty"`
+}
+
+type SeedType struct {
+	Field string `yaml:"field,omitempty"`
 }
 
 type CacheDefinition struct {
@@ -572,4 +578,28 @@ func (pipeline SimpleSinkedPipeline) Run() (err error) {
 		}
 	}
 	return pipeline.source.Err()
+}
+
+type Seeder func(Dictionary) (int64, bool, error)
+
+func NewSeeder(conf Masking, seed int64) Seeder {
+	var seeder Seeder
+	if jpath := conf.Seed.Field; jpath != "" {
+		sel := NewPathSelector(jpath)
+		h := fnv.New64a()
+		seeder = func(context Dictionary) (int64, bool, error) {
+			e, ok := sel.Read(context)
+			if !ok {
+				return 0, ok, nil
+			}
+			h.Reset()
+			_, err := h.Write([]byte(fmt.Sprintf("%v", e)))
+			return int64(h.Sum64()), true, err
+		}
+	} else {
+		seeder = func(context Dictionary) (int64, bool, error) {
+			return seed, false, nil
+		}
+	}
+	return seeder
 }
