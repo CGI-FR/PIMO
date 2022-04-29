@@ -22,8 +22,6 @@ masking:
       randomInt:
         min: 25
         max: 32
-    seed:
-      field: age
   - selector:
       jsonpath: "name3"
     mask:
