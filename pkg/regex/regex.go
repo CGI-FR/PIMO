@@ -28,14 +28,16 @@ import (
 
 // MaskEngine is a value that mask thanks to a regular expression
 type MaskEngine struct {
+	generator regen.Generator
 	exp       string
-	rngsource rand.Source
 	seeder    model.Seeder
 }
 
 // NewMask return a RegexMask from a regexp
 func NewMask(exp string, seed int64, seeder model.Seeder) (MaskEngine, error) {
-	return MaskEngine{exp, rand.NewSource(seed), seeder}, nil
+	args := &regen.GeneratorArgs{RngSource: rand.NewSource(seed)}
+	generator, err := regen.NewGenerator(exp, args)
+	return MaskEngine{generator, exp, seeder}, err
 }
 
 // Mask returns a string thanks to a regular expression
@@ -48,16 +50,16 @@ func (rm MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Ent
 			return nil, err
 		}
 		if ok {
-			rm.rngsource.Seed(seed)
+			args := &regen.GeneratorArgs{RngSource: rand.NewSource(seed)}
+			generator, err := regen.NewGenerator(rm.exp, args)
+			if err != nil {
+				return nil, err
+			}
+			return generator.Generate(), nil
 		}
 	}
 
-	args := regen.GeneratorArgs{RngSource: rm.rngsource}
-	if generator, err := regen.NewGenerator(rm.exp, &args); err != nil {
-		return nil, err
-	} else {
-		return generator.Generate(), nil
-	}
+	return rm.generator.Generate(), nil
 }
 
 // Factory create a mask from a yaml config
