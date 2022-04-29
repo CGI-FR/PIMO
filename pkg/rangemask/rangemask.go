@@ -18,7 +18,7 @@
 package rangemask
 
 import (
-	"encoding/json"
+	"fmt"
 	"strconv"
 
 	"github.com/cgi-fr/pimo/pkg/model"
@@ -41,9 +41,10 @@ func (rm MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Ent
 	if e == nil {
 		return e, nil
 	}
-	i, err := e.(json.Number).Int64()
-	if err != nil {
-		return nil, err
+	i, ok := e.(float64)
+
+	if !ok {
+		return e, fmt.Errorf("%v is not a number", e)
 	}
 	scaledValue := int(i) / rm.rangeScale * rm.rangeScale
 	rangedValue := "[" + strconv.Itoa(scaledValue) + ";" + strconv.Itoa(scaledValue+rm.rangeScale-1) + "]"

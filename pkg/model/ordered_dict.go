@@ -1,6 +1,7 @@
 package model
 
 import (
+	"encoding/json"
 	"fmt"
 
 	"github.com/rs/zerolog/log"
@@ -91,6 +92,23 @@ func CleanTypes(inter interface{}) interface{} {
 		}
 
 		return tab
+
+	case json.Number:
+
+		resFloat64, err := typedInter.Float64()
+		if err == nil {
+			return resFloat64
+		}
+
+		return typedInter.String()
+
+	case uint64:
+		res := float64(typedInter)
+		return res
+
+	case int64:
+		res := float64(typedInter)
+		return res
 	default:
 		return inter
 	}

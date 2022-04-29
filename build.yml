@@ -245,6 +245,12 @@ targets:
     steps:
       - $: go test -coverprofile=./={BUILD_DIR}/coverage.txt -covermode=atomic ./...
 
+  bench:
+    doc: "Run all bench"
+    depends: ["info", "refresh"]
+    steps:
+      - $: go test -bench=. -benchmem ./... -run=^# -benchtime=10s | tee ./={BUILD_DIR}/benchstats.txt
+
   # run "neon -props '{buildpaths: ["path/to/main/package1","path/to/main/package2"]}' release" to release specific targets
   # example : neon -props '{buildpaths: ["cmd/cli"]}' release
   release:
@@ -259,7 +265,7 @@ targets:
   # ex: neon -props '{testsuites: "mask_add_transient.yml"}' test-int
   test-int:
     doc: "Run all integration tests"
-    depends: ["info", "refresh", "lint", "test", "release"]
+    depends: ["info", "refresh", "lint", "test", "bench", "release"]
     steps:
       - delete: ={TEST_WS_DIR}/**
       - mkdir: =TEST_WS_DIR
