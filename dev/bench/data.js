@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1649928716082,
+  "lastUpdate": 1651246322982,
   "repoUrl": "https://github.com/CGI-FR/PIMO",
   "entries": {
     "Benchmark": [
@@ -248,6 +248,42 @@ window.BENCHMARK_DATA = {
             "value": 3168194,
             "unit": "ns/op\t  628550 B/op\t    5489 allocs/op",
             "extra": "3843 times\n2 procs"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "57703518+Baguettte@users.noreply.github.com",
+            "name": "P0la__brD",
+            "username": "Baguettte"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "b1b3dc3bf70c47a7b753f882b9a5bdcbd7b1ff6e",
+          "message": "feat(customseed): add custom seed forcing in config (#92)\n\n* feat(randomInt): add custom seed forcing in config\r\n\r\n* refactor(randomInt): custom seeding\r\n\r\n* chore(customSeed): add NewSeeder in model\r\n\r\n* feat(customseed): add venom test\r\n\r\n* feat(customseed): add doc\r\n\r\n* feat(customseed): impact all masks\r\n\r\n* docs(customseed): update changelog\r\n\r\n* feat(customseed): implement regex seed\r\n\r\n* feat(customseed): implement regex seed\r\n\r\n* fix(customseed): regex seed\r\n\r\n* chore(customseed): revert mistake\r\n\r\n* test(customseed): add venom test for each mask\r\n\r\n* test(customseed): add venom test for each mask\r\n\r\nCo-authored-by: adrienaury <adrien.aury@cgi.com>\r\nCo-authored-by: Adrien Aury <44274230+adrienaury@users.noreply.github.com>",
+          "timestamp": "2022-04-29T17:29:05+02:00",
+          "tree_id": "8c24479349756d5fc3f732663d15e63e8f8a2fe3",
+          "url": "https://github.com/CGI-FR/PIMO/commit/b1b3dc3bf70c47a7b753f882b9a5bdcbd7b1ff6e"
+        },
+        "date": 1651246322163,
+        "tool": "go",
+        "benches": [
+          {
+            "name": "BenchmarkPimoRun",
+            "value": 184757,
+            "unit": "ns/op\t    4146 B/op\t     120 allocs/op",
+            "extra": "63484 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge",
+            "value": 3079898,
+            "unit": "ns/op\t  628526 B/op\t    5489 allocs/op",
+            "extra": "3852 times\n2 procs"
           }
         ]
       }
