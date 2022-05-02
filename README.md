@@ -90,7 +90,7 @@ The following types of masks can be used :
   * [`dateParser`](#dateParser) is to change a date format.
   * [`template`](#template) is to mask a data with a template using other values from the jsonline.
   * [`template-each`](#template-each) is like template but will apply on each value of an array.
-  * [`fromjson`](#fromjson) is to change the format of a field to float64.
+  * [`fromjson`](#fromjson) is to convert string field values to parsed JSON, e.g. "[1,2,3]" -> [1,2,3].
 * Data structure manipulation
   * [`remove`](#remove) is to mask a field by completely removing it.
   * [`add`](#add) is a mask to add a field to the jsonline.
@@ -434,7 +434,14 @@ See also the [Template mask](#template) for other options, all functions are app
       fromjson: "sourcefield"
 ```
 
-This example will mask the `targetfield` field of the input jsonlines with the field `sourcefield` of the jsonline. This mask changes the type of the input string (`sourcefield`) to output float64 (`targetfield`). The `sourcefield` must be a number in string format or an empty field ("null").
+This example will mask the `targetfield` field of the input jsonlines with the parsed JSON from field `sourcefield` of the jsonline. This mask changes the type of the input string (`sourcefield`) :
+
+* null : nil
+* string: string
+* number: float64
+* array:  slice
+* object: map
+* bool: bool
 
 [Return to list of masks](#possible-masks)
 
