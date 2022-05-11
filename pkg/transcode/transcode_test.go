@@ -28,7 +28,9 @@ func TestMaskingShouldTranscodeValue(t *testing.T) {
 	Input := "abcdefghijklmnopqrstuvwxyz"
 	Output := "*"
 	Class := model.Class{Input: Input, Output: Output}
-	transcodeMask := NewMask([]model.Class{Class}, 0)
+	transcodeMask := NewMask([]model.Class{Class}, 0, func(context model.Dictionary) (int64, bool, error) {
+		return 0, false, nil
+	})
 
 	result, err := transcodeMask.Mask("mark_23")
 

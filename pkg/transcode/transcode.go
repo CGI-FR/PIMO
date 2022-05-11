@@ -30,17 +30,29 @@ import (
 type MaskEngine struct {
 	rand    *rand.Rand
 	Classes []model.Class
+	seeder  model.Seeder
 }
 
 // NewMaskSeeded create a MaskRandomList with a seed
-func NewMask(list []model.Class, seed int64) MaskEngine {
+func NewMask(list []model.Class, seed int64, seeder model.Seeder) MaskEngine {
 	// nolint: gosec
-	return MaskEngine{rand.New(rand.NewSource(seed)), list}
+	return MaskEngine{rand.New(rand.NewSource(seed)), list, seeder}
 }
 
 // Mask choose a mask value randomly
 func (mrl MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Entry, error) {
 	log.Info().Msg("Mask transcode")
+
+	if len(context) > 0 {
+		seed, ok, err := mrl.seeder(context[0])
+		if err != nil {
+			return nil, err
+		}
+		if ok {
+			mrl.rand.Seed(seed)
+		}
+	}
+
 	switch eString := e.(type) {
 	case string:
 		eSplit := strings.Split(eString, "")
@@ -64,10 +76,11 @@ func Factory(conf model.Masking, seed int64, caches map[string]model.Cache) (mod
 		h := fnv.New64a()
 		h.Write([]byte(conf.Selector.Jsonpath))
 		seed += int64(h.Sum64())
+		seeder := model.NewSeeder(conf, seed)
 		if classes := conf.Mask.Transcode.Classes; len(classes) > 0 {
-			return NewMask(classes, seed), true, nil
+			return NewMask(classes, seed, seeder), true, nil
 		}
-		return NewMask(defaultClasses(), seed), true, nil
+		return NewMask(defaultClasses(), seed, seeder), true, nil
 	}
 
 	return nil, false, nil

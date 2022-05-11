@@ -46,3 +46,25 @@ testcases:
     - result.code ShouldEqual 0
     - result.systemoutjson.id ShouldEqual "56545_ZXYD_abcd_6789"
     - result.systemerr ShouldBeEmpty
+
+- name: with seeder
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      seed: 42
+      masking:
+      - selector:
+          jsonpath: "id"
+        mask:
+          transcode: {}
+        seed:
+          field: "id"
+      EOF
+  - script: |-
+      echo -e '{"id":"1A"}\n{"id":"2B"}\n{"id":"3C"}\n{"id":"2B"}\n{"id":"1A"}\n{"id":"3C"}' | pimo | head -c -1 | tr '\n' ' '
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldEqual {"id":"3L"} {"id":"2O"} {"id":"8X"} {"id":"2O"} {"id":"3L"} {"id":"8X"}
+    - result.systemerr ShouldBeEmpty
