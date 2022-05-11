@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1651246322982,
+  "lastUpdate": 1652278495988,
   "repoUrl": "https://github.com/CGI-FR/PIMO",
   "entries": {
     "Benchmark": [
@@ -284,6 +284,42 @@ window.BENCHMARK_DATA = {
             "value": 3079898,
             "unit": "ns/op\t  628526 B/op\t    5489 allocs/op",
             "extra": "3852 times\n2 procs"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "57703518+Baguettte@users.noreply.github.com",
+            "name": "P0la__brD",
+            "username": "Baguettte"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "fc4f9e47874892abf42ba551eb3e4c8b234a6711",
+          "message": "feat(transcode): add transcode mask (#93)\n\n* feat(transcode): add mask transcode\r\n\r\n* feat(transcode): add classes field\r\n\r\n* feat(transcode): add default classes\r\n\r\n* feat(transcode): activate mask\r\n\r\n* feat(transcode): add venom test case\r\n\r\n* feat(transcode): add venom test case\r\n\r\n* feat(transcode): add seeder + venom test case\r\n\r\n* feat(transcode): changelog\r\n\r\n* feat(transcode): readme\r\n\r\nCo-authored-by: Adrien Aury <44274230+adrienaury@users.noreply.github.com>\r\nCo-authored-by: Adrien Aury <adrien.aury@cgi.com>",
+          "timestamp": "2022-05-11T16:12:08+02:00",
+          "tree_id": "8c7cbdbe966724d857fc706a11a4ac12521f0dc5",
+          "url": "https://github.com/CGI-FR/PIMO/commit/fc4f9e47874892abf42ba551eb3e4c8b234a6711"
+        },
+        "date": 1652278495481,
+        "tool": "go",
+        "benches": [
+          {
+            "name": "BenchmarkPimoRun",
+            "value": 182241,
+            "unit": "ns/op\t    4149 B/op\t     120 allocs/op",
+            "extra": "63205 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge",
+            "value": 3209278,
+            "unit": "ns/op\t  628735 B/op\t    5489 allocs/op",
+            "extra": "3562 times\n2 procs"
           }
         ]
       }
