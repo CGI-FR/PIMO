@@ -78,6 +78,7 @@ The following types of masks can be used :
   * [`randomChoice`](#randomChoice) is to mask with a random value from a list in argument.
   * [`weightedChoice`](#weightedChoice) is to mask with a random value from a list with probability, both given with the arguments `choice` and `weight`.
   * [`randomChoiceInUri`](#randomChoiceInUri) is to mask with a random value from an external resource.
+  * [`transcode`](#transcode) is to mask a value randomly with character class preservation.
 * K-Anonymization
   * [`range`](#range) is to mask a integer value by a range of value (e.g. replace `5` by `[0,10]`).
   * [`duration`](#duration) is to mask a date by adding or removing a certain number of days.
@@ -659,11 +660,14 @@ The mask can be parametered to use a different universe of valid characters, int
 [Markov chains](https://en.wikipedia.org/wiki/Markov_chain#Markov_text_generators) produces pseudo text based on an sample text.
 
 **sample.txt**
+
 ```txt
 I want a cheese burger
 I need a cheese cake
 ```
+
 **masking.yml**
+
 ```yaml
   - selector:
       jsonpath: "comment"
@@ -686,6 +690,58 @@ I need a cheese cake
 The `separator` field defines the way the sample text will be split (`""` for splitting into characters, `" "` for splitting into words)
 
 [Return to list of masks](#possible-masks)
+
+### Transcode
+
+This mask produce a random string by preserving character classes from the original value.
+
+**masking.yml**
+
+```yaml
+- selector:
+    jsonpath: "id"
+  mask:
+    transcode:
+      classes:
+      - input: "0123456789abcdefABCDEF"
+        output: "0123456789abcdef"
+```
+
+This example will mask the original id value by replacing every characters from the `input` class by a random character from the `output` class.
+
+```console
+$ echo '{"id": "1ef619-90F"}' | pimo
+{"id": "d8e203-a92"}
+```
+
+By default, if not specified otherwise, these classes will be used (input -> output):
+
+* lowercase letters -> lowercase letters
+* UPPERCASE LETTERS -> UPPERCASE LETTERS
+* Digits -> Digits
+
+```yaml
+# this configuration:
+- selector:
+    jsonpath: "id"
+  mask:
+    transcode: {}
+# is equivalent to:
+- selector:
+    jsonpath: "id"
+  mask:
+    transcode:
+      classes:
+        - input: "abcdefghijklmnopqrstuvwxyz"
+          output: "abcdefghijklmnopqrstuvwxyz"
+        - input: "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+          output: "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        - input: "0123456789"
+          output: "0123456789"
+```
+
+[Return to list of masks](#possible-masks)
+
 ## Flow chart
 
 PIMO can generate a Mermaid syntax flow chart to visualize the transformation process.
