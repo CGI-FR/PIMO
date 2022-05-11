@@ -75,3 +75,26 @@ testcases:
           - result.systemoutjson.name2 ShouldNotEqual 1997-01-06T08:57:41Z
           - result.systemoutjson.name2 ShouldEqual 1997-07-14T20:25:34Z
           - result.systemerr ShouldBeEmpty
+
+  - name: randdate mask with seeder
+    steps:
+    - script: rm -f masking.yml
+    - script: |-
+        cat > masking.yml <<EOF
+        version: "1"
+        masking:
+          - selector:
+              jsonpath: "date"
+            mask:
+              randDate:
+                  dateMin: "1997-01-01T00:00:00Z"
+                  dateMax: "1997-12-01T00:00:00Z"
+            seed:
+              field: "date"
+        EOF
+    - script: |-
+        echo -e '{"date":1}\n{"date":2}\n{"date":3}\n{"date":2}\n{"date":1}\n{"date":3}' | pimo | head -c -1 | tr '\n' ' '
+      assertions:
+      - result.code ShouldEqual 0
+      - result.systemout ShouldEqual {"date":"1997-03-05T16:24:29Z"} {"date":"1997-02-10T20:31:21Z"} {"date":"1997-08-01T07:12:23Z"} {"date":"1997-02-10T20:31:21Z"} {"date":"1997-03-05T16:24:29Z"} {"date":"1997-08-01T07:12:23Z"}
+      - result.systemerr ShouldBeEmpty

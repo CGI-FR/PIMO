@@ -28,7 +28,7 @@ import (
 func TestMaskingShouldReplaceDateByIncrement(t *testing.T) {
 	firstDuration := "P60D"
 	secondDuration := "P90D"
-	durationMask, err := NewMask(firstDuration, secondDuration, 0)
+	durationMask, err := NewMask(firstDuration, secondDuration, 0, nil)
 
 	assert.Equal(t, nil, err, "error is not nil")
 
@@ -42,7 +42,7 @@ func TestMaskingShouldReplaceDateByIncrement(t *testing.T) {
 func TestMaskingShouldReplaceDateByNegatifIncrement(t *testing.T) {
 	firstNegaDuration := "-P60D"
 	secondNegaDuration := "-P90D"
-	negaMaskingEngine, err := NewMask(firstNegaDuration, secondNegaDuration, 0)
+	negaMaskingEngine, err := NewMask(firstNegaDuration, secondNegaDuration, 0, nil)
 
 	assert.Equal(t, nil, err, "error is not nil")
 

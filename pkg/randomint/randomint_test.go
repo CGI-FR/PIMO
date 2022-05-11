@@ -27,7 +27,7 @@ import (
 func TestMaskingShouldReplaceSensitiveValueByRandomNumber(t *testing.T) {
 	min := 7
 	max := 77
-	ageMask := NewMask(min, max, 0)
+	ageMask := NewMask(min, max, 0, nil)
 
 	result, err := ageMask.Mask(83)
 	assert.Equal(t, nil, err, "error should be nil")

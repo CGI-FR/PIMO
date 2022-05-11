@@ -29,19 +29,37 @@ import (
 // MaskEngine is a value that mask thanks to a regular expression
 type MaskEngine struct {
 	generator regen.Generator
+	exp       string
+	seeder    model.Seeder
 }
 
 // NewMask return a RegexMask from a regexp
-func NewMask(exp string, seed int64) (MaskEngine, error) {
-	generator, err := regen.NewGenerator(exp, &regen.GeneratorArgs{RngSource: rand.NewSource(seed)})
-	return MaskEngine{generator}, err
+func NewMask(exp string, seed int64, seeder model.Seeder) (MaskEngine, error) {
+	args := &regen.GeneratorArgs{RngSource: rand.NewSource(seed)}
+	generator, err := regen.NewGenerator(exp, args)
+	return MaskEngine{generator, exp, seeder}, err
 }
 
 // Mask returns a string thanks to a regular expression
 func (rm MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Entry, error) {
 	log.Info().Msg("Mask regex")
-	out := rm.generator.Generate()
-	return out, nil
+
+	if len(context) > 0 {
+		seed, ok, err := rm.seeder(context[0])
+		if err != nil {
+			return nil, err
+		}
+		if ok {
+			args := &regen.GeneratorArgs{RngSource: rand.NewSource(seed)}
+			generator, err := regen.NewGenerator(rm.exp, args)
+			if err != nil {
+				return nil, err
+			}
+			return generator.Generate(), nil
+		}
+	}
+
+	return rm.generator.Generate(), nil
 }
 
 // Factory create a mask from a yaml config
@@ -52,7 +70,7 @@ func Factory(conf model.Masking, seed int64, caches map[string]model.Cache) (mod
 		h.Write([]byte(conf.Selector.Jsonpath))
 		seed += int64(h.Sum64())
 
-		mask, err := NewMask(conf.Mask.Regex, seed)
+		mask, err := NewMask(conf.Mask.Regex, seed, model.NewSeeder(conf, seed))
 		if err != nil {
 			return nil, true, err
 		}

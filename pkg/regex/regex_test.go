@@ -27,7 +27,7 @@ import (
 
 func TestMaskingShouldReplaceSensitiveValueByRegex(t *testing.T) {
 	regex := "0[1-7]( ([0-9]){2}){4}"
-	regmask, err := NewMask(regex, 0)
+	regmask, err := NewMask(regex, 0, nil)
 	if err != nil {
 		assert.Fail(t, "could not initialise regexep")
 	}

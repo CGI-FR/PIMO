@@ -16,6 +16,9 @@ masking:
       type: "argument"
     # Optional cache (coherence preservation)
     cache: "cacheName"
+    # Optional custom seed for this mask
+    seed:
+      field: "example.example"
 
   # another mask on a different location
   - selector:
@@ -28,6 +31,8 @@ caches:
   cacheName:
     # Optional bijective cache (enable re-identification if the cache is dumped on disk)
     unique: true
+    # Use reverse cache dictionnary
+    reverse: true
 ```
 
 `version` is the version of the masking file.
@@ -319,7 +324,7 @@ This example will mask the `last_contact` field of the input jsonlines by decrea
         outputFormat: "01/02/06"
 ```
 
-This example will change every date from the date field from the `inputFormat` to the `outputFormat`. The format should always display the following date : `Mon Jan 2 15:04:05 -0700 MST 2006`. Either field is optional and in case a field is not defined, the default format is RFC3339, which is the base format for PIMO, needed for `duration` mask and given by `randDate` mask.
+This example will change every date from the date field from the `inputFormat` to the `outputFormat`. The format should always display the following date : `Mon Jan 2 15:04:05 -0700 MST 2006`. Either field is optional and in case a field is not defined, the default format is RFC3339, which is the base format for PIMO, needed for `duration` mask and given by `randDate` mask. It is possible to use the Unix time format by specifying `inputFormat: "unixEpoch"` or `outputFormat: "unixEpoch"`.
 
 [Return to list of masks](#possible-masks)
 
@@ -487,11 +492,13 @@ This example will create an `id` field in every output jsonline. The values will
   caches:
     fakeId :
       unique: true
+      reverse: false
 ```
 
 This example will replace the content of `id` field by the matching content in the cache `fakeId`. Cache have to be declared in the `caches` section.
 Cache content can be loaded from jsonfile with the `--load-cache fakeId=fakeId.jsonl` option or by the `cache` option on another field.
 If no matching is found in the cache, `fromCache` block the current line and the next lines are processing until a matching content go into the cache.
+A `reverse` option is available in the `caches` section to use the reverse cache dictionary.
 
 [Return to list of masks](#possible-masks)
 

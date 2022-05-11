@@ -75,4 +75,31 @@ testcases:
     - result.systemoutjson.date1 ShouldEqual 2019-12-26T21:14:09.785075601Z
     - result.systemoutjson.date2 ShouldNotEqual 2019-12-20T09:59:45.225942139Z
     - result.systemoutjson.date2 ShouldEqual 2019-12-08T10:06:24.935401158Z
-    - result.systemerr ShouldBeEmpty 
+    - result.systemerr ShouldBeEmpty
+
+- name: randomduration masking with seeder
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "date"
+          mask:
+            randomDuration:
+                min: "-P2D"
+                max: "-P27D"
+          seed:
+            field: "index"
+        - selector:
+            jsonpath: "index"
+          mask:
+            remove: true
+      EOF
+  - script: |-
+      echo -e '{"index": 1, "date": "2020-01-01T00:00:00Z"}\n{"index": 2, "date": "2020-01-01T00:00:00Z"}\n{"index": 1, "date": "2020-01-01T00:00:00Z"}\n{"index": 2, "date": "2020-01-01T00:00:00Z"}' | pimo | head -c -1 | tr '\n' ' '
+    assertions:
+      - result.code ShouldEqual 0
+      - result.systemout ShouldEqual {"date":"2019-12-12T06:25:48.144603331Z"} {"date":"2019-12-22T18:10:35.317788519Z"} {"date":"2019-12-12T06:25:48.144603331Z"} {"date":"2019-12-22T18:10:35.317788519Z"}
+      - result.systemerr ShouldBeEmpty

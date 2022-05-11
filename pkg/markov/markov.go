@@ -31,10 +31,11 @@ import (
 type MaskEngine struct {
 	chain   Chain
 	maxSize int
+	seeder  model.Seeder
 }
 
 // NewMask create a MaskEngine with a seed
-func NewMask(seed int64, name, separator string, maxSize, order int) (MaskEngine, error) {
+func NewMask(seed int64, seeder model.Seeder, name, separator string, maxSize, order int) (MaskEngine, error) {
 	list, err := uri.Read(name)
 	if err != nil {
 		return MaskEngine{}, err
@@ -54,11 +55,22 @@ func NewMask(seed int64, name, separator string, maxSize, order int) (MaskEngine
 	if maxSize == 0 {
 		maxSize = 20
 	}
-	return MaskEngine{chain, maxSize}, nil
+	return MaskEngine{chain, maxSize, seeder}, nil
 }
 
 func (mm MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Entry, error) {
 	log.Info().Msg("Mask markov")
+
+	if len(context) > 0 {
+		seed, ok, err := mm.seeder(context[0])
+		if err != nil {
+			return nil, err
+		}
+		if ok {
+			mm.chain.rand.Seed(seed)
+		}
+	}
+
 	tokens := make([]string, 0)
 	for i := 0; i < mm.chain.order; i++ {
 		tokens = append(tokens, StartToken)
@@ -77,7 +89,7 @@ func Factory(conf model.Masking, seed int64, caches map[string]model.Cache) (mod
 		h := fnv.New64a()
 		h.Write([]byte(conf.Selector.Jsonpath))
 		seed += int64(h.Sum64())
-		mask, err := NewMask(seed, conf.Mask.Markov.Sample,
+		mask, err := NewMask(seed, model.NewSeeder(conf, seed), conf.Mask.Markov.Sample,
 			conf.Mask.Markov.Separator,
 			conf.Mask.Markov.MaxSize,
 			conf.Mask.Markov.Order)

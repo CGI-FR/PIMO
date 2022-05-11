@@ -6,6 +6,9 @@
       "properties": {
         "unique": {
           "type": "boolean"
+        },
+        "reverse": {
+          "type": "boolean"
         }
       },
       "additionalProperties": false,
@@ -462,6 +465,10 @@
         },
         "preserve": {
           "type": "string"
+        },
+        "seed": {
+          "$schema": "http://json-schema.org/draft-04/schema#",
+          "$ref": "#/definitions/SeedType"
         }
       },
       "additionalProperties": false,
@@ -582,6 +589,15 @@
           "type": "string"
         },
         "Max": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "SeedType": {
+      "properties": {
+        "field": {
           "type": "string"
         }
       },

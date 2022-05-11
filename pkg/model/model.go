@@ -20,6 +20,7 @@ package model
 import (
 	"bytes"
 	"fmt"
+	"hash/fnv"
 	"time"
 
 	"github.com/cgi-fr/pimo/pkg/statistics"
@@ -191,10 +192,16 @@ type Masking struct {
 	Masks     []MaskType     `yaml:"masks,omitempty" jsonschema:"oneof_required=case2,oneof_required=case4"`
 	Cache     string         `yaml:"cache,omitempty"`
 	Preserve  string         `yaml:"preserve,omitempty"`
+	Seed      SeedType       `yaml:"seed,omitempty"`
+}
+
+type SeedType struct {
+	Field string `yaml:"field,omitempty"`
 }
 
 type CacheDefinition struct {
-	Unique bool `yaml:"unique,omitempty"`
+	Unique  bool `yaml:"unique,omitempty"`
+	Reverse bool `yaml:"reverse,omitempty"`
 }
 
 type Definition struct {
@@ -376,7 +383,7 @@ func (p RepeaterProcess) Open() error {
 
 func (p RepeaterProcess) ProcessDictionary(dictionary Dictionary, out Collector) error {
 	for i := 0; i < p.times; i++ {
-		out.Collect(dictionary)
+		out.Collect(dictionary.Copy())
 	}
 	return nil
 }
@@ -431,7 +438,7 @@ func (sink *SinkToCache) Open() error {
 }
 
 func (sink *SinkToCache) ProcessDictionary(dictionary Dictionary) error {
-	sink.cache.Put(dictionary.Get("key"), dictionary.Get("value"))
+	sink.cache.Put(CleanTypes(dictionary.Get("key")), CleanTypes(dictionary.Get("value")))
 	return nil
 }
 
@@ -539,7 +546,7 @@ func (p *ProcessPipeline) Next() bool {
 }
 
 func (p *ProcessPipeline) Value() Dictionary {
-	return CopyDictionary(p.collector.Value())
+	return p.collector.Value()
 }
 
 func (p *ProcessPipeline) Err() error {
@@ -581,4 +588,28 @@ func (pipeline SimpleSinkedPipeline) Run() (err error) {
 		}
 	}
 	return pipeline.source.Err()
+}
+
+type Seeder func(Dictionary) (int64, bool, error)
+
+func NewSeeder(conf Masking, seed int64) Seeder {
+	var seeder Seeder
+	if jpath := conf.Seed.Field; jpath != "" {
+		sel := NewPathSelector(jpath)
+		h := fnv.New64a()
+		seeder = func(context Dictionary) (int64, bool, error) {
+			e, ok := sel.Read(context)
+			if !ok {
+				return 0, ok, nil
+			}
+			h.Reset()
+			_, err := h.Write([]byte(fmt.Sprintf("%v", e)))
+			return int64(h.Sum64()), true, err
+		}
+	} else {
+		seeder = func(context Dictionary) (int64, bool, error) {
+			return seed, false, nil
+		}
+	}
+	return seeder
 }

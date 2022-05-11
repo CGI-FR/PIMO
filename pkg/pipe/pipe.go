@@ -40,7 +40,7 @@ func NewMask(seed int64, injectParent string, injectRoot string, caches map[stri
 	var definition model.Definition
 	var err error
 	if len(filename) > 0 {
-		definition, err = model.LoadPipelineDefinitionFromYAML(filename)
+		definition, err = model.LoadPipelineDefinitionFromFile(filename)
 		if err != nil {
 			return MaskEngine{filename, nil, injectParent, injectRoot}, err
 		}

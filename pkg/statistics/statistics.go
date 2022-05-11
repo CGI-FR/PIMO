@@ -8,6 +8,9 @@ import (
 )
 
 type ExecutionStats interface {
+	WithErrorCode(ec int) ExecutionStats
+
+	GetErrorCode() int
 	GetIgnoredPathsCount() int  // counter for path not found in data
 	GetIgnoredLinesCount() int  // counter for line skipped (flag --skip-line-on-error)
 	GetIgnoredFieldsCount() int // counter for field skipped (flag --skip-field-on-error)
@@ -16,6 +19,7 @@ type ExecutionStats interface {
 }
 
 type stats struct {
+	errorCode            int
 	IgnoredPathsCounter  int `json:"ignoredPaths"`
 	IgnoredLinesCounter  int `json:"skippedLines"`
 	IgnoredFieldsCounter int `json:"skippedFields"`
@@ -24,6 +28,10 @@ type stats struct {
 // Reset all statistics to zero
 func Reset() {
 	over.MDC().Set("stats", &stats{})
+}
+
+func WithErrorCode(ec int) ExecutionStats {
+	return &stats{errorCode: ec}
 }
 
 // Compute current statistics and give a snapshot
@@ -42,6 +50,19 @@ func (s *stats) ToJSON() []byte {
 		log.Warn().Msg("Unable to read statistics")
 	}
 	return b
+}
+
+func (s *stats) WithErrorCode(ec int) ExecutionStats {
+	s.SetErrorCode(ec)
+	return s
+}
+
+func (s *stats) SetErrorCode(ec int) {
+	s.errorCode = ec
+}
+
+func (s *stats) GetErrorCode() int {
+	return s.errorCode
 }
 
 func (s *stats) GetIgnoredPathsCount() int {

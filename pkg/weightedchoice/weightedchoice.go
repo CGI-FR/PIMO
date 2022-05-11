@@ -66,22 +66,34 @@ func (chs Chooser) Pick() interface{} {
 
 // MaskEngine a list of masking value with weight for random
 type MaskEngine struct {
-	cs Chooser
+	cs     Chooser
+	seeder model.Seeder
 }
 
 // NewMask returns a WeightedMaskList from slice of model.Entry and weights
-func NewMask(list []model.WeightedChoiceType, seed int64) MaskEngine {
+func NewMask(list []model.WeightedChoiceType, seed int64, seeder model.Seeder) MaskEngine {
 	rand.Seed(seed)
 	cs := []Choice{}
 	for k := range list {
 		cs = append(cs, Choice{Item: list[k].Choice, Weight: list[k].Weight})
 	}
-	return MaskEngine{NewChooser(seed, cs...)}
+	return MaskEngine{NewChooser(seed, cs...), seeder}
 }
 
 // Mask choose a mask value randomly
 func (wml MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Entry, error) {
 	log.Info().Msg("Mask weightedChoice")
+
+	if len(context) > 0 {
+		seed, ok, err := wml.seeder(context[0])
+		if err != nil {
+			return nil, err
+		}
+		if ok {
+			wml.cs.rand.Seed(seed)
+		}
+	}
+
 	return wml.cs.Pick(), nil
 }
 
@@ -97,7 +109,7 @@ func Factory(conf model.Masking, seed int64, caches map[string]model.Cache) (mod
 		h := fnv.New64a()
 		h.Write([]byte(conf.Selector.Jsonpath))
 		seed += int64(h.Sum64())
-		return NewMask(maskWeight, seed), true, nil
+		return NewMask(maskWeight, seed, model.NewSeeder(conf, seed)), true, nil
 	}
 	return nil, false, nil
 }
