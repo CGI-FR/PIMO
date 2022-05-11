@@ -1,0 +1,21 @@
+name: Transcode Features
+testcases:
+- name: default case
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      seed: 42
+      masking:
+      - selector:
+          jsonpath: "id"
+        mask:
+          transcode: {}
+      EOF
+  - script: |-
+      echo '{"id": "12345-ABCD-abcd-6789"}' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemoutjson.id ShouldEqual "34854-VLBU-uweo-9195"
+    - result.systemerr ShouldBeEmpty
