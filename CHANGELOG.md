@@ -17,6 +17,7 @@ Types of changes
 ## [1.13.0]
 
 - `Added` seed option on all randomized masks, another way to preserve data coherence
+- `Added` transcode mask
 
 ## [1.12.1]
 
