@@ -11,7 +11,7 @@ require (
 	github.com/labstack/echo/v4 v4.7.2
 	github.com/mattn/go-isatty v0.0.14
 	github.com/rs/zerolog v1.26.1
-	github.com/spf13/cast v1.4.1
+	github.com/spf13/cast v1.5.0
 	github.com/spf13/cobra v1.4.0
 	github.com/stretchr/testify v1.7.1
 	github.com/zach-klippenstein/goregen v0.0.0-20160303162051-795b5e3961ea
