@@ -15,37 +15,33 @@
 // You should have received a copy of the GNU General Public License
 // along with PIMO.  If not, see <http://www.gnu.org/licenses/>.
 
-package randomuri
+package transcode
 
 import (
-	"bytes"
 	"hash/fnv"
 	"math/rand"
-	"text/template"
+	"strings"
 
 	"github.com/cgi-fr/pimo/pkg/model"
-	"github.com/cgi-fr/pimo/pkg/uri"
 	"github.com/rs/zerolog/log"
 )
 
 // MaskEngine is a list of masking value and a rand init to mask
 type MaskEngine struct {
-	rand     *rand.Rand
-	seeder   model.Seeder
-	template *template.Template
-	cache    map[string][]model.Entry
+	rand    *rand.Rand
+	Classes []model.Class
+	seeder  model.Seeder
 }
 
 // NewMaskSeeded create a MaskRandomList with a seed
-func NewMask(templateSource string, seed int64, seeder model.Seeder) (MaskEngine, error) {
-	template, err := template.New("template-randomInUri").Parse(templateSource)
+func NewMask(list []model.Class, seed int64, seeder model.Seeder) MaskEngine {
 	// nolint: gosec
-	return MaskEngine{rand.New(rand.NewSource(seed)), seeder, template, map[string][]model.Entry{}}, err
+	return MaskEngine{rand.New(rand.NewSource(seed)), list, seeder}
 }
 
 // Mask choose a mask value randomly
 func (mrl MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Entry, error) {
-	log.Info().Msg("Mask randomChoiceInUri")
+	log.Info().Msg("Mask transcode")
 
 	if len(context) > 0 {
 		seed, ok, err := mrl.seeder(context[0])
@@ -57,39 +53,46 @@ func (mrl MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.En
 		}
 	}
 
-	var output bytes.Buffer
-	if len(context) == 0 {
-		context = []model.Dictionary{model.NewDictionary()}
-	}
-	if err := mrl.template.Execute(&output, context[0].Unordered()); err != nil {
-		return nil, err
-	}
-	filename := output.String()
-	var list []model.Entry
-	if listFromCache, ok := mrl.cache[filename]; ok {
-		list = listFromCache
-	} else {
-		listFromFile, err := uri.Read(filename)
-		if err != nil {
-			return nil, err
+	switch eString := e.(type) {
+	case string:
+		eSplit := strings.Split(eString, "")
+		for i, c := range eSplit {
+			for _, class := range mrl.Classes {
+				if strings.Contains(class.Input, c) {
+					eSplit[i] = pick(class.Output, mrl.rand)
+				}
+			}
 		}
-		mrl.cache[filename] = listFromFile
-		list = listFromFile
+		return strings.Join(eSplit, ""), nil
+	default:
+		return context, nil
 	}
-
-	return list[mrl.rand.Intn(len(list))], nil
 }
 
 // Factory create a mask from a yaml config
 func Factory(conf model.Masking, seed int64, caches map[string]model.Cache) (model.MaskEngine, bool, error) {
 	// set differents seeds for differents jsonpath
-	h := fnv.New64a()
-	h.Write([]byte(conf.Selector.Jsonpath))
-	seed += int64(h.Sum64())
-
-	if len(conf.Mask.RandomChoiceInURI) != 0 {
-		mask, err := NewMask(conf.Mask.RandomChoiceInURI, seed, model.NewSeeder(conf, seed))
-		return mask, true, err
+	if conf.Mask.Transcode != nil {
+		h := fnv.New64a()
+		h.Write([]byte(conf.Selector.Jsonpath))
+		seed += int64(h.Sum64())
+		seeder := model.NewSeeder(conf, seed)
+		if classes := conf.Mask.Transcode.Classes; len(classes) > 0 {
+			return NewMask(classes, seed, seeder), true, nil
+		}
+		return NewMask(defaultClasses(), seed, seeder), true, nil
 	}
+
 	return nil, false, nil
+}
+
+func pick(output string, rand *rand.Rand) string {
+	return strings.Split(output, "")[rand.Intn(len(output))]
+}
+
+func defaultClasses() []model.Class {
+	lower := "abcdefghijklmnopqrstuvwxyz"
+	upper := "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+	digits := "0123456789"
+	return []model.Class{{Input: lower, Output: lower}, {Input: upper, Output: upper}, {Input: digits, Output: digits}}
 }

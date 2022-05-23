@@ -56,6 +56,7 @@ import (
 	"github.com/cgi-fr/pimo/pkg/statistics"
 	"github.com/cgi-fr/pimo/pkg/templateeach"
 	"github.com/cgi-fr/pimo/pkg/templatemask"
+	"github.com/cgi-fr/pimo/pkg/transcode"
 	"github.com/cgi-fr/pimo/pkg/weightedchoice"
 	"github.com/rs/zerolog/log"
 )
@@ -296,6 +297,7 @@ func injectMaskFactories() []model.MaskFactory {
 		ff1.Factory,
 		luhn.Factory,
 		markov.Factory,
+		transcode.Factory,
 	}
 }
 

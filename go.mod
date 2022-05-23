@@ -4,13 +4,14 @@ go 1.17
 
 require (
 	github.com/Masterminds/sprig/v3 v3.2.2
-	github.com/Trendyol/overlog v0.1.0
+	github.com/Trendyol/overlog v0.1.1
 	github.com/alecthomas/jsonschema v0.0.0-20210526225647-edb03dcab7bc
 	github.com/capitalone/fpe v1.2.1
 	github.com/goccy/go-yaml v1.9.5
 	github.com/labstack/echo/v4 v4.7.2
 	github.com/mattn/go-isatty v0.0.14
 	github.com/rs/zerolog v1.26.1
+	github.com/spf13/cast v1.4.1
 	github.com/spf13/cobra v1.4.0
 	github.com/stretchr/testify v1.7.1
 	github.com/zach-klippenstein/goregen v0.0.0-20160303162051-795b5e3961ea
@@ -37,7 +38,6 @@ require (
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/shopspring/decimal v1.2.0 // indirect
 	github.com/smartystreets/goconvey v1.6.4 // indirect
-	github.com/spf13/cast v1.4.1 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.1 // indirect

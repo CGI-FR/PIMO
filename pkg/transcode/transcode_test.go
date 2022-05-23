@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with PIMO.  If not, see <http://www.gnu.org/licenses/>.
 
-package randomlist
+package transcode
 
 import (
 	"testing"
@@ -24,37 +24,23 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestMaskingShouldReplaceSensitiveValueByRandomInList(t *testing.T) {
-	nameList := []model.Entry{"Michel", "Marc", "Matthias", "Youen", "Alexis"}
+func TestMaskingShouldTranscodeValue(t *testing.T) {
+	Input := "abcdefghijklmnopqrstuvwxyz"
+	Output := "*"
+	Class := model.Class{Input: Input, Output: Output}
+	transcodeMask := NewMask([]model.Class{Class}, 0, func(context model.Dictionary) (int64, bool, error) {
+		return 0, false, nil
+	})
 
-	data := model.NewDictionary().With("name", "Benjamin")
-	result, err := NewMask(nameList, 0, nil).Mask(data)
-	assert.Equal(t, nil, err, "error should be nil")
-	assert.NotEqual(t, data, result, "should be masked")
+	result, err := transcodeMask.Mask("mark_23")
 
-	assert.Contains(t, nameList, result, "Should be in the list")
-}
-
-func TestMaskingShouldReplaceSensitiveValueByRandomAndDifferent(t *testing.T) {
-	nameList := []model.Entry{"Michel", "Marc", "Matthias", "Youen", "Alexis"}
-
-	mask := NewMask(nameList, 0, nil)
-
-	diff := 0
-	for i := 0; i < 1000; i++ {
-		result, err := mask.Mask("Benjamin")
-		assert.Equal(t, nil, err, "error should be nil")
-		resultBis, err := mask.Mask("Benjamin")
-		assert.Equal(t, nil, err, "error should be nil")
-		if result != resultBis {
-			diff++
-		}
-	}
-	assert.True(t, diff >= 750, "Should be the same less than 250 times")
+	assert.Nil(t, nil, err, "error should be nil")
+	assert.Equal(t, "****_23", result)
 }
 
 func TestFactoryShouldCreateAMask(t *testing.T) {
-	maskingConfig := model.Masking{Mask: model.MaskType{RandomChoice: []model.Entry{"Michael", "Paul", "Marc"}}}
+	maskingChoice := model.TranscodeType{Classes: []model.Class{{Input: "01234", Output: "56789"}, {Input: "ABCDE", Output: "abcde"}}}
+	maskingConfig := model.Masking{Mask: model.MaskType{Transcode: &maskingChoice}}
 	_, present, err := Factory(maskingConfig, 0, nil)
 	assert.True(t, present, "should be true")
 	assert.Nil(t, err, "error should be nil")

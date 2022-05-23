@@ -20,6 +20,7 @@ package model
 import (
 	"bytes"
 	"fmt"
+	"hash/fnv"
 	"time"
 
 	"github.com/cgi-fr/pimo/pkg/statistics"
@@ -137,6 +138,15 @@ type MarkovType struct {
 	Order     int    `yaml:"order,omitempty"`
 }
 
+type Class struct {
+	Input  string `yaml:"input"`
+	Output string `yaml:"output"`
+}
+
+type TranscodeType struct {
+	Classes []Class `yaml:"classes,omitempty"`
+}
+
 type MaskType struct {
 	Add               Entry                `yaml:"add,omitempty" jsonschema:"oneof_required=Add"`
 	AddTransient      Entry                `yaml:"add-transient,omitempty" jsonschema:"oneof_required=AddTransient"`
@@ -167,6 +177,7 @@ type MaskType struct {
 	FromJSON          string               `yaml:"fromjson,omitempty" jsonschema:"oneof_required=FromJSON"`
 	Luhn              *LuhnType            `yaml:"luhn,omitempty" jsonschema:"oneof_required=Luhn"`
 	Markov            MarkovType           `yaml:"markov,omitempty" jsonschema:"oneof_required=Markov"`
+	Transcode         *TranscodeType       `yaml:"transcode,omitempty" jsonschema:"oneof_required=Transcode"`
 }
 
 type Masking struct {
@@ -181,6 +192,11 @@ type Masking struct {
 	Masks     []MaskType     `yaml:"masks,omitempty" jsonschema:"oneof_required=case2,oneof_required=case4"`
 	Cache     string         `yaml:"cache,omitempty"`
 	Preserve  string         `yaml:"preserve,omitempty"`
+	Seed      SeedType       `yaml:"seed,omitempty"`
+}
+
+type SeedType struct {
+	Field string `yaml:"field,omitempty"`
 }
 
 type CacheDefinition struct {
@@ -422,7 +438,7 @@ func (sink *SinkToCache) Open() error {
 }
 
 func (sink *SinkToCache) ProcessDictionary(dictionary Dictionary) error {
-	sink.cache.Put(dictionary.Get("key"), dictionary.Get("value"))
+	sink.cache.Put(CleanTypes(dictionary.Get("key")), CleanTypes(dictionary.Get("value")))
 	return nil
 }
 
@@ -572,4 +588,28 @@ func (pipeline SimpleSinkedPipeline) Run() (err error) {
 		}
 	}
 	return pipeline.source.Err()
+}
+
+type Seeder func(Dictionary) (int64, bool, error)
+
+func NewSeeder(conf Masking, seed int64) Seeder {
+	var seeder Seeder
+	if jpath := conf.Seed.Field; jpath != "" {
+		sel := NewPathSelector(jpath)
+		h := fnv.New64a()
+		seeder = func(context Dictionary) (int64, bool, error) {
+			e, ok := sel.Read(context)
+			if !ok {
+				return 0, ok, nil
+			}
+			h.Reset()
+			_, err := h.Write([]byte(fmt.Sprintf("%v", e)))
+			return int64(h.Sum64()), true, err
+		}
+	} else {
+		seeder = func(context Dictionary) (int64, bool, error) {
+			return seed, false, nil
+		}
+	}
+	return seeder
 }

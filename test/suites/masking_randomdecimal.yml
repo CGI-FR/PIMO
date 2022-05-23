@@ -79,4 +79,28 @@ testcases:
     - result.systemoutjson.name ShouldEqual 1.67
     - result.systemoutjson.name2 ShouldNotEqual 7.2
     - result.systemoutjson.name2 ShouldEqual 9.33
-    - result.systemerr ShouldBeEmpty 
+    - result.systemerr ShouldBeEmpty
+
+- name: random decimal with seeder
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "amount"
+          mask:
+            randomDecimal:
+              min: 0
+              max: 9
+              precision: 3
+          seed:
+            field: "amount"
+      EOF
+  - script: |-
+      echo -e '{"amount":1}\n{"amount":2}\n{"amount":3}\n{"amount":2}\n{"amount":1}\n{"amount":3}' | pimo | head -c -1 | tr '\n' ' '
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldEqual {"amount":1.306} {"amount":5.474} {"amount":4.137} {"amount":5.474} {"amount":1.306} {"amount":4.137}
+    - result.systemerr ShouldBeEmpty

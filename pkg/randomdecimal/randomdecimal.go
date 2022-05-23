@@ -29,20 +29,32 @@ import (
 // MaskEngine is a type to mask with a random float
 type MaskEngine struct {
 	rand      *rand.Rand
+	seeder    model.Seeder
 	precision int
 	min       float64
 	max       float64
 }
 
 // NewMask create a MaskEngine with a seed
-func NewMask(min float64, max float64, precision int, seed int64) MaskEngine {
+func NewMask(min float64, max float64, precision int, seed int64, seeder model.Seeder) MaskEngine {
 	// nolint: gosec
-	return MaskEngine{rand.New(rand.NewSource(seed)), precision, min, max}
+	return MaskEngine{rand.New(rand.NewSource(seed)), seeder, precision, min, max}
 }
 
 // Mask choose a mask int randomly within boundary
 func (me MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Entry, error) {
 	log.Info().Msg("Mask randomDecimal")
+
+	if len(context) > 0 {
+		seed, ok, err := me.seeder(context[0])
+		if err != nil {
+			return nil, err
+		}
+		if ok {
+			me.rand.Seed(seed)
+		}
+	}
+
 	// Generate the random number
 	r := me.min + me.rand.Float64()*(me.max-me.min)
 
@@ -58,7 +70,7 @@ func Factory(conf model.Masking, seed int64, caches map[string]model.Cache) (mod
 		h := fnv.New64a()
 		h.Write([]byte(conf.Selector.Jsonpath))
 		seed += int64(h.Sum64())
-		return NewMask(conf.Mask.RandomDecimal.Min, conf.Mask.RandomDecimal.Max, conf.Mask.RandomDecimal.Precision, seed), true, nil
+		return NewMask(conf.Mask.RandomDecimal.Min, conf.Mask.RandomDecimal.Max, conf.Mask.RandomDecimal.Precision, seed, model.NewSeeder(conf, seed)), true, nil
 	}
 	return nil, false, nil
 }
