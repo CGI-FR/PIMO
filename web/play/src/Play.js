@@ -129,28 +129,32 @@ export default function Play() {
     const result = JSON.stringify(Object.assign({}, getResult))
 
     return (
-        <div id="app" className="container my-3">
-            <div className="card mt-3">
-                <div className="card-header text-center"><h1>Pimo Play!</h1></div>
-                <div className="card-body">
-                    <div className="form-group">
-                        <p>Put your JSON here...</p>
-                        <textarea name="data" className="form-control" ref={jsonInput} rows="8" placeholder={example.json} />
+        <div className="page-wrap">
+            <h2 className="text-center">Pimo Play!</h2>
+            <div className="row">
+                <div className="col-sm12 col-md-6">
+                    <div className="form-group text-center">
+                        <p>JSON</p>
+                        <textarea name="data" rows="12" className="form-control" ref={jsonInput} placeholder={example.json} />
                     </div><br />
-                    <div className="form-group">
-                        <p>...and then your YAML here</p>
+                </div>
+                <div className="col-sm12 col-md-6">
+                    <div className="form-group text-center">
+                        <p>YAML</p>
                         <textarea name="masking" className="form-control" ref={yamlInput} rows="12" placeholder={example.yaml} />
                     </div>
-                    <button className="btn btn-sm btn-primary" onClick={postData}>Post Json</button>
-                    <button className="btn btn-sm btn-warning ml-2" onClick={clearPostOutput}>Reset</button>
-                    <div className="form-group"><br />
-                        <p>And there you've got your transformed data!</p>
-                    </div>
                 </div>
-                {getResult && <div className="alert alert-secondary mt-2" role="alert">
-                    <pre>{result}</pre>
-                </div>}
             </div>
+            <div className="row d-flex justify-content-center">
+                <button className="btn btn-sm btn-primary col-md-2" onClick={postData}>Post Json</button>
+                <button className="btn btn-sm btn-warning col-md-2" onClick={clearPostOutput}>Reset</button>
+            </div>
+            <div className="form-group"><br />
+                <p className="text-center">RESULT</p>
+            </div>
+            {getResult && <div className="alert alert-secondary mt-2" role="alert">
+                <p>{result}</p>
+            </div>}
         </div>
     )
 }
