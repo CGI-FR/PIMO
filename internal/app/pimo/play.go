@@ -53,8 +53,8 @@ func play(ctx echo.Context) error {
 		return err
 	}
 
-	//yaml := ctx.FormValue("masking")
-	//data := ctx.FormValue("data")
+	// yaml := ctx.FormValue("masking")
+	// data := ctx.FormValue("data")
 	yaml := fmt.Sprintf("%v", dataInput["masking"])
 	data := fmt.Sprintf("%v", dataInput["data"])
 
