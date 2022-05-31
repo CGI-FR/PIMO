@@ -217,7 +217,7 @@ targets:
           - $: cd web/play && yarn install
       - $: cd web/play && yarn build
       - $: cp -r web/play/build/* internal/app/pimo/client
-      - $: cd web/play/node_modules/ && go mod init ={mod}
+      - $: touch web/play/node_modules/go.mod
 
   # run "neon -props '{buildpaths: ["path/to/main/package1","path/to/main/package2"]}' compile" to compile specific targets
   # example : neon -props '{buildpaths: ["cmd/cli"]}' compile
