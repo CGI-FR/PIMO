@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1654009141856,
+  "lastUpdate": 1654009209422,
   "repoUrl": "https://github.com/CGI-FR/PIMO",
   "entries": {
     "Benchmark": [
@@ -392,6 +392,42 @@ window.BENCHMARK_DATA = {
             "value": 3030251,
             "unit": "ns/op\t  628585 B/op\t    5488 allocs/op",
             "extra": "3752 times\n2 procs"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "44274230+adrienaury@users.noreply.github.com",
+            "name": "Adrien Aury",
+            "username": "adrienaury"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "0c51730d048c3215e46ecd0d7f5c9708f5aa59ce",
+          "message": "docs: update changelog",
+          "timestamp": "2022-05-31T16:57:08+02:00",
+          "tree_id": "369fab73e962feb61d31c3680fcff1de33ada1a2",
+          "url": "https://github.com/CGI-FR/PIMO/commit/0c51730d048c3215e46ecd0d7f5c9708f5aa59ce"
+        },
+        "date": 1654009208963,
+        "tool": "go",
+        "benches": [
+          {
+            "name": "BenchmarkPimoRun",
+            "value": 198553,
+            "unit": "ns/op\t    3946 B/op\t     106 allocs/op",
+            "extra": "60052 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge",
+            "value": 3564138,
+            "unit": "ns/op\t  628782 B/op\t    5488 allocs/op",
+            "extra": "3415 times\n2 procs"
           }
         ]
       }
