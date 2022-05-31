@@ -18,6 +18,7 @@ Types of changes
 
 - `Added` seed option on all randomized masks, another way to preserve data coherence
 - `Added` transcode mask
+- `Added` play command
 
 ## [1.12.1]
 
