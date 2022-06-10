@@ -1,0 +1,12 @@
+#createJson {
+    max-width: 600px;
+}
+
+.page-wrap {
+    min-height: 92%;
+    padding: 1em 1.5em;
+}
+
+.btn {
+    padding: 0 5rem;
+}
