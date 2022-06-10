@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1654845432066,
+  "lastUpdate": 1654877772248,
   "repoUrl": "https://github.com/CGI-FR/PIMO",
   "entries": {
     "Benchmark": [
@@ -500,6 +500,42 @@ window.BENCHMARK_DATA = {
             "value": 3901132,
             "unit": "ns/op\t  628519 B/op\t    5488 allocs/op",
             "extra": "3051 times\n2 procs"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "49699333+dependabot[bot]@users.noreply.github.com",
+            "name": "dependabot[bot]",
+            "username": "dependabot[bot]"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "f1833e2568bd6fd533cd0c355ffeb6adcebc51a5",
+          "message": "chore(deps): bump github.com/spf13/cast from 1.4.1 to 1.5.0 (#117)\n\n* chore(deps): bump github.com/spf13/cast from 1.4.1 to 1.5.0\r\n\r\nBumps [github.com/spf13/cast](https://github.com/spf13/cast) from 1.4.1 to 1.5.0.\r\n- [Release notes](https://github.com/spf13/cast/releases)\r\n- [Commits](https://github.com/spf13/cast/compare/v1.4.1...v1.5.0)\r\n\r\n---\r\nupdated-dependencies:\r\n- dependency-name: github.com/spf13/cast\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-minor\r\n...\r\n\r\nSigned-off-by: dependabot[bot] <support@github.com>\r\n\r\n* chore(deps): bump github.com/spf13/cast from 1.4.1 to 1.5.0\r\n\r\nBumps [github.com/spf13/cast](https://github.com/spf13/cast) from 1.4.1 to 1.5.0.\r\n- [Release notes](https://github.com/spf13/cast/releases)\r\n- [Commits](https://github.com/spf13/cast/compare/v1.4.1...v1.5.0)\r\n\r\n---\r\nupdated-dependencies:\r\n- dependency-name: github.com/spf13/cast\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-minor\r\n...\r\n\r\nSigned-off-by: dependabot[bot] <support@github.com>\r\n\r\n* chore: go mod tidy -go=1.16 && -go=1.17\r\n\r\nCo-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>\r\nCo-authored-by: Adrien Aury <adrien.aury@cgi.com>",
+          "timestamp": "2022-06-10T18:13:30+02:00",
+          "tree_id": "d2d5351757c88336edd465e1e31a6e9d2d569537",
+          "url": "https://github.com/CGI-FR/PIMO/commit/f1833e2568bd6fd533cd0c355ffeb6adcebc51a5"
+        },
+        "date": 1654877771616,
+        "tool": "go",
+        "benches": [
+          {
+            "name": "BenchmarkPimoRun",
+            "value": 177618,
+            "unit": "ns/op\t    4120 B/op\t     120 allocs/op",
+            "extra": "66322 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge",
+            "value": 3084972,
+            "unit": "ns/op\t  628459 B/op\t    5489 allocs/op",
+            "extra": "4015 times\n2 procs"
           }
         ]
       }
