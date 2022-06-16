@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1654877772248,
+  "lastUpdate": 1655413457401,
   "repoUrl": "https://github.com/CGI-FR/PIMO",
   "entries": {
     "Benchmark": [
@@ -536,6 +536,42 @@ window.BENCHMARK_DATA = {
             "value": 3084972,
             "unit": "ns/op\t  628459 B/op\t    5489 allocs/op",
             "extra": "4015 times\n2 procs"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "44274230+adrienaury@users.noreply.github.com",
+            "name": "Adrien Aury",
+            "username": "adrienaury"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "083604b8f48e22a1ffc6ceacd79f0bfc6fd7df36",
+          "message": "Feat: pimo play monaco (#120)\n\n* feat(play): mocaco editor\r\n\r\n* fix(play): module name",
+          "timestamp": "2022-06-16T23:01:22+02:00",
+          "tree_id": "199bdd663e3a275b065f1984c5323076498a1581",
+          "url": "https://github.com/CGI-FR/PIMO/commit/083604b8f48e22a1ffc6ceacd79f0bfc6fd7df36"
+        },
+        "date": 1655413456713,
+        "tool": "go",
+        "benches": [
+          {
+            "name": "BenchmarkPimoRun",
+            "value": 181902,
+            "unit": "ns/op\t    4134 B/op\t     120 allocs/op",
+            "extra": "64732 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge",
+            "value": 3195007,
+            "unit": "ns/op\t  628693 B/op\t    5489 allocs/op",
+            "extra": "3600 times\n2 procs"
           }
         ]
       }
