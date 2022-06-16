@@ -212,11 +212,12 @@ targets:
     doc: "Build website and copy it to play.go path"
     depends: "info"
     steps:
-      - if: "!exists('web/play/node_modules/react')"
+      - if: "!exists('web/play/node_modules/webpack')"
         then:
           - $: cd web/play && yarn install
       - $: cd web/play && yarn build
-      - $: cp -r web/play/build/* internal/app/pimo/client
+      - $: rm -rf internal/app/pimo/client/*
+      - $: cp -r web/play/dist/* internal/app/pimo/client
       - $: touch web/play/node_modules/go.mod
 
   # run "neon -props '{buildpaths: ["path/to/main/package1","path/to/main/package2"]}' compile" to compile specific targets
