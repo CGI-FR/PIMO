@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1655413457401,
+  "lastUpdate": 1655482353150,
   "repoUrl": "https://github.com/CGI-FR/PIMO",
   "entries": {
     "Benchmark": [
@@ -572,6 +572,42 @@ window.BENCHMARK_DATA = {
             "value": 3195007,
             "unit": "ns/op\t  628693 B/op\t    5489 allocs/op",
             "extra": "3600 times\n2 procs"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "44274230+adrienaury@users.noreply.github.com",
+            "name": "Adrien Aury",
+            "username": "adrienaury"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "f7c66349dc0e50d12f5601847089fd8a8f945fa6",
+          "message": "fix(play): do not commit generated site (#121)\n\n* fix(play): do not commit generated website\r\n\r\n* fix(play): do not commit generated website\r\n\r\n* fix(play): do not commit generated website\r\n\r\n* fix(play): reset index.html after compile\r\n\r\n* fix(play): reset index.html after compile\r\n\r\n* fix(play): fix client .gitignore file\r\n\r\n* chore(play): do not precommit index.html\r\n\r\n* chore(play): always yarn install\r\n\r\n* chore(play): fix node_modules go.mod refresh\r\n\r\n* chore(play): remove readme.html\r\n\r\n* chore(play): leave README in the pimo play site\r\n\r\n* chore(play): hide README in final website\r\n\r\n* chore(play): put back readme.html",
+          "timestamp": "2022-06-17T18:08:12+02:00",
+          "tree_id": "4225225611f75b2abf805d32188fd2f82f31cbf0",
+          "url": "https://github.com/CGI-FR/PIMO/commit/f7c66349dc0e50d12f5601847089fd8a8f945fa6"
+        },
+        "date": 1655482351979,
+        "tool": "go",
+        "benches": [
+          {
+            "name": "BenchmarkPimoRun",
+            "value": 205541,
+            "unit": "ns/op\t    4082 B/op\t     120 allocs/op",
+            "extra": "56558 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge",
+            "value": 3599809,
+            "unit": "ns/op\t  628319 B/op\t    5488 allocs/op",
+            "extra": "3243 times\n2 procs"
           }
         ]
       }
