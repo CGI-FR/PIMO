@@ -52,7 +52,7 @@ var resultJson = editor.create(document.getElementById('result-json'), {
   scrollBeyondLastLine: false,
   minimap: {enabled: false},
   readOnly: true,
-  model: editor.createModel('{"name": "Charles"}', 'json', Uri.parse('file://result.jsonl')),
+  model: editor.createModel('', 'json', Uri.parse('file://result.jsonl')),
 });
 
 ///////////////////////////////////////////////////////////
@@ -88,12 +88,15 @@ async function postData() {
       resultJson.setValue(JSON.stringify(data))
   } catch (err) {
       console.log(err)
+  } finally {
+    document.getElementById('label-output').innerText = "Output"
   }
 }
 
 function debounce(func, timeout = 300){
     let timer;
     return (...args) => {
+        document.getElementById('label-output').innerText = "Output (refreshing...)"
         clearTimeout(timer);
         timer = setTimeout(() => { func.apply(this, args); }, timeout);
     };
@@ -101,5 +104,11 @@ function debounce(func, timeout = 300){
 
 let autoPostData = debounce(postData, 500);
 document.getElementById('editor-yaml').onkeyup = autoPostData;
+document.getElementById('editor-yaml').oninput = autoPostData;
+document.getElementById('editor-yaml').onpaste = autoPostData;
+document.getElementById('editor-yaml').oncut = autoPostData;
 document.getElementById('editor-json').onkeyup = autoPostData;
-
+document.getElementById('editor-json').oninput = autoPostData;
+document.getElementById('editor-json').onpaste = autoPostData;
+document.getElementById('editor-json').oncut = autoPostData;
+autoPostData();
