@@ -212,13 +212,12 @@ targets:
     doc: "Build website and copy it to play.go path"
     depends: "info"
     steps:
-      - if: "!exists('web/play/node_modules/webpack')"
-        then:
-          - $: cd web/play && yarn install
-      - $: cd web/play && yarn build
+      - $: cd web/play && yarn install && yarn build
       - $: rm -rf internal/app/pimo/client/*
       - $: cp -r web/play/dist/* internal/app/pimo/client
       - $: touch web/play/node_modules/go.mod
+      - $: git checkout -- web/play/node_modules/go.mod
+      - $: git checkout -- internal/app/pimo/client
 
   # run "neon -props '{buildpaths: ["path/to/main/package1","path/to/main/package2"]}' compile" to compile specific targets
   # example : neon -props '{buildpaths: ["cmd/cli"]}' compile
@@ -271,7 +270,6 @@ targets:
     steps:
       - ldflags = ldflags + " -s -w" # Omit the DWARF symbol table. Omit the symbol table and debug information.
       - call: compile
-      - $: git checkout -- web/play/node_modules/go.mod
 
   # to pass a single test use :
   # neon -props '{testsuites: "<test suite filename>"}' test-int
