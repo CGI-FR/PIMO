@@ -86,8 +86,10 @@ async function postData() {
       const data = await res.json()
 
       resultJson.setValue(JSON.stringify(data))
+      document.getElementById('result-error').innerText = ""
   } catch (err) {
       console.log(err)
+      document.getElementById('result-error').innerText = err
   } finally {
     document.getElementById('label-output').innerText = "Output"
   }
