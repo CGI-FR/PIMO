@@ -213,9 +213,10 @@ targets:
     depends: "info"
     steps:
       - $: cd web/play && yarn install && yarn build
+      - $: touch web/play/node_modules/go.mod
       - $: rm -rf internal/app/pimo/client/*
       - $: cp -r web/play/dist/* internal/app/pimo/client
-      - $: touch web/play/node_modules/go.mod
+      - $: git checkout -- internal/app/pimo/client
 
   # run "neon -props '{buildpaths: ["path/to/main/package1","path/to/main/package2"]}' compile" to compile specific targets
   # example : neon -props '{buildpaths: ["cmd/cli"]}' compile
@@ -268,7 +269,6 @@ targets:
     steps:
       - ldflags = ldflags + " -s -w" # Omit the DWARF symbol table. Omit the symbol table and debug information.
       - call: compile
-      - $: git checkout -- internal/app/pimo/client
 
   # to pass a single test use :
   # neon -props '{testsuites: "<test suite filename>"}' test-int
