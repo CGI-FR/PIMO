@@ -91,5 +91,15 @@ async function postData() {
   }
 }
 
-document.getElementById('refresh').onclick = postData
-postData();
+function debounce(func, timeout = 300){
+    let timer;
+    return (...args) => {
+        clearTimeout(timer);
+        timer = setTimeout(() => { func.apply(this, args); }, timeout);
+    };
+}
+
+let autoPostData = debounce(postData, 500);
+document.getElementById('editor-yaml').onkeyup = autoPostData;
+document.getElementById('editor-json').onkeyup = autoPostData;
+
