@@ -271,6 +271,7 @@ targets:
     steps:
       - ldflags = ldflags + " -s -w" # Omit the DWARF symbol table. Omit the symbol table and debug information.
       - call: compile
+      - $: git checkout -- internal/app/pimo/client/index.html
 
   # to pass a single test use :
   # neon -props '{testsuites: "<test suite filename>"}' test-int
