@@ -267,7 +267,7 @@ targets:
   # example : neon -props '{buildpaths: ["cmd/cli"]}' release
   release:
     doc: "Compile binary files for production"
-    depends: ["info", "refresh", "lint", "test"]
+    depends: ["info", "refresh", "lint", "test", "build-web"]
     steps:
       - ldflags = ldflags + " -s -w" # Omit the DWARF symbol table. Omit the symbol table and debug information.
       - call: compile
