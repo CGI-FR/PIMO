@@ -79,8 +79,12 @@ async function postData() {
       })
 
       if (!res.ok) {
-          const message = `An error has occurred: ${res.status} - ${res.statusText}`
-          throw new Error(message)
+        if (res.status == 500) {
+          const data = await res.text()
+          throw new Error(data)
+        }
+        const message = `An error has occurred: ${res.status} - ${res.statusText}`
+        throw new Error(message)
       }
 
       const data = await res.json()

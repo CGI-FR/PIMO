@@ -50,7 +50,7 @@ func play(ctx echo.Context) error {
 	err := ctx.Bind(&dataInput)
 	if err != nil {
 		log.Err(err).Msg("Failed to bind client data")
-		return err
+		return ctx.String(http.StatusInternalServerError, err.Error())
 	}
 
 	// yaml := ctx.FormValue("masking")
@@ -61,13 +61,13 @@ func play(ctx echo.Context) error {
 	pdef, err := model.LoadPipelineDefinitionFromYAML([]byte(yaml))
 	if err != nil {
 		log.Err(err).Msg("Cannot load pipeline definition")
-		return err
+		return ctx.String(http.StatusInternalServerError, err.Error())
 	}
 
 	input, err := jsonline.JSONToDictionary([]byte(data))
 	if err != nil {
 		log.Err(err).Msg("Cannot load pipeline definition")
-		return err
+		return ctx.String(http.StatusInternalServerError, err.Error())
 	}
 
 	config.SingleInput = &input
@@ -75,7 +75,7 @@ func play(ctx echo.Context) error {
 
 	if err := context.Configure(config); err != nil {
 		log.Err(err).Msg("Cannot configure pipeline")
-		return err
+		return ctx.String(http.StatusInternalServerError, err.Error())
 	}
 
 	result := &strings.Builder{}
@@ -83,7 +83,7 @@ func play(ctx echo.Context) error {
 	stats, err := context.Execute(result)
 	if err != nil {
 		log.Err(err).Msg("Cannot execute pipeline")
-		return err
+		return ctx.String(http.StatusInternalServerError, err.Error())
 	}
 
 	log.Info().Interface("stats", stats).Msg("Input masked")
