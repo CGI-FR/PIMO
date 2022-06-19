@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1655630490752,
+  "lastUpdate": 1655632992170,
   "repoUrl": "https://github.com/CGI-FR/PIMO",
   "entries": {
     "Benchmark": [
@@ -644,6 +644,42 @@ window.BENCHMARK_DATA = {
             "value": 3906616,
             "unit": "ns/op\t  628298 B/op\t    5489 allocs/op",
             "extra": "3364 times\n2 procs"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "44274230+adrienaury@users.noreply.github.com",
+            "name": "Adrien Aury",
+            "username": "adrienaury"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "91f1ce9f6dc01a7a96257a099705746a1b346900",
+          "message": "feat(play): add flag to change play port number (#123)",
+          "timestamp": "2022-06-19T11:58:42+02:00",
+          "tree_id": "f16af2d202796c20cdd4013d7e18281311cf99c5",
+          "url": "https://github.com/CGI-FR/PIMO/commit/91f1ce9f6dc01a7a96257a099705746a1b346900"
+        },
+        "date": 1655632991597,
+        "tool": "go",
+        "benches": [
+          {
+            "name": "BenchmarkPimoRun",
+            "value": 218731,
+            "unit": "ns/op\t    4021 B/op\t     106 allocs/op",
+            "extra": "52502 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge",
+            "value": 3919449,
+            "unit": "ns/op\t  628530 B/op\t    5489 allocs/op",
+            "extra": "3048 times\n2 procs"
           }
         ]
       }
