@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1655482353150,
+  "lastUpdate": 1655630490752,
   "repoUrl": "https://github.com/CGI-FR/PIMO",
   "entries": {
     "Benchmark": [
@@ -608,6 +608,42 @@ window.BENCHMARK_DATA = {
             "value": 3599809,
             "unit": "ns/op\t  628319 B/op\t    5488 allocs/op",
             "extra": "3243 times\n2 procs"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "44274230+adrienaury@users.noreply.github.com",
+            "name": "Adrien Aury",
+            "username": "adrienaury"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "eb767b33678b6002609787821de05b43c545890f",
+          "message": "feat(play): debounce refresh output (#122)\n\n* feat(play): debounce refresh output\r\n\r\n* chore(ci): fix when branch name has parenthesis\r\n\r\n* chore(neon): fix when branch name has parenthesis\r\n\r\n* feat(play): visual indicator of refresh + better events\r\n\r\n* feat(play): add basic error message\r\n\r\n* feat(play): better error message",
+          "timestamp": "2022-06-19T11:16:53+02:00",
+          "tree_id": "5168dd1d4fb7e940f8d4eb7edd18faf6a5f87750",
+          "url": "https://github.com/CGI-FR/PIMO/commit/eb767b33678b6002609787821de05b43c545890f"
+        },
+        "date": 1655630490400,
+        "tool": "go",
+        "benches": [
+          {
+            "name": "BenchmarkPimoRun",
+            "value": 199395,
+            "unit": "ns/op\t    4116 B/op\t     120 allocs/op",
+            "extra": "53296 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge",
+            "value": 3906616,
+            "unit": "ns/op\t  628298 B/op\t    5489 allocs/op",
+            "extra": "3364 times\n2 procs"
           }
         ]
       }
