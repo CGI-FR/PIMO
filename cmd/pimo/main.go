@@ -115,17 +115,20 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 		},
 	})
 
-	rootCmd.AddCommand(&cobra.Command{
+	playPort := 3010
+	playCmd := &cobra.Command{
 		Use: "play",
 		Run: func(cmd *cobra.Command, args []string) {
 			router := pimo.Play()
-			port := ":3010"
+			port := fmt.Sprintf("0.0.0.0:%d", playPort)
 
 			if err := router.Start(port); err != nil {
 				os.Exit(8)
 			}
 		},
-	})
+	}
+	playCmd.PersistentFlags().IntVarP(&playPort, "port", "p", 3010, "port number")
+	rootCmd.AddCommand(playCmd)
 
 	if err := rootCmd.Execute(); err != nil {
 		log.Err(err).Msg("Error when executing command")
