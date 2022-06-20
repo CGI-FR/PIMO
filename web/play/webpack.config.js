@@ -6,11 +6,7 @@ export default {
     rules: [
       {
         test: /\.css$/,
-        use: ['style-loader', 'css-loader'],
-      },
-      {
-        test: /\.ttf$/,
-        type: 'asset',
+        use: ['style-loader', 'css-loader', 'postcss-loader'],
       },
     ],
   },
