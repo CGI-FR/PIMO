@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1655702095045,
+  "lastUpdate": 1655731943935,
   "repoUrl": "https://github.com/CGI-FR/PIMO",
   "entries": {
     "Benchmark": [
@@ -752,6 +752,42 @@ window.BENCHMARK_DATA = {
             "value": 3702941,
             "unit": "ns/op\t  628399 B/op\t    5489 allocs/op",
             "extra": "3232 times\n2 procs"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "44274230+adrienaury@users.noreply.github.com",
+            "name": "Adrien Aury",
+            "username": "adrienaury"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "beaeeb0931f0d4108a935dddff74c97af537e51c",
+          "message": "fix(play): add security flag (#126)\n\n* fix(play): add security flag\r\n\r\n* fix(play): linting error",
+          "timestamp": "2022-06-20T15:28:23+02:00",
+          "tree_id": "d8333db38a9f7ff5fd298ab72ce135778a1f6f85",
+          "url": "https://github.com/CGI-FR/PIMO/commit/beaeeb0931f0d4108a935dddff74c97af537e51c"
+        },
+        "date": 1655731942302,
+        "tool": "go",
+        "benches": [
+          {
+            "name": "BenchmarkPimoRun",
+            "value": 170297,
+            "unit": "ns/op\t    4007 B/op\t     106 allocs/op",
+            "extra": "67362 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge",
+            "value": 2999909,
+            "unit": "ns/op\t  628662 B/op\t    5489 allocs/op",
+            "extra": "3696 times\n2 procs"
           }
         ]
       }
