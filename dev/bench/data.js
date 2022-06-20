@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1655632992170,
+  "lastUpdate": 1655697731612,
   "repoUrl": "https://github.com/CGI-FR/PIMO",
   "entries": {
     "Benchmark": [
@@ -680,6 +680,42 @@ window.BENCHMARK_DATA = {
             "value": 3919449,
             "unit": "ns/op\t  628530 B/op\t    5489 allocs/op",
             "extra": "3048 times\n2 procs"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "44274230+adrienaury@users.noreply.github.com",
+            "name": "Adrien Aury",
+            "username": "adrienaury"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "f866ad15d916142afbfab9c1f3cdb23c58cc4b22",
+          "message": "feat(play): responsive design (#124)\n\n* fix(play): npm, yarn and webpack config\r\n\r\n* chore(play): enable tailwind\r\n\r\n* chore(play): enable tailwind with webpack\r\n\r\n* feat(play): responsive website support\r\n\r\n* feat(play): pretty print JSON input and output\r\n\r\n* fix(play): revert background color to white",
+          "timestamp": "2022-06-20T05:57:13+02:00",
+          "tree_id": "cf65c59032d8de48ac4fe23e587c9d4da5699de8",
+          "url": "https://github.com/CGI-FR/PIMO/commit/f866ad15d916142afbfab9c1f3cdb23c58cc4b22"
+        },
+        "date": 1655697730984,
+        "tool": "go",
+        "benches": [
+          {
+            "name": "BenchmarkPimoRun",
+            "value": 226443,
+            "unit": "ns/op\t    4164 B/op\t     120 allocs/op",
+            "extra": "49238 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge",
+            "value": 4097597,
+            "unit": "ns/op\t  628540 B/op\t    5488 allocs/op",
+            "extra": "2920 times\n2 procs"
           }
         ]
       }
