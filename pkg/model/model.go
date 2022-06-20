@@ -68,116 +68,116 @@ type MaskFactory func(Masking, int64, map[string]Cache) (MaskEngine, bool, error
 type MaskContextFactory func(Masking, int64, map[string]Cache) (MaskContextEngine, bool, error)
 
 type SelectorType struct {
-	Jsonpath string `yaml:"jsonpath"`
+	Jsonpath string `yaml:"jsonpath" jsonschema_description:"Path of the target value to mask in the JSON input"`
 }
 
 type IncrementalType struct {
-	Start     int `yaml:"start"`
-	Increment int `yaml:"increment"`
+	Start     int `yaml:"start" jsonschema_description:"First value in the sequence"`
+	Increment int `yaml:"increment" jsonschema_description:"Increment to add to reach the next value in the sequence"`
 }
 
 type RandDateType struct {
-	DateMin time.Time `yaml:"dateMin"`
-	DateMax time.Time `yaml:"dateMax"`
+	DateMin time.Time `yaml:"dateMin" jsonschema_description:"Lower bound of the date range"`
+	DateMax time.Time `yaml:"dateMax" jsonschema_description:"Higher bound of the date range"`
 }
 
 type RandIntType struct {
-	Min int `yaml:"min"`
-	Max int `yaml:"max"`
+	Min int `yaml:"min" jsonschema_description:"Lower bound of the integer range"`
+	Max int `yaml:"max" jsonschema_description:"Lower bound of the integer range"`
 }
 
 type WeightedChoiceType struct {
-	Choice Entry `yaml:"choice"`
-	Weight uint  `yaml:"weight"`
+	Choice Entry `yaml:"choice" jsonschema_description:"Value for this choice"`
+	Weight uint  `yaml:"weight" jsonschema_description:"Weight of this choice, higher weights will be selected more frequently"`
 }
 
 type RandomDurationType struct {
-	Min string
-	Max string
+	Min string `jsonschema_description:"Lower bound of the duration range (ISO 8601 notation)"`
+	Max string `jsonschema_description:"Higher bound of the duration range (ISO 8601 notation)"`
 }
 
 type RandomDecimalType struct {
-	Min       float64
-	Max       float64
-	Precision int
+	Min       float64 `jsonschema_description:"Lower bound of the decimal range"`
+	Max       float64 `jsonschema_description:"Lower bound of the decimal range"`
+	Precision int     `jsonschema_description:"Precision of the generated value"`
 }
 
 type DateParserType struct {
-	InputFormat  string `yaml:"inputFormat,omitempty"`
-	OutputFormat string `yaml:"outputFormat,omitempty"`
+	InputFormat  string `yaml:"inputFormat,omitempty" jsonschema_description:"Format of the input datetime, it should always display the following date : Mon Jan 2 15:04:05 -0700 MST 2006 or the constant value 'unixEpoch'"`
+	OutputFormat string `yaml:"outputFormat,omitempty" jsonschema_description:"Format of the output datetime, it should always display the following date : Mon Jan 2 15:04:05 -0700 MST 2006 or the constant value 'unixEpoch'"`
 }
 
 type FF1Type struct {
-	KeyFromEnv string `yaml:"keyFromEnv"`
-	TweakField string `yaml:"tweakField,omitempty"`
-	Radix      uint   `yaml:"radix,omitempty"`
-	Decrypt    bool   `yaml:"decrypt,omitempty"`
+	KeyFromEnv string `yaml:"keyFromEnv" jsonschema_description:"Name of the system environment variable that contains the private key"`
+	TweakField string `yaml:"tweakField,omitempty" jsonschema_description:"Name of the field to use as 'tweak' value : reduce the attack surface by using a varying value on each record, it can be considered as an extension of the secret key that change on each record"`
+	Radix      uint   `yaml:"radix,omitempty" jsonschema_description:"determine which part of the fixed FF1 domain definition will actually be used, for example 10 will use the first 10 characters of 0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"`
+	Decrypt    bool   `yaml:"decrypt,omitempty" jsonschema_description:"Decrypt the value instead of encrypt"`
 }
 
 type PipeType struct {
-	Masking        []Masking `yaml:"masking,omitempty"`
-	InjectParent   string    `yaml:"injectParent,omitempty"`
-	InjectRoot     string    `yaml:"injectRoot,omitempty"`
-	DefinitionFile string    `yaml:"file,omitempty"`
+	Masking        []Masking `yaml:"masking,omitempty" jsonschema_description:"Define a list of selector/mask couple to apply on the JSON stream, in this order"`
+	InjectParent   string    `yaml:"injectParent,omitempty" jsonschema_description:"Used in conjunction with the 'pipe' mask, inject the parent object with the given field name"`
+	InjectRoot     string    `yaml:"injectRoot,omitempty" jsonschema_description:"Used in conjunction with the 'pipe' mask, inject the root object with the given field name"`
+	DefinitionFile string    `yaml:"file,omitempty" jsonschema_description:"URI to an external resource to read the pipeline definition"`
 }
 
 type TemplateEachType struct {
-	Item     string `yaml:"item,omitempty"`
-	Index    string `yaml:"index,omitempty"`
-	Template string `yaml:"template,omitempty"`
+	Item     string `yaml:"item,omitempty" jsonschema_description:"Inject the current element value under the given field name"`
+	Index    string `yaml:"index,omitempty" jsonschema_description:"Inject the current element index under the given field name"`
+	Template string `yaml:"template,omitempty" jsonschema_description:"Replace the current value with the result of executing this Golang template"`
 }
 
 type LuhnType struct {
-	Universe string `yaml:"universe,omitempty"`
+	Universe string `yaml:"universe,omitempty" jsonschema_description:"All possible characters that can be encountered as input value"`
 }
 
 type MarkovType struct {
-	MaxSize   int    `yaml:"max-size,omitempty"`
-	Sample    string `yaml:"sample,omitempty"`
-	Separator string `yaml:"separator,omitempty"`
-	Order     int    `yaml:"order,omitempty"`
+	MaxSize   int    `yaml:"max-size,omitempty" jsonschema_description:"Maximum length for the generated text"`
+	Sample    string `yaml:"sample,omitempty" jsonschema_description:"URI to an external resource to train the Markiv model"`
+	Separator string `yaml:"separator,omitempty" jsonschema_description:"Separator to use to read tokens, leave empty to treat each character as a token"`
+	Order     int    `yaml:"order,omitempty" jsonschema_description:"Number of tokens to consider, a higher value = more similar to sample, too high and the generated text will be completly similar to sample"`
 }
 
 type Class struct {
-	Input  string `yaml:"input"`
-	Output string `yaml:"output"`
+	Input  string `yaml:"input" jsonschema_description:"Characters to replace in the input value"`
+	Output string `yaml:"output" jsonschema_description:"Characters to use to generate the output value"`
 }
 
 type TranscodeType struct {
-	Classes []Class `yaml:"classes,omitempty"`
+	Classes []Class `yaml:"classes,omitempty" jsonschema_description:"Each class will define a rule to replace a set of characters by another"`
 }
 
 type MaskType struct {
-	Add               Entry                `yaml:"add,omitempty" jsonschema:"oneof_required=Add"`
-	AddTransient      Entry                `yaml:"add-transient,omitempty" jsonschema:"oneof_required=AddTransient"`
-	Constant          Entry                `yaml:"constant,omitempty" jsonschema:"oneof_required=Constant"`
-	RandomChoice      []Entry              `yaml:"randomChoice,omitempty" jsonschema:"oneof_required=RandomChoice"`
-	RandomChoiceInURI string               `yaml:"randomChoiceInUri,omitempty" jsonschema:"oneof_required=RandomChoiceInURI"`
-	Command           string               `yaml:"command,omitempty" jsonschema:"oneof_required=Command"`
-	RandomInt         RandIntType          `yaml:"randomInt,omitempty" jsonschema:"oneof_required=RandomInt"`
-	WeightedChoice    []WeightedChoiceType `yaml:"weightedChoice,omitempty" jsonschema:"oneof_required=WeightedChoice"`
-	Regex             string               `yaml:"regex,omitempty" jsonschema:"oneof_required=Regex"`
-	Hash              []Entry              `yaml:"hash,omitempty" jsonschema:"oneof_required=Hash"`
-	HashInURI         string               `yaml:"hashInUri,omitempty" jsonschema:"oneof_required=HashInURI"`
-	RandDate          RandDateType         `yaml:"randDate,omitempty" jsonschema:"oneof_required=RandDate"`
-	Incremental       IncrementalType      `yaml:"incremental,omitempty" jsonschema:"oneof_required=Incremental"`
-	Replacement       string               `yaml:"replacement,omitempty" jsonschema:"oneof_required=Replacement"`
-	Template          string               `yaml:"template,omitempty" jsonschema:"oneof_required=Template"`
-	TemplateEach      TemplateEachType     `yaml:"template-each,omitempty" jsonschema:"oneof_required=TemplateEach"`
-	Duration          string               `yaml:"duration,omitempty" jsonschema:"oneof_required=Duration"`
-	Remove            bool                 `yaml:"remove,omitempty" jsonschema:"oneof_required=Remove"`
-	RangeMask         int                  `yaml:"range,omitempty" jsonschema:"oneof_required=RangeMask"`
-	RandomDuration    RandomDurationType   `yaml:"randomDuration,omitempty" jsonschema:"oneof_required=RandomDuration"`
-	FluxURI           string               `yaml:"fluxUri,omitempty" jsonschema:"oneof_required=FluxURI"`
-	RandomDecimal     RandomDecimalType    `yaml:"randomDecimal,omitempty" jsonschema:"oneof_required=RandomDecimal"`
-	DateParser        DateParserType       `yaml:"dateParser,omitempty" jsonschema:"oneof_required=DateParser"`
-	FromCache         string               `yaml:"fromCache,omitempty" jsonschema:"oneof_required=FromCache"`
-	FF1               FF1Type              `yaml:"ff1,omitempty" jsonschema:"oneof_required=FF1"`
-	Pipe              PipeType             `yaml:"pipe,omitempty" jsonschema:"oneof_required=Pipe"`
-	FromJSON          string               `yaml:"fromjson,omitempty" jsonschema:"oneof_required=FromJSON"`
-	Luhn              *LuhnType            `yaml:"luhn,omitempty" jsonschema:"oneof_required=Luhn"`
-	Markov            MarkovType           `yaml:"markov,omitempty" jsonschema:"oneof_required=Markov"`
-	Transcode         *TranscodeType       `yaml:"transcode,omitempty" jsonschema:"oneof_required=Transcode"`
+	Add               Entry                `yaml:"add,omitempty" jsonschema:"oneof_required=Add,title=Add Mask,description=Add a new field in the JSON stream"`
+	AddTransient      Entry                `yaml:"add-transient,omitempty" jsonschema:"oneof_required=AddTransient,title=Add Transient Mask" jsonschema_description:"Add a new temporary field, that will not show in the JSON output"`
+	Constant          Entry                `yaml:"constant,omitempty" jsonschema:"oneof_required=Constant,title=Constant Mask" jsonschema_description:"Replace the input value with a constant field"`
+	RandomChoice      []Entry              `yaml:"randomChoice,omitempty" jsonschema:"oneof_required=RandomChoice,title=Random Choice Mask" jsonschema_description:"Replace the input value with a value chosen randomly from a constant list"`
+	RandomChoiceInURI string               `yaml:"randomChoiceInUri,omitempty" jsonschema:"oneof_required=RandomChoiceInURI,title=Random Choice in URI" jsonschema_description:"Replace the input value with a value chosen randomly from an external resource (1 line = 1 value)"`
+	Command           string               `yaml:"command,omitempty" jsonschema:"oneof_required=Command,title=Command Mask" jsonschema_description:"Replace the input value with the result of the given system command"`
+	RandomInt         RandIntType          `yaml:"randomInt,omitempty" jsonschema:"oneof_required=RandomInt,title=Random Integer Mask" jsonschema_description:"Replace the input value with a value chosen randomly from an integer range"`
+	WeightedChoice    []WeightedChoiceType `yaml:"weightedChoice,omitempty" jsonschema:"oneof_required=WeightedChoice,title=Weighted Choice Mask" jsonschema_description:"Replace the input value with a value chosen randomly from a constant list, each value is given a weight (higher weight value has higher chance to be selected)"`
+	Regex             string               `yaml:"regex,omitempty" jsonschema:"oneof_required=Regex,title=Regex Mask" jsonschema_description:"Replace the input value with a random generated value that match the given regular expression"`
+	Hash              []Entry              `yaml:"hash,omitempty" jsonschema:"oneof_required=Hash,title=Hash Mask" jsonschema_description:"Replace the input value with a value chosen deterministicly from a constant list, the same input will always be replaced by the same output"`
+	HashInURI         string               `yaml:"hashInUri,omitempty" jsonschema:"oneof_required=HashInURI,title=Hash in URI Mask" jsonschema_description:"Replace the input value with a value chosen deterministicly from an external resource (1 line = 1 value), the same input will always be replaced by the same output"`
+	RandDate          RandDateType         `yaml:"randDate,omitempty" jsonschema:"oneof_required=RandDate,title=Random Date Mask" jsonschema_description:"Replace the input value with a value chosen randomly from an date range"`
+	Incremental       IncrementalType      `yaml:"incremental,omitempty" jsonschema:"oneof_required=Incremental,title=Incremental Mask" jsonschema_description:"Replace the input value with an incrementing integer sequence"`
+	Replacement       string               `yaml:"replacement,omitempty" jsonschema:"oneof_required=Replacement,title=Replacement Mask" jsonschema_description:"Replace the input value with the value of another field"`
+	Template          string               `yaml:"template,omitempty" jsonschema:"oneof_required=Template,title=Template Mask" jsonschema_description:"Replace the input value with the result of executing the given Golang template"`
+	TemplateEach      TemplateEachType     `yaml:"template-each,omitempty" jsonschema:"oneof_required=TemplateEach,title=Template Each Mask" jsonschema_description:"Replace all input values (selector must be an array field) with the result of executing the given Golang template on each value"`
+	Duration          string               `yaml:"duration,omitempty" jsonschema:"oneof_required=Duration,title=Duration Mask" jsonschema_description:"Modify the input value (selector must be a date field) increasing or decreasing by the given amount of time"`
+	Remove            bool                 `yaml:"remove,omitempty" jsonschema:"oneof_required=Remove,title=Remove Mask" jsonschema_description:"Remove the field from the JSON stream"`
+	RangeMask         int                  `yaml:"range,omitempty" jsonschema:"oneof_required=RangeMask,title=Range Mask" jsonschema_description:"Replace the integer value with a range of the given size"`
+	RandomDuration    RandomDurationType   `yaml:"randomDuration,omitempty" jsonschema:"oneof_required=RandomDuration,title=Random Duration Mask" jsonschema_description:"Modify the input value (selector must be a date field) increasing or decreasing by a random amount of time"`
+	FluxURI           string               `yaml:"fluxUri,omitempty" jsonschema:"oneof_required=FluxURI,title=Flux in URI Mask" jsonschema_description:"Replace the input value with the next value in the sequence given by an external resource (1 line = 1 value)"`
+	RandomDecimal     RandomDecimalType    `yaml:"randomDecimal,omitempty" jsonschema:"oneof_required=RandomDecimal,title=Random Decimal Mask" jsonschema_description:"Replace the input value with a value chosen randomly from an decimal range"`
+	DateParser        DateParserType       `yaml:"dateParser,omitempty" jsonschema:"oneof_required=DateParser,title=Date Parser Mask" jsonschema_description:"Change the format of the input date"`
+	FromCache         string               `yaml:"fromCache,omitempty" jsonschema:"oneof_required=FromCache,title=From Cache Mask" jsonschema_description:"Replace the input value with the value stored at the corresponding key in the given cache"`
+	FF1               FF1Type              `yaml:"ff1,omitempty" jsonschema:"oneof_required=FF1,title=FF1 Mask" jsonschema_description:"Encrypt the input value using the FF1 algorithm (format preserving encryption)"`
+	Pipe              PipeType             `yaml:"pipe,omitempty" jsonschema:"oneof_required=Pipe,title=Pipe Mask" jsonschema_description:"If the input value contains an array of object, stream each object with the given masking pipeline definition, this mask exists to handle complex data structures"`
+	FromJSON          string               `yaml:"fromjson,omitempty" jsonschema:"oneof_required=FromJSON,title=From JSON Mask" jsonschema_description:"Parse the input value as raw JSON, and add the resulting structure to the JSON stream"`
+	Luhn              *LuhnType            `yaml:"luhn,omitempty" jsonschema:"oneof_required=Luhn,title=Luhn Mask" jsonschema_description:"Concatenate a checksum key to the input value computed with the luhn algorithm"`
+	Markov            MarkovType           `yaml:"markov,omitempty" jsonschema:"oneof_required=Markov,title=Markov Mask" jsonschema_description:"Produces pseudo text based on sample text"`
+	Transcode         *TranscodeType       `yaml:"transcode,omitempty" jsonschema:"oneof_required=Transcode,title=Transcode Mask" jsonschema_description:"Produce a random string by preserving character classes from the original value"`
 }
 
 type Masking struct {
@@ -186,29 +186,29 @@ type Masking struct {
 	// Case2: One selector, Multiple masks
 	// Case3: Multiple selectors, One mask
 	// Case4: Multiple selectors, Multiple masks
-	Selector  SelectorType   `yaml:"selector,omitempty" jsonschema:"oneof_required=case1,oneof_required=case2"`
-	Selectors []SelectorType `yaml:"selectors,omitempty" jsonschema:"oneof_required=case3,oneof_required=case4"`
-	Mask      MaskType       `yaml:"mask,omitempty" jsonschema:"oneof_required=case1,oneof_required=case3"`
-	Masks     []MaskType     `yaml:"masks,omitempty" jsonschema:"oneof_required=case2,oneof_required=case4"`
-	Cache     string         `yaml:"cache,omitempty"`
-	Preserve  string         `yaml:"preserve,omitempty"`
-	Seed      SeedType       `yaml:"seed,omitempty"`
+	Selector  SelectorType   `yaml:"selector,omitempty" jsonschema:"oneof_required=case1,oneof_required=case2" jsonschema_description:"A selector defines on which field the mask will be applied"`
+	Selectors []SelectorType `yaml:"selectors,omitempty" jsonschema:"oneof_required=case3,oneof_required=case4" jsonschema_description:"Defines on which fields the mask will be applied"`
+	Mask      MaskType       `yaml:"mask,omitempty" jsonschema:"oneof_required=case1,oneof_required=case3" jsonschema_description:"Defines how the selected value(s) will be masked"`
+	Masks     []MaskType     `yaml:"masks,omitempty" jsonschema:"oneof_required=case2,oneof_required=case4" jsonschema_description:"Defines how the selected value(s) will be masked"`
+	Cache     string         `yaml:"cache,omitempty" jsonschema_description:"Use an in-memory cache to preserve coherence between original/masked values"`
+	Preserve  string         `yaml:"preserve,omitempty" jsonschema:"enum=null,enum=empty,enum=blank" jsonschema_description:"Preserve (do not mask) some values : null = preserve null value, empty = preserve empty strings, blank = preserve both null and empty values"`
+	Seed      SeedType       `yaml:"seed,omitempty" jsonschema_description:"Initialize the Pseaudo-Random-Generator with the value given field"`
 }
 
 type SeedType struct {
-	Field string `yaml:"field,omitempty"`
+	Field string `yaml:"field,omitempty" jsonschema_description:"Initialize the Pseaudo-Random-Generator with the given field value, a Golang Template can be used here"`
 }
 
 type CacheDefinition struct {
-	Unique  bool `yaml:"unique,omitempty"`
-	Reverse bool `yaml:"reverse,omitempty"`
+	Unique  bool `yaml:"unique,omitempty" jsonschema_description:"The cache will not allow a masked value to be used multiple times, the mask will be reapplied until a unique value is generated"`
+	Reverse bool `yaml:"reverse,omitempty" jsonschema_description:"Reverse the cache, keys will be used as values, and values will be used as keys"`
 }
 
 type Definition struct {
-	Version string                     `yaml:"version"`
-	Seed    int64                      `yaml:"seed,omitempty"`
-	Masking []Masking                  `yaml:"masking"`
-	Caches  map[string]CacheDefinition `yaml:"caches,omitempty"`
+	Version string                     `yaml:"version" jsonschema_description:"Version of the pipeline definition, use the value 1"`
+	Seed    int64                      `yaml:"seed,omitempty" jsonschema_description:"Initialize the Pseaudo-Random-Generator with the given value"`
+	Masking []Masking                  `yaml:"masking" jsonschema_description:"Masking pipeline definition"`
+	Caches  map[string]CacheDefinition `yaml:"caches,omitempty" jsonschema_description:"Declare in-memory caches"`
 }
 
 /***************
