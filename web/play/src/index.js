@@ -1,3 +1,4 @@
+import './style.css';
 import { editor, Uri } from 'monaco-editor';
 import { setDiagnosticsOptions } from 'monaco-yaml';
 
