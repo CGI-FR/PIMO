@@ -116,8 +116,8 @@ type FF1Type struct {
 
 type PipeType struct {
 	Masking        []Masking `yaml:"masking,omitempty" jsonschema_description:"Define a list of selector/mask couple to apply on the JSON stream, in this order"`
-	InjectParent   string    `yaml:"injectParent,omitempty" jsonschema_description:"Used in conjonction with the 'pipe' mask, inject the parent object with the given field name"`
-	InjectRoot     string    `yaml:"injectRoot,omitempty" jsonschema_description:"Used in conjonction with the 'pipe' mask, inject the root object with the given field name"`
+	InjectParent   string    `yaml:"injectParent,omitempty" jsonschema_description:"Used in conjunction with the 'pipe' mask, inject the parent object with the given field name"`
+	InjectRoot     string    `yaml:"injectRoot,omitempty" jsonschema_description:"Used in conjunction with the 'pipe' mask, inject the root object with the given field name"`
 	DefinitionFile string    `yaml:"file,omitempty" jsonschema_description:"URI to an external resource to read the pipeline definition"`
 }
 
