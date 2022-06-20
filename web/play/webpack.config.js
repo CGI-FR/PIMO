@@ -8,10 +8,6 @@ export default {
         test: /\.css$/,
         use: ['style-loader', 'css-loader'],
       },
-      {
-        test: /\.ttf$/,
-        type: 'asset',
-      },
     ],
   },
   devServer: {
