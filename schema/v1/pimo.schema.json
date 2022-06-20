@@ -584,11 +584,11 @@
         },
         "injectParent": {
           "type": "string",
-          "description": "Used in conjonction with the 'pipe' mask, inject the parent object with the given field name"
+          "description": "Used in conjunction with the 'pipe' mask, inject the parent object with the given field name"
         },
         "injectRoot": {
           "type": "string",
-          "description": "Used in conjonction with the 'pipe' mask, inject the root object with the given field name"
+          "description": "Used in conjunction with the 'pipe' mask, inject the root object with the given field name"
         },
         "file": {
           "type": "string",
