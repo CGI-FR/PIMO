@@ -81,7 +81,7 @@ func play(ctx echo.Context) error {
 	}
 
 	if ctx.Get("enableSecurity") == true {
-		if err := checkSecurityRequirements(pdef, input); err != nil {
+		if err := checkSecurityRequirements(pdef); err != nil {
 			log.Err(err).Msg("Forbidden request")
 			return ctx.String(http.StatusInternalServerError, err.Error())
 		}
@@ -107,7 +107,7 @@ func play(ctx echo.Context) error {
 	return ctx.JSONBlob(http.StatusOK, []byte(result.String()))
 }
 
-func checkSecurityRequirements(pdef model.Definition, input model.Dictionary) error {
+func checkSecurityRequirements(pdef model.Definition) error {
 	for _, mask := range pdef.Masking {
 		// usage of command is not allowed with pimo play
 		if len(mask.Mask.Command) > 0 {
