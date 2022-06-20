@@ -45,7 +45,7 @@ var editorJson = editor.create(document.getElementById('editor-json'), {
   automaticLayout: true,
   scrollBeyondLastLine: false,
   minimap: {enabled: false},
-  model: editor.createModel('{"name": "Bill"}', 'json', Uri.parse('file://data.jsonl')),
+  model: editor.createModel('{\n  "name": "Bill"\n}', 'json', Uri.parse('file://data.jsonl')),
 });
 
 var resultJson = editor.create(document.getElementById('result-json'), {
@@ -90,7 +90,7 @@ async function postData() {
 
       const data = await res.json()
 
-      resultJson.setValue(JSON.stringify(data))
+      resultJson.setValue(JSON.stringify(data, null, 2))
       document.getElementById('result-error').innerText = ""
   } catch (err) {
       console.log(err)
