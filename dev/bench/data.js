@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1655731943935,
+  "lastUpdate": 1655732023719,
   "repoUrl": "https://github.com/CGI-FR/PIMO",
   "entries": {
     "Benchmark": [
@@ -788,6 +788,42 @@ window.BENCHMARK_DATA = {
             "value": 2999909,
             "unit": "ns/op\t  628662 B/op\t    5489 allocs/op",
             "extra": "3696 times\n2 procs"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "44274230+adrienaury@users.noreply.github.com",
+            "name": "Adrien Aury",
+            "username": "adrienaury"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "b2cae222efd4a95965d11f62f7809431b243a38a",
+          "message": "feat(play): improve masking schema (#127)\n\n* chore: upgrade schema library\r\n\r\n* feat: add inline documentation in json schema\r\n\r\n* feat(play): use tagged JSON schema\r\n\r\n* feat(play): use tagged JSON schema\r\n\r\n* fix(play): linting error\r\n\r\n* fix(play): update jsonschema",
+          "timestamp": "2022-06-20T15:28:45+02:00",
+          "tree_id": "dd2725006037e08fbdcd96d5b53731bce5b1c5d8",
+          "url": "https://github.com/CGI-FR/PIMO/commit/b2cae222efd4a95965d11f62f7809431b243a38a"
+        },
+        "date": 1655732022305,
+        "tool": "go",
+        "benches": [
+          {
+            "name": "BenchmarkPimoRun",
+            "value": 228605,
+            "unit": "ns/op\t    4146 B/op\t     120 allocs/op",
+            "extra": "50684 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge",
+            "value": 3974730,
+            "unit": "ns/op\t  628685 B/op\t    5488 allocs/op",
+            "extra": "2834 times\n2 procs"
           }
         ]
       }
