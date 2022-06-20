@@ -1,7 +1,8 @@
 {
-  "$schema": "http://json-schema.org/draft-04/schema#",
-  "$ref": "#/definitions/Definition",
-  "definitions": {
+  "$schema": "http://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/cgi-fr/pimo/pkg/model/definition",
+  "$ref": "#/$defs/Definition",
+  "$defs": {
     "CacheDefinition": {
       "properties": {
         "unique": {
@@ -15,10 +16,6 @@
       "type": "object"
     },
     "Class": {
-      "required": [
-        "input",
-        "output"
-      ],
       "properties": {
         "input": {
           "type": "string"
@@ -28,7 +25,11 @@
         }
       },
       "additionalProperties": false,
-      "type": "object"
+      "type": "object",
+      "required": [
+        "input",
+        "output"
+      ]
     },
     "DateParserType": {
       "properties": {
@@ -43,10 +44,6 @@
       "type": "object"
     },
     "Definition": {
-      "required": [
-        "version",
-        "masking"
-      ],
       "properties": {
         "version": {
           "type": "string"
@@ -56,28 +53,27 @@
         },
         "masking": {
           "items": {
-            "$schema": "http://json-schema.org/draft-04/schema#",
-            "$ref": "#/definitions/Masking"
+            "$ref": "#/$defs/Masking"
           },
           "type": "array"
         },
         "caches": {
           "patternProperties": {
             ".*": {
-              "$schema": "http://json-schema.org/draft-04/schema#",
-              "$ref": "#/definitions/CacheDefinition"
+              "$ref": "#/$defs/CacheDefinition"
             }
           },
           "type": "object"
         }
       },
       "additionalProperties": false,
-      "type": "object"
+      "type": "object",
+      "required": [
+        "version",
+        "masking"
+      ]
     },
     "FF1Type": {
-      "required": [
-        "keyFromEnv"
-      ],
       "properties": {
         "keyFromEnv": {
           "type": "string"
@@ -93,13 +89,12 @@
         }
       },
       "additionalProperties": false,
-      "type": "object"
+      "type": "object",
+      "required": [
+        "keyFromEnv"
+      ]
     },
     "IncrementalType": {
-      "required": [
-        "start",
-        "increment"
-      ],
       "properties": {
         "start": {
           "type": "integer"
@@ -109,7 +104,11 @@
         }
       },
       "additionalProperties": false,
-      "type": "object"
+      "type": "object",
+      "required": [
+        "start",
+        "increment"
+      ]
     },
     "LuhnType": {
       "properties": {
@@ -139,122 +138,6 @@
       "type": "object"
     },
     "MaskType": {
-      "properties": {
-        "add": {
-          "additionalProperties": true
-        },
-        "add-transient": {
-          "additionalProperties": true
-        },
-        "constant": {
-          "additionalProperties": true
-        },
-        "randomChoice": {
-          "items": {
-            "additionalProperties": true
-          },
-          "type": "array"
-        },
-        "randomChoiceInUri": {
-          "type": "string"
-        },
-        "command": {
-          "type": "string"
-        },
-        "randomInt": {
-          "$schema": "http://json-schema.org/draft-04/schema#",
-          "$ref": "#/definitions/RandIntType"
-        },
-        "weightedChoice": {
-          "items": {
-            "$schema": "http://json-schema.org/draft-04/schema#",
-            "$ref": "#/definitions/WeightedChoiceType"
-          },
-          "type": "array"
-        },
-        "regex": {
-          "type": "string"
-        },
-        "hash": {
-          "items": {
-            "additionalProperties": true
-          },
-          "type": "array"
-        },
-        "hashInUri": {
-          "type": "string"
-        },
-        "randDate": {
-          "$schema": "http://json-schema.org/draft-04/schema#",
-          "$ref": "#/definitions/RandDateType"
-        },
-        "incremental": {
-          "$schema": "http://json-schema.org/draft-04/schema#",
-          "$ref": "#/definitions/IncrementalType"
-        },
-        "replacement": {
-          "type": "string"
-        },
-        "template": {
-          "type": "string"
-        },
-        "template-each": {
-          "$schema": "http://json-schema.org/draft-04/schema#",
-          "$ref": "#/definitions/TemplateEachType"
-        },
-        "duration": {
-          "type": "string"
-        },
-        "remove": {
-          "type": "boolean"
-        },
-        "range": {
-          "type": "integer"
-        },
-        "randomDuration": {
-          "$schema": "http://json-schema.org/draft-04/schema#",
-          "$ref": "#/definitions/RandomDurationType"
-        },
-        "fluxUri": {
-          "type": "string"
-        },
-        "randomDecimal": {
-          "$schema": "http://json-schema.org/draft-04/schema#",
-          "$ref": "#/definitions/RandomDecimalType"
-        },
-        "dateParser": {
-          "$schema": "http://json-schema.org/draft-04/schema#",
-          "$ref": "#/definitions/DateParserType"
-        },
-        "fromCache": {
-          "type": "string"
-        },
-        "ff1": {
-          "$schema": "http://json-schema.org/draft-04/schema#",
-          "$ref": "#/definitions/FF1Type"
-        },
-        "pipe": {
-          "$schema": "http://json-schema.org/draft-04/schema#",
-          "$ref": "#/definitions/PipeType"
-        },
-        "fromjson": {
-          "type": "string"
-        },
-        "luhn": {
-          "$schema": "http://json-schema.org/draft-04/schema#",
-          "$ref": "#/definitions/LuhnType"
-        },
-        "markov": {
-          "$schema": "http://json-schema.org/draft-04/schema#",
-          "$ref": "#/definitions/MarkovType"
-        },
-        "transcode": {
-          "$schema": "http://json-schema.org/draft-04/schema#",
-          "$ref": "#/definitions/TranscodeType"
-        }
-      },
-      "additionalProperties": false,
-      "type": "object",
       "oneOf": [
         {
           "required": [
@@ -436,43 +319,102 @@
           ],
           "title": "Transcode"
         }
-      ]
-    },
-    "Masking": {
+      ],
       "properties": {
-        "selector": {
-          "$schema": "http://json-schema.org/draft-04/schema#",
-          "$ref": "#/definitions/SelectorType"
+        "add": true,
+        "add-transient": true,
+        "constant": true,
+        "randomChoice": {
+          "items": true,
+          "type": "array"
         },
-        "selectors": {
+        "randomChoiceInUri": {
+          "type": "string"
+        },
+        "command": {
+          "type": "string"
+        },
+        "randomInt": {
+          "$ref": "#/$defs/RandIntType"
+        },
+        "weightedChoice": {
           "items": {
-            "$ref": "#/definitions/SelectorType"
+            "$ref": "#/$defs/WeightedChoiceType"
           },
           "type": "array"
         },
-        "mask": {
-          "$schema": "http://json-schema.org/draft-04/schema#",
-          "$ref": "#/definitions/MaskType"
+        "regex": {
+          "type": "string"
         },
-        "masks": {
-          "items": {
-            "$ref": "#/definitions/MaskType"
-          },
+        "hash": {
+          "items": true,
           "type": "array"
         },
-        "cache": {
+        "hashInUri": {
           "type": "string"
         },
-        "preserve": {
+        "randDate": {
+          "$ref": "#/$defs/RandDateType"
+        },
+        "incremental": {
+          "$ref": "#/$defs/IncrementalType"
+        },
+        "replacement": {
           "type": "string"
         },
-        "seed": {
-          "$schema": "http://json-schema.org/draft-04/schema#",
-          "$ref": "#/definitions/SeedType"
+        "template": {
+          "type": "string"
+        },
+        "template-each": {
+          "$ref": "#/$defs/TemplateEachType"
+        },
+        "duration": {
+          "type": "string"
+        },
+        "remove": {
+          "type": "boolean"
+        },
+        "range": {
+          "type": "integer"
+        },
+        "randomDuration": {
+          "$ref": "#/$defs/RandomDurationType"
+        },
+        "fluxUri": {
+          "type": "string"
+        },
+        "randomDecimal": {
+          "$ref": "#/$defs/RandomDecimalType"
+        },
+        "dateParser": {
+          "$ref": "#/$defs/DateParserType"
+        },
+        "fromCache": {
+          "type": "string"
+        },
+        "ff1": {
+          "$ref": "#/$defs/FF1Type"
+        },
+        "pipe": {
+          "$ref": "#/$defs/PipeType"
+        },
+        "fromjson": {
+          "type": "string"
+        },
+        "luhn": {
+          "$ref": "#/$defs/LuhnType"
+        },
+        "markov": {
+          "$ref": "#/$defs/MarkovType"
+        },
+        "transcode": {
+          "$ref": "#/$defs/TranscodeType"
         }
       },
       "additionalProperties": false,
-      "type": "object",
+      "type": "object"
+    },
+    "Masking": {
       "oneOf": [
         {
           "required": [
@@ -502,13 +444,44 @@
           ],
           "title": "case4"
         }
-      ]
+      ],
+      "properties": {
+        "selector": {
+          "$ref": "#/$defs/SelectorType"
+        },
+        "selectors": {
+          "items": {
+            "$ref": "#/$defs/SelectorType"
+          },
+          "type": "array"
+        },
+        "mask": {
+          "$ref": "#/$defs/MaskType"
+        },
+        "masks": {
+          "items": {
+            "$ref": "#/$defs/MaskType"
+          },
+          "type": "array"
+        },
+        "cache": {
+          "type": "string"
+        },
+        "preserve": {
+          "type": "string"
+        },
+        "seed": {
+          "$ref": "#/$defs/SeedType"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
     },
     "PipeType": {
       "properties": {
         "masking": {
           "items": {
-            "$ref": "#/definitions/Masking"
+            "$ref": "#/$defs/Masking"
           },
           "type": "array"
         },
@@ -526,10 +499,6 @@
       "type": "object"
     },
     "RandDateType": {
-      "required": [
-        "dateMin",
-        "dateMax"
-      ],
       "properties": {
         "dateMin": {
           "type": "string",
@@ -541,13 +510,13 @@
         }
       },
       "additionalProperties": false,
-      "type": "object"
+      "type": "object",
+      "required": [
+        "dateMin",
+        "dateMax"
+      ]
     },
     "RandIntType": {
-      "required": [
-        "min",
-        "max"
-      ],
       "properties": {
         "min": {
           "type": "integer"
@@ -557,14 +526,13 @@
         }
       },
       "additionalProperties": false,
-      "type": "object"
+      "type": "object",
+      "required": [
+        "min",
+        "max"
+      ]
     },
     "RandomDecimalType": {
-      "required": [
-        "Min",
-        "Max",
-        "Precision"
-      ],
       "properties": {
         "Min": {
           "type": "number"
@@ -577,13 +545,14 @@
         }
       },
       "additionalProperties": false,
-      "type": "object"
-    },
-    "RandomDurationType": {
+      "type": "object",
       "required": [
         "Min",
-        "Max"
-      ],
+        "Max",
+        "Precision"
+      ]
+    },
+    "RandomDurationType": {
       "properties": {
         "Min": {
           "type": "string"
@@ -593,7 +562,11 @@
         }
       },
       "additionalProperties": false,
-      "type": "object"
+      "type": "object",
+      "required": [
+        "Min",
+        "Max"
+      ]
     },
     "SeedType": {
       "properties": {
@@ -605,16 +578,16 @@
       "type": "object"
     },
     "SelectorType": {
-      "required": [
-        "jsonpath"
-      ],
       "properties": {
         "jsonpath": {
           "type": "string"
         }
       },
       "additionalProperties": false,
-      "type": "object"
+      "type": "object",
+      "required": [
+        "jsonpath"
+      ]
     },
     "TemplateEachType": {
       "properties": {
@@ -635,8 +608,7 @@
       "properties": {
         "classes": {
           "items": {
-            "$schema": "http://json-schema.org/draft-04/schema#",
-            "$ref": "#/definitions/Class"
+            "$ref": "#/$defs/Class"
           },
           "type": "array"
         }
@@ -645,20 +617,18 @@
       "type": "object"
     },
     "WeightedChoiceType": {
-      "required": [
-        "choice",
-        "weight"
-      ],
       "properties": {
-        "choice": {
-          "additionalProperties": true
-        },
+        "choice": true,
         "weight": {
           "type": "integer"
         }
       },
       "additionalProperties": false,
-      "type": "object"
+      "type": "object",
+      "required": [
+        "choice",
+        "weight"
+      ]
     }
   }
 }

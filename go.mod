@@ -5,9 +5,9 @@ go 1.17
 require (
 	github.com/Masterminds/sprig/v3 v3.2.2
 	github.com/Trendyol/overlog v0.1.1
-	github.com/alecthomas/jsonschema v0.0.0-20210526225647-edb03dcab7bc
 	github.com/capitalone/fpe v1.2.1
 	github.com/goccy/go-yaml v1.9.5
+	github.com/invopop/jsonschema v0.4.0
 	github.com/labstack/echo/v4 v4.7.2
 	github.com/mattn/go-isatty v0.0.14
 	github.com/rs/zerolog v1.27.0

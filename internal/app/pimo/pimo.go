@@ -26,7 +26,6 @@ import (
 	"time"
 
 	over "github.com/Trendyol/overlog"
-	"github.com/alecthomas/jsonschema"
 	"github.com/cgi-fr/pimo/pkg/add"
 	"github.com/cgi-fr/pimo/pkg/addtransient"
 	"github.com/cgi-fr/pimo/pkg/command"
@@ -58,6 +57,7 @@ import (
 	"github.com/cgi-fr/pimo/pkg/templatemask"
 	"github.com/cgi-fr/pimo/pkg/transcode"
 	"github.com/cgi-fr/pimo/pkg/weightedchoice"
+	"github.com/invopop/jsonschema"
 	"github.com/rs/zerolog/log"
 )
 
