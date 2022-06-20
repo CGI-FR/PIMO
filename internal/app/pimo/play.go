@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/fs"
 	"net/http"
+	"net/url"
 	"strings"
 
 	"github.com/cgi-fr/pimo/pkg/jsonline"
@@ -17,7 +18,7 @@ import (
 //go:embed client
 var content embed.FS
 
-func Play() *echo.Echo {
+func Play(enableSecurity bool) *echo.Echo {
 	router := echo.New()
 
 	router.Use(middleware.CORS())
@@ -25,6 +26,15 @@ func Play() *echo.Echo {
 		Format: "${time_rfc3339} : method=${method}, uri=${uri}, status=${status}, host=${host}, origin=${user_agent}\n" +
 			" err=${error}\n",
 	}))
+
+	if enableSecurity {
+		router.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
+			return func(c echo.Context) error {
+				c.Set("enableSecurity", true)
+				return next(c)
+			}
+		})
+	}
 
 	router.GET("/*", echo.WrapHandler(handleClient()))
 	router.POST("/play", play)
@@ -70,6 +80,13 @@ func play(ctx echo.Context) error {
 		return ctx.String(http.StatusInternalServerError, err.Error())
 	}
 
+	if ctx.Get("enableSecurity") == true {
+		if err := checkSecurityRequirements(pdef); err != nil {
+			log.Err(err).Msg("Forbidden request")
+			return ctx.String(http.StatusInternalServerError, err.Error())
+		}
+	}
+
 	config.SingleInput = &input
 	context := NewContext(pdef)
 
@@ -88,6 +105,47 @@ func play(ctx echo.Context) error {
 
 	log.Info().Interface("stats", stats).Msg("Input masked")
 	return ctx.JSONBlob(http.StatusOK, []byte(result.String()))
+}
+
+func checkSecurityRequirements(pdef model.Definition) error {
+	for _, mask := range pdef.Masking {
+		// usage of command is not allowed with pimo play
+		if len(mask.Mask.Command) > 0 {
+			return fmt.Errorf("Usage of `command` mask is forbidden")
+		}
+
+		// usage of file scheme is not allowed
+		if err := checkUriScheme(mask.Mask.FluxURI); err != nil {
+			return err
+		}
+
+		if err := checkUriScheme(mask.Mask.HashInURI); err != nil {
+			return err
+		}
+
+		if err := checkUriScheme(mask.Mask.Markov.Sample); err != nil {
+			return err
+		}
+
+		if err := checkUriScheme(mask.Mask.RandomChoiceInURI); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func checkUriScheme(uri string) error {
+	u, err := url.Parse(uri)
+	if err != nil {
+		return nil
+	}
+
+	if u.Scheme == "file" {
+		return fmt.Errorf("Usage of `file` scheme is forbidden")
+	}
+
+	return nil
 }
 
 func handleClient() http.Handler {
