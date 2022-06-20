@@ -116,10 +116,11 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 	})
 
 	playPort := 3010
+	playSecure := false
 	playCmd := &cobra.Command{
 		Use: "play",
 		Run: func(cmd *cobra.Command, args []string) {
-			router := pimo.Play()
+			router := pimo.Play(playSecure)
 			port := fmt.Sprintf("0.0.0.0:%d", playPort)
 
 			if err := router.Start(port); err != nil {
@@ -128,6 +129,7 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 		},
 	}
 	playCmd.PersistentFlags().IntVarP(&playPort, "port", "p", 3010, "port number")
+	playCmd.PersistentFlags().BoolVarP(&playSecure, "secure", "s", false, "enable security features (use this flag if PIMO Play is publicly exposed)")
 	rootCmd.AddCommand(playCmd)
 
 	if err := rootCmd.Execute(); err != nil {
