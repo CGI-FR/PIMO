@@ -222,8 +222,8 @@ targets:
       - $: touch web/play/node_modules/go.mod
       - $: rm -rf internal/app/pimo/client/*
       - $: cp -r web/play/dist/* internal/app/pimo/client
-      - $: sed -i 's/{{version}}/={realtag}/g' internal/app/pimo/client/index.html
-      - $: sed -i 's/{{version}}/={realtag}/g' internal/app/pimo/client/main.js
+      - $: sed -i 's#{{version}}#={realtag}#g' internal/app/pimo/client/index.html
+      - $: sed -i 's#{{version}}#={realtag}#g' internal/app/pimo/client/main.js
       - $: git checkout -- internal/app/pimo/client
 
   # run "neon -props '{buildpaths: ["path/to/main/package1","path/to/main/package2"]}' compile" to compile specific targets
