@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1655796766651,
+  "lastUpdate": 1655797107599,
   "repoUrl": "https://github.com/CGI-FR/PIMO",
   "entries": {
     "Benchmark": [
@@ -894,6 +894,42 @@ window.BENCHMARK_DATA = {
             "value": 4451413,
             "unit": "ns/op\t  628712 B/op\t    5488 allocs/op",
             "extra": "2770 times\n2 procs"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "49699333+dependabot[bot]@users.noreply.github.com",
+            "name": "dependabot[bot]",
+            "username": "dependabot[bot]"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "f257f1631e3ec5857b6e311c4dd1ddcfbad29518",
+          "message": "chore(deps): bump github.com/stretchr/testify from 1.7.2 to 1.7.4 (#128)\n\nBumps [github.com/stretchr/testify](https://github.com/stretchr/testify) from 1.7.2 to 1.7.4.\r\n- [Release notes](https://github.com/stretchr/testify/releases)\r\n- [Commits](https://github.com/stretchr/testify/compare/v1.7.2...v1.7.4)\r\n\r\n---\r\nupdated-dependencies:\r\n- dependency-name: github.com/stretchr/testify\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-patch\r\n...\r\n\r\nSigned-off-by: dependabot[bot] <support@github.com>\r\n\r\nCo-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>",
+          "timestamp": "2022-06-21T09:33:34+02:00",
+          "tree_id": "6d37e2de17e4694adc28cba0fc46f98c70420ce7",
+          "url": "https://github.com/CGI-FR/PIMO/commit/f257f1631e3ec5857b6e311c4dd1ddcfbad29518"
+        },
+        "date": 1655797107222,
+        "tool": "go",
+        "benches": [
+          {
+            "name": "BenchmarkPimoRun",
+            "value": 229415,
+            "unit": "ns/op\t    4144 B/op\t     120 allocs/op",
+            "extra": "50816 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge",
+            "value": 4042825,
+            "unit": "ns/op\t  628673 B/op\t    5489 allocs/op",
+            "extra": "2872 times\n2 procs"
           }
         ]
       }
