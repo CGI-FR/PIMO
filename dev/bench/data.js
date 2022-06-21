@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1655732023719,
+  "lastUpdate": 1655796083905,
   "repoUrl": "https://github.com/CGI-FR/PIMO",
   "entries": {
     "Benchmark": [
@@ -824,6 +824,40 @@ window.BENCHMARK_DATA = {
             "value": 3974730,
             "unit": "ns/op\t  628685 B/op\t    5488 allocs/op",
             "extra": "2834 times\n2 procs"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "Adrien Aury",
+            "username": "adrienaury",
+            "email": "44274230+adrienaury@users.noreply.github.com"
+          },
+          "committer": {
+            "name": "GitHub",
+            "username": "web-flow",
+            "email": "noreply@github.com"
+          },
+          "id": "ca50a35e9b115ec69fc3159dc92d2fd782ce5cdd",
+          "message": "chore(build): fix when tag has slash",
+          "timestamp": "2022-06-21T07:08:33Z",
+          "url": "https://github.com/CGI-FR/PIMO/commit/ca50a35e9b115ec69fc3159dc92d2fd782ce5cdd"
+        },
+        "date": 1655796083570,
+        "tool": "go",
+        "benches": [
+          {
+            "name": "BenchmarkPimoRun",
+            "value": 181522,
+            "unit": "ns/op\t    4036 B/op\t     106 allocs/op",
+            "extra": "64113 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge",
+            "value": 3124822,
+            "unit": "ns/op\t  628632 B/op\t    5489 allocs/op",
+            "extra": "3718 times\n2 procs"
           }
         ]
       }
