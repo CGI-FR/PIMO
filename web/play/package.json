@@ -15,6 +15,7 @@
     },
     "devDependencies": {
         "css-loader": "^6.0.0",
+        "cssnano": "^5.1.12",
         "html-webpack-plugin": "^5.0.0",
         "postcss": "^8.4.14",
         "postcss-loader": "^7.0.0",
