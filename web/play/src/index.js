@@ -1,4 +1,5 @@
 import './style.css';
+import LZString from 'lz-string';
 import { editor, Uri } from 'monaco-editor';
 import { setDiagnosticsOptions } from 'monaco-yaml';
 
@@ -31,21 +32,30 @@ setDiagnosticsOptions({
 // });
 // editor.setTheme("PIMO");
 
-const value = 'version: "1"\nmasking:\n  - selector:\n      jsonpath: "name"\n    mask:\n      randomChoiceInUri: "pimo://nameFR"\n';
+var masking = 'version: "1"\nmasking:\n  - selector:\n      jsonpath: "name"\n    mask:\n      randomChoiceInUri: "pimo://nameFR"\n';
+var input = '{\n  "name": "Bill"\n}';
+
+const urlParams = new URLSearchParams(window.location.search);
+if (urlParams.has('c')) {
+    masking = LZString.decompressFromEncodedURIComponent(urlParams.get('c'));
+}
+if (urlParams.has('i')) {
+    input = LZString.decompressFromEncodedURIComponent(urlParams.get('i'));
+}
 
 var editorYaml = editor.create(document.getElementById('editor-yaml'), {
   automaticLayout: true,
   tabSize: 2,
   scrollBeyondLastLine: false,
   minimap: {enabled: false},
-  model: editor.createModel(value, 'yaml', modelUri),
+  model: editor.createModel(masking, 'yaml', modelUri),
 });
 
 var editorJson = editor.create(document.getElementById('editor-json'), {
   automaticLayout: true,
   scrollBeyondLastLine: false,
   minimap: {enabled: false},
-  model: editor.createModel('{\n  "name": "Bill"\n}', 'json', Uri.parse('file://data.jsonl')),
+  model: editor.createModel(input, 'json', Uri.parse('file://data.jsonl')),
 });
 
 var resultJson = editor.create(document.getElementById('result-json'), {
@@ -64,6 +74,11 @@ async function postData() {
       masking: editorYaml.getValue()
   }
   console.log(postData)
+
+  // update URL for sharing
+  var c = LZString.compressToEncodedURIComponent(postData.masking);
+  var i = LZString.compressToEncodedURIComponent(postData.data);
+  window.history.replaceState(null, null, `${location.protocol}//${location.host}${location.pathname}?c=${c}&i=${i}`);
 
   // if (postData.data.length === 0 || postData.masking.length === 0) {
   //     postData.data = example.json
