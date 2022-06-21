@@ -14,6 +14,10 @@ Types of changes
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [1.14.0]
+
+- `Added` (play) possibility to share URL directly from the Play website
+
 ## [1.13.0]
 
 - `Added` seed option on all randomized masks, another way to preserve data coherence
