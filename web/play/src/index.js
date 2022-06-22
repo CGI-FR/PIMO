@@ -15,7 +15,7 @@ setDiagnosticsOptions({
   schemas: [
     {
       // Id of the first schema
-      uri: 'https://raw.githubusercontent.com/CGI-FR/PIMO/{{version}}/schema/v1/pimo.schema.json',
+      uri: 'https://raw.githubusercontent.com/CGI-FR/PIMO/{{ version }}/schema/v1/pimo.schema.json',
       // Associate with our model
       fileMatch: [String(modelUri)],
     },
