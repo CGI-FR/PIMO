@@ -113,14 +113,14 @@ async function postData() {
       console.log(err)
       document.getElementById('result-error').innerText = err
   } finally {
-    document.getElementById('label-output').innerText = "Output"
+    document.getElementById('refresh-spinner').style.display = 'none';
   }
 }
 
 function debounce(func, timeout = 300){
     let timer;
     return (...args) => {
-        document.getElementById('label-output').innerText = "Output (refreshing...)"
+        document.getElementById('refresh-spinner').style.display = 'inline';
         clearTimeout(timer);
         timer = setTimeout(() => { func.apply(this, args); }, timeout);
     };

@@ -27,7 +27,15 @@
           <div class="flex-none font-sans text-xl pb-2">Input</div>
           <div class="grow shadow-lg h-[300px] md:h-full" id="editor-json"></div>
 
-          <div class="flex-none font-sans text-xl py-2" id="label-output">Output</div>
+          <div class="flex-none font-sans text-xl py-2" id="label-output">
+            <span>Output</span>
+            <svg xmlns="http://www.w3.org/2000/svg" id="refresh-spinner" class="animate-spin h-5 w-5 inline" viewBox="0 0 14 14">
+              <g fill="none" fill-rule="evenodd">
+                <circle cx="7" cy="7" r="6" stroke="#000" stroke-opacity=".1" stroke-width="2" />
+                <path fill="#000" fill-opacity=".1" fill-rule="nonzero" d="M7 0a7 7 0 0 1 7 7h-2a5 5 0 0 0-5-5V0z" />
+              </g>
+            </svg>
+          </div>
           <div class="grow shadow-lg h-[300px] md:h-full" id="result-json"></div>
         </div>
       </div>
