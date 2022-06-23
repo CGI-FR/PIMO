@@ -21,6 +21,7 @@ Types of changes
 - `Added` loading screen when JS is loading on PIMO Play website
 - `Added` loading spinner when refreshing output on PIMO Play website
 - `Added` a refresh button on PIMO Play website
+- `Fixed` jsonschema for `randomDecimal` and `randomDuration` masks
 
 ## [1.13.0]
 
