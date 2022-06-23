@@ -159,121 +159,6 @@
       "type": "object"
     },
     "MaskType": {
-      "properties": {
-        "add": {
-          "additionalProperties": true
-        },
-        "add-transient": {
-          "additionalProperties": true
-        },
-        "constant": {
-          "additionalProperties": true
-        },
-        "randomChoice": {
-          "items": {
-            "additionalProperties": true
-          },
-          "type": "array"
-        },
-        "randomChoiceInUri": {
-          "type": "string"
-        },
-        "command": {
-          "type": "string"
-        },
-        "randomInt": {
-          "$schema": "http://json-schema.org/draft-04/schema#",
-          "$ref": "#/definitions/RandIntType"
-        },
-        "weightedChoice": {
-          "items": {
-            "$schema": "http://json-schema.org/draft-04/schema#",
-            "$ref": "#/definitions/WeightedChoiceType"
-          },
-          "type": "array"
-        },
-        "regex": {
-          "type": "string"
-        },
-        "hash": {
-          "items": {
-            "additionalProperties": true
-          },
-          "type": "array"
-        },
-        "hashInUri": {
-          "type": "string"
-        },
-        "randDate": {
-          "$schema": "http://json-schema.org/draft-04/schema#",
-          "$ref": "#/definitions/RandDateType"
-        },
-        "incremental": {
-          "$schema": "http://json-schema.org/draft-04/schema#",
-          "$ref": "#/definitions/IncrementalType"
-        },
-        "replacement": {
-          "type": "string"
-        },
-        "template": {
-          "type": "string"
-        },
-        "template-each": {
-          "$schema": "http://json-schema.org/draft-04/schema#",
-          "$ref": "#/definitions/TemplateEachType"
-        },
-        "duration": {
-          "type": "string"
-        },
-        "remove": {
-          "type": "boolean"
-        },
-        "range": {
-          "type": "integer"
-        },
-        "randomDuration": {
-          "$schema": "http://json-schema.org/draft-04/schema#",
-          "$ref": "#/definitions/RandomDurationType"
-        },
-        "fluxUri": {
-          "type": "string"
-        },
-        "randomDecimal": {
-          "$schema": "http://json-schema.org/draft-04/schema#",
-          "$ref": "#/definitions/RandomDecimalType"
-        },
-        "dateParser": {
-          "$schema": "http://json-schema.org/draft-04/schema#",
-          "$ref": "#/definitions/DateParserType"
-        },
-        "fromCache": {
-          "type": "string"
-        },
-        "ff1": {
-          "$schema": "http://json-schema.org/draft-04/schema#",
-          "$ref": "#/definitions/FF1Type"
-        },
-        "pipe": {
-          "$schema": "http://json-schema.org/draft-04/schema#",
-          "$ref": "#/definitions/PipeType"
-        },
-        "fromjson": {
-          "type": "string"
-        },
-        "luhn": {
-          "$schema": "http://json-schema.org/draft-04/schema#",
-          "$ref": "#/definitions/LuhnType"
-        },
-        "markov": {
-          "$schema": "http://json-schema.org/draft-04/schema#",
-          "$ref": "#/definitions/MarkovType"
-        },
-        "permute": {
-          "type": "boolean"
-        }
-      },
-      "additionalProperties": false,
-      "type": "object",
       "oneOf": [
         {
           "required": [
@@ -451,16 +336,16 @@
         },
         {
           "required": [
-            "permute"
-          ],
-          "title": "Permute"
-        },
-        {
-          "required": [
             "transcode"
           ],
           "title": "Transcode"
         },
+        {
+          "required": [
+            "permute"
+          ],
+          "title": "Permute"
+        }
       ],
       "properties": {
         "add": {
@@ -614,6 +499,11 @@
           "$ref": "#/$defs/TranscodeType",
           "title": "Transcode Mask",
           "description": "Produce a random string by preserving character classes from the original value"
+        },
+        "permute": {
+          "type": "boolean",
+          "title": "Permute Mask",
+          "description": "Shuffle value with values from other records"
         }
       },
       "additionalProperties": false,
