@@ -20,7 +20,7 @@ export default {
     },
   },
   plugins: [
-    new HtmlWebPackPlugin({inject: "body"}),
+    new HtmlWebPackPlugin(),
     new MonacoWebpackPlugin({
       languages: ['yaml','json'],
       customLanguages: [

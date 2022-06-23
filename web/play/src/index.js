@@ -66,6 +66,8 @@ var resultJson = editor.create(document.getElementById('result-json'), {
   model: editor.createModel('', 'json', Uri.parse('file://result.jsonl')),
 });
 
+document.getElementById('loading').remove();
+
 ///////////////////////////////////////////////////////////
 
 async function postData() {
