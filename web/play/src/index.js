@@ -114,6 +114,7 @@ async function postData() {
       document.getElementById('result-error').innerText = err
   } finally {
     document.getElementById('refresh-spinner').style.display = 'none';
+    document.getElementById('refresh-button').style.display = 'inline';
   }
 }
 
@@ -121,6 +122,7 @@ function debounce(func, timeout = 300){
     let timer;
     return (...args) => {
         document.getElementById('refresh-spinner').style.display = 'inline';
+        document.getElementById('refresh-button').style.display = 'none';
         clearTimeout(timer);
         timer = setTimeout(() => { func.apply(this, args); }, timeout);
     };
@@ -135,4 +137,5 @@ document.getElementById('editor-json').onkeyup = autoPostData;
 document.getElementById('editor-json').oninput = autoPostData;
 document.getElementById('editor-json').onpaste = autoPostData;
 document.getElementById('editor-json').oncut = autoPostData;
+document.getElementById('refresh-button').onclick = autoPostData;
 autoPostData();
