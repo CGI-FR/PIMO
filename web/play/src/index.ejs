@@ -5,15 +5,19 @@
     <title>PIMO Play</title>
   </head>
   <body>
+    <div id="loading" style="background: rgba(255, 255, 255, 1); position: fixed; width: 100%; height: 100%; left: 0; top: 0; z-index: 10; text-align: center"><p style="position: absolute; width: 100%; top: 50%; text-align: center">Loading...</p></div>
+
     <div class="mb-5 flex space-x-4 items-baseline bg-black text-white">
-        <div class="m-5 font-sans text-4xl font-bold">PIMO Play</div>
-        <div class="text-slate-200 text-sm">A playground for <a href="https://github.com/CGI-FR/PIMO/tree/{{version}}" target="_blank" rel="noopener noreferrer" class="hover:underline">pimo {{version}}</a></div>
-        <div class="grow"></div>
+      <div class="m-5 font-sans text-4xl font-bold">PIMO Play</div>
+      <div class="text-slate-200 text-sm">
+        A playground for
+        <a href="https://github.com/CGI-FR/PIMO/tree/{{ version }}" target="_blank" rel="noopener noreferrer" class="hover:underline">pimo {{ version }}</a>
+      </div>
+      <div class="grow"></div>
     </div>
 
     <div class="px-4 md:px-8 lg:px-16">
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-8">
-
         <div class="flex flex-col">
           <div class="flex-none font-sans text-xl pb-2">Masking Configuration</div>
           <div class="grow shadow-lg h-[300px] md:h-[600px]" id="editor-yaml"></div>
@@ -23,14 +27,122 @@
           <div class="flex-none font-sans text-xl pb-2">Input</div>
           <div class="grow shadow-lg h-[300px] md:h-full" id="editor-json"></div>
 
-          <div class="flex-none font-sans text-xl py-2" id="label-output">Output</div>
+          <div class="flex-none font-sans text-xl py-2" id="label-output">
+            <span>Output</span>
+            <a href="#" id="refresh-button" class="hidden text-md font-medium">↻</a>
+            <svg xmlns="http://www.w3.org/2000/svg" id="refresh-spinner" class="animate-spin h-5 w-5 inline" viewBox="0 0 14 14">
+              <g fill="none" fill-rule="evenodd">
+                <circle cx="7" cy="7" r="6" stroke="#000" stroke-opacity=".1" stroke-width="2" />
+                <path fill="#000" fill-opacity=".1" fill-rule="nonzero" d="M7 0a7 7 0 0 1 7 7h-2a5 5 0 0 0-5-5V0z" />
+              </g>
+            </svg>
+          </div>
           <div class="grow shadow-lg h-[300px] md:h-full" id="result-json"></div>
         </div>
-
       </div>
 
       <div class="flex-none font-sans text-lg text-red-500" id="result-error"></div>
-    </div>
 
+      <div class="flex flex-col md:flex-row mt-5 gap-2 justify-evenly">
+        <div>
+          <h3 class="text-lg">Data Generation</h3>
+          <a
+            class="text-blue-400 text-sm underline block"
+            href="/?c=MQAgKgFglgziCmAPAhgWwA4Bt4hhA9gO4gHEAu+u82AxmSAG7KYCu8cAZgE76ohfwO8AQDsyUZjABQoAIL9Bw+GImYQNZCJAAjHMhCZ8GtRyjYANCH2F42hTHwsuNHPi5WQABQCSAWQDyIFBiwiLMCkKi4swy4BBKQXD6QsQCkcrRmHDoyDQA1vAAJkEiMFCFOGTxIABE6FCo+DU6wchcAJ6WsRxuCCgY2CD1jQBcAPRjYajwAKIAcur4YsjBSQaw9PgcCCIA5piwECBT7AB0UlIMwmVLI7UAjDVSqMgwecG7IxcgIKCmXDB6NgyABybJQfIgFjoDxcTSFXjHNA4biI-QHQEgLZI6bSH6gKo4E4gQhmNS6dQCZBkIolMoVDymajFE7FGr-QEAfROT3xIEJIA59Beb1qyEKhWasGO8CKtIoVgl-OqTMwxWCypwACkAMr+BaOMjoFhkKR83QaFgwHA2ElkkC7KBXKxaeAYMjtEC6-UlY30BXDfBm36amWIYWvPJ2zBqa20ej6OEiBF8JisHAagU1E4AMQASs00koVDEfgBaKjxtxfH61kAAKwcIhyVTu7KgALI3ORvNrIryMBrdZAFfFhTbvbrFaTKYAwgQIfBvCIAKpcKBtwPjSbI-NPYOgGDIxYiFzoMicXoCzCvegnSzaE12qogQpQDjpMQRYuZF3FVUssieIjpW8B0NWwZ1o2SwthAbY3lyPKQSA-aDsh5aKuOtSTrW07wrw874Iuy5rhutRbhMMBOLmBbfCGApuisJhQMy0bkjgNC8H6tKonwAroAIDBQI4cBpmwwEEpQCLKrAli2laei4B8gz9li2weugOA1DSAzUvAvYEtUOlYHp-LIAUawVDANDruewlaNipD8pQj5mMUAoCFRmD0GJKI8Hw+CEu4AGMMw4kHoKvSNAIJQ9FwLziEsIB3BAZBGoOEzaIYuynLs+DoPEcIaBUqDtKcnGoGM4pXGIZYAEwAAz3AA7GMVofGWeVlsZN40jAYwRYYNjuPCIBzPgsg0C4X5tCiLCnolpSWIGfQ0smcACnl-JuiZfXPkcSBkHCgrzXQ9kSZF7jRRmIhxQl9nJSQaXoBlYwijS8XBIUMC5VAVQsNopzCWMMACVAuwDRhcZgRQXBDlBTawW2jFmDh-bw7WY5tgA3tjICnEK3bTCAAA+BhEMIpNjRNU0ZCAAC+9OnLj+MIV2xJk0NlNk+Nk3TfQjMAALtPlLxmATXBPEAA&i=N4XyA"
+            >Generate first name, last name and email from referentials</a
+          >
+          <a
+            class="text-blue-400 text-sm underline block"
+            href="/?c=MQAgKgFglgziCmAPAhgWwA4Bt4hhA9gO4gHEAu+IAxgE7zJk4B28xAbspgK7xxkQMQmfPgDWcTFFE46nEB268AUKADqOLjBzIQAWWQ1R+NtQFQmICiAAmlfrAA0l6HFghkFzgHN8NKP1RnQSoPEAAjHDIaZHN4axB8C1lMGwZkJSU2eBoYKESALhAAIgBGIqVUZBhRcy98jJAQUH4cSsNjEErqkEIoTBSveBZoxnd5Th4gshA3XNQ+g0tKBR5XCxaQLygspPgAM2yhsihOJUbQCEOeyOjzZ1aDIxNUfGt4FN7+ECY0XhmmKjcN7xO5FdBQF75AD0UJgXBoP1Q8AAYgAlIogM4gAC0uHe8CoFBo9UapJAACsYIl0AwIIUinsoDkyAB9RHwcpkrriElknHuazWemcvm4tpPXl80kwNBYeD08GQmFwhG-NHlLGgGVI6iJKjwdBkOB7Xz3IRVabspxhLjTT4QGxQPYHOhMaZ0F1HE4pDzxRnveLsmBY3FabCE3yS0mU6m0+mYC1s34ixrcmBRxq45CC4VYslix7GDN87VyhUQ-DQqHs9UNJpm+CVPogf2YeK9frhHBUfAYW1xFs0Xtm9B0Nh5TTjRTB85LGx2FxOQgaLRjXJMLzYTpVUQJPaWACe6BwRUYGATjBFzUulkbWAYkWQ0jgOjeMFoUENeQs+H3pDnNp9PEGx0HCmDTCsOB7EOgT4C0NAtlAAZTqsmotqaLx0P8Jo0JUxyJCAhQQGQZDoOmMJhMIXgAHQ+OglzRCEbyoAe1E9qgULZjsZDYgATAADCUADsUKaLU2I+NiZ73owMBQmhwjLghvogAAcvgACCVD6m67hYXsXAAvhTAwE4iqUEgjBMNYfA3j4t7ng+cD2ggiBRDoBlGd+M71jhnS+Dg5g4Xh36ESQJFkVWXSMLh5g2bR-gQFwYTUXksKjlAXjyZmeLhkSxYxkwNL8PSjYxJgKbbtUxbZkKxQAN71SA1GMsySY6gAPkIRDZCAXXqVpOnTF1cJhDAUQgPxIAlCAAC+s3UY1zUJuN7U4F1im9f1mnaUcc2zQAAge+DoE2mAtTQ5RAA&i=N4XyA"
+            >Generate first name, last name and email from sample data</a
+          >
+          <a
+            class="text-blue-400 text-sm underline block"
+            href="/?c=MQAgKgFglgziCmAPAhgWwA4Bt4hhA9gO4gHEAu+IA5vAHbwBOyZOAZsgNY4xkNS1UQAN2SYArvDhkIzEA0np4AYzIhkIVvgapmAKFAB1HISiZM1Oo2Y50BeiFpjUAI0ZwAFADEmtJTmS0ACYgAKoAdADKYRpaOmQwAJQgYjD8gtI4AETyNIiZIDowHLq6Qm5Q+LQAXCCZAIyZuoUcaVUlICAAtLjw2CpabR1DIABWMJXozBA1mbaV8AD6rAyNw80wg8NdaoGBM6tb3TlIMwAMANp1nQBsALruIOennQCctwDeAEwAvgnvACzfRq6DrdGC9ZQUBibYZjCZTGZzegLFIHDrrGFDbrIXb7EGHOTwXIzc7uW5PV4fADM33OCVuj2eb3eNM6FOZgMaQA&i=N4XyA"
+            >Generate a fake phone number</a
+          >
+          <a
+            class="text-blue-400 text-sm underline block"
+            href="/?c=MQAgKgFglgziCmAPAhgWwA4Bt4hhA9gO4gHEAu+IA5vAHbwBOyZOAZsgNY4BEAcgJIAlbiAAUrBnQDGEEFKhkoALzogoAEzqLWUKcyj5aIWgFdUAI0YBKAFChIOAYLVwp+DNkQhLekzBwKCLRumiBkEDjmUAzhIOrM8AA0uEggyLTqJMhwAEwAtOpQVIFutGQM+JjGZpYMNjYAbowwBrQAXCDcOdw2qNkcULRUbfUgIKD+2FJkaSBMGe7UdJp1Y3kpUxQMI2O7IABWMIbozBAd3DQZjD17fTAcMDt7IOvI6urnN8-r8+ruAMIEXTwJ7PF6dACyXzB624ADEejYxhN4JtZr9FlEYrJ4iwkeDJvBpvhtvi9odjqdzljwgB9XHwaEgO4PUG7V7vT5k9lzdLqAAiCTZYIZEMG5wAjABOACsAAY8nKJYqJWA5XK2urNXKAFpMkUJCHIRDnHJys0qlVqjVa9V67lrOIJAAKyAY-lJYL2+BMZHQvrhJL6ZHO5oA9Eqw2a5QA2RHIjZEmbIXkLVBxeAnGKoLTVCyMfHrQnEz3PCm0E7hc6aLNkHNlWkhRnclmPB3gt4fTr68EY1D8MrC56ocUgCXt27GjpSqWjcaJ6bovmLeRkACeedqhYXWyH5crZ06q7XjfwmiZraHHK73B7P2X-cHE92I-aY+fYz6JpAM9n+JRaIpn2IAkis27Fru7b7lSnSgdcLb9G2MJpJy3btveaYDiGH7MqO45ei+U4-jOc6gKUegzPATQMGu4SDFQYSUFIkgJGEEQgDo7ozLWIGsGxjhCOBqJJiSe5HBWMHcLQ0S0jAZBumQF79EOnZ5OU6QtFoHQAOQAN66VAfHwAAjiAAB0lwrJCIgAL42RK+mov4dk5I5GR2fpZk0hA9KsQAPrgJjmHJDAgAAHGOcoebpXnRHSDIgAFMBBSFIAAMwgDK0VmTWCn1mQp6hAF6AMIMZB8dwACk5rqNw2XHoVODFaVZQVdVaW1dlcGhc1ZVtXKHV1TZ2lIv+cjuP6LBpBk43BMw-EgPkhTFDMpTlJUm4Fo6EGiVB4kHuc0kMKeZQVJgSn3Cp7xqfMmmDiAem6YF5g-gA7GIqBnmIZUxgALOZR2yfJMRWGMUqvVYdkjWNOi0MgmCYBu4Q4A08MaBxkjBLITggAAhEJmy7WC0FVp0R0XRwV1do9ZmA3JCnZYDa1nVDNhAA&i=N4XyA"
+            >Generate a valid NIR (french citizen identification number)</a
+          >
+          <a
+            class="text-blue-400 text-sm underline block"
+            href="/?c=MQAgKgFglgziCmAPAhgWwA4Bt4hhA9gO4gHEAu+IA5vAHbwBOyZOAZsgNY4BEAygJIAlAKJhuIABSsGdAMYQQAIwCuMKPRgx4cKABM6ZKKyizmUfLRC1lqRYwCUAKFCQcAkWBCwQs-BnxauiD4rCBkhJToyAxkcBLuwgByIMi0QYn8AML2ADQIyPIgUTEkyHCpXrQsVAxQZACePhDwshwgulBUdY6OAG6MahYAXCDcAEzcjqhlHOpUQz0gIKDGDDBkRdEbIWHNIAme3sggTGl+IAAcALQdXRvWtow+yJjYQQmJjktXuPDYshQGAsliCQAArGAWKJkCAjPhCJKTUHTGAcGDA0EgH7IXS6OFIzE-GQ0RBwgDaAAYrgBOAC6AG8LgBfSZfZa-XxpTYlHYwtwIw7lE6pXTnAAsN06dSsNjsDGer3g6SybJ+Wn+gIxoIhUOYsNGGUyBKWKLRWpB2Nx+LZoKJ8BJ5KpdPpYpZi3ZfP2Aq8cF8-kCwVCno+OTZK3wryISqUjWOaloVGwTRabVu0okmGUEEsLyo+FqMNQ9jClE5ZAYEcq1QLjV5exDYZArAjmCjQUUjU9htDS3DkcI0Y7KRAmDKG3jiZw8hT7SlGwzWZzmDzBYgRZLPgs5cr6mrdVrQb2hAISYOPaxvw1+fNSx1tGh+vhHmNIFN6JtFpSVtG9PpADoPiZN1MQvTNsxGekmQ-b4wngDBRxYOFfwAgUgOQw0gJfGCwNoCCoKAA&i=N4XyA"
+            >Generate a valid SIRET (french business identification number)</a
+          >
+        </div>
+        <div>
+          <h3 class="text-lg">Data Anonymization</h3>
+          <a
+            class="text-blue-400 text-sm underline block"
+            href="/?c=MQAgggdg9hCeC2BLAXgQwC6JiRBnE6AFgKYgAOATlAMbG75QBmBFqEujUFSEA5iKhAATDKlzF0AGgBQoRBAEgA7qlgFCGEBWKIhxCJkax5-QfKGIAbroCuqADbliFXNjw54ZKPUQAje8QAdLLgCsRiaipq6FAC1ISIxJakiOg4+DFaxPBQycKi6prUbCC+pDbiQgSxuvqGaq7wxDBB0tLJLlgQAFwgAEQAjH3S8GIA1ibdbSAgoAAqCfiMiC5po7hjWTnJ+I2ky8T2VUSaqNrCK8TUabUGiAcuIEyKZM6uENIzALQg4gHXXFwUxmIJAPwAVu8yBhCL0+stVgB9CCoJrDUHfECQmDQohw+xidDI1HEdEg9ZjYEY7TbYi9dAUGzEaazEALfTKUgQYjEY6xMogYraRg2RxKVKEHAQCzaa44PR3B64YIzUCQKUyq43BWGRIUSSCqDwXzyXnKCUCaBEZwgAAUZBs-kQ1CeFHIFCsGGIAEoZKrBSVxBQ8pltLd6i83jBgp9WQAxLggYgAD1RZACIHpJCl1CNKXwZmllzl4fueoNsdAZWKFVI1pACV4JFwNwguaaICQTbSAvrAGEAKIAeQA9AmbNKbc8iO529C4CrWQB1DRpJSkYoKIQ1fDadOoWjqUiWBxM0pqQSsPjEP2sthVUZjUi4Gznevxbwcq+8OjmoREQVtC9EBeCoGwyHwcUAM0AJCRAABpJwXBgXBb1AGd8Hcd8YFoMg0meeCvjYGAEFSWAY39dkQG5ZM1nGc17EcPcCUPet5HbUh7xAAkW0RXwYAqEAT3sJkCy0Ngf0XH4-i1QEqVBCEoRhOF2LzMkFKxJS8X6HiiX4iAKnUztxnkkFvzpEAAFYAAZbOsllQDjeQHHsWADXXaieT5cgzkwFy1D0BkoGibMTQoIhEREdBj1PVp-QASWYa1zncGBXMUXATAzV5kIUfiKAUeQQAAZgGEdrMskcBgATgAdgANilDLRkYw1PDYNzK3UWcSgFfQoBsJtqiyUsjEUWUuCqIr62IuAkGQM0orECRF3mRZPNo4yNgYxw0rUJ9iDII8QFgcI3WwMKIqizjpXyaLESYREEjfWJKCSOpuuVWNpMOWSXFMzFsQgXFYX6S7CEir0jMBrTQb6a6HsYJ7LiMikAbu4gAAUziDdGZnkB10ATbgMDhayACZyrK8nbPq6GQQG9BCeJ0Z0DhGnrLp6QgA&i=N4KABGBEBmCWBOBnALgfQHYEMC2BTSAXFAFID2AFupADThQA2mKGO+RkAIqfrRJAEYJk5VABNMyNlADMARgD0ABgCs82QE4A7ADYadSLmwAHeqQCeueISgAZTAHcL8AOSIwAYVLHM6M3r7ikqik0KjkCFKQigqK0vIATIqJ-lCw6ADGXlKyyop5irwMTGj8pOgArojWiXkgAL5AA"
+            >Anonymize a dataset by suppression</a
+          >
+          <a
+            class="text-blue-400 text-sm underline block"
+            href="/?c=MQAgggdg9hCeC2BLAXgQwC6JiRBnE6AFgKYgAOATlAMbG75QBmBFqEujUFSEA5iKhAATDKlzF0AGgBQoRBAEgA7qlgFCGEBWKIhxCJkax5-QfKGIAbroCuqADbliFXNjw54ZKPUQAje8QAdLLgCsRiaipq6FAC1ISIxJakiOg4+DFaxGT2qLTCouqa1GwgvqQ24kIEsbr6hmqu8MQwQSEA8skUShSpJgXogkqphCDUUJ4B6MT2aqwQQhMglg42dCAaGSQguKjNO8TUNr3oamI7NmSUdLj9IoMyoL42aakgANbE2fiCCbyjlVQvkQ9lSak4FHUpHuYgkwWkXVuMAAXCAAEQARjR0ngYneJmR0mkIBAoAAKgl8IxEC40rjcO8sjk8qQmqRqTNqkRNKhtMIaYdXnoDIgOS4QExFGRnK4IMSQABaA4BagxFyEkmaxUgABWsrIGEIqLR1NpAH0IHtiNitSSlXqYAaiMbcrh0BarTbNfT3hrbfNFvAAMKEKCIWgASQgAFVesayIh4FBkQB6FOW5oAMQAStj5eSSAolKQIF8ubFymNecRGDZHMMiDgFgLVThhYZEi5giTQJAmxZtK26iKxZIxhNgaXqg3RmwoERnCAABRkGz+cMSyGUKwYYgAShkParCnEFGSNSyw4aUplMHhR8zXBAxAAHnscqRUQum+N9u4zM2g5CvUoqdmO+ZlIcqCVKQ35-CQbo-hMpBIP8aSVt+QYAKLtCmj42Asi6SkQ7i-gacD3qSIAUiWr50niyggo42jMvk37yL+pBsNUrrur4MCVMsqx0N22riCqaq4H6Wr2vqhrGhxyFejJupyc66K8Wa-EQJUykgD60magGExRughlajwqIAKwAAx2fKtr6agL6ohidnuUSD7yA4sxjsWIClsQ5ZMrkbHbMCFBEGa9xcQsAzEGaTBmgkfIrPYay4KJoARswC58u4MCzIotx8AETguNg-EUAo8ggAAzBiKY2VZKYYgAnAA7AAbE2xW4vYjhkWwsCHlRJH4CUCiVvoUA2P8F7aFeopnFk4wUNUtXfnOcBIMgQUDLC6BZdRlIBXRTkMoxA0hSyULiEJ6XrL4czcUsMWZfKSriYKXBSQ5mqyY68nohFUUxXpdqqUD6lojFiWMMlAp6T6f2OUqAYACK7uZtoxQAsvIxrtR1NkKjZGJkxiZJ2ciNN2QAWhDuO7njznGgATDZnOU5T1M2bT-MM0zSoxQACryp441qs3oKu6CPtwGAc3ZXU81z2JAA&i=N4KABGBEBmCWBOBnALgfQHYEMC2BTSAXFAFID2AFupADThQA2mKGO+RkAIqfrRJAEYJk5VABNMyNlACMATgDsANgC0ABgCsygMzSadSLmwAHeqQCeueISgAZTAHcL8AOSIwAYVLHM6M3r7ikqik0KjkCFKQAEyqMWpaarq8ULDoAMZeUtLqqrmqyZCMzPyk6ACuiNYxuSAAvkA"
+            >Anonymize a dataset by randomisation</a
+          >
+          <a
+            class="text-blue-400 text-sm underline block"
+            href="/?c=MQAgggdg9hCeC2BLAXgQwC6JiKAzE6ApgMYAWEixqANiIgCaESa6KEBOAziABQAO1DIRAQArvABGHTgBoQnPOgDuqdsM4dENEAGtCsWSD6kYwsZOlyAdDYCUAKFAAVUsPTtUETsSiMQ8VE4dECVEalopEEJAtnYCKBBRDQJSTxThNQBzQgAPf0Dg9ATPGAQUNxJySm0GJhZYq3t7ADdpLAgALhAAIgBGbvsAoMQITI6mkBBnVwIPLx8-IeDQ8JA1AVRiYRpaMlVNoi46CHpEZoZRHdh7SdAAIVgQRlxUUWp0EHHbkABaEABVAAKgIAogAlADCYAAyiCQNRCOhDtwVhEMoQNlt6CAJI85vQoPAAcDwVDYfDEciblNfvCoEoOFRkgikdIQmE0WsMYIsTi8Z4CUTqPTGYFhCyqd8-qdMoh0CiOTj0ZjCNjcWsBYSnohZfLqaA-jscOhXHE9h5iMj2atIqJmFBRGRVdS-hoEZaoFwvpMfX8AFYKCB8DCkLrdDZEAD65ik7AGPt9IADMGDJrDGnYWmo8Z9S29Cfcnm8vkIXQA3gBfCY0lzCc0HDggYiCTgabhUCBKpswViZURqbFFJupUZuGbPV7vJWpc6el3yQjuorsfM+5NBkNh1w5SPNGiiQg5yZ56kFubFxirhPNwJtq+JkZ8UToMMABl6ACYAMwAFgArAAbAA7AAHAAnGAdwQgAIiCABiR4Jj6DroE+L49O+37-sB4GQTB8EDPqIAuIg3BLE2aQ0AoXZJG4CScKIfBqK2TwYKg85uiQy73uuqahj0VDsPQ0biLGiEnkhsxFgspankhN6toQnD3pMfyPs+b6fr+gGgWBiGSShaFhgAVAMQA&i=N4KABGBEAOA2CGAXApgfQHYFcC2AjZATpAFxQCCAQgLQCMATAMxUDCAIpADThQDOhAlvFgko9BgBYArADZajcXIlVKbTt0gALZAA9UANyGZkIyGRoAOAKKopFMqgBiFyajYB2N2oiQAxvAIAJhg4+ESkkGJSspGKCirsIAC+QA"
+            >Anonymize a technical ID (like a plate number)</a
+          >
+        </div>
+        <div>
+          <h3 class="text-lg">Data Pseudonymization</h3>
+          <a
+            class="text-blue-400 text-sm underline block"
+            href="/?c=MQAgCgzgpgrgJgewHYE8C2BLAXgQwC4bIgYQh4AWUIADgE4IDGUEpCAZmbTkhGwrZiQBzEDhBx8OaHmJJRINNyRRaIAFCgK+MpXGSQtKABt8GYWQTyzcDADcMcGDiM0VEIg24gklo8iEqIABGUBqiLBhCynAgAO4YFAgwMmwwtBSBZnwCpsgAdGEAqkhGGADWVNzI6Ni5SAA0sjTQ8NWYuAREYhJ4UlAyJCAQBEYuhiZ4UDF4lhkg-JFmznq90gWgACq6hlJEMyAw0M2wiKiYEHUgnnIhIABcYQC0OlRoUNxmIuwvK2KDGGhqPxekgZPsKlBqCAABRQPJCPKiWwqHABUi2ZwwZiNQQAekUAA9GkgYGgQqpvjZhmYGDIMUYsRA8syAJRPH4MBCUQxIJjzDhzHp-UgAoFcUEwuEIgyQkx8i5vED0rFxBLkH4KqjixBoJWYqCNHC2BAOK4IUYkQg8RrMvJs0DPDKGYikMTKKYWGUOKCgjBsFAHJCKCAVGLK5iS+GItjWeR0BBBIxQRQEBgyzm0GJmH4LIRLFxC6RssIASTkFEGUAJOEBSca4dI7umlluDD8RzY9F1c1z+b1DOY6xAADF+DpBrEqNcDkc5sGyqRtQg0AARNKXMeTWv4OFhLaDeNMFguq7OJMxABEibStE+F-mqgvODgNnMPhIUAvBTUyNoECtdwgBeACMF5qPOnwPGoIAgJs5AThgoxDPBbBgroqJUN8czUG4RAhHgk4+iAjwAEwPiAADUZFLmgRgoNBxFDMYUC0vwDwwRxIAAFbuEg1D4OQgFPgEYGcfOEDsZxjFbtQExQEJADeCnPjEeQYTC2pljIpEgCRLIAL76aJUnPJ2y48cgQkYfeoCGJySC-jIQpkCgOGemYkwBLQagMXBCFIRAKFoVQPSYRwQhcI4lz4YRciPAAzAADIl5EUUlKUSCgi7cDqdEMc80BJqxtCSZxFl8QJQkRc+TiTHAAD6yDGTB4mlRxzyhWAOB-iobVSbI1DJKOOR4EJJHJQAbI8iXAdNJHNe1Bg5cua5cJ0SB9VJghCY8YDpSuC39YSQkUXtyUHQxnEdTuXU9SVl39fMySDXgw0pmNk3TbNiXzWoQA&i=N4KABGBECGDmCmkBcYCMBOANOKsBO0AJgK7QAu8hA+gPYB2yUG66AtAAwBsrAzO5CAC+QA"
+            >Add noise to data</a
+          >
+          <a
+            class="text-blue-400 text-sm underline block"
+            href="/?c=MQAgCgzgpgrgJgewHYE8C2BLAXgQwC4bIgYQh4AWUIADgE4IDGUEpCAZmbTkhGwrZiQBzEDhBx8OaHmJJRINNyRRaIAFCgK+MpXGSQtKABt8GYWQTyzcDADcMcGDiM0VEIg24gklo8iEqIABGUBqiLBhCynAgAO4YFAgwMmwwtBSBZnwCpsgAdGEAqkhGGADWVNzI6Ni5SAA0sjTQ8NWYuAREYhJ4UlAyJCAQBEYuhiZ4UDF4lhkg-JFmznq90gWgACq6hlJEMyAw0M2wiKiYEHUgnnIhIABcYQC0OlRoUNxmIuwvK2KDGGhqPxekgZPsKlBqCAABRQPJCPKiWwqHABUi2ZwwZiNQQAekUAA9GkgYGgQqpvjZhmYGDIMUYsRA8syAJRPH4MBCUQxIJjzDhzHp-UgAoFcUEwuEIgyQkx8i5vED0rFxBLkH4KqjixBoJWYqCNHC2BAOK4IUYkQg8RrMvJs0DPDKGYikMTKKYWGUOKCgjBsFAHJCKCAVGLK5iS+GItjWeR0BBBIxQRQEBgyzm0GJmH4LIRLFxC6RssIASTkFEGUAJOEBSca4ddzsM1DlHs53J9eCMAeh2e6-RUghIqYUShULPqYVi5AwDHVb24rpAeeRchgQakod+qtGoiMsRwKFIt2DW-iFA1Nao4cnoCCyXmJQDPiQj0MyNoEAwiaoqV5nR4HcXFuQ4plvOIZznBR3mtVVEgfKtJloJBliFRpDEeb1fRjTwAJ3YIqFFBAIh-Ao1A-L9kDuEAACIAEYaLUU9PgeNQQBAUAAEEQDYKBYlHENG0IpAO1BbtxAHAQzGHWdGlKCoQHIKR1X4RTlLLQpaAwNiQGeaAk1pfgHnYkyQAAK3cJBqHwchqJomNPzwAB9FC3kY0zTwgYzTN0tSIHIDStLs6gAQQO5cVxVyoAAMQAJXc3z9KgQzaG80yLOQayKDskxhhcq8EvYzy0pM54lP8wKMGC0LwtxCA0iiuLGJ00BotUhAnQEsoIEaDIA2uAilORCSkKHakGHE891TmHA4BsPDvjmAADaApiWmgcC4N4kJ0vTjGSmZUp09LLKy2zaKCDB0nIJyeigQqhigKYStMmNjDgOzLuu278HujiQDa1QoA-AMAG9QbyL6KB+yYAF9Yb1BkDR+ZjzHiXcVyoOZNRleqjDwY6uq8wn2OebUABFfpeny7oAWTMOy6IATgAdgABkeNm6M5uiNjZtm7n5wW2YALQenyVigWmcAJRmmaZjmuZ5vmBaF-mxZJ3y7rATboCOiXTKSPBqGSQGUzsgAmfmADYec5i3GKAA&i=N4KABGBEBmCWBOBnALgfQHYEMC2BTSAXFAFID2AFupADThQA2mKGO+RkAIqfrRJAEYJk5VABNMyNlACMATgDsANgC0ABgCsygMzTIIAL5A"
+            >Preserve coherence with non-reversible functions</a
+          >
+          <a
+            class="text-blue-400 text-sm underline block"
+            href="/?c=MQAgCgzgpgrgJgewHYE8C2BLAXgQwC4bIgYQh4AWUIADgE4IDGUEpCAZmbTkhGwrZiQBzEDhBx8OaHmJJRINNyRRaIAFCgK+MpXGSQtKABt8GYWQTyzcDADcMcGDiM0VEIg24gklo8iEqIABGUBqiLBhCynAgAO4YFAgwMmwwtBSBZnwCpsgAdGEAqkhGGADWVNzI6Ni5SAA0sjTQ8NWYuAREYhJ4UlAyJCAQBEYuhiZ4UDF4lhkg-JFmznq90gWgACq6hlJEMyAw0M2wiKiYEHUgnnIhIABcYQC0OlRoUNxmIuwvK2KDGGhqPxekgZPsKlBqCAABRQPJCPKiWwqHABUi2ZwwZiNQQAekUAA9GkgYGgQqpvjZhmYGDIMUYsRA8syAJRPH4MBCUQxIJjzDhzHp-UgAoFcUEwuEIgyQkx8i5vED0rFxBLkH4KqjixBoJWYqCNHC2BAOK4IUYkQg8RrMvJs0DPDKGYikMTKKYWGUOKCgjBsFAHJCKCAVGLK5iS+GItjWeR0BBBIxQRQEBgyzm0GJmH4LIRLFxC6RssIASTkFEGUAJOEBSca4ddzsM1DlHs53J9eCMAeh2bmmpAVagDGSVpZ9TCsXIGAY6re3FdIDzyLkMCDUlDv1Vo1ERliOBQpFuwc38QoGprVHD6xAAHVKkZ3HFuGDLIoKkM0lQnVR4jvbj4ZoWhAVpNHMSR4NQyS-NIYSwlGIAAIKiEgMQAELBAg54nh6Z7qv2l56gyUAsjeGyWDgs4YFAyLEHgjSeLOEZ-i4tyHFMjQhJ47HeMgjyGMitAgYmVCpLynQ8FcXjxo4fKcsBVpMmEWwqFA2QGi8zoscEVADiSZKBJSJAEOJRGMmBug4TEhb9AUaiCSByB3CAABEACMLlqGEADClGUKQ7pwKQ+y3HAw4mIYcCNLEVAMDskwgAATFJTEQI02QgDGQl4AA+kghHcDEJjDHll4+X5EbXDp4iktQHp7LoMZJhAh6TLqeE-AABo8jyOICjyMbog1QAAcpeAC8TU+peeQAFbuCUnXzNQEnlalUk3FQfg4GFMQhOpCgbp88g2fRqrnnM3WPNtcADRVKWUGNbyTRgSb5W8c0LUYS0ICtVprf5G3VQJbgejgbCTKoN3HdCub5mZVAADyPAAfIdIYeg2ojOhA+7UHVcDjmEFakMuEZzECERBK9CQBvsINCd+uh4OKvD8CmoHQgEMhiHD+UuOGmX0LqcxWQjpFecNEAPCAmUYNlpVvDlw0y7LgYYAAjlizksyqoBrprWLjbrrzvJJYhi4LVXIN2oj4+8FK8hpT6AfJpSOXI2nkDg9tIGosvFbl71QMrFWq7LBta1AOu0Fi-tq6ADPQDHKpeSenwPPHzzQEmtL8OHavzcg1D4OQzkuVlJXB55asPdHrmV0Hl6h0xNdqye0vx7XzzaggaDeeQJpMGWhS0Bg5fUACCB3LiuLBwAYgASp5WdDMYw4zLQBey0XSAlxQ5eB4rUBt7LKuuUfwct5Qp-o2Une17LPeFX3A9D1AI9jxPU8z7iEBpAvZeaggA&i=N4KABGBEBmCWBOBnALgfQHYEMC2BTSAXFAFID2AFupADThQA2mKGO+RkAIqfiAL5A"
+            >Preserve coherence and enable reversibility with a cache</a
+          >
+          <a
+            class="text-blue-400 text-sm underline block"
+            href="/?c=MQAgCgzgpgrgJgewHYE8C2BLAXgQwC4bIgYQh4AWUIADgE4IDGUEpCAZmbTkhGwrZiQBzEDhBx8OaHmJJRINNyRRaIAFCgK+MpXGSQtKABt8GYWQTyzcDADcMcGDiM0VEIg24gklo8iEqIABGUBqiLBhCynAgAO4YFAgwMmwwtBSBZnwCpsgAdGEAqkhGGADWVNzI6Ni5SAA0sjTQ8NWYuAREYhJ4UlAyJCAQBEYuhiZ4UDF4lhkg-JFmznq90gWgACq6hlJEMyAw0M2wiKiYEHUgnnIhIABcYQC0OlRoUNxmIuwvK2KDGGhqPxekgZPsKlBqCAABRQPJCPKiWwqHABUi2ZwwZiNQQAekUAA9GkgYGgQqpvjZhmYGDIMUYsRA8syAJRPH4MBCUQxIJjzDhzHp-UgAoFcUEwuEIgyQkx8i5vED0rFxBLkH4KqjixBoJWYqCNHC2BAOK4IUYkQg8RrMvJs0DPDKGYikMTKKYWGUOKCgjBsFAHJCKCAVGLK5iS+GItjWeR0BBBIxQRQEBgyzm0GJmH4LIRLFxC6RssIASTkFEGUAJOEBSca4ddzsM1DlHs53J9eCMAez3X6KkEJFTCiUKnqYVi5AwDHVb24rpAeeRchgQakod+qtGoiMsRwKFIt2DG-iFA1Nao4fHoCCAZ9DFoKGoBHMDdVZ7E0Af-RAFRQ6xALZBjeRIYiNE0Yk5C0ICtV0kBiJcIzmIEIiCDBSjwAN9kMZFaCOOY8HFXh+BTK0YUMR5vV9f0WQKNRcJg5A7hAAAiABGFi1GPT4HjUEAQGeaAk1pfgHn48SQAAK3cJBqHwchmJYqiCBjFROIk48xIkkA2DYNitO0gwcBsAlmLYgAGPjDN-KAUAAMXoNAAFEkFsRS7LstiAH0nIAOQAYQAJQATTADYSwAeV8ryAGknOCziwg8tiDmgBcYwJD0dRwbM4CgGMkASMjoVKYZ+R3FxnD8WI23IHAuFpNwmi8JI8GoZIQHvR9nw9YZaE+WiwnMtiACYAGYABYAFYADYAHYAA4AE4cCCBg8rYIQp0ksojDQHxqAARzwvAYFsWICRQLAAEEACF-IAEScuyAHEAAkSwAKRigAZABZXyIrAABFQKAGUNkKAA1AB1AANYKAC0wi2LVjIwAkaHqi9JlUPLccEKhJ2ndU5PScrBQQRRcvyswiqIeJtxwWknFGANbkOKYALs-hOurWsDXkLgTPKiytxceNHD5N9OVBHLCvMZBu3ERY8FIMJoTmMWYxOq46oa3HWAFXRUm3bKaYK+mkEGzYO2yQW5nDcrhYxhRDhkJMWHmVQoEO1mdC8GaRsRa6jHceQne+FLefMl1ZHpBw6P4zZLDyh8nxkMQnc58QoHT59mMIrErME4w85mWgDPE6TkDkihFOUv0MBULy0+6yY4HU8TjwgKv+OeYy4EUgBvYe8kb1TaAAXynruJOeXT9Ks6yjJMszLJX-i24zwvaGLzebPsxyXLc1jkp8gKQrCyLorihK1CAA&i=N4KABGBECWAmCmA7ALtAZteAnSAuKAHAEwDMBBAnACykkCsVlFkIAvkA"
+            >Preserve coherence and enable reversibility with encryption</a
+          >
+        </div>
+        <div>
+          <h3 class="text-lg">Other</h3>
+          <!-- <a class="text-blue-400 text-sm underline block" href="#">Multiple mask and/or multiple selector syntax</a> -->
+          <a
+            class="text-blue-400 text-sm underline block"
+            href="/?c=G4UwTgzglg9gdgLgAQCICMKBQBbAhhAayjgHMFNMkkBiJABzBAnFGRQCMAbXOAlJAO5ROnJHBgAXJLjp1OATyR5CxEknhiAriPVgkIbHQmKAFChQBKJMFydNTSkgC0SZpxABjCTDDkq-pAArCHg6XAkACzZOKAgJADobOxAsAOUCPwCkD3g4ngk2dJAAE1T-BiYWEDYuHj4KKloK5jBWVDhtTn4hHXEpGTlFdNV1OC0dJPsIRybGFraUAyN5buFRPulZBSV8IlJR-UNjJDNLa1spzCA&i=N4KABGBEA2CWDOAXSAuMBtcEzEgNwENoBXAU1TAAYBfAGiwl0JPLUksjoZ3yLIsid62Hs35oAdsWjRqWALohqQA"
+            >Preserve null and/or empty values</a
+          >
+          <!-- <a class="text-blue-400 text-sm underline block" href="#">Seed parameter</a>
+          <a class="text-blue-400 text-sm underline block" href="#">Caches</a> -->
+          <!-- <a class="text-blue-400 text-sm underline block" href="#">Change date formats</a> -->
+          <a
+            class="text-blue-400 text-sm underline block"
+            href="/?c=G4UwTgzglg9gdgLgAQCICMKBQBbAhhAayjgHMFNMkkBaJCEAGxAGMAXGMcq7pAKwngAHXKwAWyFMFwMAriAhYeeQlx5JWIbIIYiQ1ELmbjKaqlA3YJU2SEWmkxACYgAHhKiOXd0xe26JAN4BAHTWckgAPkgygoLgAL7xSCJIgjDQrLBwSEHBHi6JWEA&i=N4KABGBEBuCGA2BXApgZ0gLjAbUrSANFAEaFQDGZkAJpALogC+QA"
+            >Apply a template on each value of arrays</a
+          >
+          <a
+            class="text-blue-400 text-sm underline block"
+            href="/?c=G4UwTgzglg9gdgLgAQCICMKBQEQgCbIAsATJgLYCGEA1lHAOYKZJIC0SOANiAMYAuMMExYikAYiR8AFlAhIADhWkKYdPnIFIKcLWDAUAnkhgAzBeAjwIzUUgBWluIunIUg+tqgAvJbDgQAOnkLKyxRShphWwkoPiQAdyhOTiQAIxAFKGC8SRhJKQyI2gZM4M46DLwQEzpYvzSQThh4m1F5LJAo23F8jMUwEDg4mFS7XjiACgokPBhKOgBKBKSU9K0eHhAIaFTuZeVpDJQAfRQkYAowKApdjLgKMhBW2zox-gAFS8G+V1Pn8KoxUY-1s7C440EXW6tgc8GcUlc90eYWhAMiINREhqjTwcjo0CqvXMkHgxlG4yQPG0DXWm22+BmUAG-E4Bgx0L4IDI8k4Sk6qAA3gLJLE9gEkRkAL6SlGosGNCFCdndWFOJQI1AQACuYAlstRSCKUINki5PL5riFIr4Yu1uoeUplyrYHAV-EhztEqvhri5FCS+tRRs9Igkh3OFE4WoyEAEAxy+KghPD-W+ZLecVktK2Oz20jAMC19CkqFO+W01A0eRTXyGSFe4z8IZYnO5vM5luFTXi4CQ4odSGlASt3d7ATtEsHkoAAlaAscArN5jppVggA&i=N4KABBYEQPYE4HMCGA7AlgLyQFzTFAzlAFxgDa4kVoVtkUAJjALZJoonQDGLADqgE8AdD2ZQANJTpUovAKZwC+IqQrT1YGhu1QUSZnM5QANnPxIJU7dKgEArnD0GjzNMdNxL1jVDms3RlBW3gC+kt7UwREQuvqGpFAAVjCG4dG0tg5O8dAMSABuaERp6fR+bMaBUdoh1bQAunVhdVo6TP4cCaL8KMIAZp4lPvKKypxq6a2l0NlGSMZsHEOlmY5xLgpcaApe0zHlAQlBpc2lUyuzCX3G8Giou3url9CmCHCoDA-Tvv6VR3XqWreRqAqyNEJAA"
+            >How to handle nested/complex structure</a
+          >
+          <!-- <a class="text-blue-400 text-sm underline block" href="#">Parse raw JSON</a> -->
+          <a
+            class="text-blue-400 text-sm underline block"
+            href="/?c=G4UwTgzglg9gdgLgAQCICMKBQEQgCbIAsATJgLYCGEA1lHAOYKaZJIC0SOANiAMYAuMME1aikAKwjwADhX4ALZCn5gKcaCDj8A+gDMoILnixjKNEWKQU8eNirUatSgN7PVcPAEEu0+RQByAK5kSADMAL7hWCzsnIZ8gsIxYpIycoqo+obGyUhm1BZi1gSoACryIEjyUDaaSMAUXIGVUBBIyK4AdPbqBlp6BkaRWEA&i=N4XyA"
+            >Temporary fields</a
+          >
+          <!-- <a class="text-blue-400 text-sm underline block" href="#">Generate sequences</a> -->
+        </div>
+      </div>
+    </div>
   </body>
 </html>

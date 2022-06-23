@@ -15,7 +15,7 @@ setDiagnosticsOptions({
   schemas: [
     {
       // Id of the first schema
-      uri: 'https://raw.githubusercontent.com/CGI-FR/PIMO/{{version}}/schema/v1/pimo.schema.json',
+      uri: 'https://raw.githubusercontent.com/CGI-FR/PIMO/{{ version }}/schema/v1/pimo.schema.json',
       // Associate with our model
       fileMatch: [String(modelUri)],
     },
@@ -66,6 +66,8 @@ var resultJson = editor.create(document.getElementById('result-json'), {
   model: editor.createModel('', 'json', Uri.parse('file://result.jsonl')),
 });
 
+document.getElementById('loading').remove();
+
 ///////////////////////////////////////////////////////////
 
 async function postData() {
@@ -111,14 +113,16 @@ async function postData() {
       console.log(err)
       document.getElementById('result-error').innerText = err
   } finally {
-    document.getElementById('label-output').innerText = "Output"
+    document.getElementById('refresh-spinner').style.display = 'none';
+    document.getElementById('refresh-button').style.display = 'inline';
   }
 }
 
 function debounce(func, timeout = 300){
     let timer;
     return (...args) => {
-        document.getElementById('label-output').innerText = "Output (refreshing...)"
+        document.getElementById('refresh-spinner').style.display = 'inline';
+        document.getElementById('refresh-button').style.display = 'none';
         clearTimeout(timer);
         timer = setTimeout(() => { func.apply(this, args); }, timeout);
     };
@@ -133,4 +137,5 @@ document.getElementById('editor-json').onkeyup = autoPostData;
 document.getElementById('editor-json').oninput = autoPostData;
 document.getElementById('editor-json').onpaste = autoPostData;
 document.getElementById('editor-json').oncut = autoPostData;
+document.getElementById('refresh-button').onclick = autoPostData;
 autoPostData();

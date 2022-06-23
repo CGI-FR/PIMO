@@ -134,6 +134,19 @@ This takes the `data.json` file, masks the data contained inside it and put the 
 * `--repeat-until <condition>` This flag will make PIMO keep masking every input until the condition is met. Condition format is using [Template](https://pkg.go.dev/text/template). Last output verifies the condition.
 * `--repeat-while <condition>` This flag will make PIMO keep masking every input while the condition is met. Condition format is using [Template](https://pkg.go.dev/text/template).
 
+### PIMO Play
+
+The `play` command will start a local website, where you will find commented examples and a playground to play with the masking configuration.
+
+```console
+$ pimo play
+⇨ http server started on [::]:3010
+```
+
+Then go to [http://localhost:3010/](http://localhost:3010/) in your browser.
+
+![PIMO Play screenshot](assets/pimo-play.png)
+
 ## Examples
 
 This section will give examples for every types of mask.

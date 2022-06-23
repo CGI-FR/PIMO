@@ -16,7 +16,11 @@ Types of changes
 
 ## [1.14.0]
 
-- `Added` (play) possibility to share URL directly from the Play website
+- `Added` possibility to share URL directly from the PIMO Play website
+- `Added` precrafted examples in the PIMO Play website
+- `Added` loading screen when JS is loading on PIMO Play website
+- `Added` loading spinner when refreshing output on PIMO Play website
+- `Added` a refresh button on PIMO Play website
 
 ## [1.13.0]
 
