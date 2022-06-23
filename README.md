@@ -145,7 +145,7 @@ $ pimo play
 
 Then go to [http://localhost:3010/](http://localhost:3010/) in your browser.
 
-![PIMO Play screenshot](docs/pimo-play.png)
+![PIMO Play screenshot](assets/pimo-play.png)
 
 ## Examples
 
