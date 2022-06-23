@@ -638,15 +638,15 @@
     },
     "RandomDecimalType": {
       "properties": {
-        "Min": {
+        "min": {
           "type": "number",
           "description": "Lower bound of the decimal range"
         },
-        "Max": {
+        "max": {
           "type": "number",
           "description": "Lower bound of the decimal range"
         },
-        "Precision": {
+        "precision": {
           "type": "integer",
           "description": "Precision of the generated value"
         }
@@ -654,18 +654,18 @@
       "additionalProperties": false,
       "type": "object",
       "required": [
-        "Min",
-        "Max",
-        "Precision"
+        "min",
+        "max",
+        "precision"
       ]
     },
     "RandomDurationType": {
       "properties": {
-        "Min": {
+        "min": {
           "type": "string",
           "description": "Lower bound of the duration range (ISO 8601 notation)"
         },
-        "Max": {
+        "max": {
           "type": "string",
           "description": "Higher bound of the duration range (ISO 8601 notation)"
         }
@@ -673,8 +673,8 @@
       "additionalProperties": false,
       "type": "object",
       "required": [
-        "Min",
-        "Max"
+        "min",
+        "max"
       ]
     },
     "SeedType": {

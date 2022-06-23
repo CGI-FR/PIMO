@@ -92,14 +92,14 @@ type WeightedChoiceType struct {
 }
 
 type RandomDurationType struct {
-	Min string `jsonschema_description:"Lower bound of the duration range (ISO 8601 notation)"`
-	Max string `jsonschema_description:"Higher bound of the duration range (ISO 8601 notation)"`
+	Min string `yaml:"min" jsonschema_description:"Lower bound of the duration range (ISO 8601 notation)"`
+	Max string `yaml:"max" jsonschema_description:"Higher bound of the duration range (ISO 8601 notation)"`
 }
 
 type RandomDecimalType struct {
-	Min       float64 `jsonschema_description:"Lower bound of the decimal range"`
-	Max       float64 `jsonschema_description:"Lower bound of the decimal range"`
-	Precision int     `jsonschema_description:"Precision of the generated value"`
+	Min       float64 `yaml:"min" jsonschema_description:"Lower bound of the decimal range"`
+	Max       float64 `yaml:"max" jsonschema_description:"Lower bound of the decimal range"`
+	Precision int     `yaml:"precision" jsonschema_description:"Precision of the generated value"`
 }
 
 type DateParserType struct {
