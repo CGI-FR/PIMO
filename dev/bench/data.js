@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1655819462504,
+  "lastUpdate": 1656017352618,
   "repoUrl": "https://github.com/CGI-FR/PIMO",
   "entries": {
     "Benchmark": [
@@ -1002,6 +1002,42 @@ window.BENCHMARK_DATA = {
             "value": 3381242,
             "unit": "ns/op\t  628831 B/op\t    5489 allocs/op",
             "extra": "3436 times\n2 procs"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "44274230+adrienaury@users.noreply.github.com",
+            "name": "Adrien Aury",
+            "username": "adrienaury"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "88620b685336ff7fb48b9d193949c0f962d1fb81",
+          "message": "feat(play): add crafted examples (#132)\n\n* fix(play): load script synchronously\r\n\r\n* perf(play): will this improve loading perf ?\r\n\r\n* style(play): prettify html code\r\n\r\n* feat(play): add examples links\r\n\r\n* feat(play): create examples\r\n\r\n* feat(play): fix NIR example\r\n\r\n* feat(play): fix examples links\r\n\r\n* feat(play): add SIRET generation example\r\n\r\n* feat(play): add anonymization by suppression ex.\r\n\r\n* feat(play): add anonymize technical ID\r\n\r\n* feat(play): fix typo\r\n\r\n* feat(play): add noise example\r\n\r\n* feat(play): add coherence non-reversible example\r\n\r\n* feat(play): add coherence by caches example\r\n\r\n* feat(play): add coherence by caches example\r\n\r\n* feat(play): add coherence by encryption example\r\n\r\n* feat(play): add last examples\r\n\r\n* feat(play): fix example\r\n\r\n* chore(play): fix build inject version\r\n\r\n* chore(play): fix ff1 example\r\n\r\n* chore(play): fix add noise example\r\n\r\n* feat(play): add a loading screen\r\n\r\n* feat(play): add a loading spinner\r\n\r\n* feat(play): add a refresh button\r\n\r\n* docs(play): update changelog\r\n\r\n* docs(play): update readme\r\n\r\n* docs(play): add missing image\r\n\r\n* docs(play): move image from docs to assets",
+          "timestamp": "2022-06-23T22:44:33+02:00",
+          "tree_id": "fca67767934e73a6bf8451280b9777e1a225a65e",
+          "url": "https://github.com/CGI-FR/PIMO/commit/88620b685336ff7fb48b9d193949c0f962d1fb81"
+        },
+        "date": 1656017350190,
+        "tool": "go",
+        "benches": [
+          {
+            "name": "BenchmarkPimoRun",
+            "value": 209006,
+            "unit": "ns/op\t    4119 B/op\t     120 allocs/op",
+            "extra": "52954 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge",
+            "value": 3715995,
+            "unit": "ns/op\t  627937 B/op\t    5430 allocs/op",
+            "extra": "3286 times\n2 procs"
           }
         ]
       }
