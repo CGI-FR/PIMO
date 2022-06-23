@@ -125,6 +125,12 @@ targets:
           - $: "echo -n ={tag}"
             1=: "tag"
             3x: true
+      - $: 'echo -n "={tag}"'
+        1=: "realtag"
+        3x: true
+      - $: 'echo -n "={tag}" | tr "()" "-"'
+        1=: "tag"
+        3x: true
       - $: 'echo -n "={tag}" | sed -e s/^v//'
         1=: "version"
         3x: true
@@ -208,6 +214,18 @@ targets:
       # - $: "go mod init ={mod}"
       - $: "go mod tidy"
 
+  build-web:
+    doc: "Build website and copy it to play.go path"
+    depends: "info"
+    steps:
+      - $: cd web/play && yarn install && yarn build
+      - $: touch web/play/node_modules/go.mod
+      - $: rm -rf internal/app/pimo/client/*
+      - $: cp -r web/play/dist/* internal/app/pimo/client
+      - $: sed -i 's~{{version}}~={realtag}~g' internal/app/pimo/client/index.html
+      - $: sed -i 's~{{version}}~={realtag}~g' internal/app/pimo/client/main.js
+      - $: git checkout -- internal/app/pimo/client
+
   # run "neon -props '{buildpaths: ["path/to/main/package1","path/to/main/package2"]}' compile" to compile specific targets
   # example : neon -props '{buildpaths: ["cmd/cli"]}' compile
   compile:
@@ -245,11 +263,17 @@ targets:
     steps:
       - $: go test -coverprofile=./={BUILD_DIR}/coverage.txt -covermode=atomic ./...
 
+  bench:
+    doc: "Run all bench"
+    depends: ["info", "refresh"]
+    steps:
+      - $: go test -bench=. -benchmem ./... -run=^# -benchtime=10s | tee ./={BUILD_DIR}/benchstats.txt
+
   # run "neon -props '{buildpaths: ["path/to/main/package1","path/to/main/package2"]}' release" to release specific targets
   # example : neon -props '{buildpaths: ["cmd/cli"]}' release
   release:
     doc: "Compile binary files for production"
-    depends: ["info", "refresh", "lint", "test"]
+    depends: ["info", "refresh", "lint", "test", "build-web"]
     steps:
       - ldflags = ldflags + " -s -w" # Omit the DWARF symbol table. Omit the symbol table and debug information.
       - call: compile
@@ -259,7 +283,7 @@ targets:
   # ex: neon -props '{testsuites: "mask_add_transient.yml"}' test-int
   test-int:
     doc: "Run all integration tests"
-    depends: ["info", "refresh", "lint", "test", "release"]
+    depends: ["info", "refresh", "lint", "test", "bench", "release"]
     steps:
       - delete: ={TEST_WS_DIR}/**
       - mkdir: =TEST_WS_DIR

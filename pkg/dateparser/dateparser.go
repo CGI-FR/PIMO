@@ -23,6 +23,7 @@ import (
 
 	"github.com/cgi-fr/pimo/pkg/model"
 	"github.com/rs/zerolog/log"
+	"github.com/spf13/cast"
 )
 
 // MaskEngine is a type to change a date format
@@ -44,13 +45,20 @@ func (me MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Ent
 	}
 	var t time.Time
 	var err error
-	if me.inputFormat != "" {
+	switch {
+	case me.inputFormat == "unixEpoch":
+		i, err := cast.ToInt64E(e)
+		if err != nil {
+			return nil, err
+		}
+		t = time.Unix(i, 0)
+	case me.inputFormat != "":
 		timestring := fmt.Sprintf("%v", e)
 		t, err = time.Parse(me.inputFormat, timestring)
 		if err != nil {
 			return nil, err
 		}
-	} else {
+	default:
 		switch v := e.(type) {
 		case string:
 			t, err = time.Parse(time.RFC3339, v)
@@ -63,9 +71,13 @@ func (me MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Ent
 			return nil, err
 		}
 	}
-	if me.outputFormat != "" {
+
+	if me.outputFormat == "unixEpoch" {
+		return t.Unix(), nil
+	} else if me.outputFormat != "" {
 		return t.Format(me.outputFormat), nil
 	}
+
 	return t, nil
 }
 

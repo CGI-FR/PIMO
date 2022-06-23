@@ -28,7 +28,7 @@ import (
 func TestMaskingShouldReplaceDateByRandom(t *testing.T) {
 	dateMin := time.Date(1970, 1, 1, 0, 0, 0, 0, time.UTC)
 	dateMax := time.Date(2000, 1, 1, 0, 0, 0, 0, time.UTC)
-	dateRange := NewMask(dateMin, dateMax, 0)
+	dateRange := NewMask(dateMin, dateMax, 0, nil)
 
 	data := time.Date(2019, 3, 2, 0, 0, 0, 0, time.UTC)
 

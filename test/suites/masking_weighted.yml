@@ -80,4 +80,31 @@ testcases:
     - result.code ShouldEqual 0
     - result.systemoutjson.name ShouldEqual Dupond
     - result.systemoutjson.name2 ShouldEqual Dupont
-    - result.systemerr ShouldBeEmpty 
+    - result.systemerr ShouldBeEmpty
+
+- name: weightedChoice with seeder
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "field"
+          mask:
+            weightedChoice:
+              - choice: "un"
+                weight: 10
+              - choice: "two"
+                weight: 7
+              - choice: "three"
+                weight: 11
+          seed:
+            field: "field"
+      EOF
+  - script: |-
+      echo -e '{"field":1}\n{"field":2}\n{"field":3}\n{"field":2}\n{"field":1}\n{"field":3}' | pimo | head -c -1 | tr '\n' ' '
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldEqual {"field":"un"} {"field":"three"} {"field":"two"} {"field":"three"} {"field":"un"} {"field":"two"}
+    - result.systemerr ShouldBeEmpty

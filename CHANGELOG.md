@@ -14,6 +14,20 @@ Types of changes
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [1.14.0]
+
+- `Added` (play) possibility to share URL directly from the Play website
+
+## [1.13.0]
+
+- `Added` seed option on all randomized masks, another way to preserve data coherence
+- `Added` transcode mask
+- `Added` play command
+
+## [1.12.1]
+
+- `Fixed` use fromcache after a mask which causes a change in the type of the value
+
 ## [1.12.0]
 
 - `Added` permute mask randomly permutes values along a chosen JSON path
@@ -27,6 +41,8 @@ Types of changes
 - `Fixed` pimo doesn't panic anymore with fromjson combined with pipe mask, or fromjson combined with another fromjson mask with nested selectors
 - `Fixed` mask `replacement` with nested selectors
 - `Fixed` using fromCache, the line is not deleted if the jsonpath in not present in the document
+- `Added` option in `caches`section for use reverse cache
+- `Added` unixEpoch format with mask `dateParser`
 
 ## [1.11.0]
 

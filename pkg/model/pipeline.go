@@ -87,6 +87,7 @@ func BuildPipeline(pipeline Pipeline, conf Definition, caches map[string]Cache) 
 					Masks:     nil,
 					Cache:     masking.Cache,
 					Preserve:  masking.Preserve,
+					Seed:      masking.Seed,
 				}
 
 				if virtualMask.Mask.FromCache != "" {
@@ -163,13 +164,9 @@ func BuildPipeline(pipeline Pipeline, conf Definition, caches map[string]Cache) 
 	return pipeline, caches, nil
 }
 
-func LoadPipelineDefinitionFromYAML(filename string) (Definition, error) {
-	source, err := ioutil.ReadFile(filename)
-	if err != nil {
-		return Definition{}, err
-	}
+func LoadPipelineDefinitionFromYAML(source []byte) (Definition, error) {
 	var conf Definition
-	err = yaml.Unmarshal(source, &conf)
+	err := yaml.Unmarshal(source, &conf)
 	if err != nil {
 		return conf, err
 	}
@@ -177,6 +174,14 @@ func LoadPipelineDefinitionFromYAML(filename string) (Definition, error) {
 		conf.Seed = time.Now().UnixNano()
 	}
 	return conf, nil
+}
+
+func LoadPipelineDefinitionFromFile(filename string) (Definition, error) {
+	source, err := ioutil.ReadFile(filename)
+	if err != nil {
+		return Definition{}, err
+	}
+	return LoadPipelineDefinitionFromYAML(source)
 }
 
 func LoadPipelineDefintionFromOneLiner(oneLine []string) (Definition, error) {
