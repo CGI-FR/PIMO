@@ -73,6 +73,7 @@ document.getElementById('loading').remove();
 function loadExample(params) {
     editorYaml.setValue(LZString.decompressFromEncodedURIComponent(params[0]));
     editorJson.setValue(LZString.decompressFromEncodedURIComponent(params[1]));
+    resultJson.setValue("");
     autoPostData();
 }
 
