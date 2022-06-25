@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1656050953095,
+  "lastUpdate": 1656154552031,
   "repoUrl": "https://github.com/CGI-FR/PIMO",
   "entries": {
     "Benchmark": [
@@ -1110,6 +1110,42 @@ window.BENCHMARK_DATA = {
             "value": 3188298,
             "unit": "ns/op\t  628643 B/op\t    5488 allocs/op",
             "extra": "3656 times\n2 procs"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "youen.peron@cgi.com",
+            "name": "Youen Péron",
+            "username": "youen"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "79d6822c7e09325ea7c0040538374d7ad6424f10",
+          "message": "fix(play): verbosity flag (#136)\n\n* fix(play): verbosity flag\r\n\r\n* docs(play): update changelog\r\n\r\nCo-authored-by: Adrien Aury <adrien.aury@cgi.com>",
+          "timestamp": "2022-06-25T12:51:52+02:00",
+          "tree_id": "f5978aab69d898d8f947d21b088134e6b24b2b69",
+          "url": "https://github.com/CGI-FR/PIMO/commit/79d6822c7e09325ea7c0040538374d7ad6424f10"
+        },
+        "date": 1656154551460,
+        "tool": "go",
+        "benches": [
+          {
+            "name": "BenchmarkPimoRun",
+            "value": 181741,
+            "unit": "ns/op\t    4032 B/op\t     106 allocs/op",
+            "extra": "64550 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge",
+            "value": 3188911,
+            "unit": "ns/op\t  628509 B/op\t    5488 allocs/op",
+            "extra": "3763 times\n2 procs"
           }
         ]
       }
