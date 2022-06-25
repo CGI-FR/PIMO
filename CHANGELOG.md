@@ -16,7 +16,7 @@ Types of changes
 
 ## [1.14.1]
 
-- `Fixed` click an examples doest not reload webpage on the PIMO Play website
+- `Fixed` click on examples does not reload webpage on the PIMO Play website
 
 ## [1.14.0]
 
