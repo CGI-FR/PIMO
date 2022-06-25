@@ -120,6 +120,8 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 	playCmd := &cobra.Command{
 		Use: "play",
 		Run: func(cmd *cobra.Command, args []string) {
+			initLog()
+
 			router := pimo.Play(playSecure)
 			port := fmt.Sprintf("0.0.0.0:%d", playPort)
 
