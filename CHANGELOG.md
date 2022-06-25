@@ -14,6 +14,10 @@ Types of changes
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [1.14.1]
+
+- `Fixed` verbosity in pimo play command
+
 ## [1.14.0]
 
 - `Added` possibility to share URL directly from the PIMO Play website
