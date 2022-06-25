@@ -8,7 +8,7 @@
     <div id="loading" style="background: rgba(255, 255, 255, 1); position: fixed; width: 100%; height: 100%; left: 0; top: 0; z-index: 10; text-align: center"><p style="position: absolute; width: 100%; top: 50%; text-align: center">Loading...</p></div>
 
     <div class="mb-5 flex space-x-4 items-baseline bg-black text-white">
-      <div class="m-5 font-sans text-4xl font-bold">PIMO Play</div>
+      <div class="m-5 font-sans text-4xl font-bold"><a id="reset-link" class="cursor-pointer">PIMO Play</a></div>
       <div class="text-slate-200 text-sm">
         A playground for
         <a href="https://github.com/CGI-FR/PIMO/tree/{{ version }}" target="_blank" rel="noopener noreferrer" class="hover:underline">pimo {{ version }}</a>
@@ -46,19 +46,19 @@
       <div class="flex flex-col md:flex-row mt-5 gap-2 justify-evenly">
         <div>
           <h3 class="text-lg">Data Generation</h3>
-          <a id="example-generation" class="text-blue-400 text-sm underline block cursor-pointer"></a>
+          <a id="example-generation" class="text-blue-400 visited:text-purple-400 text-sm underline block cursor-pointer"></a>
         </div>
         <div>
           <h3 class="text-lg">Data Anonymization</h3>
-          <a id="example-anonymization" class="text-blue-400 text-sm underline block cursor-pointer"></a>
+          <a id="example-anonymization" class="text-blue-400 visited:text-purple-400 text-sm underline block cursor-pointer"></a>
         </div>
         <div>
           <h3 class="text-lg">Data Pseudonymization</h3>
-          <a id="example-pseudonymization" class="text-blue-400 text-sm underline block cursor-pointer"></a>
+          <a id="example-pseudonymization" class="text-blue-400 visited:text-purple-400 text-sm underline block cursor-pointer"></a>
         </div>
         <div>
           <h3 class="text-lg">Other</h3>
-          <a id="example-other" class="text-blue-400 text-sm underline block cursor-pointer"></a>
+          <a id="example-other" class="text-blue-400 visited:text-purple-400 text-sm underline block cursor-pointer"></a>
         </div>
       </div>
     </div>

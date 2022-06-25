@@ -122,27 +122,37 @@ examples_generation_a.remove()
 
 let examples_anonymization_a = document.getElementById("example-anonymization")
 examples_anonymization.forEach((params, name) => {
-    let link = examples_generation_a.cloneNode(true);
+    let link = examples_anonymization_a.cloneNode(true);
     link.innerText = name;
     link.onclick = () => { loadExample(params) }
     examples_anonymization_a.parentElement.appendChild(link)
 });
+examples_anonymization_a.remove()
 
 let examples_pseudonymization_a = document.getElementById("example-pseudonymization")
 examples_pseudonymization.forEach((params, name) => {
-    let link = examples_generation_a.cloneNode(true);
+    let link = examples_pseudonymization_a.cloneNode(true);
     link.innerText = name;
     link.onclick = () => { loadExample(params) }
     examples_pseudonymization_a.parentElement.appendChild(link)
 });
+examples_pseudonymization_a.remove()
 
 let examples_other_a = document.getElementById("example-other")
 examples_other.forEach((params, name) => {
-    let link = examples_generation_a.cloneNode(true);
+    let link = examples_other_a.cloneNode(true);
     link.innerText = name;
     link.onclick = () => { loadExample(params) }
     examples_other_a.parentElement.appendChild(link)
 });
+examples_other_a.remove()
+
+document.getElementById("reset-link").onclick = () => {
+    editorYaml.setValue(masking);
+    editorJson.setValue(input);
+    resultJson.setValue("");
+    autoPostData();
+}
 
 ///////////////////////////////////////////////////////////
 
