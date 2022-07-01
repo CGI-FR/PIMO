@@ -211,10 +211,11 @@ type CacheDefinition struct {
 }
 
 type Definition struct {
-	Version string                     `yaml:"version" jsonschema_description:"Version of the pipeline definition, use the value 1"`
-	Seed    int64                      `yaml:"seed,omitempty" jsonschema_description:"Initialize the Pseaudo-Random-Generator with the given value"`
-	Masking []Masking                  `yaml:"masking" jsonschema_description:"Masking pipeline definition"`
-	Caches  map[string]CacheDefinition `yaml:"caches,omitempty" jsonschema_description:"Declare in-memory caches"`
+	Version   string                     `yaml:"version" jsonschema_description:"Version of the pipeline definition, use the value 1"`
+	Seed      int64                      `yaml:"seed,omitempty" jsonschema_description:"Initialize the Pseaudo-Random-Generator with the given value"`
+	Functions string                     `yaml:"functions,omitempty" jsonschema_description:"Declare functions to be used in the masking"`
+	Masking   []Masking                  `yaml:"masking" jsonschema_description:"Masking pipeline definition"`
+	Caches    map[string]CacheDefinition `yaml:"caches,omitempty" jsonschema_description:"Declare in-memory caches"`
 }
 
 /***************

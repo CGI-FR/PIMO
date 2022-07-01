@@ -1,0 +1,76 @@
+name: functions features
+testcases:
+- name: declaring fonctions and using in template
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      functions: -|
+        func rangLettre(lettre) {
+          return lettre - 'A' + 1;
+        }
+      masking:
+        - selector:
+            jsonpath: "rang_lettre_J"
+          mask:
+            template: "{{rangLettre 'J'}}"
+      EOF
+  - script: |-
+      echo '{"rang_lettre_J": ""}' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemoutjson.rang_lettre_J ShouldEqual 10
+    - result.systemerr ShouldBeEmpty
+
+# - name: declaring fonctions and using in a mask without paramsFromContext
+#   steps:
+#   - script: rm -f masking.yml
+#   - script: |-
+#       cat > masking.yml <<EOF
+#       version: "1"
+#       functions: -|
+#         func rangLettre(lettre) {
+#           return lettre - 'A' + 1;
+#         }
+#       masking:
+#         - selector:
+#             jsonpath: "lettre"
+#           mask:
+#             call:
+#               name: "rangLettre"
+#       EOF
+#   - script: |-
+#       echo '{"lettre": "Z"}' | pimo
+#     assertions:
+#     - result.code ShouldEqual 0
+#     - result.systemoutjson.rang_lettre ShouldEqual 26
+#     - result.systemerr ShouldBeEmpty
+
+# - name: declaring fonctions and using in a mask with paramsFromContext
+#   steps:
+#   - script: rm -f masking.yml
+#   - script: |-
+#       cat > masking.yml <<EOF
+#       version: "1"
+#       functions: -|
+#         func create_email(nom, prenom) {
+#           return nom+"."+prenom+"@mail.com";
+#         }
+#       masking:
+#         - selector:
+#             jsonpath: "email"
+#           mask:
+#             call:
+#               name: "create_email"
+#               paramsFromContext:
+#                 - "nom"
+#                 - "prenom"
+#       EOF
+#   - script: |-
+#       echo '{"nom": "dupont", "prenom": "sophie", "email": ""}' | pimo
+#     assertions:
+#     - result.code ShouldEqual 0
+#     - result.systemoutjson.email ShouldEqual dupont.sophie@email.com
+#     - result.systemerr ShouldBeEmpty
+

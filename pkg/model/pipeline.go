@@ -68,6 +68,8 @@ func BuildPipeline(pipeline Pipeline, conf Definition, caches map[string]Cache) 
 	caches = BuildCaches(conf.Caches, caches)
 	cleaners := []Processor{}
 
+	// Compile(conf.Functions)
+
 	for _, masking := range conf.Masking {
 		allSelectors := masking.Selectors
 		if sel := masking.Selector; sel.Jsonpath != "" {
