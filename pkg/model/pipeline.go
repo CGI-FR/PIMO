@@ -68,7 +68,23 @@ func BuildPipeline(pipeline Pipeline, conf Definition, caches map[string]Cache) 
 	caches = BuildCaches(conf.Caches, caches)
 	cleaners := []Processor{}
 
-	// Compile(conf.Functions)
+	// NewEngine compile et récupère les noms des fonctions du script définit dans "functions"
+	// env := script.NewEngine(conf.Functions)
+
+	// J'ai besoin de env pour exécuter la fonction du script dans le masque template
+	// script.Execute(env, `add(2,4)`)
+	// comment je passe env pour définir mes fonctions dans le package template ?
+	// func NewEngine(text string) (*Engine, error) {
+	// 	funcMap := template.FuncMap{
+	// 		"ToUpper":  strings.ToUpper,
+	// 		"ToLower":  strings.ToLower,
+	// 		"NoAccent": rmAcc,
+	//		env.names[0]: script.Execute(env.env, text),
+	// 	}
+	// 	temp, err := template.New("template").Funcs(sprig.TxtFuncMap()).Funcs(funcMap).Parse(text)
+
+	// 	return &Engine{temp}, err
+	// }
 
 	for _, masking := range conf.Masking {
 		allSelectors := masking.Selectors

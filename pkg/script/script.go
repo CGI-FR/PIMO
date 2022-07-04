@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with PIMO.  If not, see <http://www.gnu.org/licenses/>.
 
-package model
+package script
 
 import (
 	"fmt"
@@ -26,6 +26,16 @@ import (
 	"github.com/mattn/anko/env"
 	"github.com/mattn/anko/vm"
 )
+
+type Engine struct {
+	env   *env.Env
+	names []string
+}
+
+// NewEngine create a template Engine
+func NewEngine(script string) *Engine {
+	return &Engine{env: Compile(env.NewEnv(), script), names: Names(script)}
+}
 
 // DefinePackage defines the packages that can be used.
 func DefinePackage(e *env.Env) {
@@ -41,9 +51,7 @@ func DefinePackage(e *env.Env) {
 }
 
 // Compile returns the environment needed for a VM to run in after compiling the script.
-func Compile(script string) *env.Env {
-	e := env.NewEnv()
-
+func Compile(e *env.Env, script string) *env.Env {
 	DefinePackage(e)
 
 	err := e.Define("println", fmt.Println)
@@ -55,13 +63,12 @@ func Compile(script string) *env.Env {
 	if err != nil {
 		log.Fatalf("Execute error: %v\n", err)
 	}
+
 	return e
 }
 
 // Execute parses script and executes in the specified environment.
-func Execute(script string) interface{} {
-	e := Compile(script)
-
+func Execute(e *env.Env, script string) interface{} {
 	output, err := vm.Execute(e, nil, script)
 	if err != nil {
 		log.Fatalf("Execute error: %v\n", err)

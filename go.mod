@@ -9,6 +9,7 @@ require (
 	github.com/goccy/go-yaml v1.9.5
 	github.com/invopop/jsonschema v0.4.0
 	github.com/labstack/echo/v4 v4.7.2
+	github.com/mattn/anko v0.1.9
 	github.com/mattn/go-isatty v0.0.14
 	github.com/rs/zerolog v1.27.0
 	github.com/spf13/cast v1.5.0
@@ -32,7 +33,6 @@ require (
 	github.com/imdario/mergo v0.3.11 // indirect
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
 	github.com/labstack/gommon v0.3.1 // indirect
-	github.com/mattn/anko v0.1.9
 	github.com/mattn/go-colorable v0.1.12 // indirect
 	github.com/mitchellh/copystructure v1.0.0 // indirect
 	github.com/mitchellh/reflectwalk v1.0.0 // indirect
