@@ -99,7 +99,7 @@ func BuildPipeline(pipeline Pipeline, conf Definition, caches map[string]Cache) 
 					nbArg++
 				}
 
-				configuration := NewMaskFactoryConfiguration(virtualMask, conf.Seed, caches)
+				configuration := MaskFactoryConfiguration{Masking: virtualMask, Seed: conf.Seed, Cache: caches}
 
 				for _, factory := range maskFactories {
 					mask, present, err := factory(configuration)

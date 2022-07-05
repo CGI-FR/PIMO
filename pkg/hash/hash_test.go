@@ -39,7 +39,7 @@ func TestMaskingShouldReplaceSensitiveValueByHashing(t *testing.T) {
 
 func TestFactoryShouldCreateAMask(t *testing.T) {
 	maskingConfig := model.Masking{Mask: model.MaskType{Hash: []model.Entry{"Mickael", "Benjamin", "Michel"}}}
-	factoryConfig := model.NewMaskFactoryConfiguration(maskingConfig, 0, nil)
+	factoryConfig := model.MaskFactoryConfiguration{Masking: maskingConfig, Seed: 0}
 	config, present, err := Factory(factoryConfig)
 	waitedConfig := MaskEngine{[]model.Entry{"Mickael", "Benjamin", "Michel"}}
 	assert.Equal(t, waitedConfig, config, "should be equal")
@@ -49,7 +49,7 @@ func TestFactoryShouldCreateAMask(t *testing.T) {
 
 func TestFactoryShouldNotCreateAMaskFromAnEmptyConfig(t *testing.T) {
 	maskingConfig := model.Masking{Mask: model.MaskType{}}
-	factoryConfig := model.NewMaskFactoryConfiguration(maskingConfig, 0, nil)
+	factoryConfig := model.MaskFactoryConfiguration{Masking: maskingConfig, Seed: 0}
 	mask, present, err := Factory(factoryConfig)
 	assert.Nil(t, mask, "should be nil")
 	assert.False(t, present, "should be false")

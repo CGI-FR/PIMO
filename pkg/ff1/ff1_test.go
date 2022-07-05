@@ -85,7 +85,7 @@ func TestDecodingKeyShouldWork(t *testing.T) {
 
 func TestFactoryShouldReturnNilOnEmptyConfig(t *testing.T) {
 	maskingConfig := model.Masking{Mask: model.MaskType{}}
-	factoryConfig := model.NewMaskFactoryConfiguration(maskingConfig, 0, nil)
+	factoryConfig := model.MaskFactoryConfiguration{Masking: maskingConfig, Seed: 0}
 	mask, present, err := Factory(factoryConfig)
 	assert.Nil(t, mask, "should be nil")
 	assert.False(t, present, "should be false")
@@ -94,7 +94,7 @@ func TestFactoryShouldReturnNilOnEmptyConfig(t *testing.T) {
 
 func TestFactoryShouldReturnErrorOnWrongConfig(t *testing.T) {
 	maskingConfig := model.Masking{Mask: model.MaskType{FF1: model.FF1Type{KeyFromEnv: "XXXXXX", Radix: 0, TweakField: "tweak"}}}
-	factoryConfig := model.NewMaskFactoryConfiguration(maskingConfig, 0, nil)
+	factoryConfig := model.MaskFactoryConfiguration{Masking: maskingConfig, Seed: 0}
 	mask, present, err := Factory(factoryConfig)
 	assert.Nil(t, mask, "should be nil")
 	assert.True(t, present, "should be true")

@@ -57,7 +57,7 @@ func TestFactoryShouldCreateAMask(t *testing.T) {
 	min := time.Date(1990, 1, 1, 0, 0, 0, 0, time.UTC)
 	max := time.Date(2000, 1, 1, 0, 0, 0, 0, time.UTC)
 	maskingConfig := model.Masking{Mask: model.MaskType{RandDate: model.RandDateType{DateMin: min, DateMax: max}}}
-	factoryConfig := model.NewMaskFactoryConfiguration(maskingConfig, 0, nil)
+	factoryConfig := model.MaskFactoryConfiguration{Masking: maskingConfig, Seed: 0}
 	config, present, err := Factory(factoryConfig)
 	assert.NotNil(t, config, "config shouldn't be nil")
 	assert.True(t, present, "should be true")
@@ -66,7 +66,7 @@ func TestFactoryShouldCreateAMask(t *testing.T) {
 
 func TestFactoryShouldNotCreateAMaskFromAnEmptyConfig(t *testing.T) {
 	maskingConfig := model.Masking{Mask: model.MaskType{}}
-	factoryConfig := model.NewMaskFactoryConfiguration(maskingConfig, 0, nil)
+	factoryConfig := model.MaskFactoryConfiguration{Masking: maskingConfig, Seed: 0}
 	mask, present, err := Factory(factoryConfig)
 	assert.Nil(t, mask, "should be nil")
 	assert.False(t, present, "should be false")

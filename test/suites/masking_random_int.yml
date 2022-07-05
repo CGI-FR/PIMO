@@ -71,9 +71,7 @@ testcases:
       echo '{"name": "Toto", "name2": ""}' | pimo
     assertions:
     - result.code ShouldEqual 0
-    - result.systemoutjson.name ShouldNotEqual 83
     - result.systemoutjson.name ShouldEqual 27
-    - result.systemoutjson.name2 ShouldNotEqual 83
     - result.systemoutjson.name2 ShouldEqual 55
     - result.systemerr ShouldBeEmpty
 

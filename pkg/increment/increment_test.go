@@ -48,7 +48,7 @@ func TestMaskingShouldCreateIncrementalIntwithOffset(t *testing.T) {
 
 func TestRegistryMaskToConfigurationShouldCreateAMask(t *testing.T) {
 	maskingConfig := model.Masking{Mask: model.MaskType{Incremental: model.IncrementalType{Start: 1, Increment: 3}}}
-	factoryConfig := model.NewMaskFactoryConfiguration(maskingConfig, 0, nil)
+	factoryConfig := model.MaskFactoryConfiguration{Masking: maskingConfig, Seed: 0}
 	actual, present, err := Factory(factoryConfig)
 	waited := NewMask(1, 3)
 	assert.Equal(t, waited, actual, "should be equal")
@@ -58,7 +58,7 @@ func TestRegistryMaskToConfigurationShouldCreateAMask(t *testing.T) {
 
 func TestRegistryMaskToConfigurationShouldNotCreateAMaskFromAnEmptyConfig(t *testing.T) {
 	maskingConfig := model.Masking{Mask: model.MaskType{}}
-	factoryConfig := model.NewMaskFactoryConfiguration(maskingConfig, 0, nil)
+	factoryConfig := model.MaskFactoryConfiguration{Masking: maskingConfig, Seed: 0}
 	mask, present, err := Factory(factoryConfig)
 	assert.Nil(t, mask, "should be nil")
 	assert.False(t, present, "should be false")

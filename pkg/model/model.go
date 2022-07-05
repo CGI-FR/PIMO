@@ -69,10 +69,6 @@ type MaskFactoryConfiguration struct {
 	Cache   map[string]Cache
 }
 
-func NewMaskFactoryConfiguration(masking Masking, seed int64, cache map[string]Cache) MaskFactoryConfiguration {
-	return MaskFactoryConfiguration{Masking: masking, Seed: seed, Cache: cache}
-}
-
 type MaskFactory func(MaskFactoryConfiguration) (MaskEngine, bool, error)
 
 type MaskContextFactory func(MaskFactoryConfiguration) (MaskContextEngine, bool, error)

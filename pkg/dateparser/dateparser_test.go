@@ -72,7 +72,7 @@ func TestMaskingShouldReplaceDateStringByDateStringInTwoMasks(t *testing.T) {
 
 func TestFactoryShouldCreateAMask(t *testing.T) {
 	maskingConfig := model.Masking{Mask: model.MaskType{DateParser: model.DateParserType{InputFormat: "2006-02-01", OutputFormat: "01/02/06"}}}
-	factoryConfig := model.NewMaskFactoryConfiguration(maskingConfig, 0, nil)
+	factoryConfig := model.MaskFactoryConfiguration{Masking: maskingConfig, Seed: 0}
 	config, present, err := Factory(factoryConfig)
 	mask := NewMask("2006-02-01", "01/02/06")
 	assert.Equal(t, mask, config, "should be equal")
@@ -80,7 +80,7 @@ func TestFactoryShouldCreateAMask(t *testing.T) {
 	assert.Nil(t, err, "error should be nil")
 
 	maskingConfig = model.Masking{Mask: model.MaskType{DateParser: model.DateParserType{InputFormat: "2006-02-01", OutputFormat: ""}}}
-	factoryConfig = model.NewMaskFactoryConfiguration(maskingConfig, 0, nil)
+	factoryConfig = model.MaskFactoryConfiguration{Masking: maskingConfig, Seed: 0}
 	config, present, err = Factory(factoryConfig)
 	mask = NewMask("2006-02-01", "")
 	assert.Equal(t, mask, config, "should be equal")
@@ -88,7 +88,7 @@ func TestFactoryShouldCreateAMask(t *testing.T) {
 	assert.Nil(t, err, "error should be nil")
 
 	maskingConfig = model.Masking{Mask: model.MaskType{DateParser: model.DateParserType{InputFormat: "", OutputFormat: "01/02/06"}}}
-	factoryConfig = model.NewMaskFactoryConfiguration(maskingConfig, 0, nil)
+	factoryConfig = model.MaskFactoryConfiguration{Masking: maskingConfig, Seed: 0}
 	config, present, err = Factory(factoryConfig)
 	mask = NewMask("", "01/02/06")
 	assert.Equal(t, mask, config, "should be equal")

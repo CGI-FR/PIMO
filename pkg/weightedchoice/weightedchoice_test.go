@@ -46,7 +46,7 @@ func TestMaskingShouldReplaceSensitiveValueByWeightedRandom(t *testing.T) {
 func TestFactoryShouldCreateAMask(t *testing.T) {
 	maskingChoice := []model.WeightedChoiceType{{Choice: "Dupont", Weight: 9}, {Choice: "Dupond", Weight: 1}}
 	maskingConfig := model.Masking{Mask: model.MaskType{WeightedChoice: maskingChoice}}
-	factoryConfig := model.NewMaskFactoryConfiguration(maskingConfig, 0, nil)
+	factoryConfig := model.MaskFactoryConfiguration{Masking: maskingConfig, Seed: 0}
 	_, present, err := Factory(factoryConfig)
 	assert.True(t, present, "should be true")
 	assert.Nil(t, err, "error should be nil")
@@ -54,7 +54,7 @@ func TestFactoryShouldCreateAMask(t *testing.T) {
 
 func TestFactoryShouldNotCreateAMaskFromAnEmptyConfig(t *testing.T) {
 	maskingConfig := model.Masking{Mask: model.MaskType{}}
-	factoryConfig := model.NewMaskFactoryConfiguration(maskingConfig, 0, nil)
+	factoryConfig := model.MaskFactoryConfiguration{Masking: maskingConfig, Seed: 0}
 	mask, present, err := Factory(factoryConfig)
 	assert.Nil(t, mask, "should be nil")
 	assert.False(t, present, "should be false")

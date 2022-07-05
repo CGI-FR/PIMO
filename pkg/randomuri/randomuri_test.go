@@ -26,7 +26,7 @@ import (
 
 func TestFactoryShouldCreateAMaskFromAList(t *testing.T) {
 	maskingConfig := model.Masking{Mask: model.MaskType{RandomChoiceInURI: "file://../../test/names.txt"}}
-	factoryConfig := model.NewMaskFactoryConfiguration(maskingConfig, 0, nil)
+	factoryConfig := model.MaskFactoryConfiguration{Masking: maskingConfig, Seed: 0}
 	mask, present, err := Factory(factoryConfig)
 	assert.Nil(t, err, "error should be nil")
 	assert.True(t, present, "should be true")
@@ -37,7 +37,7 @@ func TestFactoryShouldCreateAMaskFromAList(t *testing.T) {
 
 func TestFactoryShouldCreateAMaskFromAListWithTemplate(t *testing.T) {
 	maskingConfig := model.Masking{Mask: model.MaskType{RandomChoiceInURI: "file://../../test/names_{{.gender}}.txt"}}
-	factoryConfig := model.NewMaskFactoryConfiguration(maskingConfig, 0, nil)
+	factoryConfig := model.MaskFactoryConfiguration{Masking: maskingConfig, Seed: 0}
 	mask, present, err := Factory(factoryConfig)
 	assert.Nil(t, err, "error should be nil")
 	assert.True(t, present, "should be true")
@@ -48,7 +48,7 @@ func TestFactoryShouldCreateAMaskFromAListWithTemplate(t *testing.T) {
 
 func TestFactoryShouldNotCreateAMaskFromAnEmptyConfig(t *testing.T) {
 	maskingConfig := model.Masking{Mask: model.MaskType{}}
-	factoryConfig := model.NewMaskFactoryConfiguration(maskingConfig, 0, nil)
+	factoryConfig := model.MaskFactoryConfiguration{Masking: maskingConfig, Seed: 0}
 	mask, present, err := Factory(factoryConfig)
 	assert.Nil(t, mask, "should be nil")
 	assert.False(t, present, "should be false")
