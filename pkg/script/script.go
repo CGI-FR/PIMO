@@ -54,12 +54,7 @@ func DefinePackage(e *env.Env) {
 func Compile(e *env.Env, script string) *env.Env {
 	DefinePackage(e)
 
-	err := e.Define("println", fmt.Println)
-	if err != nil {
-		log.Fatalf("Define error: %v\n", err)
-	}
-
-	_, err = vm.Execute(e, nil, script)
+	_, err := vm.Execute(e, nil, script)
 	if err != nil {
 		log.Fatalf("Execute error: %v\n", err)
 	}
