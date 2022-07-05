@@ -19,6 +19,7 @@ package templatemask
 
 import (
 	"testing"
+	tmpl "text/template"
 
 	"github.com/cgi-fr/pimo/pkg/model"
 	"github.com/stretchr/testify/assert"
@@ -26,7 +27,7 @@ import (
 
 func TestMaskingShouldReplaceSensitiveValueByTemplate(t *testing.T) {
 	template := "{{.name}}.{{.surname}}@gmail.com"
-	tempMask, err := NewMask(template)
+	tempMask, err := NewMask(template, tmpl.FuncMap{})
 	if err != nil {
 		assert.Fail(t, err.Error())
 	}
@@ -40,7 +41,7 @@ func TestMaskingShouldReplaceSensitiveValueByTemplate(t *testing.T) {
 
 func TestMaskingShouldReplaceSensitiveValueByTemplateInNested(t *testing.T) {
 	template := "{{.customer.identity.name}}.{{.customer.identity.surname}}@gmail.com"
-	tempMask, err := NewMask(template)
+	tempMask, err := NewMask(template, tmpl.FuncMap{})
 	if err != nil {
 		assert.Fail(t, err.Error())
 	}
@@ -64,7 +65,7 @@ func TestFactoryShouldCreateAMask(t *testing.T) {
 	factoryConfig := model.MaskFactoryConfiguration{Masking: maskingConfig, Seed: 0}
 	config, present, err := Factory(factoryConfig)
 	assert.Nil(t, err, "error should be nil")
-	maskingEngine, _ := NewMask("{{.name}}.{{.surname}}@gmail.com")
+	maskingEngine, _ := NewMask("{{.name}}.{{.surname}}@gmail.com", tmpl.FuncMap{})
 	assert.IsType(t, maskingEngine, config, "should be equal")
 	assert.True(t, present, "should be true")
 	assert.Nil(t, err, "error should be nil")
@@ -95,7 +96,7 @@ func TestFactoryShouldReturnAnErrorInWrongConfig(t *testing.T) {
 
 func TestMaskingTemplateShouldFormat(t *testing.T) {
 	template := `{{"hello!" | upper | repeat 2}}`
-	tempMask, err := NewMask(template)
+	tempMask, err := NewMask(template, tmpl.FuncMap{})
 	if err != nil {
 		assert.Fail(t, err.Error())
 	}
@@ -125,7 +126,7 @@ func TestRFactoryShouldCreateANestedContextMask(t *testing.T) {
 
 func TestMaskingTemplateShouldIterOverContextArray(t *testing.T) {
 	template := `{{- range $index, $rel := .REL_PERMIS -}}{{.ID_PERMIS}}{{- end -}}`
-	tempMask, err := NewMask(template)
+	tempMask, err := NewMask(template, tmpl.FuncMap{})
 	if err != nil {
 		assert.Fail(t, err.Error())
 	}

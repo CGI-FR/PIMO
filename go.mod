@@ -20,9 +20,12 @@ require (
 	golang.org/x/text v0.3.7
 )
 
+require github.com/Masterminds/semver v1.5.0 // indirect
+
 require (
 	github.com/Masterminds/goutils v1.1.1 // indirect
 	github.com/Masterminds/semver/v3 v3.1.1 // indirect
+	github.com/Masterminds/sprig v2.22.0+incompatible
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/fatih/color v1.13.0 // indirect
 	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect

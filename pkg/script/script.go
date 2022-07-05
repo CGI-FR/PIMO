@@ -27,44 +27,36 @@ import (
 	"github.com/mattn/anko/vm"
 )
 
-type Engine struct {
-	env   *env.Env
-	names []string
-}
-
-// NewEngine create a template Engine
-func NewEngine(script string) *Engine {
-	return &Engine{env: Compile(env.NewEnv(), script), names: Names(script)}
+type Environment struct {
+	Env *env.Env
 }
 
 // DefinePackage defines the packages that can be used.
-func DefinePackage(e *env.Env) {
-	err := e.Define("println", fmt.Println)
+func (env Environment) DefinePackage() {
+	err := env.Env.Define("println", fmt.Println)
 	if err != nil {
 		log.Fatalf("Define error: %v\n", err)
 	}
 
-	err = e.Define("pow", math.Pow)
+	err = env.Env.Define("pow", math.Pow)
 	if err != nil {
 		log.Fatalf("Define error: %v\n", err)
 	}
 }
 
 // Compile returns the environment needed for a VM to run in after compiling the script.
-func Compile(e *env.Env, script string) *env.Env {
-	DefinePackage(e)
+func (env Environment) Compile(script string) {
+	env.DefinePackage()
 
-	_, err := vm.Execute(e, nil, script)
+	_, err := vm.Execute(env.Env, nil, script)
 	if err != nil {
 		log.Fatalf("Execute error: %v\n", err)
 	}
-
-	return e
 }
 
 // Execute parses script and executes in the specified environment.
-func Execute(e *env.Env, script string) interface{} {
-	output, err := vm.Execute(e, nil, script)
+func (env Environment) Execute(script string) interface{} {
+	output, err := vm.Execute(env.Env, nil, script)
 	if err != nil {
 		log.Fatalf("Execute error: %v\n", err)
 	}

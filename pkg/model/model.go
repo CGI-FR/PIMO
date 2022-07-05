@@ -21,6 +21,7 @@ import (
 	"bytes"
 	"fmt"
 	"hash/fnv"
+	tmpl "text/template"
 	"time"
 
 	"github.com/cgi-fr/pimo/pkg/statistics"
@@ -64,9 +65,10 @@ func (fme FunctionMaskContextEngine) MaskContext(e Dictionary, key string, conte
 }
 
 type MaskFactoryConfiguration struct {
-	Masking Masking
-	Seed    int64
-	Cache   map[string]Cache
+	Masking   Masking
+	Seed      int64
+	Cache     map[string]Cache
+	Functions tmpl.FuncMap
 }
 
 type MaskFactory func(MaskFactoryConfiguration) (MaskEngine, bool, error)

@@ -20,6 +20,7 @@ package script
 import (
 	"testing"
 
+	"github.com/mattn/anko/env"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -30,11 +31,12 @@ func TestExecute(t *testing.T) {
 					return x+y
 			    }`
 
-	env := NewEngine(function)
+	env := Environment{Env: env.NewEnv()}
+	env.Compile(function)
 
 	template := `add(4,6)`
 
-	result := Execute(env.env, template)
+	result := env.Execute(template)
 
 	assert.Equal(t, result, int64(10))
 }

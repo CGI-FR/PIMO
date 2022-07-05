@@ -14,7 +14,7 @@ testcases:
         - selector:
             jsonpath: "rang_lettre_J"
           mask:
-            template: "{{rangLettre 'J'}}"
+            template: '{{rangLettre "J"}}'
       EOF
   - script: |-
       echo '{"rang_lettre_J": ""}' | pimo
