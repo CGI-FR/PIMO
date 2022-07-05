@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1656575422088,
+  "lastUpdate": 1657025360200,
   "repoUrl": "https://github.com/CGI-FR/PIMO",
   "entries": {
     "Benchmark": [
@@ -1218,6 +1218,42 @@ window.BENCHMARK_DATA = {
             "value": 3057424,
             "unit": "ns/op\t  628518 B/op\t    5489 allocs/op",
             "extra": "3920 times\n2 procs"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "89643755+giraud10@users.noreply.github.com",
+            "name": "giraud10",
+            "username": "giraud10"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "5065b42813066e06cbcc51ad0708a12fb92bd372",
+          "message": "refactor(MaskFactory): takes as parameter a new structure (#141)\n\n* refactor(MaskFactory): takes as parameter a new structure\r\n\r\n* refactor: remove NewMaskFactoryConfiguration",
+          "timestamp": "2022-07-05T14:44:28+02:00",
+          "tree_id": "8031f6e68d38a3c436768422e6e3ae3c4b507e43",
+          "url": "https://github.com/CGI-FR/PIMO/commit/5065b42813066e06cbcc51ad0708a12fb92bd372"
+        },
+        "date": 1657025358797,
+        "tool": "go",
+        "benches": [
+          {
+            "name": "BenchmarkPimoRun",
+            "value": 228676,
+            "unit": "ns/op\t    4038 B/op\t     106 allocs/op",
+            "extra": "50997 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge",
+            "value": 3865152,
+            "unit": "ns/op\t  628553 B/op\t    5489 allocs/op",
+            "extra": "3068 times\n2 procs"
           }
         ]
       }
