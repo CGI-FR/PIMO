@@ -39,8 +39,8 @@ func (rm MaskEngine) MaskContext(context model.Dictionary, key string, contexts 
 }
 
 // Factory create a mask from a yaml config
-func Factory(conf model.Masking, seed int64, caches map[string]model.Cache) (model.MaskContextEngine, bool, error) {
-	if conf.Mask.Remove {
+func Factory(conf model.MaskFactoryConfiguration) (model.MaskContextEngine, bool, error) {
+	if conf.Masking.Mask.Remove {
 		return NewMask(), true, nil
 	}
 	return nil, false, nil

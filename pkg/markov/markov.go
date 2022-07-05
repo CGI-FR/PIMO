@@ -84,15 +84,15 @@ func (mm MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Ent
 }
 
 // Factory create a mask from a yaml config
-func Factory(conf model.Masking, seed int64, caches map[string]model.Cache) (model.MaskEngine, bool, error) {
-	if len(conf.Mask.Markov.Sample) != 0 {
+func Factory(conf model.MaskFactoryConfiguration) (model.MaskEngine, bool, error) {
+	if len(conf.Masking.Mask.Markov.Sample) != 0 {
 		h := fnv.New64a()
-		h.Write([]byte(conf.Selector.Jsonpath))
-		seed += int64(h.Sum64())
-		mask, err := NewMask(seed, model.NewSeeder(conf, seed), conf.Mask.Markov.Sample,
-			conf.Mask.Markov.Separator,
-			conf.Mask.Markov.MaxSize,
-			conf.Mask.Markov.Order)
+		h.Write([]byte(conf.Masking.Selector.Jsonpath))
+		conf.Seed += int64(h.Sum64())
+		mask, err := NewMask(conf.Seed, model.NewSeeder(conf.Masking, conf.Seed), conf.Masking.Mask.Markov.Sample,
+			conf.Masking.Mask.Markov.Separator,
+			conf.Masking.Mask.Markov.MaxSize,
+			conf.Masking.Mask.Markov.Order)
 		return mask, true, err
 	}
 	return nil, false, nil

@@ -87,7 +87,8 @@ func TestMaskingShouldReturnAnErrorIfNotATime(t *testing.T) {
 
 func TestFactoryShouldCreateAMask(t *testing.T) {
 	maskingConfig := model.Masking{Mask: model.MaskType{Duration: "P2D"}}
-	config, present, err := Factory(maskingConfig, 0, nil)
+	factoryConfig := model.NewMaskFactoryConfiguration(maskingConfig, 0, nil)
+	config, present, err := Factory(factoryConfig)
 	mask, _ := NewMask("P2D")
 	assert.Equal(t, mask, config, "should be equal")
 	assert.True(t, present, "should be true")
@@ -96,7 +97,8 @@ func TestFactoryShouldCreateAMask(t *testing.T) {
 
 func TestFactoryShouldNotCreateAMaskFromAnEmptyConfig(t *testing.T) {
 	maskingConfig := model.Masking{Mask: model.MaskType{}}
-	mask, present, err := Factory(maskingConfig, 0, nil)
+	factoryConfig := model.NewMaskFactoryConfiguration(maskingConfig, 0, nil)
+	mask, present, err := Factory(factoryConfig)
 	assert.Nil(t, mask, "should be nil")
 	assert.False(t, present, "should be false")
 	assert.Nil(t, err, "error should be nil")
@@ -104,7 +106,8 @@ func TestFactoryShouldNotCreateAMaskFromAnEmptyConfig(t *testing.T) {
 
 func TestFactoryShouldReturnAnErrorInWrongConfig(t *testing.T) {
 	maskingConfig := model.Masking{Mask: model.MaskType{Duration: "NotADuration"}}
-	mask, present, err := Factory(maskingConfig, 0, nil)
+	factoryConfig := model.NewMaskFactoryConfiguration(maskingConfig, 0, nil)
+	mask, present, err := Factory(factoryConfig)
 	assert.Nil(t, mask, "should be nil")
 	assert.False(t, present, "should be true")
 	assert.NotNil(t, err, "error shouldn't be nil")

@@ -72,9 +72,9 @@ func (am MaskEngine) GetCleaner() model.FunctionMaskContextEngine {
 }
 
 // Create a mask from a configuration
-func Factory(conf model.Masking, seed int64, caches map[string]model.Cache) (model.MaskContextEngine, bool, error) {
-	if conf.Mask.AddTransient != nil {
-		mask, err := NewMask(conf.Mask.AddTransient)
+func Factory(conf model.MaskFactoryConfiguration) (model.MaskContextEngine, bool, error) {
+	if conf.Masking.Mask.AddTransient != nil {
+		mask, err := NewMask(conf.Masking.Mask.AddTransient)
 		if err != nil {
 			return nil, false, err
 		}

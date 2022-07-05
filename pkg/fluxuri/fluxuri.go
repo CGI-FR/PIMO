@@ -52,9 +52,9 @@ func (me MaskEngine) MaskContext(context model.Dictionary, key string, contexts 
 }
 
 // Create a mask from a configuration
-func Factory(conf model.Masking, seed int64, caches map[string]model.Cache) (model.MaskContextEngine, bool, error) {
-	if len(conf.Mask.FluxURI) != 0 {
-		mask, err := NewMask(conf.Mask.FluxURI)
+func Factory(conf model.MaskFactoryConfiguration) (model.MaskContextEngine, bool, error) {
+	if len(conf.Masking.Mask.FluxURI) != 0 {
+		mask, err := NewMask(conf.Masking.Mask.FluxURI)
 		return mask, true, err
 	}
 	return nil, false, nil

@@ -36,7 +36,8 @@ func TestMaskingShouldAddField(t *testing.T) {
 
 func TestFactoryShouldCreateAMask(t *testing.T) {
 	maskingConfig := model.Masking{Selector: model.SelectorType{Jsonpath: "field"}, Mask: model.MaskType{Add: "value"}}
-	_, present, err := Factory(maskingConfig, 0, nil)
+	factoryConfig := model.NewMaskFactoryConfiguration(maskingConfig, 0, nil)
+	_, present, err := Factory(factoryConfig)
 	assert.NoError(t, err, "error should be nil")
 	assert.True(t, present, "should be true")
 }

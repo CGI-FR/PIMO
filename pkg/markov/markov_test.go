@@ -11,7 +11,8 @@ import (
 
 func TestFactoryShouldCreateAMask(t *testing.T) {
 	maskingConfig := model.Masking{Mask: model.MaskType{Markov: model.MarkovType{MaxSize: 20, Sample: "pimo://nameFR"}}}
-	_, present, err := Factory(maskingConfig, 0, nil)
+	factoryConfig := model.NewMaskFactoryConfiguration(maskingConfig, 0, nil)
+	_, present, err := Factory(factoryConfig)
 	assert.True(t, present, "should be true")
 	assert.Nil(t, err, "error should be nil")
 }

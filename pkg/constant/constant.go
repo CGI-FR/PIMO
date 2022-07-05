@@ -39,9 +39,9 @@ func (cm MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Ent
 }
 
 // Factory create a mask from a configuration
-func Factory(conf model.Masking, seed int64, caches map[string]model.Cache) (model.MaskEngine, bool, error) {
-	if conf.Mask.Constant != nil {
-		return NewMask(conf.Mask.Constant), true, nil
+func Factory(conf model.MaskFactoryConfiguration) (model.MaskEngine, bool, error) {
+	if conf.Masking.Mask.Constant != nil {
+		return NewMask(conf.Masking.Mask.Constant), true, nil
 	}
 	return nil, false, nil
 }
