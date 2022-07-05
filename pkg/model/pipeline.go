@@ -99,8 +99,10 @@ func BuildPipeline(pipeline Pipeline, conf Definition, caches map[string]Cache) 
 					nbArg++
 				}
 
+				configuration := MaskFactoryConfiguration{Masking: virtualMask, Seed: conf.Seed, Cache: caches}
+
 				for _, factory := range maskFactories {
-					mask, present, err := factory(virtualMask, conf.Seed, caches)
+					mask, present, err := factory(configuration)
 					if err != nil {
 						return nil, nil, errors.New(err.Error() + " for " + virtualMask.Selector.Jsonpath)
 					}
@@ -123,7 +125,7 @@ func BuildPipeline(pipeline Pipeline, conf Definition, caches map[string]Cache) 
 				}
 
 				for _, factory := range maskContextFactories {
-					mask, present, err := factory(virtualMask, conf.Seed, caches)
+					mask, present, err := factory(configuration)
 					if err != nil {
 						return nil, nil, errors.New(err.Error() + " for " + virtualMask.Selector.Jsonpath)
 					}

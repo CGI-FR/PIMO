@@ -50,9 +50,9 @@ func (cme MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.En
 }
 
 // Create a mask from a configuration
-func Factory(conf model.Masking, seed int64, caches map[string]model.Cache) (model.MaskEngine, bool, error) {
-	if len(conf.Mask.Command) != 0 {
-		return NewMask(conf.Mask.Command), true, nil
+func Factory(conf model.MaskFactoryConfiguration) (model.MaskEngine, bool, error) {
+	if len(conf.Masking.Mask.Command) != 0 {
+		return NewMask(conf.Masking.Mask.Command), true, nil
 	}
 	return nil, false, nil
 }

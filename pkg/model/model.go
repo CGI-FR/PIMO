@@ -63,9 +63,15 @@ func (fme FunctionMaskContextEngine) MaskContext(e Dictionary, key string, conte
 	return fme.Function(e, key, context...)
 }
 
-type MaskFactory func(Masking, int64, map[string]Cache) (MaskEngine, bool, error)
+type MaskFactoryConfiguration struct {
+	Masking Masking
+	Seed    int64
+	Cache   map[string]Cache
+}
 
-type MaskContextFactory func(Masking, int64, map[string]Cache) (MaskContextEngine, bool, error)
+type MaskFactory func(MaskFactoryConfiguration) (MaskEngine, bool, error)
+
+type MaskContextFactory func(MaskFactoryConfiguration) (MaskContextEngine, bool, error)
 
 type SelectorType struct {
 	Jsonpath string `yaml:"jsonpath" jsonschema_description:"Path of the target value to mask in the JSON input"`

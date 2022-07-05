@@ -55,14 +55,14 @@ func (rim MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.En
 }
 
 // Factory create a mask from a yaml config
-func Factory(conf model.Masking, seed int64, caches map[string]model.Cache) (model.MaskEngine, bool, error) {
-	if conf.Mask.RandomInt.Min != 0 || conf.Mask.RandomInt.Max != 0 {
+func Factory(conf model.MaskFactoryConfiguration) (model.MaskEngine, bool, error) {
+	if conf.Masking.Mask.RandomInt.Min != 0 || conf.Masking.Mask.RandomInt.Max != 0 {
 		// set differents seeds for differents jsonpath
 		h := fnv.New64a()
-		h.Write([]byte(conf.Selector.Jsonpath))
-		seed += int64(h.Sum64())
-		seeder := model.NewSeeder(conf, seed)
-		return NewMask(conf.Mask.RandomInt.Min, conf.Mask.RandomInt.Max, seed, seeder), true, nil
+		h.Write([]byte(conf.Masking.Selector.Jsonpath))
+		conf.Seed += int64(h.Sum64())
+		seeder := model.NewSeeder(conf.Masking, conf.Seed)
+		return NewMask(conf.Masking.Mask.RandomInt.Min, conf.Masking.Mask.RandomInt.Max, conf.Seed, seeder), true, nil
 	}
 	return nil, false, nil
 }

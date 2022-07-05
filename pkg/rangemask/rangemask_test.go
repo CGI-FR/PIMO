@@ -43,7 +43,8 @@ func TestMaskingShouldFailwithNotNumberInput(t *testing.T) {
 
 func TestFactoryShouldCreateAMask(t *testing.T) {
 	maskingConfig := model.Masking{Mask: model.MaskType{RangeMask: 15}}
-	mask, present, err := Factory(maskingConfig, 0, nil)
+	factoryConfig := model.MaskFactoryConfiguration{Masking: maskingConfig, Seed: 0}
+	mask, present, err := Factory(factoryConfig)
 	waitedMask := NewMask(15)
 	assert.Equal(t, waitedMask, mask, "should be equal")
 	assert.True(t, present, "should be true")

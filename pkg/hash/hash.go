@@ -43,17 +43,17 @@ func (hm MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Ent
 }
 
 // Create a mask from a configuration
-func Factory(conf model.Masking, seed int64, caches map[string]model.Cache) (model.MaskEngine, bool, error) {
-	if len(conf.Mask.Hash) != 0 && len(conf.Mask.HashInURI) != 0 {
+func Factory(conf model.MaskFactoryConfiguration) (model.MaskEngine, bool, error) {
+	if len(conf.Masking.Mask.Hash) != 0 && len(conf.Masking.Mask.HashInURI) != 0 {
 		return nil, false, fmt.Errorf("2 different hash choices")
 	}
-	if len(conf.Mask.Hash) != 0 {
+	if len(conf.Masking.Mask.Hash) != 0 {
 		var maskHash MaskEngine
-		maskHash.List = append(maskHash.List, conf.Mask.Hash...)
+		maskHash.List = append(maskHash.List, conf.Masking.Mask.Hash...)
 		return maskHash, true, nil
 	}
-	if len(conf.Mask.HashInURI) != 0 {
-		list, err := uri.Read(conf.Mask.HashInURI)
+	if len(conf.Masking.Mask.HashInURI) != 0 {
+		list, err := uri.Read(conf.Masking.Mask.HashInURI)
 		return MaskEngine{list}, true, err
 	}
 	return nil, false, nil

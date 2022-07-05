@@ -60,13 +60,13 @@ func (dateRange MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (mo
 }
 
 // Create a mask from a configuration
-func Factory(conf model.Masking, seed int64, caches map[string]model.Cache) (model.MaskEngine, bool, error) {
-	if conf.Mask.RandDate.DateMin != conf.Mask.RandDate.DateMax {
+func Factory(conf model.MaskFactoryConfiguration) (model.MaskEngine, bool, error) {
+	if conf.Masking.Mask.RandDate.DateMin != conf.Masking.Mask.RandDate.DateMax {
 		// set differents seeds for differents jsonpath
 		h := fnv.New64a()
-		h.Write([]byte(conf.Selector.Jsonpath))
-		seed += int64(h.Sum64())
-		return NewMask(conf.Mask.RandDate.DateMin, conf.Mask.RandDate.DateMax, seed, model.NewSeeder(conf, seed)), true, nil
+		h.Write([]byte(conf.Masking.Selector.Jsonpath))
+		conf.Seed += int64(h.Sum64())
+		return NewMask(conf.Masking.Mask.RandDate.DateMin, conf.Masking.Mask.RandDate.DateMax, conf.Seed, model.NewSeeder(conf.Masking, conf.Seed)), true, nil
 	}
 	return nil, false, nil
 }
