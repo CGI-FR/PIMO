@@ -5,25 +5,29 @@
   "$defs": {
     "CacheDefinition": {
       "properties": {
-        "unique": {
+        "Unique": {
           "type": "boolean",
           "description": "The cache will not allow a masked value to be used multiple times, the mask will be reapplied until a unique value is generated"
         },
-        "reverse": {
+        "Reverse": {
           "type": "boolean",
           "description": "Reverse the cache, keys will be used as values, and values will be used as keys"
         }
       },
       "additionalProperties": false,
-      "type": "object"
+      "type": "object",
+      "required": [
+        "Unique",
+        "Reverse"
+      ]
     },
     "Class": {
       "properties": {
-        "input": {
+        "Input": {
           "type": "string",
           "description": "Characters to replace in the input value"
         },
-        "output": {
+        "Output": {
           "type": "string",
           "description": "Characters to use to generate the output value"
         }
@@ -31,42 +35,46 @@
       "additionalProperties": false,
       "type": "object",
       "required": [
-        "input",
-        "output"
+        "Input",
+        "Output"
       ]
     },
     "DateParserType": {
       "properties": {
-        "inputFormat": {
+        "InputFormat": {
           "type": "string",
           "description": "Format of the input datetime, it should always display the following date : Mon Jan 2 15:04:05 -0700 MST 2006 or the constant value 'unixEpoch'"
         },
-        "outputFormat": {
+        "OutputFormat": {
           "type": "string",
           "description": "Format of the output datetime, it should always display the following date : Mon Jan 2 15:04:05 -0700 MST 2006 or the constant value 'unixEpoch'"
         }
       },
       "additionalProperties": false,
-      "type": "object"
+      "type": "object",
+      "required": [
+        "InputFormat",
+        "OutputFormat"
+      ]
     },
     "Definition": {
       "properties": {
-        "version": {
+        "Version": {
           "type": "string",
           "description": "Version of the pipeline definition, use the value 1"
         },
-        "seed": {
+        "Seed": {
           "type": "integer",
           "description": "Initialize the Pseaudo-Random-Generator with the given value"
         },
-        "masking": {
+        "Masking": {
           "items": {
             "$ref": "#/$defs/Masking"
           },
           "type": "array",
           "description": "Masking pipeline definition"
         },
-        "caches": {
+        "Caches": {
           "patternProperties": {
             ".*": {
               "$ref": "#/$defs/CacheDefinition"
@@ -79,25 +87,27 @@
       "additionalProperties": false,
       "type": "object",
       "required": [
-        "version",
-        "masking"
+        "Version",
+        "Seed",
+        "Masking",
+        "Caches"
       ]
     },
     "FF1Type": {
       "properties": {
-        "keyFromEnv": {
+        "KeyFromEnv": {
           "type": "string",
           "description": "Name of the system environment variable that contains the private key"
         },
-        "tweakField": {
+        "TweakField": {
           "type": "string",
           "description": "Name of the field to use as 'tweak' value : reduce the attack surface by using a varying value on each record, it can be considered as an extension of the secret key that change on each record"
         },
-        "radix": {
+        "Radix": {
           "type": "integer",
           "description": "determine which part of the fixed FF1 domain definition will actually be used, for example 10 will use the first 10 characters of 0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
         },
-        "decrypt": {
+        "Decrypt": {
           "type": "boolean",
           "description": "Decrypt the value instead of encrypt"
         }
@@ -105,16 +115,19 @@
       "additionalProperties": false,
       "type": "object",
       "required": [
-        "keyFromEnv"
+        "KeyFromEnv",
+        "TweakField",
+        "Radix",
+        "Decrypt"
       ]
     },
     "IncrementalType": {
       "properties": {
-        "start": {
+        "Start": {
           "type": "integer",
           "description": "First value in the sequence"
         },
-        "increment": {
+        "Increment": {
           "type": "integer",
           "description": "Increment to add to reach the next value in the sequence"
         }
@@ -122,260 +135,269 @@
       "additionalProperties": false,
       "type": "object",
       "required": [
-        "start",
-        "increment"
+        "Start",
+        "Increment"
       ]
     },
     "LuhnType": {
       "properties": {
-        "universe": {
+        "Universe": {
           "type": "string",
           "description": "All possible characters that can be encountered as input value"
         }
       },
       "additionalProperties": false,
-      "type": "object"
+      "type": "object",
+      "required": [
+        "Universe"
+      ]
     },
     "MarkovType": {
       "properties": {
-        "max-size": {
+        "MaxSize": {
           "type": "integer",
           "description": "Maximum length for the generated text"
         },
-        "sample": {
+        "Sample": {
           "type": "string",
           "description": "URI to an external resource to train the Markiv model"
         },
-        "separator": {
+        "Separator": {
           "type": "string",
           "description": "Separator to use to read tokens, leave empty to treat each character as a token"
         },
-        "order": {
+        "Order": {
           "type": "integer",
           "description": "Number of tokens to consider, a higher value = more similar to sample, too high and the generated text will be completly similar to sample"
         }
       },
       "additionalProperties": false,
-      "type": "object"
+      "type": "object",
+      "required": [
+        "MaxSize",
+        "Sample",
+        "Separator",
+        "Order"
+      ]
     },
     "MaskType": {
       "oneOf": [
         {
           "required": [
-            "add"
+            "Add"
           ],
           "title": "Add"
         },
         {
           "required": [
-            "add-transient"
+            "AddTransient"
           ],
           "title": "AddTransient"
         },
         {
           "required": [
-            "constant"
+            "Constant"
           ],
           "title": "Constant"
         },
         {
           "required": [
-            "randomChoice"
+            "RandomChoice"
           ],
           "title": "RandomChoice"
         },
         {
           "required": [
-            "randomChoiceInUri"
+            "RandomChoiceInURI"
           ],
           "title": "RandomChoiceInURI"
         },
         {
           "required": [
-            "command"
+            "Command"
           ],
           "title": "Command"
         },
         {
           "required": [
-            "randomInt"
+            "RandomInt"
           ],
           "title": "RandomInt"
         },
         {
           "required": [
-            "weightedChoice"
+            "WeightedChoice"
           ],
           "title": "WeightedChoice"
         },
         {
           "required": [
-            "regex"
+            "Regex"
           ],
           "title": "Regex"
         },
         {
           "required": [
-            "hash"
+            "Hash"
           ],
           "title": "Hash"
         },
         {
           "required": [
-            "hashInUri"
+            "HashInURI"
           ],
           "title": "HashInURI"
         },
         {
           "required": [
-            "randDate"
+            "RandDate"
           ],
           "title": "RandDate"
         },
         {
           "required": [
-            "incremental"
+            "Incremental"
           ],
           "title": "Incremental"
         },
         {
           "required": [
-            "replacement"
+            "Replacement"
           ],
           "title": "Replacement"
         },
         {
           "required": [
-            "template"
+            "Template"
           ],
           "title": "Template"
         },
         {
           "required": [
-            "template-each"
+            "TemplateEach"
           ],
           "title": "TemplateEach"
         },
         {
           "required": [
-            "duration"
+            "Duration"
           ],
           "title": "Duration"
         },
         {
           "required": [
-            "remove"
+            "Remove"
           ],
           "title": "Remove"
         },
         {
           "required": [
-            "range"
+            "RangeMask"
           ],
           "title": "RangeMask"
         },
         {
           "required": [
-            "randomDuration"
+            "RandomDuration"
           ],
           "title": "RandomDuration"
         },
         {
           "required": [
-            "fluxUri"
+            "FluxURI"
           ],
           "title": "FluxURI"
         },
         {
           "required": [
-            "randomDecimal"
+            "RandomDecimal"
           ],
           "title": "RandomDecimal"
         },
         {
           "required": [
-            "dateParser"
+            "DateParser"
           ],
           "title": "DateParser"
         },
         {
           "required": [
-            "fromCache"
+            "FromCache"
           ],
           "title": "FromCache"
         },
         {
           "required": [
-            "ff1"
+            "FF1"
           ],
           "title": "FF1"
         },
         {
           "required": [
-            "pipe"
+            "Pipe"
           ],
           "title": "Pipe"
         },
         {
           "required": [
-            "fromjson"
+            "FromJSON"
           ],
           "title": "FromJSON"
         },
         {
           "required": [
-            "luhn"
+            "Luhn"
           ],
           "title": "Luhn"
         },
         {
           "required": [
-            "markov"
+            "Markov"
           ],
           "title": "Markov"
         },
         {
           "required": [
-            "transcode"
+            "Transcode"
           ],
           "title": "Transcode"
         }
       ],
       "properties": {
-        "add": {
+        "Add": {
           "title": "Add Mask",
           "description": "Add a new field in the JSON stream"
         },
-        "add-transient": {
+        "AddTransient": {
           "title": "Add Transient Mask",
           "description": "Add a new temporary field, that will not show in the JSON output"
         },
-        "constant": {
+        "Constant": {
           "title": "Constant Mask",
           "description": "Replace the input value with a constant field"
         },
-        "randomChoice": {
+        "RandomChoice": {
           "items": true,
           "type": "array",
           "title": "Random Choice Mask",
           "description": "Replace the input value with a value chosen randomly from a constant list"
         },
-        "randomChoiceInUri": {
+        "RandomChoiceInURI": {
           "type": "string",
           "title": "Random Choice in URI",
           "description": "Replace the input value with a value chosen randomly from an external resource (1 line = 1 value)"
         },
-        "command": {
+        "Command": {
           "type": "string",
           "title": "Command Mask",
           "description": "Replace the input value with the result of the given system command"
         },
-        "randomInt": {
+        "RandomInt": {
           "$ref": "#/$defs/RandIntType",
           "title": "Random Integer Mask",
           "description": "Replace the input value with a value chosen randomly from an integer range"
         },
-        "weightedChoice": {
+        "WeightedChoice": {
           "items": {
             "$ref": "#/$defs/WeightedChoiceType"
           },
@@ -383,180 +405,212 @@
           "title": "Weighted Choice Mask",
           "description": "Replace the input value with a value chosen randomly from a constant list, each value is given a weight (higher weight value has higher chance to be selected)"
         },
-        "regex": {
+        "Regex": {
           "type": "string",
           "title": "Regex Mask",
           "description": "Replace the input value with a random generated value that match the given regular expression"
         },
-        "hash": {
+        "Hash": {
           "items": true,
           "type": "array",
           "title": "Hash Mask",
           "description": "Replace the input value with a value chosen deterministicly from a constant list, the same input will always be replaced by the same output"
         },
-        "hashInUri": {
+        "HashInURI": {
           "type": "string",
           "title": "Hash in URI Mask",
           "description": "Replace the input value with a value chosen deterministicly from an external resource (1 line = 1 value), the same input will always be replaced by the same output"
         },
-        "randDate": {
+        "RandDate": {
           "$ref": "#/$defs/RandDateType",
           "title": "Random Date Mask",
           "description": "Replace the input value with a value chosen randomly from an date range"
         },
-        "incremental": {
+        "Incremental": {
           "$ref": "#/$defs/IncrementalType",
           "title": "Incremental Mask",
           "description": "Replace the input value with an incrementing integer sequence"
         },
-        "replacement": {
+        "Replacement": {
           "type": "string",
           "title": "Replacement Mask",
           "description": "Replace the input value with the value of another field"
         },
-        "template": {
+        "Template": {
           "type": "string",
           "title": "Template Mask",
           "description": "Replace the input value with the result of executing the given Golang template"
         },
-        "template-each": {
+        "TemplateEach": {
           "$ref": "#/$defs/TemplateEachType",
           "title": "Template Each Mask",
           "description": "Replace all input values (selector must be an array field) with the result of executing the given Golang template on each value"
         },
-        "duration": {
+        "Duration": {
           "type": "string",
           "title": "Duration Mask",
           "description": "Modify the input value (selector must be a date field) increasing or decreasing by the given amount of time"
         },
-        "remove": {
+        "Remove": {
           "type": "boolean",
           "title": "Remove Mask",
           "description": "Remove the field from the JSON stream"
         },
-        "range": {
+        "RangeMask": {
           "type": "integer",
           "title": "Range Mask",
           "description": "Replace the integer value with a range of the given size"
         },
-        "randomDuration": {
+        "RandomDuration": {
           "$ref": "#/$defs/RandomDurationType",
           "title": "Random Duration Mask",
           "description": "Modify the input value (selector must be a date field) increasing or decreasing by a random amount of time"
         },
-        "fluxUri": {
+        "FluxURI": {
           "type": "string",
           "title": "Flux in URI Mask",
           "description": "Replace the input value with the next value in the sequence given by an external resource (1 line = 1 value)"
         },
-        "randomDecimal": {
+        "RandomDecimal": {
           "$ref": "#/$defs/RandomDecimalType",
           "title": "Random Decimal Mask",
           "description": "Replace the input value with a value chosen randomly from an decimal range"
         },
-        "dateParser": {
+        "DateParser": {
           "$ref": "#/$defs/DateParserType",
           "title": "Date Parser Mask",
           "description": "Change the format of the input date"
         },
-        "fromCache": {
+        "FromCache": {
           "type": "string",
           "title": "From Cache Mask",
           "description": "Replace the input value with the value stored at the corresponding key in the given cache"
         },
-        "ff1": {
+        "FF1": {
           "$ref": "#/$defs/FF1Type",
           "title": "FF1 Mask",
           "description": "Encrypt the input value using the FF1 algorithm (format preserving encryption)"
         },
-        "pipe": {
+        "Pipe": {
           "$ref": "#/$defs/PipeType",
           "title": "Pipe Mask",
           "description": "If the input value contains an array of object, stream each object with the given masking pipeline definition, this mask exists to handle complex data structures"
         },
-        "fromjson": {
+        "FromJSON": {
           "type": "string",
           "title": "From JSON Mask",
           "description": "Parse the input value as raw JSON, and add the resulting structure to the JSON stream"
         },
-        "luhn": {
+        "Luhn": {
           "$ref": "#/$defs/LuhnType",
           "title": "Luhn Mask",
           "description": "Concatenate a checksum key to the input value computed with the luhn algorithm"
         },
-        "markov": {
+        "Markov": {
           "$ref": "#/$defs/MarkovType",
           "title": "Markov Mask",
           "description": "Produces pseudo text based on sample text"
         },
-        "transcode": {
+        "Transcode": {
           "$ref": "#/$defs/TranscodeType",
           "title": "Transcode Mask",
           "description": "Produce a random string by preserving character classes from the original value"
         }
       },
       "additionalProperties": false,
-      "type": "object"
+      "type": "object",
+      "required": [
+        "Add",
+        "AddTransient",
+        "Constant",
+        "RandomChoice",
+        "RandomChoiceInURI",
+        "Command",
+        "RandomInt",
+        "WeightedChoice",
+        "Regex",
+        "Hash",
+        "HashInURI",
+        "RandDate",
+        "Incremental",
+        "Replacement",
+        "Template",
+        "TemplateEach",
+        "Duration",
+        "Remove",
+        "RangeMask",
+        "RandomDuration",
+        "FluxURI",
+        "RandomDecimal",
+        "DateParser",
+        "FromCache",
+        "FF1",
+        "Pipe",
+        "FromJSON",
+        "Luhn",
+        "Markov",
+        "Transcode"
+      ]
     },
     "Masking": {
       "oneOf": [
         {
           "required": [
-            "selector",
-            "mask"
+            "Selector",
+            "Mask"
           ],
           "title": "case1"
         },
         {
           "required": [
-            "selector",
-            "masks"
+            "Selector",
+            "Masks"
           ],
           "title": "case2"
         },
         {
           "required": [
-            "selectors",
-            "mask"
+            "Selectors",
+            "Mask"
           ],
           "title": "case3"
         },
         {
           "required": [
-            "selectors",
-            "masks"
+            "Selectors",
+            "Masks"
           ],
           "title": "case4"
         }
       ],
       "properties": {
-        "selector": {
+        "Selector": {
           "$ref": "#/$defs/SelectorType",
           "description": "A selector defines on which field the mask will be applied"
         },
-        "selectors": {
+        "Selectors": {
           "items": {
             "$ref": "#/$defs/SelectorType"
           },
           "type": "array",
           "description": "Defines on which fields the mask will be applied"
         },
-        "mask": {
+        "Mask": {
           "$ref": "#/$defs/MaskType",
           "description": "Defines how the selected value(s) will be masked"
         },
-        "masks": {
+        "Masks": {
           "items": {
             "$ref": "#/$defs/MaskType"
           },
           "type": "array",
           "description": "Defines how the selected value(s) will be masked"
         },
-        "cache": {
+        "Cache": {
           "type": "string",
           "description": "Use an in-memory cache to preserve coherence between original/masked values"
         },
-        "preserve": {
+        "Preserve": {
           "type": "string",
           "enum": [
             "null",
@@ -565,47 +619,62 @@
           ],
           "description": "Preserve (do not mask) some values : null = preserve null value, empty = preserve empty strings, blank = preserve both null and empty values"
         },
-        "seed": {
+        "Seed": {
           "$ref": "#/$defs/SeedType",
           "description": "Initialize the Pseaudo-Random-Generator with the value given field"
         }
       },
       "additionalProperties": false,
-      "type": "object"
+      "type": "object",
+      "required": [
+        "Selector",
+        "Selectors",
+        "Mask",
+        "Masks",
+        "Cache",
+        "Preserve",
+        "Seed"
+      ]
     },
     "PipeType": {
       "properties": {
-        "masking": {
+        "Masking": {
           "items": {
             "$ref": "#/$defs/Masking"
           },
           "type": "array",
           "description": "Define a list of selector/mask couple to apply on the JSON stream, in this order"
         },
-        "injectParent": {
+        "InjectParent": {
           "type": "string",
           "description": "Used in conjunction with the 'pipe' mask, inject the parent object with the given field name"
         },
-        "injectRoot": {
+        "InjectRoot": {
           "type": "string",
           "description": "Used in conjunction with the 'pipe' mask, inject the root object with the given field name"
         },
-        "file": {
+        "DefinitionFile": {
           "type": "string",
           "description": "URI to an external resource to read the pipeline definition"
         }
       },
       "additionalProperties": false,
-      "type": "object"
+      "type": "object",
+      "required": [
+        "Masking",
+        "InjectParent",
+        "InjectRoot",
+        "DefinitionFile"
+      ]
     },
     "RandDateType": {
       "properties": {
-        "dateMin": {
+        "DateMin": {
           "type": "string",
           "format": "date-time",
           "description": "Lower bound of the date range"
         },
-        "dateMax": {
+        "DateMax": {
           "type": "string",
           "format": "date-time",
           "description": "Higher bound of the date range"
@@ -614,17 +683,17 @@
       "additionalProperties": false,
       "type": "object",
       "required": [
-        "dateMin",
-        "dateMax"
+        "DateMin",
+        "DateMax"
       ]
     },
     "RandIntType": {
       "properties": {
-        "min": {
+        "Min": {
           "type": "integer",
           "description": "Lower bound of the integer range"
         },
-        "max": {
+        "Max": {
           "type": "integer",
           "description": "Lower bound of the integer range"
         }
@@ -632,21 +701,21 @@
       "additionalProperties": false,
       "type": "object",
       "required": [
-        "min",
-        "max"
+        "Min",
+        "Max"
       ]
     },
     "RandomDecimalType": {
       "properties": {
-        "min": {
+        "Min": {
           "type": "number",
           "description": "Lower bound of the decimal range"
         },
-        "max": {
+        "Max": {
           "type": "number",
           "description": "Lower bound of the decimal range"
         },
-        "precision": {
+        "Precision": {
           "type": "integer",
           "description": "Precision of the generated value"
         }
@@ -654,18 +723,18 @@
       "additionalProperties": false,
       "type": "object",
       "required": [
-        "min",
-        "max",
-        "precision"
+        "Min",
+        "Max",
+        "Precision"
       ]
     },
     "RandomDurationType": {
       "properties": {
-        "min": {
+        "Min": {
           "type": "string",
           "description": "Lower bound of the duration range (ISO 8601 notation)"
         },
-        "max": {
+        "Max": {
           "type": "string",
           "description": "Higher bound of the duration range (ISO 8601 notation)"
         }
@@ -673,23 +742,26 @@
       "additionalProperties": false,
       "type": "object",
       "required": [
-        "min",
-        "max"
+        "Min",
+        "Max"
       ]
     },
     "SeedType": {
       "properties": {
-        "field": {
+        "Field": {
           "type": "string",
           "description": "Initialize the Pseaudo-Random-Generator with the given field value, a Golang Template can be used here"
         }
       },
       "additionalProperties": false,
-      "type": "object"
+      "type": "object",
+      "required": [
+        "Field"
+      ]
     },
     "SelectorType": {
       "properties": {
-        "jsonpath": {
+        "Jsonpath": {
           "type": "string",
           "description": "Path of the target value to mask in the JSON input"
         }
@@ -697,30 +769,35 @@
       "additionalProperties": false,
       "type": "object",
       "required": [
-        "jsonpath"
+        "Jsonpath"
       ]
     },
     "TemplateEachType": {
       "properties": {
-        "item": {
+        "Item": {
           "type": "string",
           "description": "Inject the current element value under the given field name"
         },
-        "index": {
+        "Index": {
           "type": "string",
           "description": "Inject the current element index under the given field name"
         },
-        "template": {
+        "Template": {
           "type": "string",
           "description": "Replace the current value with the result of executing this Golang template"
         }
       },
       "additionalProperties": false,
-      "type": "object"
+      "type": "object",
+      "required": [
+        "Item",
+        "Index",
+        "Template"
+      ]
     },
     "TranscodeType": {
       "properties": {
-        "classes": {
+        "Classes": {
           "items": {
             "$ref": "#/$defs/Class"
           },
@@ -729,14 +806,17 @@
         }
       },
       "additionalProperties": false,
-      "type": "object"
+      "type": "object",
+      "required": [
+        "Classes"
+      ]
     },
     "WeightedChoiceType": {
       "properties": {
-        "choice": {
+        "Choice": {
           "description": "Value for this choice"
         },
-        "weight": {
+        "Weight": {
           "type": "integer",
           "description": "Weight of this choice, higher weights will be selected more frequently"
         }
@@ -744,8 +824,8 @@
       "additionalProperties": false,
       "type": "object",
       "required": [
-        "choice",
-        "weight"
+        "Choice",
+        "Weight"
       ]
     }
   }
