@@ -27,7 +27,7 @@ import (
 func TestMaskingShouldReplaceSensitiveValueByRandomNumber(t *testing.T) {
 	min := 7
 	max := 77
-	ageMask := NewMask(min, max, 0)
+	ageMask := NewMask(min, max, 0, nil)
 
 	result, err := ageMask.Mask(83)
 	assert.Equal(t, nil, err, "error should be nil")
@@ -39,7 +39,8 @@ func TestMaskingShouldReplaceSensitiveValueByRandomNumber(t *testing.T) {
 
 func TestFactoryShouldCreateAMask(t *testing.T) {
 	maskingConfig := model.Masking{Mask: model.MaskType{RandomInt: model.RandIntType{Min: 18, Max: 25}}}
-	mask, present, err := Factory(maskingConfig, 0, nil)
+	factoryConfig := model.MaskFactoryConfiguration{Masking: maskingConfig, Seed: 0}
+	mask, present, err := Factory(factoryConfig)
 	assert.NotNil(t, mask, "shouldn't be nil")
 	assert.True(t, present, "should be true")
 	assert.Nil(t, err, "error should be nil")
@@ -47,7 +48,8 @@ func TestFactoryShouldCreateAMask(t *testing.T) {
 
 func TestFactoryShouldNotCreateAMaskFromAnEmptyConfig(t *testing.T) {
 	maskingConfig := model.Masking{Mask: model.MaskType{}}
-	mask, present, err := Factory(maskingConfig, 0, nil)
+	factoryConfig := model.MaskFactoryConfiguration{Masking: maskingConfig, Seed: 0}
+	mask, present, err := Factory(factoryConfig)
 	assert.Nil(t, mask, "should be nil")
 	assert.False(t, present, "should be false")
 	assert.Nil(t, err, "error should be nil")

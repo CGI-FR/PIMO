@@ -317,7 +317,7 @@ testcases:
     - result.systemout ShouldContainSubstring '{"name":"Marcel","id":1,"supervisor":"Mathieu"}'
     - result.systemout ShouldContainSubstring '{"name":"Mickael","id":5,"supervisor":"Mickael"}'
     - result.systemout ShouldContainSubstring '{"name":"Mathieu","id":2,"supervisor":"Mickael"}'
-    
+
     - result.systemerr ShouldBeEmpty
 
 - name: masking with other key
@@ -357,7 +357,7 @@ testcases:
     - result.systemout ShouldContainSubstring '{"name":"Marcel","id":1}'
     - result.systemout ShouldContainSubstring '{"name":"Mickael","id":5}'
     - result.systemout ShouldContainSubstring '{"name":"Mathieu","id":2}'
-    
+
     - result.systemerr ShouldBeEmpty
   - script: cat name.jsonl
     assertions:
@@ -405,7 +405,7 @@ testcases:
     - result.systemout ShouldContainSubstring {"MATRI":"FTTO4452","PRENOM":"Marcel"}
     - result.systemout ShouldContainSubstring {"MATRI":"FJUS4442","PRENOM":"Mickael"}
     - result.systemout ShouldContainSubstring {"MATRI":"FDDO8965","PRENOM":"Mathieu"}
-    
+
     - result.systemerr ShouldBeEmpty
   - script: cat name.jsonl
     assertions:
@@ -413,3 +413,173 @@ testcases:
     - result.systemout ShouldContainSubstring {"key":"FDDO8965","value":"Mathieu"}
     - result.systemout ShouldContainSubstring {"key":"FTTO4452","value":"Marcel"}
     - result.systemout ShouldContainSubstring {"key":"FJUS4442","value":"Mickael"}
+
+- name: line not removed if key not present in json
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      seed: 1
+      masking:
+        - selector:
+            jsonpath: "name"
+          mask:
+            fromCache: mycache
+      caches:
+        mycache : {}
+      EOF
+  - script: |-
+      echo '{"othervalue":18}' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldEqual {"othervalue":18}
+
+- name: use reverse cache
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      seed: 1
+      masking:
+        - selector:
+            jsonpath: "category"
+          mask:
+            fromCache: "cat"
+      caches:
+        cat:
+          unique: true
+          reverse: true
+      EOF
+  - script: |-
+      cat > cat.jsonl <<EOF
+      {"key": "Animal", "value": 1}
+      {"key": "Food", "value": 2}
+      {"key": "IT", "value": 3}
+      EOF
+  - script: |-
+      pimo --load-cache cat=./cat.jsonl <<EOF
+      {"nb_word": 148, "category" : 1}
+      {"nb_word": 419, "category" : 3}
+      {"nb_word": 377, "category" : 2}
+      EOF
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldContainSubstring '{"nb_word":148,"category":"Animal"}'
+    - result.systemout ShouldContainSubstring '{"nb_word":419,"category":"IT"}'
+    - result.systemout ShouldContainSubstring '{"nb_word":377,"category":"Food"}'
+
+    - result.systemerr ShouldBeEmpty
+
+- name: save reverse cache
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      seed: 1
+      masking:
+        - selector:
+            jsonpath: "PRENOM"
+          mask:
+            add: ""
+        - selector:
+            jsonpath: "PRENOM"
+          mask:
+            replacement: "MATRI"
+        - selector:
+            jsonpath: "PRENOM"
+          mask:
+            randomChoice:
+              - "Mickael"
+              - "Mathieu"
+              - "Marcel"
+          cache: "name"
+      caches:
+        name :
+          unique: true
+          reverse: true
+
+      EOF
+  - script: |-
+      pimo --dump-cache name=reverseName.jsonl <<EOF
+      {"MATRI": "FTTO4452" }
+      {"MATRI":"FJUS4442"}
+      {"MATRI":"FDDO8965"}
+    assertions:
+    - result.systemerr ShouldBeEmpty
+  - script: cat reverseName.jsonl
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldContainSubstring {"key":"Mathieu","value":"FDDO8965"}
+    - result.systemout ShouldContainSubstring {"key":"Marcel","value":"FTTO4452"}
+    - result.systemout ShouldContainSubstring {"key":"Mickael","value":"FJUS4442"}
+
+- name: bug fromCache with calculated value 1
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      seed: 42
+      masking:
+        - selector:
+            jsonpath: "sexe"
+          masks:
+            - constant: 2
+            - fromCache: "cacheSex"
+
+      caches:
+        cacheSex :
+          unique: true
+          reverse:  true
+      EOF
+  - script: |-
+      cat > cacheSex.jsonl <<EOF
+      {"key": "M", "value": 2}
+      {"key": "F", "value": 1}
+      EOF
+  - script: |-
+      pimo --load-cache cacheSex=./cacheSex.jsonl <<EOF
+      {"sexe": 2.4}
+      EOF
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldContainSubstring '{"sexe":"M"}'
+    - result.systemerr ShouldBeEmpty
+
+- name: bug fromCache with calculated value 2
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat  > masking.yml <<EOF
+      version: "1"
+      seed: 42
+      masking:
+        - selector:
+            jsonpath: "sexe"
+          masks:
+            - template : '[[ round (toString .sexe) 0  ]]'
+            - fromjson: "sexe"
+            - fromCache: "cacheSex"
+      caches:
+        cacheSex :
+          unique: true
+          reverse:  true
+      EOF
+  - script: sed -i  "s/\[\[/\{\{/g"  masking.yml
+  - script: sed -i  "s/\]\]/\}\}/g"  masking.yml
+  - script: |-
+      cat > cacheSex.jsonl <<EOF
+      {"key": "M", "value": 2}
+      {"key": "F", "value": 1}
+      EOF
+  - script: |-
+      pimo --load-cache cacheSex=./cacheSex.jsonl <<EOF
+      {"sexe": 2.4}
+      EOF
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldContainSubstring '{"sexe":"M"}'
+    - result.systemerr ShouldBeEmpty

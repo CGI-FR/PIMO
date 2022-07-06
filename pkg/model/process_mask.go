@@ -23,13 +23,14 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func NewMaskEngineProcess(selector Selector, mask MaskEngine) Processor {
-	return &MaskEngineProcess{selector, mask}
+func NewMaskEngineProcess(selector Selector, mask MaskEngine, preserve string) Processor {
+	return &MaskEngineProcess{selector, mask, preserve}
 }
 
 type MaskEngineProcess struct {
 	selector Selector
 	mask     MaskEngine
+	preserve string
 }
 
 func (mep *MaskEngineProcess) Open() error {
@@ -40,14 +41,23 @@ func (mep *MaskEngineProcess) ProcessDictionary(dictionary Dictionary, out Colle
 	over.AddGlobalFields("path")
 	over.MDC().Set("path", mep.selector)
 	defer func() { over.MDC().Remove("path") }()
-	result := CopyDictionary(dictionary)
+	result := dictionary
 	applied := mep.selector.Apply(result, func(rootContext, parentContext Dictionary, key string, value Entry) (Action, Entry) {
-		masked, err := mep.mask.Mask(value, rootContext, parentContext)
-		if err != nil {
-			ret = err
+		switch {
+		case value == nil && (mep.preserve == "null" || mep.preserve == "blank"):
+			log.Trace().Msgf("Preserve %s value, skip masking", mep.preserve)
 			return NOTHING, nil
+		case value == "" && (mep.preserve == "empty" || mep.preserve == "blank"):
+			log.Trace().Msgf("Preserve %s value, skip masking", mep.preserve)
+			return NOTHING, nil
+		default:
+			masked, err := mep.mask.Mask(value, rootContext, parentContext)
+			if err != nil {
+				ret = err
+				return NOTHING, nil
+			}
+			return WRITE, masked
 		}
-		return WRITE, masked
 	})
 
 	if !applied {

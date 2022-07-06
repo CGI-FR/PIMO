@@ -27,31 +27,42 @@ import (
 
 // MaskEngine is a list of number to mask randomly
 type MaskEngine struct {
-	rand *rand.Rand
-	min  int
-	max  int
+	rand   *rand.Rand
+	min    int
+	max    int
+	seeder model.Seeder
 }
 
 // NewMask create a MaskEngine with a seed
-func NewMask(min int, max int, seed int64) MaskEngine {
+func NewMask(min int, max int, seed int64, seeder model.Seeder) MaskEngine {
 	// nolint: gosec
-	return MaskEngine{rand.New(rand.NewSource(seed)), min, max}
+	return MaskEngine{rand.New(rand.NewSource(seed)), min, max, seeder}
 }
 
 // Mask choose a mask int randomly within boundary
 func (rim MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Entry, error) {
 	log.Info().Msg("Mask randomInt")
+	if len(context) > 0 {
+		seed, ok, err := rim.seeder(context[0])
+		if err != nil {
+			return nil, err
+		}
+		if ok {
+			rim.rand.Seed(seed)
+		}
+	}
 	return rim.rand.Intn(rim.max+1-rim.min) + rim.min, nil
 }
 
 // Factory create a mask from a yaml config
-func Factory(conf model.Masking, seed int64, caches map[string]model.Cache) (model.MaskEngine, bool, error) {
-	if conf.Mask.RandomInt.Min != 0 || conf.Mask.RandomInt.Max != 0 {
+func Factory(conf model.MaskFactoryConfiguration) (model.MaskEngine, bool, error) {
+	if conf.Masking.Mask.RandomInt.Min != 0 || conf.Masking.Mask.RandomInt.Max != 0 {
 		// set differents seeds for differents jsonpath
 		h := fnv.New64a()
-		h.Write([]byte(conf.Selector.Jsonpath))
-		seed += int64(h.Sum64())
-		return NewMask(conf.Mask.RandomInt.Min, conf.Mask.RandomInt.Max, seed), true, nil
+		h.Write([]byte(conf.Masking.Selector.Jsonpath))
+		conf.Seed += int64(h.Sum64())
+		seeder := model.NewSeeder(conf.Masking, conf.Seed)
+		return NewMask(conf.Masking.Mask.RandomInt.Min, conf.Masking.Mask.RandomInt.Max, conf.Seed, seeder), true, nil
 	}
 	return nil, false, nil
 }

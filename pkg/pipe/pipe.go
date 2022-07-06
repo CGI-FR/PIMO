@@ -40,7 +40,7 @@ func NewMask(seed int64, injectParent string, injectRoot string, caches map[stri
 	var definition model.Definition
 	var err error
 	if len(filename) > 0 {
-		definition, err = model.LoadPipelineDefinitionFromYAML(filename)
+		definition, err = model.LoadPipelineDefinitionFromFile(filename)
 		if err != nil {
 			return MaskEngine{filename, nil, injectParent, injectRoot}, err
 		}
@@ -113,13 +113,13 @@ func (me MaskEngine) MaskContext(e model.Dictionary, key string, context ...mode
 }
 
 // Factory create a mask from a configuration
-func Factory(conf model.Masking, seed int64, caches map[string]model.Cache) (model.MaskContextEngine, bool, error) {
-	if len(conf.Mask.Pipe.Masking) > 0 || len(conf.Mask.Pipe.DefinitionFile) > 0 {
+func Factory(conf model.MaskFactoryConfiguration) (model.MaskContextEngine, bool, error) {
+	if len(conf.Masking.Mask.Pipe.Masking) > 0 || len(conf.Masking.Mask.Pipe.DefinitionFile) > 0 {
 		// set differents seeds for differents jsonpath
 		h := fnv.New64a()
-		h.Write([]byte(conf.Selector.Jsonpath))
-		seed += int64(h.Sum64())
-		mask, err := NewMask(seed, conf.Mask.Pipe.InjectParent, conf.Mask.Pipe.InjectRoot, caches, conf.Mask.Pipe.DefinitionFile, conf.Mask.Pipe.Masking...)
+		h.Write([]byte(conf.Masking.Selector.Jsonpath))
+		conf.Seed += int64(h.Sum64())
+		mask, err := NewMask(conf.Seed, conf.Masking.Mask.Pipe.InjectParent, conf.Masking.Mask.Pipe.InjectRoot, conf.Cache, conf.Masking.Mask.Pipe.DefinitionFile, conf.Masking.Mask.Pipe.Masking...)
 		if err != nil {
 			return mask, true, err
 		}

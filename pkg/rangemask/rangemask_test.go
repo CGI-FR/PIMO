@@ -19,6 +19,7 @@ package rangemask
 
 import (
 	"encoding/json"
+	"fmt"
 	"testing"
 
 	"github.com/cgi-fr/pimo/pkg/model"
@@ -27,16 +28,23 @@ import (
 
 func TestMaskingShouldReplaceSensitiveValueByRangedValue(t *testing.T) {
 	rangeMask := NewMask(10)
-	result, err := rangeMask.Mask(json.Number("25"))
+	result, err := rangeMask.Mask(model.CleanTypes(json.Number("25")))
 	assert.Equal(t, nil, err, "error should be nil")
 	waited := "[20;29]"
 	assert.NotEqual(t, float64(25), result, "should be masked")
 	assert.Equal(t, waited, result, "should be [20;29]")
 }
 
+func TestMaskingShouldFailwithNotNumberInput(t *testing.T) {
+	rangeMask := NewMask(10)
+	_, err := rangeMask.Mask("not a number")
+	assert.Equal(t, fmt.Errorf("not a number is not a number"), err, "error should not be nil")
+}
+
 func TestFactoryShouldCreateAMask(t *testing.T) {
 	maskingConfig := model.Masking{Mask: model.MaskType{RangeMask: 15}}
-	mask, present, err := Factory(maskingConfig, 0, nil)
+	factoryConfig := model.MaskFactoryConfiguration{Masking: maskingConfig, Seed: 0}
+	mask, present, err := Factory(factoryConfig)
 	waitedMask := NewMask(15)
 	assert.Equal(t, waitedMask, mask, "should be equal")
 	assert.True(t, present, "should be true")

@@ -28,7 +28,7 @@ import (
 func TestMaskingShouldReplaceDateByIncrement(t *testing.T) {
 	firstDuration := "P60D"
 	secondDuration := "P90D"
-	durationMask, err := NewMask(firstDuration, secondDuration, 0)
+	durationMask, err := NewMask(firstDuration, secondDuration, 0, nil)
 
 	assert.Equal(t, nil, err, "error is not nil")
 
@@ -42,7 +42,7 @@ func TestMaskingShouldReplaceDateByIncrement(t *testing.T) {
 func TestMaskingShouldReplaceDateByNegatifIncrement(t *testing.T) {
 	firstNegaDuration := "-P60D"
 	secondNegaDuration := "-P90D"
-	negaMaskingEngine, err := NewMask(firstNegaDuration, secondNegaDuration, 0)
+	negaMaskingEngine, err := NewMask(firstNegaDuration, secondNegaDuration, 0, nil)
 
 	assert.Equal(t, nil, err, "error is not nil")
 
@@ -55,7 +55,8 @@ func TestMaskingShouldReplaceDateByNegatifIncrement(t *testing.T) {
 
 func TestFactoryShouldCreateAMask(t *testing.T) {
 	maskingConfig := model.Masking{Mask: model.MaskType{RandomDuration: model.RandomDurationType{Min: "-P60D", Max: "-P90D"}}}
-	_, present, err := Factory(maskingConfig, 0, nil)
+	factoryConfig := model.MaskFactoryConfiguration{Masking: maskingConfig, Seed: 0}
+	_, present, err := Factory(factoryConfig)
 	assert.True(t, present, "should be true")
 	assert.Nil(t, err, "error should be nil")
 }

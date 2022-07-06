@@ -30,3 +30,49 @@ testcases:
     - result.systemout ShouldBeEmpty
   - script: rm -f expected.txt
   - script: rm -f output.txt
+
+- name: fluxuri using cache
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > expected-cache.jsonl << EOF
+      {"key":1,"value":1001}
+      {"key":2,"value":1002}
+      {"key":3,"value":1003}
+      EOF
+  - script: |-
+      cat > test-id.csv << EOF
+      1001
+      1002
+      1003
+      EOF
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      seed: 42
+      masking:
+        - selector:
+            jsonpath: "ID"
+          mask:
+            fluxUri: "file://test-id.csv"
+          cache: "cacheId"
+      caches:
+        cacheId : {}
+
+      EOF
+  - script: |-
+      pimo --dump-cache cacheId=output-cache.jsonl << EOF
+      {"ID":1}
+      {"ID":2}
+      {"ID":3}
+      EOF
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemerr ShouldBeEmpty
+  - script: |-
+      diff output-cache.jsonl expected-cache.jsonl
+    assertions:
+    - result.systemerr ShouldBeEmpty
+  - script: rm -f expected-cache.jsonl
+  - script: rm -f output-cache.jsonl
+  - script: rm -f test-id.csv

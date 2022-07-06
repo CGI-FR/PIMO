@@ -79,3 +79,24 @@ testcases:
     - result.systemoutjson.name ShouldNotEqual Toto
     - result.systemoutjson.name ShouldEqual Benjamin
     - result.systemerr ShouldBeEmpty
+
+- name: random choice in uri with seeder
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "name"
+          mask:
+            randomChoiceInUri: "file://../names.txt"
+          seed:
+            field: "name"
+      EOF
+  - script: |-
+      echo -e '{"name":1}\n{"name":2}\n{"name":3}\n{"name":2}\n{"name":1}\n{"name":3}' | pimo | head -c -1 | tr '\n' ' '
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldEqual {"name":"Mickael"} {"name":"Marc"} {"name":"Mickael"} {"name":"Marc"} {"name":"Mickael"} {"name":"Mickael"}
+    - result.systemerr ShouldBeEmpty

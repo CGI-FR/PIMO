@@ -32,7 +32,7 @@ func TestMaskingShouldReplaceSensitiveValueByRandomNumber(t *testing.T) {
 	min := float64(0)
 	max := float64(10)
 	precision := 2
-	randomMask := NewMask(min, max, precision, time.Now().UnixNano())
+	randomMask := NewMask(min, max, precision, time.Now().UnixNano(), nil)
 
 	result, err := randomMask.Mask(20)
 	assert.Equal(t, nil, err, "error should be nil")
@@ -45,7 +45,8 @@ func TestMaskingShouldReplaceSensitiveValueByRandomNumber(t *testing.T) {
 
 func TestFactoryShouldCreateAMask(t *testing.T) {
 	maskingConfig := model.Masking{Mask: model.MaskType{RandomDecimal: model.RandomDecimalType{Min: float64(0), Max: float64(10), Precision: 2}}}
-	_, present, err := Factory(maskingConfig, 0, nil)
+	factoryConfig := model.MaskFactoryConfiguration{Masking: maskingConfig, Seed: 0}
+	_, present, err := Factory(factoryConfig)
 	assert.True(t, present, "should be true")
 	assert.Nil(t, err, "error should be nil")
 }

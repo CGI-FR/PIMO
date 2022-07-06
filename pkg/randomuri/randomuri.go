@@ -31,20 +31,32 @@ import (
 // MaskEngine is a list of masking value and a rand init to mask
 type MaskEngine struct {
 	rand     *rand.Rand
+	seeder   model.Seeder
 	template *template.Template
 	cache    map[string][]model.Entry
 }
 
 // NewMaskSeeded create a MaskRandomList with a seed
-func NewMask(templateSource string, seed int64) (MaskEngine, error) {
+func NewMask(templateSource string, seed int64, seeder model.Seeder) (MaskEngine, error) {
 	template, err := template.New("template-randomInUri").Parse(templateSource)
 	// nolint: gosec
-	return MaskEngine{rand.New(rand.NewSource(seed)), template, map[string][]model.Entry{}}, err
+	return MaskEngine{rand.New(rand.NewSource(seed)), seeder, template, map[string][]model.Entry{}}, err
 }
 
 // Mask choose a mask value randomly
 func (mrl MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Entry, error) {
 	log.Info().Msg("Mask randomChoiceInUri")
+
+	if len(context) > 0 {
+		seed, ok, err := mrl.seeder(context[0])
+		if err != nil {
+			return nil, err
+		}
+		if ok {
+			mrl.rand.Seed(seed)
+		}
+	}
+
 	var output bytes.Buffer
 	if len(context) == 0 {
 		context = []model.Dictionary{model.NewDictionary()}
@@ -69,14 +81,14 @@ func (mrl MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.En
 }
 
 // Factory create a mask from a yaml config
-func Factory(conf model.Masking, seed int64, caches map[string]model.Cache) (model.MaskEngine, bool, error) {
+func Factory(conf model.MaskFactoryConfiguration) (model.MaskEngine, bool, error) {
 	// set differents seeds for differents jsonpath
 	h := fnv.New64a()
-	h.Write([]byte(conf.Selector.Jsonpath))
-	seed += int64(h.Sum64())
+	h.Write([]byte(conf.Masking.Selector.Jsonpath))
+	conf.Seed += int64(h.Sum64())
 
-	if len(conf.Mask.RandomChoiceInURI) != 0 {
-		mask, err := NewMask(conf.Mask.RandomChoiceInURI, seed)
+	if len(conf.Masking.Mask.RandomChoiceInURI) != 0 {
+		mask, err := NewMask(conf.Masking.Mask.RandomChoiceInURI, conf.Seed, model.NewSeeder(conf.Masking, conf.Seed))
 		return mask, true, err
 	}
 	return nil, false, nil

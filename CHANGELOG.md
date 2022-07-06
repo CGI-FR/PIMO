@@ -14,6 +14,54 @@ Types of changes
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [1.14.1]
+
+- `Fixed` click on examples does not reload webpage on the PIMO Play website
+- `Fixed` verbosity in pimo play command
+
+## [1.14.0]
+
+- `Added` possibility to share URL directly from the PIMO Play website
+- `Added` precrafted examples in the PIMO Play website
+- `Added` loading screen when JS is loading on PIMO Play website
+- `Added` loading spinner when refreshing output on PIMO Play website
+- `Added` a refresh button on PIMO Play website
+- `Fixed` jsonschema for `randomDecimal` and `randomDuration` masks
+
+## [1.13.0]
+
+- `Added` seed option on all randomized masks, another way to preserve data coherence
+- `Added` transcode mask
+- `Added` play command
+
+## [1.12.1]
+
+- `Fixed` use fromcache after a mask which causes a change in the type of the value
+
+## [1.12.0]
+
+- `Added` markov mask to generate pseudo text based on a sample text
+- `Added` command to export maskings as a mermaid flow chart
+- `Added` possibility to use option `preserve: notInCache` with mask `fromCache`
+- `Added` flag to mask input while a declared condition is met
+- `Added` flag to mask input until a declared condition is met
+- `Added` flag to declare a simple mask definition in command line
+- `Added` possibility to declare multiple selectors for a masking definition
+- `Fixed` pimo doesn't panic anymore with fromjson combined with pipe mask, or fromjson combined with another fromjson mask with nested selectors
+- `Fixed` mask `replacement` with nested selectors
+- `Fixed` using fromCache, the line is not deleted if the jsonpath in not present in the document
+- `Added` option in `caches`section for use reverse cache
+- `Added` unixEpoch format with mask `dateParser`
+
+## [1.11.0]
+
+- `Added` option preserve in masking configuration.
+- `Fixed` cache with mask `fluxUri`.
+
+## [1.10.0]
+
+- `Added` luhn mask to generate valid checksums using the Luhn algorithm.
+
 ## [1.9.1]
 
 - `Fixed` JSON Schema validation for `masks` property (only required if `mask` is not set).

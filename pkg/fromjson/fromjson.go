@@ -26,19 +26,19 @@ import (
 
 // MaskEngine is a value that will be the initialisation of the field when it's created
 type MaskEngine struct {
-	sourcefield string
+	sourcefield model.Selector
 }
 
 // NewMask return a MaskEngine from a value
 func NewMask(source string) MaskEngine {
-	return MaskEngine{source}
+	return MaskEngine{model.NewPathSelector(source)}
 }
 
 // MaskContext
 func (am MaskEngine) MaskContext(context model.Dictionary, key string, contexts ...model.Dictionary) (model.Dictionary, error) {
 	log.Info().Msg("Mask fromjson")
 
-	value := context.Get(am.sourcefield)
+	value, _ := am.sourcefield.Read(contexts[0])
 
 	switch t := value.(type) {
 	case string:
@@ -47,7 +47,7 @@ func (am MaskEngine) MaskContext(context model.Dictionary, key string, contexts 
 		if err != nil {
 			return context, err
 		}
-		context.Set(key, result)
+		context.Set(key, model.CleanTypes(result))
 	default:
 		log.Warn().Msg("Invalid type")
 	}
@@ -56,9 +56,9 @@ func (am MaskEngine) MaskContext(context model.Dictionary, key string, contexts 
 }
 
 // Create a mask from a configuration
-func Factory(conf model.Masking, seed int64, caches map[string]model.Cache) (model.MaskContextEngine, bool, error) {
-	if conf.Mask.FromJSON != "" {
-		return NewMask(conf.Mask.FromJSON), true, nil
+func Factory(conf model.MaskFactoryConfiguration) (model.MaskContextEngine, bool, error) {
+	if conf.Masking.Mask.FromJSON != "" {
+		return NewMask(conf.Masking.Mask.FromJSON), true, nil
 	}
 	return nil, false, nil
 }

@@ -1,0 +1,87 @@
+name: repeat-until/repeat-while features
+testcases:
+- name: repeat-until simple
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "age"
+          mask:
+            incremental:
+              start: 0
+              increment: 1
+      EOF
+  - script: |-
+      cat > expected.txt <<EOF
+      {"age":0}
+      {"age":1}
+      {"age":2}
+      {"age":3}
+      EOF
+  - script: |-
+      echo '{"age": 0}' | pimo --repeat-until "{{eq .age 3}}" > result.txt
+    assertions:
+    - result.code ShouldEqual 0
+  - script: diff expected.txt result.txt
+    assertions:
+      - result.systemout ShouldBeEmpty
+  - script: rm -f expected.txt
+  - script: rm -f result.txt
+
+- name: repeat-while simple
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "age"
+          mask:
+            incremental:
+              start: 0
+              increment: 1
+      EOF
+  - script: |-
+      cat > expected.txt <<EOF
+      {"age":0}
+      {"age":1}
+      {"age":2}
+      EOF
+  - script: |-
+      echo '{"age": 0}' | pimo --repeat-while "{{lt .age 3}}" > result.txt
+    assertions:
+    - result.code ShouldEqual 0
+  - script: diff expected.txt result.txt
+    assertions:
+      - result.systemout ShouldBeEmpty
+  - script: rm -f expected.txt
+  - script: rm -f result.txt
+
+- name: repeat-until with flag --skip-line-on-error should not interrupt pipeline
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "age"
+          mask:
+            constant: "invalid_value"
+  - script: |-
+      echo '{"age": 0}' | pimo -vinfo --log-json --skip-line-on-error --repeat-until "{{eq .age 3}}"
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemerr ShouldNotContainSubstring "level":"error"
+    - result.systemerr ShouldContainSubstring Line skipped
+
+- name: repeat-until && repeat-while not compatible
+  steps:
+  - script: |-
+      pimo --empty-input --repeat-while "not_empty" --repeat-until  "not_empty"
+    assertions:
+    - result.code ShouldEqual 1

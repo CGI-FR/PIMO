@@ -45,4 +45,14 @@ jobs:
             -w /workspace \
             -e PATH=/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/go/bin:/home/vscode/go/bin:/workspace/bin \
             vscode \
-            neon -props "{tag: ${CI_ACTION_REF_NAME}, MODULE: github.com/${CI_REPOSITORY,,}, BY: ${CI_ACTOR}}" test-int
+            neon -props "{tag: $(echo ${CI_ACTION_REF_NAME} | tr '()' '-'), MODULE: github.com/${CI_REPOSITORY,,}, BY: $(echo ${CI_ACTOR} | tr -d '[]')}" test-int
+
+      - name: Store benchmark result
+        uses: benchmark-action/github-action-benchmark@v1
+        with:
+          tool: 'go'
+          output-file-path: bin/benchstats.txt
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          auto-push: ${{ env.CI_REF_NAME == 'main' }}
+          fail-on-alert: true
+

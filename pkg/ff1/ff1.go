@@ -96,15 +96,15 @@ func decodingKey(key string) ([]byte, error) {
 }
 
 // Factory create a mask from a configuration
-func Factory(conf model.Masking, seed int64, caches map[string]model.Cache) (model.MaskEngine, bool, error) {
-	if conf.Mask.FF1.KeyFromEnv != "" || conf.Mask.FF1.Radix > 0 {
-		if conf.Mask.FF1.KeyFromEnv == "" {
+func Factory(conf model.MaskFactoryConfiguration) (model.MaskEngine, bool, error) {
+	if conf.Masking.Mask.FF1.KeyFromEnv != "" || conf.Masking.Mask.FF1.Radix > 0 {
+		if conf.Masking.Mask.FF1.KeyFromEnv == "" {
 			return nil, true, fmt.Errorf("keyFromEnv attribut is not optional")
 		}
-		if conf.Mask.FF1.Radix == 0 {
+		if conf.Masking.Mask.FF1.Radix == 0 {
 			return nil, true, fmt.Errorf("radix attribut is not optional")
 		}
-		return NewMask(conf.Mask.FF1.KeyFromEnv, conf.Mask.FF1.TweakField, conf.Mask.FF1.Radix, conf.Mask.FF1.Decrypt), true, nil
+		return NewMask(conf.Masking.Mask.FF1.KeyFromEnv, conf.Masking.Mask.FF1.TweakField, conf.Masking.Mask.FF1.Radix, conf.Masking.Mask.FF1.Decrypt), true, nil
 	}
 	return nil, false, nil
 }

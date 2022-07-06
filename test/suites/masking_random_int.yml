@@ -71,8 +71,29 @@ testcases:
       echo '{"name": "Toto", "name2": ""}' | pimo
     assertions:
     - result.code ShouldEqual 0
-    - result.systemoutjson.name ShouldNotEqual 83
     - result.systemoutjson.name ShouldEqual 27
-    - result.systemoutjson.name2 ShouldNotEqual 83
     - result.systemoutjson.name2 ShouldEqual 55
-    - result.systemerr ShouldBeEmpty 
+    - result.systemerr ShouldBeEmpty
+
+- name: random int with seeder
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "age"
+          mask:
+            randomInt:
+              min: 0
+              max: 100
+          seed:
+            field: "age"
+      EOF
+  - script: |-
+      echo -e '{"age":1}\n{"age":2}\n{"age":3}\n{"age":2}\n{"age":1}\n{"age":3}' | pimo | head -c -1 | tr '\n' ' '
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldEqual {"age":44} {"age":39} {"age":60} {"age":39} {"age":44} {"age":60}
+    - result.systemerr ShouldBeEmpty

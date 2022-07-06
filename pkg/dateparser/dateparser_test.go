@@ -18,6 +18,7 @@
 package dateparser
 
 import (
+	"encoding/json"
 	"testing"
 	"time"
 
@@ -71,23 +72,44 @@ func TestMaskingShouldReplaceDateStringByDateStringInTwoMasks(t *testing.T) {
 
 func TestFactoryShouldCreateAMask(t *testing.T) {
 	maskingConfig := model.Masking{Mask: model.MaskType{DateParser: model.DateParserType{InputFormat: "2006-02-01", OutputFormat: "01/02/06"}}}
-	config, present, err := Factory(maskingConfig, 0, nil)
+	factoryConfig := model.MaskFactoryConfiguration{Masking: maskingConfig, Seed: 0}
+	config, present, err := Factory(factoryConfig)
 	mask := NewMask("2006-02-01", "01/02/06")
 	assert.Equal(t, mask, config, "should be equal")
 	assert.True(t, present, "should be true")
 	assert.Nil(t, err, "error should be nil")
 
 	maskingConfig = model.Masking{Mask: model.MaskType{DateParser: model.DateParserType{InputFormat: "2006-02-01", OutputFormat: ""}}}
-	config, present, err = Factory(maskingConfig, 0, nil)
+	factoryConfig = model.MaskFactoryConfiguration{Masking: maskingConfig, Seed: 0}
+	config, present, err = Factory(factoryConfig)
 	mask = NewMask("2006-02-01", "")
 	assert.Equal(t, mask, config, "should be equal")
 	assert.True(t, present, "should be true")
 	assert.Nil(t, err, "error should be nil")
 
 	maskingConfig = model.Masking{Mask: model.MaskType{DateParser: model.DateParserType{InputFormat: "", OutputFormat: "01/02/06"}}}
-	config, present, err = Factory(maskingConfig, 0, nil)
+	factoryConfig = model.MaskFactoryConfiguration{Masking: maskingConfig, Seed: 0}
+	config, present, err = Factory(factoryConfig)
 	mask = NewMask("", "01/02/06")
 	assert.Equal(t, mask, config, "should be equal")
 	assert.True(t, present, "should be true")
 	assert.Nil(t, err, "error should be nil")
+}
+
+func TestMaskingShouldReplaceUnixEpochByDateString(t *testing.T) {
+	outputFormat := "02/01/06"
+	dateMask := NewMask("unixEpoch", outputFormat)
+	data := model.CleanTypes(json.Number("1647512434"))
+	resulttime, err := dateMask.Mask(data)
+	assert.Equal(t, nil, err, "error should be nil")
+	assert.Equal(t, "17/03/22", resulttime, "Should return the same time")
+}
+
+func TestMaskingShouldReplaceDateStringByUnixEpoch(t *testing.T) {
+	inputFormat := "02/01/06"
+	dateMask := NewMask(inputFormat, "unixEpoch")
+	data := "17/03/22"
+	result, err := dateMask.Mask(data)
+	assert.Equal(t, nil, err, "error should be nil")
+	assert.Equal(t, int64(1647475200), result, "Should return the same time")
 }

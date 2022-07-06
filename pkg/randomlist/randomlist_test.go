@@ -28,7 +28,7 @@ func TestMaskingShouldReplaceSensitiveValueByRandomInList(t *testing.T) {
 	nameList := []model.Entry{"Michel", "Marc", "Matthias", "Youen", "Alexis"}
 
 	data := model.NewDictionary().With("name", "Benjamin")
-	result, err := NewMask(nameList, 0).Mask(data)
+	result, err := NewMask(nameList, 0, nil).Mask(data)
 	assert.Equal(t, nil, err, "error should be nil")
 	assert.NotEqual(t, data, result, "should be masked")
 
@@ -38,7 +38,7 @@ func TestMaskingShouldReplaceSensitiveValueByRandomInList(t *testing.T) {
 func TestMaskingShouldReplaceSensitiveValueByRandomAndDifferent(t *testing.T) {
 	nameList := []model.Entry{"Michel", "Marc", "Matthias", "Youen", "Alexis"}
 
-	mask := NewMask(nameList, 0)
+	mask := NewMask(nameList, 0, nil)
 
 	diff := 0
 	for i := 0; i < 1000; i++ {
@@ -55,14 +55,16 @@ func TestMaskingShouldReplaceSensitiveValueByRandomAndDifferent(t *testing.T) {
 
 func TestFactoryShouldCreateAMask(t *testing.T) {
 	maskingConfig := model.Masking{Mask: model.MaskType{RandomChoice: []model.Entry{"Michael", "Paul", "Marc"}}}
-	_, present, err := Factory(maskingConfig, 0, nil)
+	factoryConfig := model.MaskFactoryConfiguration{Masking: maskingConfig, Seed: 0}
+	_, present, err := Factory(factoryConfig)
 	assert.True(t, present, "should be true")
 	assert.Nil(t, err, "error should be nil")
 }
 
 func TestFactoryShouldNotCreateAMaskFromAnEmptyConfig(t *testing.T) {
 	maskingConfig := model.Masking{Mask: model.MaskType{}}
-	mask, present, err := Factory(maskingConfig, 0, nil)
+	factoryConfig := model.MaskFactoryConfiguration{Masking: maskingConfig, Seed: 0}
+	mask, present, err := Factory(factoryConfig)
 	assert.Nil(t, mask, "should be nil")
 	assert.False(t, present, "should be false")
 	assert.Nil(t, err, "error should be nil")

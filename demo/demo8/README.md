@@ -44,14 +44,14 @@ Consider the following structure :
 }
 ```
 
-- `organisations` is an array of organisation objects. 
+- `organisations` is an array of organisation objects.
 - each organisation contains a field `persons`, this field is an array of person objects.
 
 How to mask the `email` field in each person to this format : `{{.person.name}}.{{.person.surname}}@{{.domain}}` ?
 
 ### A wrong approach
 
-The first idea that might come to mind is something like: 
+The first idea that might come to mind is something like:
 
 **`masking-wrong.yml`**
 ```yaml
@@ -159,6 +159,9 @@ The usecase exposed in the [previous chapter](#Motivation) is tackled in this pa
 ### Step 1 : setting a sub-pipeline to process the persons
 
 This mask can process the persons objects like an independent stream of json. Its content is another `masking` node defining a list of masks to apply.
+
+[![](https://mermaid.ink/img/pako:eNp1kMFqwzAMhl_F1amFdLCrDz11g0FhpTvOZWixkngksrFlxtb23eckG7u0uvz60ScJ6QS1twQamt5_1h1GUbuDYVVi4ThkeV1Osjqq9XqjfGyR3TeK85zuAsVUdMZTfm8jhu4685baGRvjKjHOPxvYu0DLLTWO3Vh-dD1pVakn_qBa9hiJ5d8fvC9uZeB8Y-v9vJTYzskNarpt4bOUSzfPkxyhgoHigM6W75zGdgPS0UAGdEktNZh7MWD4UtAcLAo9WCc-gm6wT1QBZvEvX1yDlpjpD9o6LI8afqnLD41ChqU)](https://mermaid.live/edit/#pako:eNp1kMFqwzAMhl_F1amFdLCrDz11g0FhpTvOZWixkngksrFlxtb23eckG7u0uvz60ScJ6QS1twQamt5_1h1GUbuDYVVi4ThkeV1Osjqq9XqjfGyR3TeK85zuAsVUdMZTfm8jhu4685baGRvjKjHOPxvYu0DLLTWO3Vh-dD1pVakn_qBa9hiJ5d8fvC9uZeB8Y-v9vJTYzskNarpt4bOUSzfPkxyhgoHigM6W75zGdgPS0UAGdEktNZh7MWD4UtAcLAo9WCc-gm6wT1QBZvEvX1yDlpjpD9o6LI8afqnLD41ChqU)
+
 
 **`masking-pipe-1.yml`**
 ```yaml

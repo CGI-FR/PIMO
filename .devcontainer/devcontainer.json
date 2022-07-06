@@ -29,7 +29,8 @@
         "quicktype.quicktype",
         "spikespaz.vscode-smoothtype",
         "EditorConfig.EditorConfig",
-        "redhat.vscode-yaml"
+        "redhat.vscode-yaml",
+        "bradlc.vscode-tailwindcss"
     ],
     "settings": {
         // General settings

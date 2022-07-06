@@ -16,17 +16,23 @@ masking:
       type: "argument"
     # Optional cache (coherence preservation)
     cache: "cacheName"
+    # Optional custom seed for this mask
+    seed:
+      field: "example.example"
 
   # another mask on a different location
   - selector:
       jsonpath: "example.example2"
     mask:
       type: "argument"
+    preserve: "null"
 
 caches:
   cacheName:
     # Optional bijective cache (enable re-identification if the cache is dumped on disk)
     unique: true
+    # Use reverse cache dictionnary
+    reverse: true
 ```
 
 `version` is the version of the masking file.
@@ -36,6 +42,7 @@ caches:
 `jsonpath` defines the path of the entry that has to be masked in the json file.
 `mask` defines the mask that will be used for the entry defined by `selector`.
 `cache` is optional, if the current entry is already in the cache as key the associated value is returned without executing the mask. Otherwise the mask is executed and a new entry is added in the cache with the orignal content as `key` and the masked result as `value`. The cache have to be declared in the `caches` section of the YAML file.
+`preserve` is optional, and is used to keep some values unmasked in the json file. Allowed `preserve` options are: `"null"` (null values), `"empty"` (empty string `""`), and `"blank"` (both `empty` and `null` values). Additionally, `preserve` can be used with mask [`fromCache`](#fromCache) to preserve uncached values. (usage: `preserve: "notInCache"`)
 
 Multiple masks can be applied on the same jsonpath location, like in this example :
 
@@ -46,6 +53,16 @@ Multiple masks can be applied on the same jsonpath location, like in this exampl
       - add: "hello"
       - template: "{{.example}} World!"
       - remove: true
+```
+
+Masks can be applied on multiple selectors, like in this example:
+
+```yaml
+  - selectors:
+      - jsonpath: "example"
+      - jsonpath: "example2"
+    mask:
+      add: "hello"
 ```
 
 ## Possible masks
@@ -61,6 +78,7 @@ The following types of masks can be used :
   * [`randomChoice`](#randomChoice) is to mask with a random value from a list in argument.
   * [`weightedChoice`](#weightedChoice) is to mask with a random value from a list with probability, both given with the arguments `choice` and `weight`.
   * [`randomChoiceInUri`](#randomChoiceInUri) is to mask with a random value from an external resource.
+  * [`transcode`](#transcode) is to mask a value randomly with character class preservation.
 * K-Anonymization
   * [`range`](#range) is to mask a integer value by a range of value (e.g. replace `5` by `[0,10]`).
   * [`duration`](#duration) is to mask a date by adding or removing a certain number of days.
@@ -73,6 +91,7 @@ The following types of masks can be used :
   * [`dateParser`](#dateParser) is to change a date format.
   * [`template`](#template) is to mask a data with a template using other values from the jsonline.
   * [`template-each`](#template-each) is like template but will apply on each value of an array.
+  * [`fromjson`](#fromjson) is to convert string field values to parsed JSON, e.g. "[1,2,3]" -> [1,2,3].
 * Data structure manipulation
   * [`remove`](#remove) is to mask a field by completely removing it.
   * [`add`](#add) is a mask to add a field to the jsonline.
@@ -85,6 +104,7 @@ The following types of masks can be used :
   * [`replacement`](#replacement) is to mask a data with another data from the jsonline.
   * [`pipe`](#pipe) is a mask to handle complex nested array structures, it can read an array as an object stream and process it with a sub-pipeline.
   * [`luhn`](#luhn) can generate valid numbers using the Luhn algorithm (e.g. french SIRET or SIREN).
+  * [`markov`](#markov) can generate pseudo text based on a sample text.
 
 A full `masking.yml` file example, using every kind of mask, is given with the source code.
 
@@ -110,6 +130,22 @@ This takes the `data.json` file, masks the data contained inside it and put the 
 * `--verbosity <level>` or `-v<level>` This flag increase verbosity on the stderr output, possible values: none (0), error (1), warn (2), info (3), debug (4), trace (5).
 * `--debug` This flag complete the logs with debug information (source file, line number).
 * `--log-json` Set this flag to produce JSON formatted logs ([demo9](demo/demo9) goes deeper into logging and structured logging)
+* `--mask` Declare a simple masking definition in command line (minified YAML format: `--mask "value={fluxUri: 'pimo://nameFR'}"`, or `--mask "value=[{add: ''},{fluxUri: 'pimo://nameFR'}]"` for multiple masks). For advanced use case (e.g. if caches needed) `masking.yml` file definition will be preferred.
+* `--repeat-until <condition>` This flag will make PIMO keep masking every input until the condition is met. Condition format is using [Template](https://pkg.go.dev/text/template). Last output verifies the condition.
+* `--repeat-while <condition>` This flag will make PIMO keep masking every input while the condition is met. Condition format is using [Template](https://pkg.go.dev/text/template).
+
+### PIMO Play
+
+The `play` command will start a local website, where you will find commented examples and a playground to play with the masking configuration.
+
+```console
+$ pimo play
+⇨ http server started on [::]:3010
+```
+
+Then go to [http://localhost:3010/](http://localhost:3010/) in your browser.
+
+![PIMO Play screenshot](assets/pimo-play.png)
 
 ## Examples
 
@@ -303,7 +339,7 @@ This example will mask the `last_contact` field of the input jsonlines by decrea
         outputFormat: "01/02/06"
 ```
 
-This example will change every date from the date field from the `inputFormat` to the `outputFormat`. The format should always display the following date : `Mon Jan 2 15:04:05 -0700 MST 2006`. Either field is optional and in case a field is not defined, the default format is RFC3339, which is the base format for PIMO, needed for `duration` mask and given by `randDate` mask.
+This example will change every date from the date field from the `inputFormat` to the `outputFormat`. The format should always display the following date : `Mon Jan 2 15:04:05 -0700 MST 2006`. Either field is optional and in case a field is not defined, the default format is RFC3339, which is the base format for PIMO, needed for `duration` mask and given by `randDate` mask. It is possible to use the Unix time format by specifying `inputFormat: "unixEpoch"` or `outputFormat: "unixEpoch"`.
 
 [Return to list of masks](#possible-masks)
 
@@ -403,6 +439,26 @@ See also the [Template mask](#template) for other options, all functions are app
 
 [Return to list of masks](#possible-masks)
 
+### Fromjson
+
+```yaml
+  - selector:
+      jsonpath: "targetfield"
+    mask:
+      fromjson: "sourcefield"
+```
+
+This example will mask the `targetfield` field of the input jsonlines with the parsed JSON from field `sourcefield` of the jsonline. This mask changes the type of the input string (`sourcefield`) :
+
+* null : nil
+* string: string
+* number: float64
+* array:  slice
+* object: map
+* bool: bool
+
+[Return to list of masks](#possible-masks)
+
 ### Remove
 
 ```yaml
@@ -471,11 +527,13 @@ This example will create an `id` field in every output jsonline. The values will
   caches:
     fakeId :
       unique: true
+      reverse: false
 ```
 
 This example will replace the content of `id` field by the matching content in the cache `fakeId`. Cache have to be declared in the `caches` section.
 Cache content can be loaded from jsonfile with the `--load-cache fakeId=fakeId.jsonl` option or by the `cache` option on another field.
 If no matching is found in the cache, `fromCache` block the current line and the next lines are processing until a matching content go into the cache.
+A `reverse` option is available in the `caches` section to use the reverse cache dictionary.
 
 [Return to list of masks](#possible-masks)
 
@@ -552,31 +610,6 @@ If the data structure contains arrays of object like in the example below, this 
 }
 ```
 
-### Luhn
-
-The [Luhn](https://en.wikipedia.org/wiki/Luhn_algorithm) algorithm is a simple checksum formula used to validate a variety of identification numbers.
-
-The `luhn` mask can calculate the checksum for any value.
-
-```yaml
-  - selector:
-      jsonpath: "siret"
-    mask:
-      luhn: {}
-```
-
-In this example, the `siret` value will be appended with the correct checksum, to create a valid SIRET number (french business identifier).
-
-The mask can be parametered to use a different universe of valid characters, internally using the [Luhn mod N](https://en.wikipedia.org/wiki/Luhn_mod_N_algorithm) algorithm.
-
-```yaml
-  - selector:
-      jsonpath: "siret"
-    mask:
-      luhn:
-        universe: "abcde"
-```
-
 **`masking.yml`**
 
 ```yaml
@@ -627,6 +660,129 @@ masking:
 Be sure to check [demo](demo/demo8) to get more details about this mask.
 
 [Return to list of masks](#possible-masks)
+
+### Luhn
+
+The [Luhn](https://en.wikipedia.org/wiki/Luhn_algorithm) algorithm is a simple checksum formula used to validate a variety of identification numbers.
+
+The `luhn` mask can calculate the checksum for any value.
+
+```yaml
+  - selector:
+      jsonpath: "siret"
+    mask:
+      luhn: {}
+```
+
+In this example, the `siret` value will be appended with the correct checksum, to create a valid SIRET number (french business identifier).
+
+The mask can be parametered to use a different universe of valid characters, internally using the [Luhn mod N](https://en.wikipedia.org/wiki/Luhn_mod_N_algorithm) algorithm.
+
+```yaml
+  - selector:
+      jsonpath: "siret"
+    mask:
+      luhn:
+        universe: "abcde"
+```
+
+[Return to list of masks](#possible-masks)
+
+
+### Markov
+
+[Markov chains](https://en.wikipedia.org/wiki/Markov_chain#Markov_text_generators) produces pseudo text based on an sample text.
+
+**sample.txt**
+
+```txt
+I want a cheese burger
+I need a cheese cake
+```
+
+**masking.yml**
+
+```yaml
+  - selector:
+      jsonpath: "comment"
+    mask:
+      markov:
+        max-size: 20
+        sample: "file://sample.txt"
+        separator: " "
+```
+
+This example will mask the surname comment of the input jsonlines with a random value comment generated by the markov mask with an order of `2`. The different possibilities generated from **sample.txt** will be :
+
+```txt
+I want a cheese burger
+I need a cheese burger
+I want a cheese cake
+I need a cheese cake
+```
+
+The `separator` field defines the way the sample text will be split (`""` for splitting into characters, `" "` for splitting into words)
+
+[Return to list of masks](#possible-masks)
+
+### Transcode
+
+This mask produce a random string by preserving character classes from the original value.
+
+**masking.yml**
+
+```yaml
+- selector:
+    jsonpath: "id"
+  mask:
+    transcode:
+      classes:
+      - input: "0123456789abcdefABCDEF"
+        output: "0123456789abcdef"
+```
+
+This example will mask the original id value by replacing every characters from the `input` class by a random character from the `output` class.
+
+```console
+$ echo '{"id": "1ef619-90F"}' | pimo
+{"id": "d8e203-a92"}
+```
+
+By default, if not specified otherwise, these classes will be used (input -> output):
+
+* lowercase letters -> lowercase letters
+* UPPERCASE LETTERS -> UPPERCASE LETTERS
+* Digits -> Digits
+
+```yaml
+# this configuration:
+- selector:
+    jsonpath: "id"
+  mask:
+    transcode: {}
+# is equivalent to:
+- selector:
+    jsonpath: "id"
+  mask:
+    transcode:
+      classes:
+        - input: "abcdefghijklmnopqrstuvwxyz"
+          output: "abcdefghijklmnopqrstuvwxyz"
+        - input: "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+          output: "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        - input: "0123456789"
+          output: "0123456789"
+```
+
+[Return to list of masks](#possible-masks)
+
+## Flow chart
+
+PIMO can generate a Mermaid syntax flow chart to visualize the transformation process.
+
+for example the command `pimo flow masking.yml > masing.mmd` with that [masking.yml](masking.yml) file generate following chart :
+
+[![](https://mermaid.ink/img/pako:eNqtltFumzAUhl_F9RXRSESArQoXVbVQaZMWbUo77SJElQsOWAMbga02SvNEfYy92GxDUHDoBdoQCvZ_Dieffx9HOcCYJRgGcJez5zhDFQff1hEF8roitBR8Y-nHZAum0xsQi5qzAlezMmMUN3m1eEorVGZG8LFOm7i6-iFV6jWCa5ziF8vZzKfXWwtYG2e62E4O7nFy8I-TCL6aBedNPUyTZmCGNeEVE1zy3nzXj-37S6GoMBegpB62ElrYJaM1R5Rbn0meazqdbTI14ngSdwDFvWBxT84hmrBimTESY2tF4t_oz1turxDPCBbyWcU4z3FH6Q5iumM5UWoaJpUeo5z3CL9Kv1aEBsD9aIMVegmA52oq9aLJpLXxznkDznkXznndNhaFRLNwnDEQsorxbN_55A365I2lqkU10Fyt2iNrtZbtFyZpxnHS7msoSkY5uAULWw8TOZxr1lMpk7bTR-5rklS4rmecPVNzg89C_Z0-C7T4X1CdWXfyPKI8AUvC9_ZaPO2b0T0qy4xUWM-aDjivfNEKveC41SSIm9YrqUevhLNGDeXUUh-6V-eLa2fqzOUNHCfQN_jgyAv8fFjaQOepVnYd9_08vUb9vebaGnF8n_sDfe5f9Lnf_baWOYpxgeUJVHrX4_5gj_tjiQpEcgNIST0eJbQ4D7iQPNLlw2HWdunxOJOTZnSbqtxZzArNqSvNL45Jw_jP1f5Tqc6_RhxnX45q_hjL441ibth4HurZeR5o6UNRIU4YtaY_PjmhRuy9bqL2g0PI0IbyBMslJfI_wUG9FUGeyT6KYCCHCd4hkfMIRvQoU0WpuvkuIZxVMNihvMY2RIKz-z2NYcArgU9JIUFyfUWbdfwLdee3Rg)](https://mermaid.live/edit/#pako:eNqtltFumzAUhl_F9RXRSESArQoXVbVQaZMWbUo77SJElQsOWAMbga02SvNEfYy92GxDUHDoBdoQCvZ_Dieffx9HOcCYJRgGcJez5zhDFQff1hEF8roitBR8Y-nHZAum0xsQi5qzAlezMmMUN3m1eEorVGZG8LFOm7i6-iFV6jWCa5ziF8vZzKfXWwtYG2e62E4O7nFy8I-TCL6aBedNPUyTZmCGNeEVE1zy3nzXj-37S6GoMBegpB62ElrYJaM1R5Rbn0meazqdbTI14ngSdwDFvWBxT84hmrBimTESY2tF4t_oz1turxDPCBbyWcU4z3FH6Q5iumM5UWoaJpUeo5z3CL9Kv1aEBsD9aIMVegmA52oq9aLJpLXxznkDznkXznndNhaFRLNwnDEQsorxbN_55A365I2lqkU10Fyt2iNrtZbtFyZpxnHS7msoSkY5uAULWw8TOZxr1lMpk7bTR-5rklS4rmecPVNzg89C_Z0-C7T4X1CdWXfyPKI8AUvC9_ZaPO2b0T0qy4xUWM-aDjivfNEKveC41SSIm9YrqUevhLNGDeXUUh-6V-eLa2fqzOUNHCfQN_jgyAv8fFjaQOepVnYd9_08vUb9vebaGnF8n_sDfe5f9Lnf_baWOYpxgeUJVHrX4_5gj_tjiQpEcgNIST0eJbQ4D7iQPNLlw2HWdunxOJOTZnSbqtxZzArNqSvNL45Jw_jP1f5Tqc6_RhxnX45q_hjL441ibth4HurZeR5o6UNRIU4YtaY_PjmhRuy9bqL2g0PI0IbyBMslJfI_wUG9FUGeyT6KYCCHCd4hkfMIRvQoU0WpuvkuIZxVMNihvMY2RIKz-z2NYcArgU9JIUFyfUWbdfwLdee3Rg)
 
 ## Visual Studio Code
 

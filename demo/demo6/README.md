@@ -19,6 +19,8 @@ The `masking.yml` file contains the following configuration:
 
 This configuration will clean the input stream into a correct one.
 
+[![](https://mermaid.ink/img/pako:eNpVUEtrwzAM_iuuTi20lF1zKAy2ncYGbdklCsOLlMbgR3DshdH2v8-J05XpIvl7WegMtSOGAhrthrqVPojXPVqRaiGJyu0j0bYSm81OWB5eFGvKbB-_Tl527R_82Z8yM9YNHI0XhBSyfONBfEgdeYVwubsesontnHsnpk8XLoYuht371Kp5M2XTo1xObZW3a0bT0e3ZuG_Osn9QTvPTXCLOOqxgDYa9kYrSEc6jESG0bBihSCNxI6MOCGivSRo7koGfSQXnoWik7nkNMgZ3-LE1FMFHvomelEwHMrPq-gvit3by)](https://mermaid.live/edit/#pako:eNpVUEtrwzAM_iuuTi20lF1zKAy2ncYGbdklCsOLlMbgR3DshdH2v8-J05XpIvl7WegMtSOGAhrthrqVPojXPVqRaiGJyu0j0bYSm81OWB5eFGvKbB-_Tl527R_82Z8yM9YNHI0XhBSyfONBfEgdeYVwubsesontnHsnpk8XLoYuht371Kp5M2XTo1xObZW3a0bT0e3ZuG_Osn9QTvPTXCLOOqxgDYa9kYrSEc6jESG0bBihSCNxI6MOCGivSRo7koGfSQXnoWik7nkNMgZ3-LE1FMFHvomelEwHMrPq-gvit3by)
+
 #### **`masking.yml`**
 ```yaml
 version: "1"

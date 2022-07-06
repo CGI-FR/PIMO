@@ -24,24 +24,26 @@ import (
 
 // ReplacementMask is to mask with a value from another field
 type MaskEngine struct {
-	Field string
+	Field model.Selector
 }
 
 // NewMask return a mask containing another field of the dictionary
 func NewMask(field string) MaskEngine {
-	return MaskEngine{field}
+	return MaskEngine{model.NewPathSelector(field)}
 }
 
 // Mask masks a value with another field of the json
 func (remp MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Entry, error) {
 	log.Info().Msg("Mask replacement")
-	return context[0].Get(remp.Field), nil
+	v, _ := remp.Field.Read(context[0])
+
+	return v, nil
 }
 
 // Factory create a mask from a yaml config
-func Factory(conf model.Masking, seed int64, caches map[string]model.Cache) (model.MaskEngine, bool, error) {
-	if len(conf.Mask.Replacement) != 0 {
-		return NewMask(conf.Mask.Replacement), true, nil
+func Factory(conf model.MaskFactoryConfiguration) (model.MaskEngine, bool, error) {
+	if len(conf.Masking.Mask.Replacement) != 0 {
+		return NewMask(conf.Masking.Mask.Replacement), true, nil
 	}
 	return nil, false, nil
 }

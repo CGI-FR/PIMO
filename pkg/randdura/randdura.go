@@ -30,13 +30,14 @@ import (
 
 // MaskEngine is to mask a value thanks to 2 durations
 type MaskEngine struct {
-	Min  time.Duration
-	Max  time.Duration
-	rand *rand.Rand
+	Min    time.Duration
+	Max    time.Duration
+	rand   *rand.Rand
+	seeder model.Seeder
 }
 
 // NewMask create a MaskEngine with 2 ISO8601 duration strings
-func NewMask(minString, maxString string, seed int64) (MaskEngine, error) {
+func NewMask(minString, maxString string, seed int64, seeder model.Seeder) (MaskEngine, error) {
 	var durMin time.Duration
 	var durMax time.Duration
 	var err error
@@ -54,7 +55,7 @@ func NewMask(minString, maxString string, seed int64) (MaskEngine, error) {
 		durMax, err = duration.ParseDuration(maxString)
 	}
 	// nolint: gosec
-	return MaskEngine{durMin, durMax, rand.New(rand.NewSource(seed))}, err
+	return MaskEngine{durMin, durMax, rand.New(rand.NewSource(seed)), seeder}, err
 }
 
 // Mask masks a time value with a duration
@@ -62,6 +63,16 @@ func (me MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Ent
 	log.Info().Msg("Mask randomDuration")
 	if e == nil {
 		return e, nil
+	}
+
+	if len(context) > 0 {
+		seed, ok, err := me.seeder(context[0])
+		if err != nil {
+			return nil, err
+		}
+		if ok {
+			me.rand.Seed(seed)
+		}
 	}
 
 	var t time.Time
@@ -93,12 +104,12 @@ func (me MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Ent
 }
 
 // Create a mask from a configuration
-func Factory(conf model.Masking, seed int64, caches map[string]model.Cache) (model.MaskEngine, bool, error) {
-	if len(conf.Mask.RandomDuration.Min) != 0 || len(conf.Mask.RandomDuration.Max) != 0 { // set differents seeds for differents jsonpath
+func Factory(conf model.MaskFactoryConfiguration) (model.MaskEngine, bool, error) {
+	if len(conf.Masking.Mask.RandomDuration.Min) != 0 || len(conf.Masking.Mask.RandomDuration.Max) != 0 { // set differents seeds for differents jsonpath
 		h := fnv.New64a()
-		h.Write([]byte(conf.Selector.Jsonpath))
-		seed += int64(h.Sum64())
-		mask, err := NewMask(conf.Mask.RandomDuration.Min, conf.Mask.RandomDuration.Max, seed)
+		h.Write([]byte(conf.Masking.Selector.Jsonpath))
+		conf.Seed += int64(h.Sum64())
+		mask, err := NewMask(conf.Masking.Mask.RandomDuration.Min, conf.Masking.Mask.RandomDuration.Max, conf.Seed, model.NewSeeder(conf.Masking, conf.Seed))
 		if err != nil {
 			return nil, false, err
 		}

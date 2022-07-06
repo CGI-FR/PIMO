@@ -19,7 +19,9 @@ package model
 
 import (
 	"errors"
+	"fmt"
 	"io/ioutil"
+	"strings"
 	"time"
 
 	"github.com/goccy/go-yaml"
@@ -65,84 +67,140 @@ func BuildCaches(caches map[string]CacheDefinition, existing map[string]Cache) m
 func BuildPipeline(pipeline Pipeline, conf Definition, caches map[string]Cache) (Pipeline, map[string]Cache, error) {
 	caches = BuildCaches(conf.Caches, caches)
 	cleaners := []Processor{}
+
 	for _, masking := range conf.Masking {
-		nbArg := 0
-
-		allMasksDefinition := append([]MaskType{masking.Mask}, masking.Masks...)
-
-		for _, maskDefinition := range allMasksDefinition {
-			virtualMask := Masking{
-				Selector: masking.Selector,
-				Mask:     maskDefinition,
-				Masks:    nil,
-				Cache:    masking.Cache,
-			}
-
-			if virtualMask.Mask.FromCache != "" {
-				cache, ok := caches[virtualMask.Mask.FromCache]
-				if !ok {
-					return nil, nil, errors.New("Cache '" + virtualMask.Cache + "' not found for '" + virtualMask.Selector.Jsonpath + "'")
-				}
-				pipeline = pipeline.Process(NewFromCacheProcess(NewPathSelector(virtualMask.Selector.Jsonpath), cache))
-				nbArg++
-			}
-
-			for _, factory := range maskFactories {
-				mask, present, err := factory(virtualMask, conf.Seed, caches)
-				if err != nil {
-					return nil, nil, errors.New(err.Error() + " for " + virtualMask.Selector.Jsonpath)
-				}
-				if present {
-					if virtualMask.Cache != "" {
-						cache, ok := caches[virtualMask.Cache]
-						if !ok {
-							return nil, nil, errors.New("Cache '" + virtualMask.Cache + "' not found for '" + virtualMask.Selector.Jsonpath + "'")
-						}
-						switch typedCache := cache.(type) {
-						case UniqueCache:
-							mask = NewUniqueMaskCacheEngine(typedCache, mask)
-						default:
-							mask = NewMaskCacheEngine(typedCache, mask)
-						}
-					}
-					pipeline = pipeline.Process(NewMaskEngineProcess(NewPathSelector(virtualMask.Selector.Jsonpath), mask))
-					nbArg++
-				}
-			}
-
-			for _, factory := range maskContextFactories {
-				mask, present, err := factory(virtualMask, conf.Seed, caches)
-				if err != nil {
-					return nil, nil, errors.New(err.Error() + " for " + virtualMask.Selector.Jsonpath)
-				}
-				if present {
-					pipeline = pipeline.Process(NewMaskContextEngineProcess(NewPathSelector(virtualMask.Selector.Jsonpath), mask))
-					nbArg++
-					if i, hasCleaner := mask.(HasCleaner); hasCleaner {
-						cleaners = append(cleaners, NewMaskContextEngineProcess(NewPathSelector(virtualMask.Selector.Jsonpath), i.GetCleaner()))
-					}
-				}
-			}
+		allSelectors := masking.Selectors
+		if sel := masking.Selector; sel.Jsonpath != "" {
+			allSelectors = append(allSelectors, sel)
 		}
-		if nbArg == 0 {
-			return pipeline, nil, errors.New("No masks defined for " + masking.Selector.Jsonpath)
+
+		for _, sel := range allSelectors {
+			nbArg := 0
+
+			allMasksDefinition := append([]MaskType{masking.Mask}, masking.Masks...)
+
+			for _, maskDefinition := range allMasksDefinition {
+				virtualMask := Masking{
+					Selector:  sel,
+					Selectors: nil,
+					Mask:      maskDefinition,
+					Masks:     nil,
+					Cache:     masking.Cache,
+					Preserve:  masking.Preserve,
+					Seed:      masking.Seed,
+				}
+
+				if virtualMask.Mask.FromCache != "" {
+					cache, ok := caches[virtualMask.Mask.FromCache]
+					if !ok {
+						return nil, nil, errors.New("Cache '" + virtualMask.Cache + "' not found for '" + virtualMask.Selector.Jsonpath + "'")
+					}
+					pipeline = pipeline.Process(NewFromCacheProcess(NewPathSelector(virtualMask.Selector.Jsonpath), cache, virtualMask.Preserve))
+					nbArg++
+				}
+
+				configuration := MaskFactoryConfiguration{Masking: virtualMask, Seed: conf.Seed, Cache: caches}
+
+				for _, factory := range maskFactories {
+					mask, present, err := factory(configuration)
+					if err != nil {
+						return nil, nil, errors.New(err.Error() + " for " + virtualMask.Selector.Jsonpath)
+					}
+					if present {
+						if virtualMask.Cache != "" {
+							cache, ok := caches[virtualMask.Cache]
+							if !ok {
+								return nil, nil, errors.New("Cache '" + virtualMask.Cache + "' not found for '" + virtualMask.Selector.Jsonpath + "'")
+							}
+							switch typedCache := cache.(type) {
+							case UniqueCache:
+								mask = NewUniqueMaskCacheEngine(typedCache, mask)
+							default:
+								mask = NewMaskCacheEngine(typedCache, mask)
+							}
+						}
+						pipeline = pipeline.Process(NewMaskEngineProcess(NewPathSelector(virtualMask.Selector.Jsonpath), mask, virtualMask.Preserve))
+						nbArg++
+					}
+				}
+
+				for _, factory := range maskContextFactories {
+					mask, present, err := factory(configuration)
+					if err != nil {
+						return nil, nil, errors.New(err.Error() + " for " + virtualMask.Selector.Jsonpath)
+					}
+					if present {
+						if virtualMask.Cache != "" {
+							cache, ok := caches[virtualMask.Cache]
+							if !ok {
+								return nil, nil, errors.New("Cache '" + virtualMask.Cache + "' not found for '" + virtualMask.Selector.Jsonpath + "'")
+							}
+							switch typedCache := cache.(type) {
+							case UniqueCache:
+								mask = NewUniqueMaskContextCacheEngine(typedCache, mask)
+							default:
+								mask = NewMaskContextCacheEngine(typedCache, mask)
+							}
+						}
+						pipeline = pipeline.Process(NewMaskContextEngineProcess(NewPathSelector(virtualMask.Selector.Jsonpath), mask))
+						nbArg++
+						if i, hasCleaner := mask.(HasCleaner); hasCleaner {
+							cleaners = append(cleaners, NewMaskContextEngineProcess(NewPathSelector(virtualMask.Selector.Jsonpath), i.GetCleaner()))
+						}
+					}
+				}
+			}
+			if nbArg == 0 {
+				return pipeline, nil, errors.New("No masks defined for " + masking.Selector.Jsonpath)
+			}
 		}
 	}
 	for _, cleaner := range cleaners {
 		pipeline = pipeline.Process(cleaner)
 	}
+
 	return pipeline, caches, nil
 }
 
-func LoadPipelineDefinitionFromYAML(filename string) (Definition, error) {
+func LoadPipelineDefinitionFromYAML(source []byte) (Definition, error) {
+	var conf Definition
+	err := yaml.Unmarshal(source, &conf)
+	if err != nil {
+		return conf, err
+	}
+	if conf.Seed == 0 {
+		conf.Seed = time.Now().UnixNano()
+	}
+	return conf, nil
+}
+
+func LoadPipelineDefinitionFromFile(filename string) (Definition, error) {
 	source, err := ioutil.ReadFile(filename)
 	if err != nil {
 		return Definition{}, err
 	}
+	return LoadPipelineDefinitionFromYAML(source)
+}
+
+func LoadPipelineDefintionFromOneLiner(oneLine []string) (Definition, error) {
 	var conf Definition
-	err = yaml.Unmarshal(source, &conf)
-	if err != nil {
-		return conf, err
+	conf.Masking = []Masking{}
+	for _, value := range oneLine {
+		i := strings.Index(value, "=")
+		if i == -1 {
+			return conf, fmt.Errorf("%s is not of the form 'jsonpath={mask}'", value)
+		}
+		jsonpath, maskString := value[:i], value[(i+1):]
+
+		masking := Masking{Selector: SelectorType{Jsonpath: jsonpath}}
+
+		if err := yaml.Unmarshal([]byte(maskString), &masking.Mask); err != nil {
+			if err2 := yaml.Unmarshal([]byte(maskString), &masking.Masks); err2 != nil {
+				return conf, err
+			}
+		}
+
+		conf.Masking = append(conf.Masking, masking)
 	}
 	if conf.Seed == 0 {
 		conf.Seed = time.Now().UnixNano()
