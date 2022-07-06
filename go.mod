@@ -7,7 +7,7 @@ require (
 	github.com/Trendyol/overlog v0.1.1
 	github.com/capitalone/fpe v1.2.1
 	github.com/goccy/go-yaml v1.9.5
-	github.com/invopop/jsonschema v0.4.0
+	github.com/invopop/jsonschema v0.5.0
 	github.com/labstack/echo/v4 v4.7.2
 	github.com/mattn/go-isatty v0.0.14
 	github.com/rs/zerolog v1.27.0
