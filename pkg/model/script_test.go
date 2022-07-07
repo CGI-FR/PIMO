@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with PIMO.  If not, see <http://www.gnu.org/licenses/>.
 
-package script
+package model
 
 import (
 	"testing"
@@ -41,25 +41,16 @@ func TestExecute(t *testing.T) {
 	assert.Equal(t, result, int64(10))
 }
 
-func TestName(t *testing.T) {
+func TestBuildScriptFunction(t *testing.T) {
 	t.Parallel()
 
-	function1 := `Hello
-	func add(x,y) {
-		return x+y
-	}`
-
-	result1 := Names(function1)
-	assert.Equal(t, []string{"add"}, result1)
-
-	function2 := `Hello
-	func add(x,y) {
-		return x+y
+	Param := []Param{
+		{Name: "i", Type: "int64"},
 	}
-	func sub(x,y) {
-		return x-y
-	}`
 
-	result2 := Names(function2)
-	assert.Equal(t, []string{"add", "sub"}, result2)
+	function := Function{Name: "add", Params: Param, Body: "return i + 1"}
+
+	res := function.Build()
+
+	assert.Equal(t, "func add(i) { return i + 1 }", res)
 }

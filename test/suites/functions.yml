@@ -6,21 +6,24 @@ testcases:
   - script: |-
       cat > masking.yml <<EOF
       version: "1"
-      functions: -|
-        func rangLettre(lettre) {
-          return lettre - 'A' + 1;
-        }
+      functions:
+        - name: "add"
+          params:
+            - name: "i"
+              type: "int64"
+          body: |-
+            return i + 10
       masking:
         - selector:
-            jsonpath: "rang_lettre_J"
+            jsonpath: "value"
           mask:
-            template: '{{rangLettre "J"}}'
+            template: '{{add 5}}'
       EOF
   - script: |-
-      echo '{"rang_lettre_J": ""}' | pimo
+      echo '{"value": "15"}' | pimo
     assertions:
     - result.code ShouldEqual 0
-    - result.systemoutjson.rang_lettre_J ShouldEqual 10
+    - result.systemoutjson.value ShouldEqual 15
     - result.systemerr ShouldBeEmpty
 
 # - name: declaring fonctions and using in a mask without paramsFromContext

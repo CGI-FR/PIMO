@@ -62,7 +62,7 @@ func TestMaskingShouldReplaceSensitiveValueByTemplateInNested(t *testing.T) {
 
 func TestFactoryShouldCreateAMask(t *testing.T) {
 	maskingConfig := model.Masking{Selector: model.SelectorType{Jsonpath: "mail"}, Mask: model.MaskType{Template: "{{.name}}.{{.surname}}@gmail.com"}}
-	factoryConfig := model.MaskFactoryConfiguration{Masking: maskingConfig, Seed: 0}
+	factoryConfig := model.MaskFactoryConfiguration{Masking: maskingConfig, Seed: 0, Functions: make(tmpl.FuncMap)}
 	config, present, err := Factory(factoryConfig)
 	assert.Nil(t, err, "error should be nil")
 	maskingEngine, _ := NewMask("{{.name}}.{{.surname}}@gmail.com", tmpl.FuncMap{})
@@ -78,7 +78,7 @@ func TestFactoryShouldCreateAMask(t *testing.T) {
 
 func TestFactoryShouldNotCreateAMaskFromAnEmptyConfig(t *testing.T) {
 	maskingConfig := model.Masking{Mask: model.MaskType{}}
-	factoryConfig := model.MaskFactoryConfiguration{Masking: maskingConfig, Seed: 0}
+	factoryConfig := model.MaskFactoryConfiguration{Masking: maskingConfig, Seed: 0, Functions: make(tmpl.FuncMap)}
 	mask, present, err := Factory(factoryConfig)
 	assert.Nil(t, mask, "should be nil")
 	assert.False(t, present, "should be false")
@@ -87,7 +87,7 @@ func TestFactoryShouldNotCreateAMaskFromAnEmptyConfig(t *testing.T) {
 
 func TestFactoryShouldReturnAnErrorInWrongConfig(t *testing.T) {
 	maskingConfig := model.Masking{Mask: model.MaskType{Template: "{{.name}.{{.surname}}@gmail.com"}}
-	factoryConfig := model.MaskFactoryConfiguration{Masking: maskingConfig, Seed: 0}
+	factoryConfig := model.MaskFactoryConfiguration{Masking: maskingConfig, Seed: 0, Functions: make(tmpl.FuncMap)}
 	mask, present, err := Factory(factoryConfig)
 	assert.Nil(t, mask, "should be nil")
 	assert.False(t, present, "should be true")
@@ -110,7 +110,7 @@ func TestMaskingTemplateShouldFormat(t *testing.T) {
 
 func TestRFactoryShouldCreateANestedContextMask(t *testing.T) {
 	maskingConfig := model.Masking{Selector: model.SelectorType{Jsonpath: "foo.bar"}, Mask: model.MaskType{Template: "{{.baz}}"}}
-	factoryConfig := model.MaskFactoryConfiguration{Masking: maskingConfig, Seed: 0}
+	factoryConfig := model.MaskFactoryConfiguration{Masking: maskingConfig, Seed: 0, Functions: make(tmpl.FuncMap)}
 	maskEngine, present, err := Factory(factoryConfig)
 	assert.Nil(t, err, "should be nil")
 	assert.True(t, present, "should be true")

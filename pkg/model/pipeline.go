@@ -25,7 +25,6 @@ import (
 	tmpl "text/template"
 	"time"
 
-	"github.com/cgi-fr/pimo/pkg/script"
 	"github.com/goccy/go-yaml"
 	"github.com/mattn/anko/env"
 )
@@ -67,16 +66,21 @@ func BuildCaches(caches map[string]CacheDefinition, existing map[string]Cache) m
 	return existing
 }
 
-func BuildFunctions(text string) tmpl.FuncMap {
-	if text == "" {
-		return tmpl.FuncMap{}
+func BuildFunctions(funcs []Function) tmpl.FuncMap {
+	funcMap := make(tmpl.FuncMap)
+
+	if len(funcs) == 0 {
+		return funcMap
 	}
 
-	env := script.Environment{Env: env.NewEnv()}
-	env.Compile(text)
-	funcMap := tmpl.FuncMap{
-		script.Names(text)[0]: env.Execute,
+	env := Environment{Env: env.NewEnv()}
+
+	for _, f := range funcs {
+		env.Compile(f.Build())
+		// TODO: Créer la fonction avec les bons noms de paramètres et types
+		funcMap[f.Name] = func(i int64) int64 { return env.Execute(fmt.Sprintf(f.Name+"(%d)", i)).(int64) }
 	}
+
 	return funcMap
 }
 

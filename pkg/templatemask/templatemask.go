@@ -21,21 +21,19 @@ import (
 	"bytes"
 	tmpl "text/template"
 
-	"github.com/Masterminds/sprig"
 	"github.com/cgi-fr/pimo/pkg/model"
+	"github.com/cgi-fr/pimo/pkg/template"
 	"github.com/rs/zerolog/log"
 )
 
 // MaskEngine is to mask a value thanks to a template
 type MaskEngine struct {
-	// template *template.Engine
-	template *tmpl.Template
+	template *template.Engine
 }
 
 // NewMask create a MaskEngine
 func NewMask(text string, funcs tmpl.FuncMap) (MaskEngine, error) {
-	temp, err := tmpl.New("template").Funcs(sprig.TxtFuncMap()).Funcs(funcs).Parse(text)
-	// temp, err := template.NewEngine(text)
+	temp, err := template.NewEngine(text, funcs)
 	return MaskEngine{temp}, err
 }
 

@@ -15,13 +15,12 @@
 // You should have received a copy of the GNU General Public License
 // along with PIMO.  If not, see <http://www.gnu.org/licenses/>.
 
-package script
+package model
 
 import (
 	"fmt"
 	"log"
 	"math"
-	"regexp"
 
 	"github.com/mattn/anko/env"
 	"github.com/mattn/anko/vm"
@@ -64,15 +63,17 @@ func (env Environment) Execute(script string) interface{} {
 	return output
 }
 
-// Names returns the list of function names found in script
-func Names(script string) (names []string) {
-	re := regexp.MustCompile(`func (.*)\(.*\)`)
-
-	find := re.FindAllSubmatch([]byte(script), -1)
-
-	for i := range find {
-		names = append(names, string(find[i][1]))
+func (f Function) Build() string {
+	script := ""
+	params := ""
+	for i, param := range f.Params {
+		if i == 0 {
+			params += param.Name
+		} else {
+			params += "," + param.Name
+		}
 	}
+	script += "func " + f.Name + "(" + params + ") { " + f.Body + " }"
 
-	return names
+	return script
 }

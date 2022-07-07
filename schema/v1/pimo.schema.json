@@ -59,6 +59,13 @@
           "type": "integer",
           "description": "Initialize the Pseaudo-Random-Generator with the given value"
         },
+        "functions": {
+          "items": {
+            "$ref": "#/$defs/Function"
+          },
+          "type": "array",
+          "description": "Declare functions to be used in the masking"
+        },
         "masking": {
           "items": {
             "$ref": "#/$defs/Masking"
@@ -106,6 +113,32 @@
       "type": "object",
       "required": [
         "keyFromEnv"
+      ]
+    },
+    "Function": {
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Declare name function"
+        },
+        "params": {
+          "items": {
+            "$ref": "#/$defs/Param"
+          },
+          "type": "array",
+          "description": "Declare parameters function"
+        },
+        "body": {
+          "type": "string",
+          "description": "Declare body function"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "name",
+        "params",
+        "body"
       ]
     },
     "IncrementalType": {
@@ -572,6 +605,24 @@
       },
       "additionalProperties": false,
       "type": "object"
+    },
+    "Param": {
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Declare name parameter"
+        },
+        "type": {
+          "type": "string",
+          "description": "Declare type parameter"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "name",
+        "type"
+      ]
     },
     "PipeType": {
       "properties": {
