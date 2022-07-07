@@ -44,13 +44,12 @@ func TestExecute(t *testing.T) {
 func TestBuildScriptFunction(t *testing.T) {
 	t.Parallel()
 
-	Param := []Param{
-		{Name: "i", Type: "int64"},
-	}
+	Param := make(map[string]string)
+	Param["i"] = "int64"
 
-	function := Function{Name: "add", Params: Param, Body: "return i + 1"}
+	function := Function{Params: Param, Body: "return i + 1"}
 
-	res := function.Build()
+	res := function.Build("add")
 
 	assert.Equal(t, "func add(i) { return i + 1 }", res)
 }

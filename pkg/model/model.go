@@ -212,20 +212,14 @@ type CacheDefinition struct {
 	Reverse bool `yaml:"reverse,omitempty" jsonschema_description:"Reverse the cache, keys will be used as values, and values will be used as keys"`
 }
 type Function struct {
-	Name   string  `yaml:"name" jsonschema_description:"Declare name function"`
-	Params []Param `yaml:"params" jsonschema_description:"Declare parameters function"`
-	Body   string  `yaml:"body" jsonschema_description:"Declare body function"`
-}
-
-type Param struct {
-	Name string `yaml:"name" jsonschema_description:"Declare name parameter"`
-	Type string `yaml:"type" jsonschema_description:"Declare type parameter"`
+	Params map[string]string `yaml:"params" jsonschema_description:"Declare parameters function"`
+	Body   string            `yaml:"body" jsonschema_description:"Declare body function"`
 }
 
 type Definition struct {
 	Version   string                     `yaml:"version" jsonschema_description:"Version of the pipeline definition, use the value 1"`
 	Seed      int64                      `yaml:"seed,omitempty" jsonschema_description:"Initialize the Pseaudo-Random-Generator with the given value"`
-	Functions []Function                 `yaml:"functions,omitempty" jsonschema_description:"Declare functions to be used in the masking"`
+	Functions map[string]Function        `yaml:"functions,omitempty" jsonschema_description:"Declare functions to be used in the masking"`
 	Masking   []Masking                  `yaml:"masking" jsonschema_description:"Masking pipeline definition"`
 	Caches    map[string]CacheDefinition `yaml:"caches,omitempty" jsonschema_description:"Declare in-memory caches"`
 }

@@ -7,10 +7,9 @@ testcases:
       cat > masking.yml <<EOF
       version: "1"
       functions:
-        - name: "add"
+        "add":
           params:
-            - name: "i"
-              type: "int64"
+            "i": "int64"
           body: |-
             return i + 10
       masking:

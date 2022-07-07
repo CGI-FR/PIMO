@@ -66,7 +66,7 @@ func BuildCaches(caches map[string]CacheDefinition, existing map[string]Cache) m
 	return existing
 }
 
-func BuildFunctions(funcs []Function) tmpl.FuncMap {
+func BuildFunctions(funcs map[string]Function) tmpl.FuncMap {
 	funcMap := make(tmpl.FuncMap)
 
 	if len(funcs) == 0 {
@@ -75,10 +75,10 @@ func BuildFunctions(funcs []Function) tmpl.FuncMap {
 
 	env := Environment{Env: env.NewEnv()}
 
-	for _, f := range funcs {
-		env.Compile(f.Build())
+	for name, f := range funcs {
+		env.Compile(f.Build(name))
 		// TODO: Créer la fonction avec les bons noms de paramètres et types
-		funcMap[f.Name] = func(i int64) int64 { return env.Execute(fmt.Sprintf(f.Name+"(%d)", i)).(int64) }
+		funcMap[name] = func(i int64) int64 { return env.Execute(fmt.Sprintf(name+"(%d)", i)).(int64) }
 	}
 
 	return funcMap

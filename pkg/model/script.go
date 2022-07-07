@@ -63,17 +63,19 @@ func (env Environment) Execute(script string) interface{} {
 	return output
 }
 
-func (f Function) Build() string {
+func (f Function) Build(name string) string {
 	script := ""
 	params := ""
-	for i, param := range f.Params {
+	i := 0
+	for nameP := range f.Params {
 		if i == 0 {
-			params += param.Name
+			params += nameP
 		} else {
-			params += "," + param.Name
+			params += "," + nameP
 		}
+		i++
 	}
-	script += "func " + f.Name + "(" + params + ") { " + f.Body + " }"
+	script += "func " + name + "(" + params + ") { " + f.Body + " }"
 
 	return script
 }
