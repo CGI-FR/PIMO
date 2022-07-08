@@ -25,6 +25,7 @@ import (
 	tmpl "text/template"
 	"time"
 
+	"github.com/cgi-fr/pimo/pkg/functions"
 	"github.com/goccy/go-yaml"
 	"github.com/mattn/anko/env"
 )
@@ -77,8 +78,13 @@ func BuildFunctions(funcs map[string]Function) tmpl.FuncMap {
 
 	for name, f := range funcs {
 		env.Compile(f.Build(name))
-		// TODO: Créer la fonction avec les bons noms de paramètres et types
-		funcMap[name] = func(i int64) int64 { return env.Execute(fmt.Sprintf(name+"(%d)", i)).(int64) }
+
+		ankowrapper := func(args ...interface{}) interface{} {
+			joined := strings.Trim(strings.Join(strings.Fields(fmt.Sprint(args)), ","), "[]")
+			return env.Execute(fmt.Sprintf(name+"(%s)", joined))
+		}
+
+		funcMap[name] = functions.GetFunction(f.Params, "int64", ankowrapper).Interface()
 	}
 
 	return funcMap

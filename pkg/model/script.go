@@ -39,7 +39,7 @@ func (env Environment) DefinePackage() {
 
 	err = env.Env.Define("pow", math.Pow)
 	if err != nil {
-		log.Fatalf("Define error: %v\n", err)
+		log.Fatalf("Define package error: %v\n", err)
 	}
 }
 
@@ -49,7 +49,7 @@ func (env Environment) Compile(script string) {
 
 	_, err := vm.Execute(env.Env, nil, script)
 	if err != nil {
-		log.Fatalf("Execute error: %v\n", err)
+		log.Fatalf("Compile environment error: %v\n", err)
 	}
 }
 
@@ -57,7 +57,7 @@ func (env Environment) Compile(script string) {
 func (env Environment) Execute(script string) interface{} {
 	output, err := vm.Execute(env.Env, nil, script)
 	if err != nil {
-		log.Fatalf("Execute error: %v\n", err)
+		log.Fatalf("Execute environment error: %v\n", err)
 	}
 
 	return output
