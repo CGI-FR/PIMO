@@ -19,67 +19,79 @@ package functions
 
 import (
 	"encoding/json"
+	"errors"
+	"fmt"
 	"reflect"
 )
 
-func getTypeFromString(t string) reflect.Type {
+func getTypeFromString(t string) (reflect.Type, error) {
 	switch t {
 	case "int64":
-		return reflect.TypeOf(int64(0))
+		return reflect.TypeOf(int64(0)), nil
 	case "int32":
-		return reflect.TypeOf(int32(0))
+		return reflect.TypeOf(int32(0)), nil
 	case "int16":
-		return reflect.TypeOf(int16(0))
+		return reflect.TypeOf(int16(0)), nil
 	case "int8":
-		return reflect.TypeOf(int8(0))
+		return reflect.TypeOf(int8(0)), nil
 	case "uint":
-		return reflect.TypeOf(uint(0))
+		return reflect.TypeOf(uint(0)), nil
 	case "uint64":
-		return reflect.TypeOf(uint64(0))
+		return reflect.TypeOf(uint64(0)), nil
 	case "uint32":
-		return reflect.TypeOf(uint32(0))
+		return reflect.TypeOf(uint32(0)), nil
 	case "uint16":
-		return reflect.TypeOf(uint16(0))
+		return reflect.TypeOf(uint16(0)), nil
 	case "uint8":
-		return reflect.TypeOf(uint8(0))
+		return reflect.TypeOf(uint8(0)), nil
 	case "float64":
-		return reflect.TypeOf(float64(0))
+		return reflect.TypeOf(float64(0)), nil
 	case "float32":
-		return reflect.TypeOf(float32(0))
+		return reflect.TypeOf(float32(0)), nil
 	case "string":
-		return reflect.TypeOf("0")
+		return reflect.TypeOf("0"), nil
 	case "json.Number":
-		return reflect.TypeOf(json.Number("0"))
+		return reflect.TypeOf(json.Number("0")), nil
 	case "bool":
-		return reflect.TypeOf(true)
-	case "":
-		panic("")
+		return reflect.TypeOf(true), nil
 	default:
-		panic("")
+		return nil, errors.New("No type declared in the yaml configuration file")
 	}
 }
 
-func GetFunction(params map[string]string, ret string, ankowrapper func(...interface{}) interface{}) reflect.Value {
+func BuildFunction(params map[string]string, ret string,
+	ankowrapper func(args ...interface{}) (interface{}, error),
+) (reflect.Value, error) {
 	paramsType := []reflect.Type{}
 
 	for _, t := range params {
-		paramsType = append(paramsType, getTypeFromString(t))
+		typeString, err := getTypeFromString(t)
+		if err != nil {
+			return reflect.Value{}, fmt.Errorf("cannot build function: %w", err)
+		}
+
+		paramsType = append(paramsType, typeString)
 	}
 
-	typefn := reflect.FuncOf(paramsType, []reflect.Type{getTypeFromString(ret)}, false)
+	typeStringReturn, err := getTypeFromString(ret)
+	if err != nil {
+		return reflect.Value{}, fmt.Errorf("cannot build function: %w", err)
+	}
 
-	wrapfn := func(args []reflect.Value) (results []reflect.Value) {
+	typefn := reflect.FuncOf(paramsType, []reflect.Type{typeStringReturn}, false)
+
+	wrapfn := func(args []reflect.Value) []reflect.Value {
 		argsInterface := []interface{}{}
 		for i := range args {
 			argsInterface = append(argsInterface, args[i].Interface())
 		}
 
-		result := ankowrapper(argsInterface...)
+		result, _ := ankowrapper(argsInterface...)
 
 		return []reflect.Value{reflect.ValueOf(result)}
 	}
 
 	fn := reflect.MakeFunc(typefn, wrapfn)
 
-	return fn
+	return fn, nil
 }

@@ -19,7 +19,6 @@ package model
 
 import (
 	"fmt"
-	"log"
 	"math"
 
 	"github.com/mattn/anko/env"
@@ -30,37 +29,49 @@ type Environment struct {
 	Env *env.Env
 }
 
-// DefinePackage defines the packages that can be used.
-func (env Environment) DefinePackage() {
-	err := env.Env.Define("println", fmt.Println)
-	if err != nil {
-		log.Fatalf("Define error: %v\n", err)
+func NewEnvironment() Environment {
+	e := env.NewEnv()
+
+	if err := DefinePackage(e); err != nil {
+		return Environment{}
 	}
 
-	err = env.Env.Define("pow", math.Pow)
-	if err != nil {
-		log.Fatalf("Define package error: %v\n", err)
+	return Environment{e}
+}
+
+// DefinePackage defines the packages that can be used.
+func DefinePackage(e *env.Env) error {
+	if err := e.Define("println", fmt.Println); err != nil {
+		return fmt.Errorf("cannot define package: %w", err)
 	}
+
+	if err := e.Define("pow", math.Pow); err != nil {
+		return fmt.Errorf("cannot define package: %w", err)
+	}
+
+	return nil
 }
 
 // Compile returns the environment needed for a VM to run in after compiling the script.
-func (env Environment) Compile(script string) {
-	env.DefinePackage()
+func (env Environment) Compile(script string) error {
+	// env.DefinePackage()
 
 	_, err := vm.Execute(env.Env, nil, script)
 	if err != nil {
-		log.Fatalf("Compile environment error: %v\n", err)
+		return fmt.Errorf("cannot compile environment: %w", err)
 	}
+
+	return nil
 }
 
 // Execute parses script and executes in the specified environment.
-func (env Environment) Execute(script string) interface{} {
+func (env Environment) Execute(script string) (interface{}, error) {
 	output, err := vm.Execute(env.Env, nil, script)
 	if err != nil {
-		log.Fatalf("Execute environment error: %v\n", err)
+		return nil, fmt.Errorf("cannot execute environment: %w", err)
 	}
 
-	return output
+	return output, nil
 }
 
 func (f Function) Build(name string) string {

@@ -32,11 +32,13 @@ func TestExecute(t *testing.T) {
 			    }`
 
 	env := Environment{Env: env.NewEnv()}
-	env.Compile(function)
+	err := env.Compile(function)
+	assert.Nil(t, err)
 
 	template := `add(4,6)`
 
-	result := env.Execute(template)
+	result, err := env.Execute(template)
+	assert.Nil(t, err)
 
 	assert.Equal(t, result, int64(10))
 }

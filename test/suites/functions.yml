@@ -10,6 +10,7 @@ testcases:
         "add":
           params:
             "i": "int64"
+          returns: "int64"
           body: |-
             return i + 10
       masking:
@@ -24,6 +25,44 @@ testcases:
     - result.code ShouldEqual 0
     - result.systemoutjson.value ShouldEqual 15
     - result.systemerr ShouldBeEmpty
+
+# - name: declaring multiple fonctions and using in template
+#   steps:
+#   - script: rm -f masking.yml
+#   - script: |-
+#       cat > masking.yml <<EOF
+#       version: "1"
+#       functions:
+#         "add":
+#           params:
+#             "i": "int64"
+#           returns: "int64"
+#           body: |-
+#             return i + 10
+#         "sub":
+#           params:
+#             "x": "int64"
+#             "y": "int64"
+#           returns: "int64"
+#           body: |-
+#             return x - y
+#       masking:
+#         - selector:
+#             jsonpath: "addValue"
+#           mask:
+#             template: '{{add 5}}'
+#         - selector:
+#             jsonpath: "subValue"
+#           mask:
+#             template: '{{sub 10 5}}'
+#       EOF
+#   - script: |-
+#       echo '{"value": "15"}' | pimo
+#     assertions:
+#     - result.code ShouldEqual 0
+#     - result.systemoutjson.addValue ShouldEqual 15
+#     - result.systemoutjson.subValue ShouldEqual 5
+#     - result.systemerr ShouldBeEmpty
 
 # - name: declaring fonctions and using in a mask without paramsFromContext
 #   steps:

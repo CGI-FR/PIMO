@@ -27,7 +27,6 @@ import (
 
 	"github.com/cgi-fr/pimo/pkg/functions"
 	"github.com/goccy/go-yaml"
-	"github.com/mattn/anko/env"
 )
 
 // nolint: gochecknoglobals
@@ -67,32 +66,48 @@ func BuildCaches(caches map[string]CacheDefinition, existing map[string]Cache) m
 	return existing
 }
 
-func BuildFunctions(funcs map[string]Function) tmpl.FuncMap {
+func BuildFuncMap(funcs map[string]Function) (tmpl.FuncMap, error) {
 	funcMap := make(tmpl.FuncMap)
 
 	if len(funcs) == 0 {
-		return funcMap
+		return funcMap, nil
 	}
 
-	env := Environment{Env: env.NewEnv()}
+	// env := Environment{Env: env.NewEnv()}
+	env := NewEnvironment()
 
 	for name, f := range funcs {
-		env.Compile(f.Build(name))
-
-		ankowrapper := func(args ...interface{}) interface{} {
-			joined := strings.Trim(strings.Join(strings.Fields(fmt.Sprint(args)), ","), "[]")
-			return env.Execute(fmt.Sprintf(name+"(%s)", joined))
+		err := env.Compile(f.Build(name))
+		if err != nil {
+			return nil, fmt.Errorf("cannot compile function: %w", err)
 		}
 
-		funcMap[name] = functions.GetFunction(f.Params, "int64", ankowrapper).Interface()
+		ankowrapper := func(args ...interface{}) (interface{}, error) {
+			joined := strings.Trim(strings.Join(strings.Fields(fmt.Sprint(args)), ","), "[]")
+			output, err := env.Execute(fmt.Sprintf(name+"(%s)", joined))
+			if err != nil {
+				return nil, fmt.Errorf("cannot wrap anko function: %w", err)
+			}
+			return output, nil
+		}
+
+		function, err := functions.BuildFunction(f.Params, f.Returns, ankowrapper)
+		if err != nil {
+			return funcMap, errors.New(err.Error() + " for " + name + " function")
+		}
+
+		funcMap[name] = function.Interface()
 	}
 
-	return funcMap
+	return funcMap, nil
 }
 
 func BuildPipeline(pipeline Pipeline, conf Definition, caches map[string]Cache) (Pipeline, map[string]Cache, error) {
 	caches = BuildCaches(conf.Caches, caches)
-	functions := BuildFunctions(conf.Functions)
+	functions, err := BuildFuncMap(conf.Functions)
+	if err != nil {
+		return nil, nil, errors.New(err.Error())
+	}
 	cleaners := []Processor{}
 
 	for _, masking := range conf.Masking {

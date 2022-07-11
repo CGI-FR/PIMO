@@ -212,8 +212,9 @@ type CacheDefinition struct {
 	Reverse bool `yaml:"reverse,omitempty" jsonschema_description:"Reverse the cache, keys will be used as values, and values will be used as keys"`
 }
 type Function struct {
-	Params map[string]string `yaml:"params" jsonschema_description:"Declare parameters function"`
-	Body   string            `yaml:"body" jsonschema_description:"Declare body function"`
+	Params  map[string]string `yaml:"params" jsonschema_description:"Declare parameters function"`
+	Returns string            `yaml:"returns" jsonschema_description:"Declare return type of function"`
+	Body    string            `yaml:"body" jsonschema_description:"Declare body function"`
 }
 
 type Definition struct {

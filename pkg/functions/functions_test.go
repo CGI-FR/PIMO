@@ -27,9 +27,11 @@ import (
 func TestGetTypeFromString(t *testing.T) {
 	t.Parallel()
 
-	type1 := getTypeFromString("int64")
+	type1, err1 := getTypeFromString("int64")
+	assert.Nil(t, err1)
 	assert.Equal(t, reflect.TypeOf(int64(25)), type1)
 
-	type2 := getTypeFromString("string")
+	type2, err2 := getTypeFromString("string")
+	assert.Nil(t, err2)
 	assert.Equal(t, reflect.TypeOf("hello"), type2)
 }
