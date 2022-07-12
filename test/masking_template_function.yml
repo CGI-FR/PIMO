@@ -1,0 +1,14 @@
+version: "1"
+functions:
+  "print":
+    params:
+      - name: "str"
+        type: "string"
+    returns: "string"
+    body: |-
+      return str
+masking:
+  - selector:
+      jsonpath: "text"
+    mask:
+      template: '{{print "hello"}}'

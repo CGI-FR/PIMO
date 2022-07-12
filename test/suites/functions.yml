@@ -27,6 +27,50 @@ testcases:
     - result.systemoutjson.value ShouldEqual 15
     - result.systemerr ShouldBeEmpty
 
+- name: declaring fonctions with string parameter
+  steps:
+  - script: rm -f masking.yml
+  - script: cp ../masking_template_function.yml masking.yml
+  - script: |-
+      echo '{"text": ""}' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemoutjson.text ShouldEqual hello
+    - result.systemerr ShouldBeEmpty
+
+- name: declaring fonctions with boolean parameter
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      functions:
+        "isEmpty":
+          params:
+            - name: "empty"
+              type: "bool"
+          returns: "string"
+          body: |-
+            if empty {
+              return "Is empty"
+            }
+            return "Is not empty"
+      masking:
+        - selector:
+            jsonpath: "value"
+          mask:
+            template: '{{isEmpty false}}'
+            EOF
+  - script: |-
+      echo '{"value": "1"}' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemoutjson.value ShouldEqual "Is not empty"
+    - result.systemerr ShouldBeEmpty
+
+
+
+
 # - name: declaring multiple fonctions and using in template
 #   steps:
 #   - script: rm -f masking.yml

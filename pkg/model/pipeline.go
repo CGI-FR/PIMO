@@ -82,7 +82,15 @@ func BuildFuncMap(funcs map[string]Function) (tmpl.FuncMap, error) {
 		}
 
 		ankowrapper := func(args ...interface{}) (interface{}, error) {
-			joined := strings.Trim(strings.Join(strings.Fields(fmt.Sprint(args)), ","), "[]")
+			var joined string
+			for _, arg := range args {
+				switch arg.(type) {
+				case string:
+					joined = fmt.Sprintf("\"%s\"", strings.Trim(strings.Join(strings.Fields(fmt.Sprint(args)), ","), "[]"))
+				default:
+					joined = strings.Trim(strings.Join(strings.Fields(fmt.Sprint(args)), ","), "[]")
+				}
+			}
 			output, err := env.Execute(fmt.Sprintf("%s(%s)", name, joined))
 			if err != nil {
 				return nil, fmt.Errorf("cannot execute function: %w", err)
