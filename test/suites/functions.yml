@@ -9,7 +9,8 @@ testcases:
       functions:
         "add":
           params:
-            "i": "int64"
+            - name: "i"
+              type: "int64"
           returns: "int64"
           body: |-
             return i + 10
@@ -20,7 +21,7 @@ testcases:
             template: '{{add 5}}'
       EOF
   - script: |-
-      echo '{"value": "15"}' | pimo
+      echo '{"value": "1"}' | pimo
     assertions:
     - result.code ShouldEqual 0
     - result.systemoutjson.value ShouldEqual 15

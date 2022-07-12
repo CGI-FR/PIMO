@@ -55,16 +55,16 @@ func getTypeFromString(t string) (reflect.Type, error) {
 	case "bool":
 		return reflect.TypeOf(true), nil
 	default:
-		return nil, errors.New("No type declared in the yaml configuration file")
+		return nil, errors.New("Invalid type declared in the yaml configuration file")
 	}
 }
 
-func BuildFunction(params map[string]string, ret string,
+func BuildFunction(types []string, ret string,
 	ankowrapper func(args ...interface{}) (interface{}, error),
 ) (reflect.Value, error) {
 	paramsType := []reflect.Type{}
 
-	for _, t := range params {
+	for _, t := range types {
 		typeString, err := getTypeFromString(t)
 		if err != nil {
 			return reflect.Value{}, fmt.Errorf("cannot build function: %w", err)
@@ -86,7 +86,10 @@ func BuildFunction(params map[string]string, ret string,
 			argsInterface = append(argsInterface, args[i].Interface())
 		}
 
-		result, _ := ankowrapper(argsInterface...)
+		result, err := ankowrapper(argsInterface...)
+		if err != nil {
+			panic(err)
+		}
 
 		return []reflect.Value{reflect.ValueOf(result)}
 	}

@@ -73,7 +73,6 @@ func BuildFuncMap(funcs map[string]Function) (tmpl.FuncMap, error) {
 		return funcMap, nil
 	}
 
-	// env := Environment{Env: env.NewEnv()}
 	env := NewEnvironment()
 
 	for name, f := range funcs {
@@ -84,14 +83,19 @@ func BuildFuncMap(funcs map[string]Function) (tmpl.FuncMap, error) {
 
 		ankowrapper := func(args ...interface{}) (interface{}, error) {
 			joined := strings.Trim(strings.Join(strings.Fields(fmt.Sprint(args)), ","), "[]")
-			output, err := env.Execute(fmt.Sprintf(name+"(%s)", joined))
+			output, err := env.Execute(fmt.Sprintf("%s(%s)", name, joined))
 			if err != nil {
-				return nil, fmt.Errorf("cannot wrap anko function: %w", err)
+				return nil, fmt.Errorf("cannot execute function: %w", err)
 			}
 			return output, nil
 		}
 
-		function, err := functions.BuildFunction(f.Params, f.Returns, ankowrapper)
+		types := []string{}
+		for _, param := range f.Params {
+			types = append(types, param.Type)
+		}
+
+		function, err := functions.BuildFunction(types, f.Returns, ankowrapper)
 		if err != nil {
 			return funcMap, errors.New(err.Error() + " for " + name + " function")
 		}
@@ -106,7 +110,7 @@ func BuildPipeline(pipeline Pipeline, conf Definition, caches map[string]Cache) 
 	caches = BuildCaches(conf.Caches, caches)
 	functions, err := BuildFuncMap(conf.Functions)
 	if err != nil {
-		return nil, nil, errors.New(err.Error())
+		return nil, nil, err
 	}
 	cleaners := []Processor{}
 

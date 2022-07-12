@@ -120,12 +120,10 @@
     "Function": {
       "properties": {
         "params": {
-          "patternProperties": {
-            ".*": {
-              "type": "string"
-            }
+          "items": {
+            "$ref": "#/$defs/Param"
           },
-          "type": "object",
+          "type": "array",
           "description": "Declare parameters function"
         },
         "returns": {
@@ -609,6 +607,24 @@
       },
       "additionalProperties": false,
       "type": "object"
+    },
+    "Param": {
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Declare name parameters"
+        },
+        "type": {
+          "type": "string",
+          "description": "Declare type parameters"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "name",
+        "type"
+      ]
     },
     "PipeType": {
       "properties": {

@@ -46,8 +46,7 @@ func TestExecute(t *testing.T) {
 func TestBuildScriptFunction(t *testing.T) {
 	t.Parallel()
 
-	Param := make(map[string]string)
-	Param["i"] = "int64"
+	Param := []Param{{Name: "i", Type: "int64"}}
 
 	function := Function{Params: Param, Body: "return i + 1"}
 

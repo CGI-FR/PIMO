@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"math"
 
+	"github.com/mattn/anko/core"
 	"github.com/mattn/anko/env"
 	"github.com/mattn/anko/vm"
 )
@@ -41,9 +42,7 @@ func NewEnvironment() Environment {
 
 // DefinePackage defines the packages that can be used.
 func DefinePackage(e *env.Env) error {
-	if err := e.Define("println", fmt.Println); err != nil {
-		return fmt.Errorf("cannot define package: %w", err)
-	}
+	e = core.Import(e)
 
 	if err := e.Define("pow", math.Pow); err != nil {
 		return fmt.Errorf("cannot define package: %w", err)
@@ -78,11 +77,11 @@ func (f Function) Build(name string) string {
 	script := ""
 	params := ""
 	i := 0
-	for nameP := range f.Params {
+	for _, param := range f.Params {
 		if i == 0 {
-			params += nameP
+			params += param.Name
 		} else {
-			params += "," + nameP
+			params += "," + param.Name
 		}
 		i++
 	}
