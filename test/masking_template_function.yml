@@ -1,6 +1,6 @@
 version: "1"
 functions:
-  "print":
+  print:
     params:
       - name: "str"
         type: "string"
