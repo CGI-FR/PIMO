@@ -14,6 +14,10 @@ Types of changes
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [1.15.0]
+
+- `Added` functions section in masking configuration
+
 ## [1.14.1]
 
 - `Fixed` click on examples does not reload webpage on the PIMO Play website

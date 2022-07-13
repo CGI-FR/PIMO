@@ -9,6 +9,8 @@ PIMO requires a yaml configuration file to works. By default, the file is named 
 ```yaml
 version: "1"
 seed: 42
+functions:
+    # Optional define functions
 masking:
   - selector:
       jsonpath: "example.example"
@@ -37,6 +39,7 @@ caches:
 
 `version` is the version of the masking file.
 `seed` is to give every random mask the same seed, it is optional and if it is not defined, the seed is derived from the current time to increase randomness.
+`functions` is used to define the functions that can be used in the te mask `template`, `template-each`, `add`, and `add-transient`.
 `masking` is used to define the pipeline of masks that is going to be applied.
 `selector` is made of a jsonpath and a mask.
 `jsonpath` defines the path of the entry that has to be masked in the json file.
@@ -63,6 +66,37 @@ Masks can be applied on multiple selectors, like in this example:
       - jsonpath: "example2"
     mask:
       add: "hello"
+```
+
+It is possible to define functions and reuse them later in the masks, like in this example:
+
+```yaml
+functions:
+  add20:
+    params:
+      - name: "i"
+        type: "int64"
+    returns: "int64"
+    body: |-
+      return i + 20
+  sub:
+    params:
+      - name: "x"
+        type: "int64"
+      - name: "y"
+        type: "int64"
+    returns: "int64"
+    body: |-
+      return x - y
+masking:
+  - selector:
+      jsonpath: "addValue"
+    mask:
+      template: '{{add20 5}}'
+  - selector:
+      jsonpath: "subValue"
+    mask:
+      template: '{{sub 10 5}}'
 ```
 
 ## Possible masks
