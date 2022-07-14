@@ -26,6 +26,8 @@ import (
 
 func getTypeFromString(t string) (reflect.Type, error) {
 	switch t {
+	case "int":
+		return reflect.TypeOf(int(0)), nil
 	case "int64":
 		return reflect.TypeOf(int64(0)), nil
 	case "int32":

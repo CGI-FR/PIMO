@@ -76,6 +76,7 @@ func BuildFuncMap(funcs map[string]Function) (tmpl.FuncMap, error) {
 	env := NewEnvironment()
 
 	for name, f := range funcs {
+		name := name // https://stackoverflow.com/a/26694016/2531684
 		err := env.Compile(f.Build(name))
 		if err != nil {
 			return nil, fmt.Errorf("cannot compile function: %w", err)
