@@ -105,7 +105,6 @@ testcases:
       echo '{"addValue": "1", "subValue": "2"}' | pimo
     assertions:
     - result.code ShouldEqual 0
-    - result.systemoutjson.addValue ShouldEqual 15
-    - result.systemoutjson.subValue ShouldEqual 5
+    - result.systemout ShouldEqual {"addValue":"15","subValue":"5"}
     - result.systemerr ShouldBeEmpty
 
