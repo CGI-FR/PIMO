@@ -77,7 +77,7 @@ testcases:
       functions:
         add:
           params:
-            - name: "i":
+            - name: "i"
               type: "int64"
           returns: "int64"
           body: |-
