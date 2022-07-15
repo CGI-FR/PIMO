@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1657025360200,
+  "lastUpdate": 1657895595099,
   "repoUrl": "https://github.com/CGI-FR/PIMO",
   "entries": {
     "Benchmark": [
@@ -1254,6 +1254,42 @@ window.BENCHMARK_DATA = {
             "value": 3865152,
             "unit": "ns/op\t  628553 B/op\t    5489 allocs/op",
             "extra": "3068 times\n2 procs"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "89643755+giraud10@users.noreply.github.com",
+            "name": "giraud10",
+            "username": "giraud10"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "ddd3337959282f6b92b5c87645d2f0c0730d8be4",
+          "message": "feat: enrich template functions by yaml definition (#139)\n\n* test: add tests venom\r\n\r\n* feat: add package script\r\n\r\n* feat: remove duplicate code\r\n\r\n* feat: add functions to MaskFactoryConfiguration\r\n\r\n* feat: add new Function struct\r\n\r\n* feat: update Function struct\r\n\r\n* feat: add package functions\r\n\r\n* feat: manage errors\r\n\r\n* feat: change Params struct\r\n\r\n* test: add venom test for string and boolean parameter\r\n\r\n* docs: update README and CHANGELOG\r\n\r\n* test: add test venom (define multiple functions)\r\n\r\n* feat(functions): fix multiple funcs bug\r\n\r\n* feat(functions): fix venom test\r\n\r\n* feat(functions): fix venom bug ...\r\n\r\n* refactor(functions): simplify code\r\n\r\n* style(functions): fix linting error\r\n\r\n* fix(functions): fix string param\r\n\r\n* fix(functions): fix param interpreter\r\n\r\n* test: add function in test bench (#143)\r\n\r\n* test(functions): update code\r\n\r\n* test(functions): remove type and returns\r\n\r\n* fix(functions): Inf and NaN cases\r\n\r\n* fix(functions): remove pow function\r\n\r\n* fix(functions): linting\r\n\r\nCo-authored-by: Adrien Aury <adrien.aury@cgi.com>\r\nCo-authored-by: Youen Péron <youen.peron@cgi.com>",
+          "timestamp": "2022-07-15T16:29:14+02:00",
+          "tree_id": "febe595ab963eebeae10f9cb1888e03482e9b3b0",
+          "url": "https://github.com/CGI-FR/PIMO/commit/ddd3337959282f6b92b5c87645d2f0c0730d8be4"
+        },
+        "date": 1657895594530,
+        "tool": "go",
+        "benches": [
+          {
+            "name": "BenchmarkPimoRun",
+            "value": 263698,
+            "unit": "ns/op\t   16691 B/op\t     204 allocs/op",
+            "extra": "44097 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge",
+            "value": 3445417,
+            "unit": "ns/op\t  691978 B/op\t    5951 allocs/op",
+            "extra": "3400 times\n2 procs"
           }
         ]
       }
