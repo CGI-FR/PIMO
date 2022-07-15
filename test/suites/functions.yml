@@ -1,0 +1,101 @@
+name: functions features
+testcases:
+- name: declaring fonctions and using in template
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      functions:
+        add:
+          params:
+            - name: "i"
+          body: |-
+            return i + 10
+      masking:
+        - selector:
+            jsonpath: "value"
+          mask:
+            template: '{{add 5}}'
+      EOF
+  - script: |-
+      echo '{"value": "1"}' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemoutjson.value ShouldEqual 15
+    - result.systemerr ShouldBeEmpty
+
+- name: declaring fonctions with string parameter
+  steps:
+  - script: rm -f masking.yml
+  - script: cp ../masking_template_function.yml masking.yml
+  - script: |-
+      echo '{"text": ""}' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemoutjson.text ShouldEqual hello
+    - result.systemerr ShouldBeEmpty
+
+- name: declaring fonctions with boolean parameter
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      functions:
+        "isEmpty":
+          params:
+            - name: "empty"
+          body: |-
+            if empty {
+              return "Is empty"
+            }
+            return "Is not empty"
+      masking:
+        - selector:
+            jsonpath: "value"
+          mask:
+            template: '{{isEmpty false}}'
+            EOF
+  - script: |-
+      echo '{"value": "1"}' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemoutjson.value ShouldEqual "Is not empty"
+    - result.systemerr ShouldBeEmpty
+
+- name: declaring multiple fonctions and using in template
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      functions:
+        add:
+          params:
+            - name: "i"
+          body: |-
+            return i + 10
+        sub:
+          params:
+            - name: "x"
+            - name: "y"
+          body: |-
+            return x - y
+      masking:
+        - selector:
+            jsonpath: "addValue"
+          mask:
+            template: '{{add 5}}'
+        - selector:
+            jsonpath: "subValue"
+          mask:
+            template: '{{sub 10 5}}'
+      EOF
+  - script: |-
+      echo '{"addValue": "1", "subValue": "2"}' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldEqual {"addValue":"15","subValue":"5"}
+    - result.systemerr ShouldBeEmpty
+

@@ -19,6 +19,7 @@ package add
 
 import (
 	"bytes"
+	tmpl "text/template"
 
 	"github.com/cgi-fr/pimo/pkg/model"
 	"github.com/cgi-fr/pimo/pkg/template"
@@ -32,9 +33,9 @@ type MaskEngine struct {
 }
 
 // NewMask return a MaskEngine from a value
-func NewMask(value model.Entry) (MaskEngine, error) {
+func NewMask(value model.Entry, tmpl tmpl.FuncMap) (MaskEngine, error) {
 	if tmplstr, ok := value.(string); ok {
-		temp, err := template.NewEngine(tmplstr)
+		temp, err := template.NewEngine(tmplstr, tmpl)
 		return MaskEngine{value, temp}, err
 	}
 	return MaskEngine{value, nil}, nil
@@ -62,7 +63,7 @@ func (am MaskEngine) MaskContext(context model.Dictionary, key string, contexts 
 // Create a mask from a configuration
 func Factory(conf model.MaskFactoryConfiguration) (model.MaskContextEngine, bool, error) {
 	if conf.Masking.Mask.Add != nil {
-		mask, err := NewMask(conf.Masking.Mask.Add)
+		mask, err := NewMask(conf.Masking.Mask.Add, conf.Functions)
 		return mask, true, err
 	}
 	return nil, false, nil

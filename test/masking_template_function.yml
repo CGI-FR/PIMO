@@ -1,0 +1,12 @@
+version: "1"
+functions:
+  print:
+    params:
+      - name: "str"
+    body: |-
+      return str
+masking:
+  - selector:
+      jsonpath: "text"
+    mask:
+      template: '{{print "hello"}}'
