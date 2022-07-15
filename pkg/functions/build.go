@@ -66,9 +66,9 @@ func (d Definition) AsCall(name string, args ...interface{}) string {
 	for _, arg := range args {
 		switch arg.(type) {
 		case string:
-			joined = fmt.Sprintf("\"%s\"", strings.Trim(strings.Join(strings.Fields(fmt.Sprint(args)), ","), "[]"))
+			joined = fmt.Sprintf("\"%s\"", strings.Trim(strings.Join(strings.Fields(fmt.Sprint(args...)), ","), "[]"))
 		default:
-			joined = strings.Trim(strings.Join(strings.Fields(fmt.Sprint(args)), ","), "[]")
+			joined = strings.Trim(strings.Join(strings.Fields(fmt.Sprint(args...)), ","), "[]")
 		}
 	}
 	return fmt.Sprintf("%s(%s)", name, joined)
