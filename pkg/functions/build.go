@@ -18,6 +18,7 @@
 package functions
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 	"text/template"
@@ -25,13 +26,11 @@ import (
 
 type ParamDefinition struct {
 	Name string
-	Type string
 }
 
 type Definition struct {
-	Params  []ParamDefinition
-	Returns string
-	Body    string
+	Params []ParamDefinition
+	Body   string
 }
 
 type Builder struct {
@@ -62,16 +61,18 @@ func (d Definition) AsScript(name string) string {
 
 // AsCall returns a call instruction of the function with the given param values.
 func (d Definition) AsCall(name string, args ...interface{}) string {
-	var joined string
-	for _, arg := range args {
-		switch arg.(type) {
-		case string:
-			joined = fmt.Sprintf("\"%s\"", strings.Trim(strings.Join(strings.Fields(fmt.Sprint(args...)), ","), "[]"))
-		default:
-			joined = strings.Trim(strings.Join(strings.Fields(fmt.Sprint(args...)), ","), "[]")
+	result := &strings.Builder{}
+	result.WriteString(name)
+	result.WriteByte('(')
+	for i, arg := range args {
+		if i > 0 {
+			result.WriteByte(',')
 		}
+		b, _ := json.Marshal(arg)
+		result.Write(b)
 	}
-	return fmt.Sprintf("%s(%s)", name, joined)
+	result.WriteByte(')')
+	return result.String()
 }
 
 // Build returns a FuncMap (map[string]interface{}) that can be used in Go Template API, with all functions.
@@ -93,7 +94,7 @@ func (b Builder) Build() (template.FuncMap, error) {
 		}
 
 		wrapper := func(args ...interface{}) (interface{}, error) {
-			output, err := env.Execute(def.AsCall(name, args))
+			output, err := env.Execute(def.AsCall(name, args...))
 			if err != nil {
 				return nil, fmt.Errorf("cannot execute function: %w", err)
 			}
