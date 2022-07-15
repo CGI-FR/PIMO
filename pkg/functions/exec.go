@@ -40,7 +40,7 @@ func NewEnvironment() Environment {
 }
 
 func (e Environment) init() error {
-	e.env = core.Import(e.env)
+	core.Import(e.env)
 
 	return nil
 }
