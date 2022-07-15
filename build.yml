@@ -249,6 +249,7 @@ targets:
     doc: "Examine source code and report suspicious constructs"
     depends: ["info", "refresh"]
     steps:
+      - $: 'killall golangci-lint || :'
       - if: len(linters) == 0
         then:
           - $: golangci-lint run --enable-all ={replace(join(appendpath("--disable", lintersno), " "), "/", " ")}

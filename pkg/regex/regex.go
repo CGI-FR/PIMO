@@ -79,10 +79,10 @@ func Factory(conf model.MaskFactoryConfiguration) (model.MaskEngine, bool, error
 	return nil, false, nil
 }
 
-func Func(seed int64) func(regex string) (model.Entry, error) {
+func Func(seed int64) interface{} {
 	var callnumber int64
 	return func(regex string) (model.Entry, error) {
-		mask, err := NewMask(regex, seed+callnumber)
+		mask, err := NewMask(regex, seed+callnumber, model.NewSeeder(model.Masking{}, 0))
 		if err != nil {
 			return "", err
 		}

@@ -53,6 +53,7 @@ import (
 	"github.com/cgi-fr/pimo/pkg/remove"
 	"github.com/cgi-fr/pimo/pkg/replacement"
 	"github.com/cgi-fr/pimo/pkg/statistics"
+	"github.com/cgi-fr/pimo/pkg/template"
 	"github.com/cgi-fr/pimo/pkg/templateeach"
 	"github.com/cgi-fr/pimo/pkg/templatemask"
 	"github.com/cgi-fr/pimo/pkg/transcode"
@@ -134,6 +135,7 @@ func (ctx *Context) Configure(cfg Config) error {
 		Process(model.NewRepeaterProcess(cfg.Iteration))
 	over.AddGlobalFields("input-line")
 
+	injectTemplateFuncs()
 	model.InjectMaskContextFactories(injectMaskContextFactories())
 	model.InjectMaskFactories(injectMaskFactories())
 	model.InjectConfig(cfg.SkipLineOnError, cfg.SkipFieldOnError)
@@ -299,6 +301,10 @@ func injectMaskFactories() []model.MaskFactory {
 		markov.Factory,
 		transcode.Factory,
 	}
+}
+
+func injectTemplateFuncs() {
+	template.InjectSeededFuncGenerator("MaskRegex", regex.Func)
 }
 
 var re = regexp.MustCompile(`(\[\d*\])?$`)

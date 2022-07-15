@@ -23,7 +23,6 @@ import (
 
 	"github.com/cgi-fr/pimo/pkg/model"
 	"github.com/cgi-fr/pimo/pkg/template"
-  "github.com/cgi-fr/pimo/pkg/regex"
 	"github.com/rs/zerolog/log"
 )
 
@@ -34,8 +33,7 @@ type MaskEngine struct {
 
 // NewMask create a MaskEngine
 func NewMask(text string, funcs tmpl.FuncMap, seed int64) (MaskEngine, error) {
-  funcs["MaskRegex"] = regex.Func(seed)
-	temp, err := template.NewEngine(text, funcs)
+	temp, err := template.NewEngine(text, funcs, 0)
 	return MaskEngine{temp}, err
 }
 

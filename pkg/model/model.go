@@ -306,7 +306,7 @@ func (source *SourceFromSlice) Open() error {
 }
 
 func NewRepeaterUntilProcess(source *TempSource, text, mode string) (Processor, error) {
-	eng, err := template.NewEngine(text, tmpl.FuncMap{})
+	eng, err := template.NewEngine(text, tmpl.FuncMap{}, 0)
 
 	return RepeaterUntilProcess{eng, source, mode}, err
 }

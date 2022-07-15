@@ -64,7 +64,7 @@ func TestFactoryShouldCreateAMask(t *testing.T) {
 	maskingConfig := model.Masking{Selector: model.SelectorType{Jsonpath: "mail"}, Mask: model.MaskType{Template: "{{.name}}.{{.surname}}@gmail.com"}}
 	factoryConfig := model.MaskFactoryConfiguration{Masking: maskingConfig, Seed: 0, Functions: make(tmpl.FuncMap)}
 	config, present, err := Factory(factoryConfig)
-  assert.Nil(t, err, "error should be nil")
+	assert.Nil(t, err, "error should be nil")
 	maskingEngine, _ := NewMask("{{.name}}.{{.surname}}@gmail.com", tmpl.FuncMap{}, 0)
 	assert.IsType(t, maskingEngine, config, "should be equal")
 	assert.True(t, present, "should be true")
@@ -97,7 +97,6 @@ func TestFactoryShouldReturnAnErrorInWrongConfig(t *testing.T) {
 func TestMaskingTemplateShouldFormat(t *testing.T) {
 	template := `{{"hello!" | upper | repeat 2}}`
 	tempMask, err := NewMask(template, tmpl.FuncMap{}, 0)
-
 	if err != nil {
 		assert.Fail(t, err.Error())
 	}
