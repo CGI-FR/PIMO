@@ -38,11 +38,10 @@ func BenchmarkPimoRun(b *testing.B) {
 		Functions: map[string]model.Function{
 			"addTest": {
 				Params: []model.Param{
-					{Name: "x", Type: "int64"},
-					{Name: "y", Type: "int64"},
+					{Name: "x"},
+					{Name: "y"},
 				},
-				Returns: "int64",
-				Body:    "return x + y",
+				Body: "return x + y",
 			},
 		},
 		Masking: []model.Masking{
@@ -118,11 +117,10 @@ func BenchmarkPimoRunLarge(b *testing.B) {
 		Functions: map[string]model.Function{
 			"addTest": {
 				Params: []model.Param{
-					{Name: "x", Type: "int64"},
-					{Name: "y", Type: "int64"},
+					{Name: "x"},
+					{Name: "y"},
 				},
-				Returns: "int64",
-				Body:    "return x + y",
+				Body: "return x + y",
 			},
 		},
 		Masking: []model.Masking{
