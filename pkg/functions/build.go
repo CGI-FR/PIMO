@@ -18,7 +18,6 @@
 package functions
 
 import (
-	"encoding/json"
 	"fmt"
 	"strings"
 	"text/template"
@@ -68,8 +67,17 @@ func (d Definition) AsCall(name string, args ...interface{}) string {
 		if i > 0 {
 			result.WriteByte(',')
 		}
-		b, _ := json.Marshal(arg)
-		result.Write(b)
+
+		switch typedArg := arg.(type) {
+		case string:
+			result.WriteByte('"')
+			result.WriteString(typedArg)
+			result.WriteByte('"')
+		case nil:
+			result.WriteString("nil")
+		default:
+			result.WriteString(fmt.Sprint(arg))
+		}
 	}
 	result.WriteByte(')')
 	return result.String()
