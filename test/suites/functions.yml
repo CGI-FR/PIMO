@@ -10,8 +10,6 @@ testcases:
         add:
           params:
             - name: "i"
-              type: "int64"
-          returns: "int64"
           body: |-
             return i + 10
       masking:
@@ -48,8 +46,6 @@ testcases:
         "isEmpty":
           params:
             - name: "empty"
-              type: "bool"
-          returns: "string"
           body: |-
             if empty {
               return "Is empty"
@@ -78,17 +74,12 @@ testcases:
         add:
           params:
             - name: "i"
-              type: "int64"
-          returns: "int64"
           body: |-
             return i + 10
         sub:
           params:
             - name: "x"
-              type: "int64"
             - name: "y"
-              type: "int64"
-          returns: "int64"
           body: |-
             return x - y
       masking:

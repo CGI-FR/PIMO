@@ -3,8 +3,6 @@ functions:
   print:
     params:
       - name: "str"
-        type: "string"
-    returns: "string"
     body: |-
       return str
 masking:
