@@ -47,12 +47,10 @@ func rmAcc(s string) string {
 }
 
 // NewMask create a MaskEngine
-func NewMask(text string, itemName string, indexName string) (MaskEngine, error) {
-	funcMap := template.FuncMap{
-		"ToUpper":  strings.ToUpper,
-		"ToLower":  strings.ToLower,
-		"NoAccent": rmAcc,
-	}
+func NewMask(text string, itemName string, indexName string, funcMap template.FuncMap) (MaskEngine, error) {
+	funcMap["ToUpper"] = strings.ToUpper
+	funcMap["ToLower"] = strings.ToLower
+	funcMap["NoAccent"] = rmAcc
 	temp, err := template.New("template-each").Funcs(sprig.TxtFuncMap()).Funcs(funcMap).Parse(text)
 	if len(itemName) == 0 {
 		itemName = "it"
@@ -104,7 +102,7 @@ func (tmpl MaskEngine) MaskContext(context model.Dictionary, key string, context
 // Factory create a mask from a yaml config
 func Factory(conf model.MaskFactoryConfiguration) (model.MaskContextEngine, bool, error) {
 	if len(conf.Masking.Mask.TemplateEach.Template) != 0 {
-		mask, err := NewMask(conf.Masking.Mask.TemplateEach.Template, conf.Masking.Mask.TemplateEach.Item, conf.Masking.Mask.TemplateEach.Index)
+		mask, err := NewMask(conf.Masking.Mask.TemplateEach.Template, conf.Masking.Mask.TemplateEach.Item, conf.Masking.Mask.TemplateEach.Index, conf.Functions)
 		if err != nil {
 			return nil, false, err
 		}

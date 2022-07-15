@@ -21,6 +21,7 @@ import (
 	"bytes"
 	"fmt"
 	"hash/fnv"
+	tmpl "text/template"
 	"time"
 
 	"github.com/cgi-fr/pimo/pkg/statistics"
@@ -64,9 +65,10 @@ func (fme FunctionMaskContextEngine) MaskContext(e Dictionary, key string, conte
 }
 
 type MaskFactoryConfiguration struct {
-	Masking Masking
-	Seed    int64
-	Cache   map[string]Cache
+	Masking   Masking
+	Seed      int64
+	Cache     map[string]Cache
+	Functions tmpl.FuncMap
 }
 
 type MaskFactory func(MaskFactoryConfiguration) (MaskEngine, bool, error)
@@ -209,12 +211,21 @@ type CacheDefinition struct {
 	Unique  bool `yaml:"unique,omitempty" jsonschema_description:"The cache will not allow a masked value to be used multiple times, the mask will be reapplied until a unique value is generated"`
 	Reverse bool `yaml:"reverse,omitempty" jsonschema_description:"Reverse the cache, keys will be used as values, and values will be used as keys"`
 }
+type Function struct {
+	Params []Param `yaml:"params" jsonschema_description:"Declare parameters function"`
+	Body   string  `yaml:"body" jsonschema_description:"Declare body function"`
+}
+
+type Param struct {
+	Name string `yaml:"name" jsonschema_description:"Declare name parameters"`
+}
 
 type Definition struct {
-	Version string                     `yaml:"version" jsonschema_description:"Version of the pipeline definition, use the value 1"`
-	Seed    int64                      `yaml:"seed,omitempty" jsonschema_description:"Initialize the Pseaudo-Random-Generator with the given value"`
-	Masking []Masking                  `yaml:"masking" jsonschema_description:"Masking pipeline definition"`
-	Caches  map[string]CacheDefinition `yaml:"caches,omitempty" jsonschema_description:"Declare in-memory caches"`
+	Version   string                     `yaml:"version" jsonschema_description:"Version of the pipeline definition, use the value 1"`
+	Seed      int64                      `yaml:"seed,omitempty" jsonschema_description:"Initialize the Pseaudo-Random-Generator with the given value"`
+	Functions map[string]Function        `yaml:"functions,omitempty" jsonschema_description:"Declare functions to be used in the masking"`
+	Masking   []Masking                  `yaml:"masking" jsonschema_description:"Masking pipeline definition"`
+	Caches    map[string]CacheDefinition `yaml:"caches,omitempty" jsonschema_description:"Declare in-memory caches"`
 }
 
 /***************
@@ -295,7 +306,7 @@ func (source *SourceFromSlice) Open() error {
 }
 
 func NewRepeaterUntilProcess(source *TempSource, text, mode string) (Processor, error) {
-	eng, err := template.NewEngine(text)
+	eng, err := template.NewEngine(text, tmpl.FuncMap{})
 
 	return RepeaterUntilProcess{eng, source, mode}, err
 }

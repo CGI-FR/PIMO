@@ -19,6 +19,7 @@ package addtransient
 
 import (
 	"bytes"
+	tmpl "text/template"
 
 	"github.com/cgi-fr/pimo/pkg/model"
 	"github.com/cgi-fr/pimo/pkg/template"
@@ -32,9 +33,9 @@ type MaskEngine struct {
 }
 
 // NewMask return a MaskEngine from a value
-func NewMask(value model.Entry) (MaskEngine, error) {
+func NewMask(value model.Entry, tmpl tmpl.FuncMap) (MaskEngine, error) {
 	if tmplstr, ok := value.(string); ok {
-		temp, err := template.NewEngine(tmplstr)
+		temp, err := template.NewEngine(tmplstr, tmpl)
 		return MaskEngine{value, temp}, err
 	}
 	return MaskEngine{value, nil}, nil
@@ -74,7 +75,7 @@ func (am MaskEngine) GetCleaner() model.FunctionMaskContextEngine {
 // Create a mask from a configuration
 func Factory(conf model.MaskFactoryConfiguration) (model.MaskContextEngine, bool, error) {
 	if conf.Masking.Mask.AddTransient != nil {
-		mask, err := NewMask(conf.Masking.Mask.AddTransient)
+		mask, err := NewMask(conf.Masking.Mask.AddTransient, conf.Functions)
 		if err != nil {
 			return nil, false, err
 		}

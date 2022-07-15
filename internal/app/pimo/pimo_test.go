@@ -35,7 +35,20 @@ import (
 func BenchmarkPimoRun(b *testing.B) {
 	definition := model.Definition{
 		Version: "1",
+		Functions: map[string]model.Function{
+			"addTest": {
+				Params: []model.Param{
+					{Name: "x"},
+					{Name: "y"},
+				},
+				Body: "return x + y",
+			},
+		},
 		Masking: []model.Masking{
+			{
+				Selector: model.SelectorType{Jsonpath: "addTransientFunction"},
+				Mask:     model.MaskType{AddTransient: "{{addTest 4 5}}"},
+			},
 			{
 				Selector: model.SelectorType{Jsonpath: "name"},
 				Mask: model.MaskType{
@@ -101,6 +114,15 @@ func BenchmarkPimoRunLarge(b *testing.B) {
 
 	definition := model.Definition{
 		Version: "1",
+		Functions: map[string]model.Function{
+			"addTest": {
+				Params: []model.Param{
+					{Name: "x"},
+					{Name: "y"},
+				},
+				Body: "return x + y",
+			},
+		},
 		Masking: []model.Masking{
 			{
 				Selector: model.SelectorType{Jsonpath: "add"},
@@ -109,6 +131,10 @@ func BenchmarkPimoRunLarge(b *testing.B) {
 			{
 				Selector: model.SelectorType{Jsonpath: "addTransient"},
 				Mask:     model.MaskType{AddTransient: "also added"},
+			},
+			{
+				Selector: model.SelectorType{Jsonpath: "addTransientFunction"},
+				Mask:     model.MaskType{AddTransient: "{{addTest 4 5}}"},
 			},
 			{
 				Selector: model.SelectorType{Jsonpath: "state"},
