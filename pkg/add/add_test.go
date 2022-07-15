@@ -19,13 +19,14 @@ package add
 
 import (
 	"testing"
+	"text/template"
 
 	"github.com/cgi-fr/pimo/pkg/model"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestMaskingShouldAddField(t *testing.T) {
-	addMask, err := NewMask("newvalue", 0)
+	addMask, err := NewMask("newvalue", template.FuncMap{}, 0)
 	assert.NoError(t, err, "error should be nil")
 	data := model.NewDictionary().With("field", "SomeInformation")
 	result, err := addMask.MaskContext(data, "newfield", data)
@@ -36,7 +37,7 @@ func TestMaskingShouldAddField(t *testing.T) {
 
 func TestFactoryShouldCreateAMask(t *testing.T) {
 	maskingConfig := model.Masking{Selector: model.SelectorType{Jsonpath: "field"}, Mask: model.MaskType{Add: "value"}}
-	factoryConfig := model.MaskFactoryConfiguration{Masking: maskingConfig, Seed: 0}
+	factoryConfig := model.MaskFactoryConfiguration{Masking: maskingConfig, Seed: 0, Functions: template.FuncMap{}}
 	_, present, err := Factory(factoryConfig)
 	assert.NoError(t, err, "error should be nil")
 	assert.True(t, present, "should be true")

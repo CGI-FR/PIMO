@@ -19,6 +19,7 @@ package templatemask
 
 import (
 	"testing"
+	tmpl "text/template"
 
 	"github.com/cgi-fr/pimo/pkg/model"
 	"github.com/stretchr/testify/assert"
@@ -26,7 +27,7 @@ import (
 
 func TestMaskingShouldReplaceSensitiveValueByTemplate(t *testing.T) {
 	template := "{{.name}}.{{.surname}}@gmail.com"
-	tempMask, err := NewMask(template, 0)
+	tempMask, err := NewMask(template, tmpl.FuncMap{}, 0)
 	if err != nil {
 		assert.Fail(t, err.Error())
 	}
@@ -40,7 +41,7 @@ func TestMaskingShouldReplaceSensitiveValueByTemplate(t *testing.T) {
 
 func TestMaskingShouldReplaceSensitiveValueByTemplateInNested(t *testing.T) {
 	template := "{{.customer.identity.name}}.{{.customer.identity.surname}}@gmail.com"
-	tempMask, err := NewMask(template, 0)
+	tempMask, err := NewMask(template, tmpl.FuncMap{}, 0)
 	if err != nil {
 		assert.Fail(t, err.Error())
 	}
@@ -61,10 +62,10 @@ func TestMaskingShouldReplaceSensitiveValueByTemplateInNested(t *testing.T) {
 
 func TestFactoryShouldCreateAMask(t *testing.T) {
 	maskingConfig := model.Masking{Selector: model.SelectorType{Jsonpath: "mail"}, Mask: model.MaskType{Template: "{{.name}}.{{.surname}}@gmail.com"}}
-	factoryConfig := model.MaskFactoryConfiguration{Masking: maskingConfig, Seed: 0}
+	factoryConfig := model.MaskFactoryConfiguration{Masking: maskingConfig, Seed: 0, Functions: make(tmpl.FuncMap)}
 	config, present, err := Factory(factoryConfig)
-	assert.Nil(t, err, "error should be nil")
-	maskingEngine, _ := NewMask("{{.name}}.{{.surname}}@gmail.com", 0)
+  assert.Nil(t, err, "error should be nil")
+	maskingEngine, _ := NewMask("{{.name}}.{{.surname}}@gmail.com", tmpl.FuncMap{}, 0)
 	assert.IsType(t, maskingEngine, config, "should be equal")
 	assert.True(t, present, "should be true")
 	assert.Nil(t, err, "error should be nil")
@@ -77,7 +78,7 @@ func TestFactoryShouldCreateAMask(t *testing.T) {
 
 func TestFactoryShouldNotCreateAMaskFromAnEmptyConfig(t *testing.T) {
 	maskingConfig := model.Masking{Mask: model.MaskType{}}
-	factoryConfig := model.MaskFactoryConfiguration{Masking: maskingConfig, Seed: 0}
+	factoryConfig := model.MaskFactoryConfiguration{Masking: maskingConfig, Seed: 0, Functions: make(tmpl.FuncMap)}
 	mask, present, err := Factory(factoryConfig)
 	assert.Nil(t, mask, "should be nil")
 	assert.False(t, present, "should be false")
@@ -86,7 +87,7 @@ func TestFactoryShouldNotCreateAMaskFromAnEmptyConfig(t *testing.T) {
 
 func TestFactoryShouldReturnAnErrorInWrongConfig(t *testing.T) {
 	maskingConfig := model.Masking{Mask: model.MaskType{Template: "{{.name}.{{.surname}}@gmail.com"}}
-	factoryConfig := model.MaskFactoryConfiguration{Masking: maskingConfig, Seed: 0}
+	factoryConfig := model.MaskFactoryConfiguration{Masking: maskingConfig, Seed: 0, Functions: make(tmpl.FuncMap)}
 	mask, present, err := Factory(factoryConfig)
 	assert.Nil(t, mask, "should be nil")
 	assert.False(t, present, "should be true")
@@ -95,7 +96,8 @@ func TestFactoryShouldReturnAnErrorInWrongConfig(t *testing.T) {
 
 func TestMaskingTemplateShouldFormat(t *testing.T) {
 	template := `{{"hello!" | upper | repeat 2}}`
-	tempMask, err := NewMask(template, 0)
+	tempMask, err := NewMask(template, tmpl.FuncMap{}, 0)
+
 	if err != nil {
 		assert.Fail(t, err.Error())
 	}
@@ -109,7 +111,7 @@ func TestMaskingTemplateShouldFormat(t *testing.T) {
 
 func TestRFactoryShouldCreateANestedContextMask(t *testing.T) {
 	maskingConfig := model.Masking{Selector: model.SelectorType{Jsonpath: "foo.bar"}, Mask: model.MaskType{Template: "{{.baz}}"}}
-	factoryConfig := model.MaskFactoryConfiguration{Masking: maskingConfig, Seed: 0}
+	factoryConfig := model.MaskFactoryConfiguration{Masking: maskingConfig, Seed: 0, Functions: make(tmpl.FuncMap)}
 	maskEngine, present, err := Factory(factoryConfig)
 	assert.Nil(t, err, "should be nil")
 	assert.True(t, present, "should be true")
@@ -125,7 +127,7 @@ func TestRFactoryShouldCreateANestedContextMask(t *testing.T) {
 
 func TestMaskingTemplateShouldIterOverContextArray(t *testing.T) {
 	template := `{{- range $index, $rel := .REL_PERMIS -}}{{.ID_PERMIS}}{{- end -}}`
-	tempMask, err := NewMask(template, 0)
+	tempMask, err := NewMask(template, tmpl.FuncMap{}, 0)
 	if err != nil {
 		assert.Fail(t, err.Error())
 	}

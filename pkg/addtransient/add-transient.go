@@ -19,9 +19,11 @@ package addtransient
 
 import (
 	"bytes"
+	tmpl "text/template"
 
 	"github.com/cgi-fr/pimo/pkg/model"
 	"github.com/cgi-fr/pimo/pkg/template"
+  "github.com/cgi-fr/pimo/pkg/regex"
 	"github.com/rs/zerolog/log"
 )
 
@@ -32,9 +34,10 @@ type MaskEngine struct {
 }
 
 // NewMask return a MaskEngine from a value
-func NewMask(value model.Entry, seed int64) (MaskEngine, error) {
+func NewMask(value model.Entry, tmpl tmpl.FuncMap, seed int64) (MaskEngine, error) {
 	if tmplstr, ok := value.(string); ok {
-		temp, err := template.NewEngine(tmplstr, seed)
+    tmpl["MaskRegex"] = regex.Func(seed)
+		temp, err := template.NewEngine(tmplstr, tmpl)
 		return MaskEngine{value, temp}, err
 	}
 	return MaskEngine{value, nil}, nil
@@ -74,7 +77,7 @@ func (am MaskEngine) GetCleaner() model.FunctionMaskContextEngine {
 // Create a mask from a configuration
 func Factory(conf model.MaskFactoryConfiguration) (model.MaskContextEngine, bool, error) {
 	if conf.Masking.Mask.AddTransient != nil {
-		mask, err := NewMask(conf.Masking.Mask.AddTransient, conf.Seed)
+		mask, err := NewMask(conf.Masking.Mask.AddTransient, conf.Functions, conf.Seed)
 		if err != nil {
 			return nil, false, err
 		}

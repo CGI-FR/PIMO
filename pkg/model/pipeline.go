@@ -22,8 +22,10 @@ import (
 	"fmt"
 	"io/ioutil"
 	"strings"
+	tmpl "text/template"
 	"time"
 
+	"github.com/cgi-fr/pimo/pkg/functions"
 	"github.com/goccy/go-yaml"
 )
 
@@ -64,8 +66,32 @@ func BuildCaches(caches map[string]CacheDefinition, existing map[string]Cache) m
 	return existing
 }
 
+func BuildFuncMap(funcs map[string]Function) (tmpl.FuncMap, error) {
+	b := functions.Builder{
+		Definitions: map[string]functions.Definition{},
+	}
+
+	for name, f := range funcs {
+		params := []functions.ParamDefinition{}
+		for _, p := range f.Params {
+			params = append(params, functions.ParamDefinition{Name: p.Name})
+		}
+
+		b.Definitions[name] = functions.Definition{
+			Params: params,
+			Body:   f.Body,
+		}
+	}
+
+	return b.Build()
+}
+
 func BuildPipeline(pipeline Pipeline, conf Definition, caches map[string]Cache) (Pipeline, map[string]Cache, error) {
 	caches = BuildCaches(conf.Caches, caches)
+	functions, err := BuildFuncMap(conf.Functions)
+	if err != nil {
+		return nil, nil, err
+	}
 	cleaners := []Processor{}
 
 	for _, masking := range conf.Masking {
@@ -99,7 +125,7 @@ func BuildPipeline(pipeline Pipeline, conf Definition, caches map[string]Cache) 
 					nbArg++
 				}
 
-				configuration := MaskFactoryConfiguration{Masking: virtualMask, Seed: conf.Seed, Cache: caches}
+				configuration := MaskFactoryConfiguration{Masking: virtualMask, Seed: conf.Seed, Cache: caches, Functions: functions}
 
 				for _, factory := range maskFactories {
 					mask, present, err := factory(configuration)

@@ -26,13 +26,10 @@ func rmAcc(s string) string {
 }
 
 // NewEngine create a template Engine
-func NewEngine(text string, seed int64) (*Engine, error) {
-	funcMap := template.FuncMap{
-		"ToUpper":  strings.ToUpper,
-		"ToLower":  strings.ToLower,
-		"NoAccent": rmAcc,
-		"regex":    regex.Func(seed),
-	}
+func NewEngine(text string, funcMap template.FuncMap) (*Engine, error) {
+	funcMap["ToUpper"] = strings.ToUpper
+	funcMap["ToLower"] = strings.ToLower
+	funcMap["NoAccent"] = rmAcc
 	temp, err := template.New("template").Funcs(sprig.TxtFuncMap()).Funcs(funcMap).Parse(text)
 	return &Engine{temp}, err
 }
