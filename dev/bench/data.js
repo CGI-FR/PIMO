@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1657895595099,
+  "lastUpdate": 1657899052055,
   "repoUrl": "https://github.com/CGI-FR/PIMO",
   "entries": {
     "Benchmark": [
@@ -1290,6 +1290,42 @@ window.BENCHMARK_DATA = {
             "value": 3445417,
             "unit": "ns/op\t  691978 B/op\t    5951 allocs/op",
             "extra": "3400 times\n2 procs"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "49699333+dependabot[bot]@users.noreply.github.com",
+            "name": "dependabot[bot]",
+            "username": "dependabot[bot]"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "2c370cb06f1a29ed5c5dec502a5cc7d852fe8a08",
+          "message": "chore(deps): bump github.com/invopop/jsonschema from 0.4.0 to 0.5.0 (#142)\n\n* chore(deps): bump github.com/invopop/jsonschema from 0.4.0 to 0.5.0\r\n\r\nBumps [github.com/invopop/jsonschema](https://github.com/invopop/jsonschema) from 0.4.0 to 0.5.0.\r\n- [Release notes](https://github.com/invopop/jsonschema/releases)\r\n- [Commits](https://github.com/invopop/jsonschema/compare/v0.4.0...v0.5.0)\r\n\r\n---\r\nupdated-dependencies:\r\n- dependency-name: github.com/invopop/jsonschema\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-minor\r\n...\r\n\r\nSigned-off-by: dependabot[bot] <support@github.com>\r\n\r\n* chore(deps): update jsonschema\r\n\r\n* chore(deps): fix regression in jsonschema\r\n\r\n* fix(deps): linting\r\n\r\n* fix(deps): missing json tags\r\n\r\nCo-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>\r\nCo-authored-by: Adrien Aury <adrien.aury@cgi.com>\r\nCo-authored-by: Adrien Aury <44274230+adrienaury@users.noreply.github.com>",
+          "timestamp": "2022-07-15T17:25:42+02:00",
+          "tree_id": "7fa54a8bd7e8092930147f3ae04586eb7fa6d149",
+          "url": "https://github.com/CGI-FR/PIMO/commit/2c370cb06f1a29ed5c5dec502a5cc7d852fe8a08"
+        },
+        "date": 1657899051422,
+        "tool": "go",
+        "benches": [
+          {
+            "name": "BenchmarkPimoRun",
+            "value": 333939,
+            "unit": "ns/op\t   16574 B/op\t     186 allocs/op",
+            "extra": "34602 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge",
+            "value": 4456569,
+            "unit": "ns/op\t  692271 B/op\t    6014 allocs/op",
+            "extra": "2892 times\n2 procs"
           }
         ]
       }
