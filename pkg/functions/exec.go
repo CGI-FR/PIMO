@@ -19,7 +19,6 @@ package functions
 
 import (
 	"fmt"
-	"math"
 
 	"github.com/mattn/anko/core"
 	"github.com/mattn/anko/env"
@@ -42,10 +41,6 @@ func NewEnvironment() Environment {
 
 func (e Environment) init() error {
 	e.env = core.Import(e.env)
-
-	if err := e.env.Define("pow", math.Pow); err != nil {
-		return fmt.Errorf("cannot define package: %w", err)
-	}
 
 	return nil
 }
