@@ -75,17 +75,12 @@ functions:
   add20:
     params:
       - name: "i"
-        type: "int64"
-    returns: "int64"
     body: |-
       return i + 20
   sub:
     params:
       - name: "x"
-        type: "int64"
       - name: "y"
-        type: "int64"
-    returns: "int64"
     body: |-
       return x - y
 masking:

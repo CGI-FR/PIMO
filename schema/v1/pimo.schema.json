@@ -126,10 +126,6 @@
           "type": "array",
           "description": "Declare parameters function"
         },
-        "returns": {
-          "type": "string",
-          "description": "Declare return type of function"
-        },
         "body": {
           "type": "string",
           "description": "Declare body function"
@@ -139,7 +135,6 @@
       "type": "object",
       "required": [
         "params",
-        "returns",
         "body"
       ]
     },
@@ -613,17 +608,12 @@
         "name": {
           "type": "string",
           "description": "Declare name parameters"
-        },
-        "type": {
-          "type": "string",
-          "description": "Declare type parameters"
         }
       },
       "additionalProperties": false,
       "type": "object",
       "required": [
-        "name",
-        "type"
+        "name"
       ]
     },
     "PipeType": {

@@ -67,52 +67,23 @@ func BuildCaches(caches map[string]CacheDefinition, existing map[string]Cache) m
 }
 
 func BuildFuncMap(funcs map[string]Function) (tmpl.FuncMap, error) {
-	funcMap := make(tmpl.FuncMap)
-
-	if len(funcs) == 0 {
-		return funcMap, nil
+	b := functions.Builder{
+		Definitions: map[string]functions.Definition{},
 	}
-
-	env := NewEnvironment()
 
 	for name, f := range funcs {
-		name := name // https://stackoverflow.com/a/26694016/2531684
-		err := env.Compile(f.Build(name))
-		if err != nil {
-			return nil, fmt.Errorf("cannot compile function: %w", err)
+		params := []functions.ParamDefinition{}
+		for _, p := range f.Params {
+			params = append(params, functions.ParamDefinition{Name: p.Name})
 		}
 
-		ankowrapper := func(args ...interface{}) (interface{}, error) {
-			var joined string
-			for _, arg := range args {
-				switch arg.(type) {
-				case string:
-					joined = fmt.Sprintf("\"%s\"", strings.Trim(strings.Join(strings.Fields(fmt.Sprint(args)), ","), "[]"))
-				default:
-					joined = strings.Trim(strings.Join(strings.Fields(fmt.Sprint(args)), ","), "[]")
-				}
-			}
-			output, err := env.Execute(fmt.Sprintf("%s(%s)", name, joined))
-			if err != nil {
-				return nil, fmt.Errorf("cannot execute function: %w", err)
-			}
-			return output, nil
+		b.Definitions[name] = functions.Definition{
+			Params: params,
+			Body:   f.Body,
 		}
-
-		types := []string{}
-		for _, param := range f.Params {
-			types = append(types, param.Type)
-		}
-
-		function, err := functions.BuildFunction(types, f.Returns, ankowrapper)
-		if err != nil {
-			return funcMap, errors.New(err.Error() + " for " + name + " function")
-		}
-
-		funcMap[name] = function.Interface()
 	}
 
-	return funcMap, nil
+	return b.Build()
 }
 
 func BuildPipeline(pipeline Pipeline, conf Definition, caches map[string]Cache) (Pipeline, map[string]Cache, error) {

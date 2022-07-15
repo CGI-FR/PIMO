@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with PIMO.  If not, see <http://www.gnu.org/licenses/>.
 
-package model
+package functions
 
 import (
 	"fmt"
@@ -27,35 +27,32 @@ import (
 )
 
 type Environment struct {
-	Env *env.Env
+	env *env.Env
 }
 
 func NewEnvironment() Environment {
-	e := env.NewEnv()
+	e := Environment{env.NewEnv()}
 
-	if err := DefinePackage(e); err != nil {
+	if err := e.init(); err != nil {
 		return Environment{}
 	}
 
-	return Environment{e}
+	return e
 }
 
-// DefinePackage defines the packages that can be used.
-func DefinePackage(e *env.Env) error {
-	e = core.Import(e)
+func (e Environment) init() error {
+	e.env = core.Import(e.env)
 
-	if err := e.Define("pow", math.Pow); err != nil {
+	if err := e.env.Define("pow", math.Pow); err != nil {
 		return fmt.Errorf("cannot define package: %w", err)
 	}
 
 	return nil
 }
 
-// Compile returns the environment needed for a VM to run in after compiling the script.
-func (env Environment) Compile(script string) error {
-	// env.DefinePackage()
-
-	_, err := vm.Execute(env.Env, nil, script)
+// Compile the script and returns the environment needed to run it.
+func (e Environment) Compile(script string) error {
+	_, err := vm.Execute(e.env, nil, script)
 	if err != nil {
 		return fmt.Errorf("cannot compile environment: %w", err)
 	}
@@ -64,28 +61,11 @@ func (env Environment) Compile(script string) error {
 }
 
 // Execute parses script and executes in the specified environment.
-func (env Environment) Execute(script string) (interface{}, error) {
-	output, err := vm.Execute(env.Env, nil, script)
+func (e Environment) Execute(script string) (interface{}, error) {
+	output, err := vm.Execute(e.env, nil, script)
 	if err != nil {
 		return nil, fmt.Errorf("cannot execute environment: %w", err)
 	}
 
 	return output, nil
-}
-
-func (f Function) Build(name string) string {
-	script := ""
-	params := ""
-	i := 0
-	for _, param := range f.Params {
-		if i == 0 {
-			params += param.Name
-		} else {
-			params += "," + param.Name
-		}
-		i++
-	}
-	script += "func " + name + "(" + params + ") { " + f.Body + " }"
-
-	return script
 }
