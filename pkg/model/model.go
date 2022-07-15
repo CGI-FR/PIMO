@@ -223,7 +223,7 @@ type Param struct {
 type Definition struct {
 	Version   string                     `yaml:"version" json:"version" jsonschema_description:"Version of the pipeline definition, use the value 1"`
 	Seed      int64                      `yaml:"seed,omitempty" json:"seed,omitempty" jsonschema_description:"Initialize the Pseaudo-Random-Generator with the given value"`
-  Functions map[string]Function        `yaml:"functions,omitempty" json:"functions,omitempty" jsonschema_description:"Declare functions to be used in the masking"`
+	Functions map[string]Function        `yaml:"functions,omitempty" json:"functions,omitempty" jsonschema_description:"Declare functions to be used in the masking"`
 	Masking   []Masking                  `yaml:"masking" json:"masking" jsonschema_description:"Masking pipeline definition"`
 	Caches    map[string]CacheDefinition `yaml:"caches,omitempty" json:"caches,omitempty" jsonschema_description:"Declare in-memory caches"`
 }
