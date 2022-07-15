@@ -19,6 +19,7 @@ package functions
 
 import (
 	"fmt"
+	"math"
 	"strings"
 	"text/template"
 )
@@ -73,6 +74,14 @@ func (d Definition) AsCall(name string, args ...interface{}) string {
 			result.WriteByte('"')
 			result.WriteString(typedArg)
 			result.WriteByte('"')
+		case float64:
+			if math.IsInf(typedArg, 0) || math.IsNaN(typedArg) {
+				result.WriteByte('"')
+				result.WriteString(fmt.Sprint(typedArg))
+				result.WriteByte('"')
+			} else {
+				result.WriteString(fmt.Sprint(arg))
+			}
 		case nil:
 			result.WriteString("nil")
 		default:
