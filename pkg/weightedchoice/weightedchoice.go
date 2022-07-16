@@ -109,7 +109,7 @@ func Factory(conf model.MaskFactoryConfiguration) (model.MaskEngine, bool, error
 		h := fnv.New64a()
 		h.Write([]byte(conf.Masking.Selector.Jsonpath))
 		conf.Seed += int64(h.Sum64())
-		return NewMask(maskWeight, conf.Seed, model.NewSeeder(conf.Masking, conf.Seed)), true, nil
+		return NewMask(maskWeight, conf.Seed, model.NewSeeder(conf.Masking.Seed.Field, conf.Seed)), true, nil
 	}
 	return nil, false, nil
 }

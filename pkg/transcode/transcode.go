@@ -76,7 +76,7 @@ func Factory(conf model.MaskFactoryConfiguration) (model.MaskEngine, bool, error
 		h := fnv.New64a()
 		h.Write([]byte(conf.Masking.Selector.Jsonpath))
 		conf.Seed += int64(h.Sum64())
-		seeder := model.NewSeeder(conf.Masking, conf.Seed)
+		seeder := model.NewSeeder(conf.Masking.Seed.Field, conf.Seed)
 		if classes := conf.Masking.Mask.Transcode.Classes; len(classes) > 0 {
 			return NewMask(classes, conf.Seed, seeder), true, nil
 		}

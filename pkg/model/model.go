@@ -306,7 +306,7 @@ func (source *SourceFromSlice) Open() error {
 }
 
 func NewRepeaterUntilProcess(source *TempSource, text, mode string) (Processor, error) {
-	eng, err := template.NewEngine(text, tmpl.FuncMap{}, 0)
+	eng, err := template.NewEngine(text, tmpl.FuncMap{}, 0, "")
 
 	return RepeaterUntilProcess{eng, source, mode}, err
 }
@@ -609,19 +609,20 @@ func (pipeline SimpleSinkedPipeline) Run() (err error) {
 
 type Seeder func(Dictionary) (int64, bool, error)
 
-func NewSeeder(conf Masking, seed int64) Seeder {
+func NewSeeder(sourceField string, seed int64) Seeder {
 	var seeder Seeder
-	if jpath := conf.Seed.Field; jpath != "" {
+
+	if jpath := sourceField; jpath != "" {
 		sel := NewPathSelector(jpath)
-		h := fnv.New64a()
+		hash := fnv.New64a()
 		seeder = func(context Dictionary) (int64, bool, error) {
 			e, ok := sel.Read(context)
 			if !ok {
 				return 0, ok, nil
 			}
-			h.Reset()
-			_, err := h.Write([]byte(fmt.Sprintf("%v", e)))
-			return int64(h.Sum64()), true, err
+			hash.Reset()
+			_, err := hash.Write([]byte(fmt.Sprintf("%v", e)))
+			return int64(hash.Sum64()), true, err
 		}
 	} else {
 		seeder = func(context Dictionary) (int64, bool, error) {

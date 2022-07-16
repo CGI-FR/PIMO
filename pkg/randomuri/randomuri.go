@@ -88,7 +88,7 @@ func Factory(conf model.MaskFactoryConfiguration) (model.MaskEngine, bool, error
 	conf.Seed += int64(h.Sum64())
 
 	if len(conf.Masking.Mask.RandomChoiceInURI) != 0 {
-		mask, err := NewMask(conf.Masking.Mask.RandomChoiceInURI, conf.Seed, model.NewSeeder(conf.Masking, conf.Seed))
+		mask, err := NewMask(conf.Masking.Mask.RandomChoiceInURI, conf.Seed, model.NewSeeder(conf.Masking.Seed.Field, conf.Seed))
 		return mask, true, err
 	}
 	return nil, false, nil
