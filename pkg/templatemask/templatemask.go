@@ -33,7 +33,7 @@ type MaskEngine struct {
 
 // NewMask create a MaskEngine
 func NewMask(text string, funcs tmpl.FuncMap, seed int64) (MaskEngine, error) {
-	temp, err := template.NewEngine(text, funcs, 0)
+	temp, err := template.NewEngine(text, funcs, seed)
 	return MaskEngine{temp}, err
 }
 
