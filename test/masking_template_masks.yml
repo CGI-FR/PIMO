@@ -21,10 +21,10 @@ masking:
       jsonpath: "randomDecimal"
     mask:
       add: '{{MaskRandomDecimal 0 17.23 2}}'
-  # - selector:
-  #     jsonpath: "command"
-  #   mask:
-  #     template: '{{command "echo -n Dorothy"}}'
+  - selector:
+      jsonpath: "command"
+    mask:
+      add: '{{MaskCommand "echo -n Dorothy"}}'
   # - selector:
   #     jsonpath: "weightedChoice"
   #   mask:

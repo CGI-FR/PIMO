@@ -66,7 +66,7 @@ testcases:
     - result.systemerr ShouldBeEmpty
   - script : |-
       cat > expected.json <<EOF
-      {"regex":"05 30 85 92 14 / 04 40 20 85 81","randomChoice":"Marcelle","randomChoiceInUri":"Vincent","randomInt":"26","randomDecimal":"6.43"}
+      {"regex":"05 30 85 92 14 / 04 40 20 85 81","randomChoice":"Marcelle","randomChoiceInUri":"Vincent","randomInt":"26","randomDecimal":"6.43","command":"Dorothy"}
       EOF
   - script: diff expected.json result.json
     assertions:
