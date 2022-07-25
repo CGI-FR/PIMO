@@ -306,6 +306,7 @@ func injectMaskFactories() []model.MaskFactory {
 func injectTemplateFuncs() {
 	template.InjectSeededFuncGenerator("MaskRegex", regex.Func)
 	template.InjectSeededFuncGenerator("MaskRandomChoice", randomlist.Func)
+	template.InjectSeededFuncGenerator("MaskRandomChoiceInUri", randomuri.Func)
 }
 
 var re = regexp.MustCompile(`(\[\d*\])?$`)

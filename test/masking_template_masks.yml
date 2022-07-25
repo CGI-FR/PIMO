@@ -9,10 +9,10 @@ masking:
       jsonpath: "randomChoice"
     mask:
       add: '{{MaskRandomChoice (list "Mickael" "Mathieu" "Marcelle")}}'
-  # - selector:
-  #     jsonpath: "randomChoiceInUri"
-  #   mask:
-  #     template: '{{randomChoiceInUri "pimo://nameFR"}}'
+  - selector:
+      jsonpath: "randomChoiceInUri"
+    mask:
+      add: '{{MaskRandomChoiceInUri "pimo://nameFR"}}'
   # - selector:
   #     jsonpath: "randomInt"
   #   mask:
