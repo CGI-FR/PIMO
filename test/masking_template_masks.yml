@@ -17,10 +17,10 @@ masking:
       jsonpath: "randomInt"
     mask:
       add: '{{MaskRandomInt 25 32}}'
-  # - selector:
-  #     jsonpath: "randomDecimal"
-  #   mask:
-  #     template: '{{randomDecimal 0 17.23 2}}'
+  - selector:
+      jsonpath: "randomDecimal"
+    mask:
+      add: '{{MaskRandomDecimal 0 17.23 2}}'
   # - selector:
   #     jsonpath: "command"
   #   mask:
