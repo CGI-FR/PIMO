@@ -25,10 +25,10 @@ masking:
       jsonpath: "command"
     mask:
       add: '{{MaskCommand "echo -n Dorothy"}}'
-  # - selector:
-  #     jsonpath: "weightedChoice"
-  #   mask:
-  #     template: '{{weightedChoice (list "Dupond" "Dupont") (list 1 9)}}'
+  - selector:
+      jsonpath: "weightedChoice"
+    mask:
+      add: '{{MaskWeightedChoice (dict "Dupond" 9 "Dupont" 1)}}'
   # - selector:
   #     jsonpath: "hash"
   #   mask:

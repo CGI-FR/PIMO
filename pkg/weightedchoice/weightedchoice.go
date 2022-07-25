@@ -113,3 +113,16 @@ func Factory(conf model.MaskFactoryConfiguration) (model.MaskEngine, bool, error
 	}
 	return nil, false, nil
 }
+
+func Func(seed int64, seedField string) interface{} {
+	var callnumber int64
+	return func(choices_ map[string]interface{}) (model.Entry, error) {
+		choices := make([]model.WeightedChoiceType, len(choices_))
+		for k, v := range choices_ {
+			choices = append(choices, model.WeightedChoiceType{Choice: k, Weight: uint(v.(int))})
+		}
+		mask := NewMask(choices, seed+callnumber, model.NewSeeder(seedField, seed+callnumber))
+		callnumber++
+		return mask.Mask(nil)
+	}
+}
