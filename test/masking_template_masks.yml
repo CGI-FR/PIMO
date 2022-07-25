@@ -13,10 +13,10 @@ masking:
       jsonpath: "randomChoiceInUri"
     mask:
       add: '{{MaskRandomChoiceInUri "pimo://nameFR"}}'
-  # - selector:
-  #     jsonpath: "randomInt"
-  #   mask:
-  #     template: '{{randomInt 25 32}}'
+  - selector:
+      jsonpath: "randomInt"
+    mask:
+      add: '{{MaskRandomInt 25 32}}'
   # - selector:
   #     jsonpath: "randomDecimal"
   #   mask:

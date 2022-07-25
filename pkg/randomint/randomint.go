@@ -66,3 +66,12 @@ func Factory(conf model.MaskFactoryConfiguration) (model.MaskEngine, bool, error
 	}
 	return nil, false, nil
 }
+
+func Func(seed int64, seedField string) interface{} {
+	var callnumber int64
+	return func(min int, max int) (model.Entry, error) {
+		mask := NewMask(min, max, seed+callnumber, model.NewSeeder(seedField, seed+callnumber))
+		callnumber++
+		return mask.Mask(nil)
+	}
+}
