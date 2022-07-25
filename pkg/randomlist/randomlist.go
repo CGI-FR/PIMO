@@ -68,3 +68,16 @@ func Factory(conf model.MaskFactoryConfiguration) (model.MaskEngine, bool, error
 
 	return nil, false, nil
 }
+
+func Func(seed int64, seedField string) interface{} {
+	var callnumber int64
+	return func(choices_ []interface{}) (model.Entry, error) {
+		choices := make([]model.Entry, len(choices_))
+		for i, c := range choices_ {
+			choices[i] = c
+		}
+		mask := NewMask(choices, seed+callnumber, model.NewSeeder(seedField, seed+callnumber))
+		callnumber++
+		return mask.Mask(nil)
+	}
+}
