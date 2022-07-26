@@ -154,6 +154,33 @@ document.getElementById("reset-link").onclick = () => {
     autoPostData();
 }
 
+/* When the user clicks on the button, toggle between hiding and showing the dropdown content */
+document.getElementById("dropdown-button").onclick = () => {
+    document.getElementById("myDropdown").classList.toggle("show");
+}
+
+// Close the dropdown if the user clicks outside of it
+window.onclick = function(e) {
+    if (!e.target.matches('.dropbtn')) {
+    var myDropdown = document.getElementById("myDropdown");
+      if (myDropdown.classList.contains('show')) {
+        myDropdown.classList.remove('show');
+      }
+    }
+}
+
+// Share an url link
+document.getElementById("btnShare").onclick = () => {
+    var dummy = document.createElement('input'),
+    text = window.location.href;
+    document.body.appendChild(dummy);
+    dummy.value = text;
+    dummy.select();
+    document.execCommand('copy');
+    document.body.removeChild(dummy);
+    alert("URL Copied.");
+}
+
 ///////////////////////////////////////////////////////////
 
 async function postData() {
@@ -220,3 +247,5 @@ document.getElementById('editor-json').onpaste = autoPostData;
 document.getElementById('editor-json').oncut = autoPostData;
 document.getElementById('refresh-button').onclick = autoPostData;
 autoPostData();
+
+

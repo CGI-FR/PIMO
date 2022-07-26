@@ -4,7 +4,7 @@
     "private": true,
     "type": "module",
     "scripts": {
-        "start": "webpack serve --open --mode development",
+        "start": "webpack serve --open --mode development --live-reload",
         "build": "webpack --mode production"
     },
     "dependencies": {

@@ -15,6 +15,7 @@ export default {
     ],
   },
   devServer: {
+    watchFiles: ["src/*"],
     proxy: {
       '/play': 'http://localhost:3010',
     },

@@ -58,7 +58,7 @@ githooks/** text eol=lf
 *.cmd      text eol=crlf
 
 # Serialisation
-*.json     text
+*.json     text eol=lf
 *.toml     text
 *.xml      text
 *.yaml     text

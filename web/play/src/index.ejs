@@ -9,11 +9,23 @@
 
     <div class="mb-5 flex space-x-4 items-baseline bg-black text-white">
       <div class="m-5 font-sans text-4xl font-bold"><a id="reset-link" class="cursor-pointer">PIMO Play</a></div>
-      <div class="text-slate-200 text-sm">
+      <div class="text-slate-200 text-sm flex-grow">
         A playground for
         <a href="https://github.com/CGI-FR/PIMO/tree/{{ version }}" target="_blank" rel="noopener noreferrer" class="hover:underline">pimo {{ version }}</a>
       </div>
-      <div class="grow"></div>
+      <div class="dropdown">
+        <button class="dropbtn" id="dropdown-button">Dropdown
+          <i class="fa fa-caret-down"></i>
+        </button>
+        <div class="dropdown-content" id="myDropdown">
+          <button type="button" class="btn btn-default navbar-btn pull-right" id="btnShare">
+            <span class="glyphicon glyphicon-share"></span>Share : copy link555
+          </button>
+          <button type="button" class="btn btn-default navbar-btn pull-right">
+            <span class="glyphicon glyphicon-share" aria-hidden="true"></span>Export as Venom Test
+          </button>
+        </div>
+      </div>
     </div>
 
     <div class="px-4 md:px-8 lg:px-16">
