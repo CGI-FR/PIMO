@@ -2,6 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <title>PIMO Play</title>
   </head>
   <body>
@@ -18,12 +19,14 @@
           <i class="fa fa-caret-down"></i>
         </button>
         <div class="dropdown-content" id="myDropdown">
-          <button type="button" class="btn btn-default navbar-btn pull-right" id="btnShare">
-            <span class="glyphicon glyphicon-share"></span>Share : copy link555
+          <button type="button" class="btn btn-default navbar-btn pull-right" id="btnShareTest">
+            <i class="fa fa-share"></i> Share : copy link
           </button>
-          <button type="button" class="btn btn-default navbar-btn pull-right">
-            <span class="glyphicon glyphicon-share" aria-hidden="true"></span>Export as Venom Test
-          </button>
+          <a download="pimo-test.yaml" href="data:text/yaml;base64," id="aDownloadTest">
+            <button type="button" id="btnDownloadTest">
+                <i class="fa fa-flask"></i> Export as Venom Test
+            </button>
+          </a>
         </div>
       </div>
     </div>

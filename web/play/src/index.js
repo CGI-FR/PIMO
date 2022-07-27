@@ -3,6 +3,7 @@ import LZString from 'lz-string';
 import { editor, Uri } from 'monaco-editor';
 import { setDiagnosticsOptions } from 'monaco-yaml';
 
+
 // The uri is used for the schema file match.
 const modelUri = Uri.parse('file://masking.yml');
 
@@ -170,7 +171,7 @@ window.onclick = function(e) {
 }
 
 // Share an url link
-document.getElementById("btnShare").onclick = () => {
+document.getElementById("btnShareTest").onclick = () => {
     var dummy = document.createElement('input'),
     text = window.location.href;
     document.body.appendChild(dummy);
@@ -179,6 +180,58 @@ document.getElementById("btnShare").onclick = () => {
     document.execCommand('copy');
     document.body.removeChild(dummy);
     alert("URL Copied.");
+}
+
+
+// Download venom test yaml file
+/**
+ * @param {string} str  The string to be indented.
+ * @param {number} numOfSpaces  The amount of spaces to place at the
+ *     beginning of each line of the string.
+ * @return {string}  The new string with each line beginning with the desired
+ *     amount of spaces.
+*/
+function indent(str, numOfSpaces) {
+    str = str.replace(/^(?=.)/gm, new Array(numOfSpaces + 1).join(' '));
+    return str
+}
+
+document.getElementById("btnDownloadTest").onclick = () => {
+
+    var masking = editorYaml.getValue();
+    var output = resultJson.getValue();
+    var input = editorJson.getValue();
+    var url = window.location.href;
+
+    var template = `name: "test generated  from pimoplay ${url}"
+testcases:
+- name: pimo play generated test (to change)
+  steps:
+    - script: rm -f masking.yml
+    - script: |-
+        cat > masking.yml <<EOF
+${indent(masking, 8)}
+        EOF
+    - script: |-
+        jq -c . > input.jsonl <<EOF
+${indent(input, 8)}
+        EOF
+    - script: |-
+        jq -c . > expected.jsonl <<EOF
+${indent(output, 8)}
+        EOF
+    - script: |-
+        < input.jsonl pimo > result.jsonl
+      assertions:
+        - result.code ShouldEqual 0
+    - script: |-
+        diff expected.jsonl result.jsonl
+      assertions:
+        - result.code ShouldEqual 0
+        - result.systemout ShouldBeEmpty`;
+
+    var encodedString = btoa(unescape(encodeURIComponent(template)));
+    document.getElementById("aDownloadTest").href = "data:text/yaml;base64," + encodedString
 }
 
 ///////////////////////////////////////////////////////////
