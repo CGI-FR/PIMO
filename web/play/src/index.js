@@ -230,8 +230,8 @@ ${indent(output, 8)}
         - result.code ShouldEqual 0
         - result.systemout ShouldBeEmpty`;
 
-    var encodedString = btoa(unescape(encodeURIComponent(template)));
-    document.getElementById("aDownloadTest").href = "data:text/yaml;base64," + encodedString
+    var encodedString = encodeURIComponent(template);
+    document.getElementById("aDownloadTest").href = "data:text/yaml," + encodedString
 }
 
 ///////////////////////////////////////////////////////////
