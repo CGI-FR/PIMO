@@ -17,6 +17,7 @@ Types of changes
 ## [1.15.0]
 
 - `Added` functions section in masking configuration
+- `Security` in PIMO Play : disallow usage of mask Command in `masks` property
 
 ## [1.14.1]
 

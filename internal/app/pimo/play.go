@@ -114,6 +114,12 @@ func checkSecurityRequirements(pdef model.Definition) error {
 			return fmt.Errorf("Usage of `command` mask is forbidden")
 		}
 
+		for _, m := range mask.Masks {
+			if len(m.Command) > 0 {
+				return fmt.Errorf("Usage of `command` mask is forbidden")
+			}
+		}
+
 		// usage of file scheme is not allowed
 		if err := checkUriScheme(mask.Mask.FluxURI); err != nil {
 			return err
