@@ -43,10 +43,11 @@ masking:
       jsonpath: "randDate"
     mask:
       add: '{{MaskRandDate "1970-01-01T00:00:00Z" "2020-01-01T00:00:00Z"}}'
-  # - selector:
-  #     jsonpath: "duration"
-  #   mask:
-  #     template: '{{duration "-P2D"}}'
+  - selector:
+      jsonpath: "duration"
+    masks:
+      - add: "2011-12-26T19:17:55Z"
+      - template: '{{MaskDuration "-P2D" .duration}}'
   # - selector:
   #     jsonpath: "dateParser"
   #   mask:
