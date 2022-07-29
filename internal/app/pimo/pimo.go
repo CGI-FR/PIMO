@@ -313,6 +313,7 @@ func injectTemplateFuncs() {
 	template.InjectSeededFuncGenerator("MaskWeightedChoice", weightedchoice.Func)
 	template.InjectSeededFuncGenerator("MaskHash", hash.Func)
 	template.InjectSeededFuncGenerator("MaskHashInUri", hash.FuncInUri)
+	template.InjectSeededFuncGenerator("MaskRandDate", randdate.Func)
 }
 
 var re = regexp.MustCompile(`(\[\d*\])?$`)

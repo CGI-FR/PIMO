@@ -39,10 +39,10 @@ masking:
     masks:
       - add: "1"
       - template: '{{MaskHashInUri "pimo://nameFR" .hashInUri}}'
-  # - selector:
-  #     jsonpath: "randDate"
-  #   mask:
-  #     template: '{{randDate "1970-01-01T00:00:00Z" "2020-01-01T00:00:00Z"}}'
+  - selector:
+      jsonpath: "randDate"
+    mask:
+      add: '{{MaskRandDate "1970-01-01T00:00:00Z" "2020-01-01T00:00:00Z"}}'
   # - selector:
   #     jsonpath: "duration"
   #   mask:

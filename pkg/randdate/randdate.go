@@ -70,3 +70,20 @@ func Factory(conf model.MaskFactoryConfiguration) (model.MaskEngine, bool, error
 	}
 	return nil, false, nil
 }
+
+func Func(seed int64, seedField string) interface{} {
+	var callnumber int64
+	return func(dateminstr string, datemaxstr string) (model.Entry, error) {
+		datemin, err := time.Parse(time.RFC3339, dateminstr)
+		if err != nil {
+			return nil, err
+		}
+		datemax, err := time.Parse(time.RFC3339, datemaxstr)
+		if err != nil {
+			return nil, err
+		}
+		mask := NewMask(datemin, datemax, seed+callnumber, model.NewSeeder(seedField, seed+callnumber))
+		callnumber++
+		return mask.Mask(nil)
+	}
+}
