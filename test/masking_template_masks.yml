@@ -53,10 +53,11 @@ masking:
     masks:
       - add: "2022-07-29"
       - template: '{{MaskDateParser "2006-01-02" "02/01/06" .dateParser}}'
-  # - selector:
-  #     jsonpath: "randomDuration"
-  #   mask:
-  #     template: '{{randomDuration "-P2D" "-P27D"}}'
+  - selector:
+      jsonpath: "randomDuration"
+    masks:
+      - add: "2011-12-26T19:17:55Z"
+      - template: '{{MaskRandomDuration "-P2D" "-P27D" .randomDuration}}'
   # - selector:
   #     jsonpath: "incremental"
   #   mask:
