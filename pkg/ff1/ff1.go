@@ -108,3 +108,14 @@ func Factory(conf model.MaskFactoryConfiguration) (model.MaskEngine, bool, error
 	}
 	return nil, false, nil
 }
+
+func Func(seed int64, seedField string) interface{} {
+	var callnumber int64
+	return func(key string, tweak string, radix uint, decrypt bool, input model.Entry) (model.Entry, error) {
+		context := model.NewDictionary()
+		context.Set("tweak", tweak)
+		mask := NewMask(key, "tweak", radix, decrypt)
+		callnumber++
+		return mask.Mask(input, context)
+	}
+}

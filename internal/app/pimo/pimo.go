@@ -317,6 +317,7 @@ func injectTemplateFuncs() {
 	template.InjectSeededFuncGenerator("MaskDuration", duration.Func)
 	template.InjectSeededFuncGenerator("MaskDateParser", dateparser.Func)
 	template.InjectSeededFuncGenerator("MaskRandomDuration", randdura.Func)
+	template.InjectSeededFuncGenerator("MaskFF1", ff1.Func)
 }
 
 var re = regexp.MustCompile(`(\[\d*\])?$`)
