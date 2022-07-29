@@ -220,3 +220,19 @@ document.getElementById('editor-json').onpaste = autoPostData;
 document.getElementById('editor-json').oncut = autoPostData;
 document.getElementById('refresh-button').onclick = autoPostData;
 autoPostData();
+
+
+// CTRL + S download masking.yaml file
+document.addEventListener("keydown", function(e) {
+    if ((e.key === "s" || e.key === "S") && (navigator.userAgentData.platform.match("Mac") ? e.metaKey : e.ctrlKey)) {
+        e.preventDefault();
+
+        var encodedMasking = encodeURIComponent(editorYaml.getValue());
+        var aDownloadMasking = document.createElement("a")
+
+        aDownloadMasking.setAttribute("href", `data:text/yaml,${encodedMasking}`)
+        aDownloadMasking.setAttribute("download", "masking.yml")
+        aDownloadMasking.click()
+        aDownloadMasking.remove()
+    }
+}, false);
