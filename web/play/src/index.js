@@ -231,7 +231,7 @@ document.addEventListener("keydown", function(e) {
         var aDownloadMasking = document.createElement("a")
 
         aDownloadMasking.setAttribute("href", `data:text/yaml,${encodedMasking}`)
-        aDownloadMasking.setAttribute("download", "masking.yaml")
+        aDownloadMasking.setAttribute("download", "masking.yml")
         aDownloadMasking.click()
         aDownloadMasking.remove()
     }
