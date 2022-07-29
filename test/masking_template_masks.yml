@@ -34,10 +34,11 @@ masking:
     masks:
       - add: "1"
       - template: '{{MaskHash (list "Emerald City" "Ruby City" "Sapphire City") .hash}}'
-  # - selector:
-  #     jsonpath: "hashInUri"
-  #   mask:
-  #     template: '{{hashInUri "pimo://nameFR"}}'
+  - selector:
+      jsonpath: "hashInUri"
+    masks:
+      - add: "1"
+      - template: '{{MaskHashInUri "pimo://nameFR" .hashInUri}}'
   # - selector:
   #     jsonpath: "randDate"
   #   mask:

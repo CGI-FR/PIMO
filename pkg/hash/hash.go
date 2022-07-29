@@ -77,3 +77,17 @@ func Func(seed int64, seedField string) interface{} {
 		return mask.Mask(input)
 	}
 }
+
+func FuncInUri(seed int64, seedField string) interface{} {
+	var callnumber int64
+	return func(uristr string, input model.Entry) (model.Entry, error) {
+		log.Warn().Msg("Using MaskHashInUri from a template can cause performance issues")
+		list, err := uri.Read(uristr)
+		if err != nil {
+			return nil, err
+		}
+		mask := NewMask(list, seed+callnumber, model.NewSeeder(seedField, seed+callnumber))
+		callnumber++
+		return mask.Mask(input)
+	}
+}
