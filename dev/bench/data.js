@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1659106031768,
+  "lastUpdate": 1659108741779,
   "repoUrl": "https://github.com/CGI-FR/PIMO",
   "entries": {
     "Benchmark": [
@@ -1398,6 +1398,42 @@ window.BENCHMARK_DATA = {
             "value": 3297541,
             "unit": "ns/op\t  692325 B/op\t    6014 allocs/op",
             "extra": "3590 times\n2 procs"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "49699333+dependabot[bot]@users.noreply.github.com",
+            "name": "dependabot[bot]",
+            "username": "dependabot[bot]"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "9f290bb78127ca3b8897e03c31f73e5f274991df",
+          "message": "chore(deps): bump terser from 5.14.1 to 5.14.2 in /web/play (#157)\n\nBumps [terser](https://github.com/terser/terser) from 5.14.1 to 5.14.2.\r\n- [Release notes](https://github.com/terser/terser/releases)\r\n- [Changelog](https://github.com/terser/terser/blob/master/CHANGELOG.md)\r\n- [Commits](https://github.com/terser/terser/compare/v5.14.1...v5.14.2)\r\n\r\n---\r\nupdated-dependencies:\r\n- dependency-name: terser\r\n  dependency-type: indirect\r\n...\r\n\r\nSigned-off-by: dependabot[bot] <support@github.com>\r\n\r\nCo-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>",
+          "timestamp": "2022-07-29T17:27:16+02:00",
+          "tree_id": "7b916ce70e99f0970d31974937716a991c6a47ad",
+          "url": "https://github.com/CGI-FR/PIMO/commit/9f290bb78127ca3b8897e03c31f73e5f274991df"
+        },
+        "date": 1659108741122,
+        "tool": "go",
+        "benches": [
+          {
+            "name": "BenchmarkPimoRun",
+            "value": 339359,
+            "unit": "ns/op\t   16591 B/op\t     186 allocs/op",
+            "extra": "33786 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge",
+            "value": 4345496,
+            "unit": "ns/op\t  692367 B/op\t    6014 allocs/op",
+            "extra": "2731 times\n2 procs"
           }
         ]
       }
