@@ -32,7 +32,7 @@ type MaskEngine struct {
 }
 
 // NewMaskSeeded create a MaskRandomList with a seed
-func NewMask(list []model.Entry, seed int64, seeder model.Seeder) MaskEngine {
+func NewMask(list []model.Entry) MaskEngine {
 	// nolint: gosec
 	return MaskEngine{list}
 }
@@ -66,28 +66,24 @@ func Factory(conf model.MaskFactoryConfiguration) (model.MaskEngine, bool, error
 }
 
 func Func(seed int64, seedField string) interface{} {
-	var callnumber int64
 	return func(choices_ []interface{}, input model.Entry) (model.Entry, error) {
 		choices := make([]model.Entry, len(choices_))
 		for i, c := range choices_ {
 			choices[i] = c
 		}
-		mask := NewMask(choices, seed+callnumber, model.NewSeeder(seedField, seed+callnumber))
-		callnumber++
+		mask := NewMask(choices)
 		return mask.Mask(input)
 	}
 }
 
 func FuncInUri(seed int64, seedField string) interface{} {
-	var callnumber int64
 	return func(uristr string, input model.Entry) (model.Entry, error) {
 		log.Warn().Msg("Using MaskHashInUri from a template can cause performance issues")
 		list, err := uri.Read(uristr)
 		if err != nil {
 			return nil, err
 		}
-		mask := NewMask(list, seed+callnumber, model.NewSeeder(seedField, seed+callnumber))
-		callnumber++
+		mask := NewMask(list)
 		return mask.Mask(input)
 	}
 }

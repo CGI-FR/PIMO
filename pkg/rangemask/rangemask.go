@@ -43,8 +43,8 @@ func (rm MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Ent
 	if e == nil {
 		return e, nil
 	}
-	i, ok := e.(float64)
-
+	val := tryConvertToFloat64(e)
+	i, ok := val.(float64)
 	if !ok {
 		return e, fmt.Errorf("%v is not a number", e)
 	}
@@ -62,7 +62,6 @@ func Factory(conf model.MaskFactoryConfiguration) (model.MaskEngine, bool, error
 }
 
 func Func(seed int64, seedField string) interface{} {
-	var callnumber int64
 	return func(maybescale interface{}, input model.Entry) (model.Entry, error) {
 		var err error
 		var scale int
@@ -100,8 +99,7 @@ func Func(seed int64, seedField string) interface{} {
 			scale = int(typedscale)
 		}
 		mask := NewMask(scale)
-		callnumber++
-		return mask.Mask(tryConvertToFloat64(input))
+		return mask.Mask(input)
 	}
 }
 
