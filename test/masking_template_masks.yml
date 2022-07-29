@@ -29,10 +29,11 @@ masking:
       jsonpath: "weightedChoice"
     mask:
       add: '{{MaskWeightedChoice (dict "Dupond" 9 "Dupont" 1)}}'
-  # - selector:
-  #     jsonpath: "hash"
-  #   mask:
-  #     template: '{{hash (list "Emerald City" "Ruby City" "Sapphire City")}}'
+  - selector:
+      jsonpath: "hash"
+    masks:
+      - add: "1"
+      - template: '{{MaskHash (list "Emerald City" "Ruby City" "Sapphire City") .hash}}'
   # - selector:
   #     jsonpath: "hashInUri"
   #   mask:

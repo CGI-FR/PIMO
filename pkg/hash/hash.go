@@ -31,6 +31,12 @@ type MaskEngine struct {
 	List []model.Entry
 }
 
+// NewMaskSeeded create a MaskRandomList with a seed
+func NewMask(list []model.Entry, seed int64, seeder model.Seeder) MaskEngine {
+	// nolint: gosec
+	return MaskEngine{list}
+}
+
 // Mask choose a mask value by hash
 func (hm MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Entry, error) {
 	log.Info().Msg("Mask hash")
@@ -57,4 +63,17 @@ func Factory(conf model.MaskFactoryConfiguration) (model.MaskEngine, bool, error
 		return MaskEngine{list}, true, err
 	}
 	return nil, false, nil
+}
+
+func Func(seed int64, seedField string) interface{} {
+	var callnumber int64
+	return func(choices_ []interface{}, input model.Entry) (model.Entry, error) {
+		choices := make([]model.Entry, len(choices_))
+		for i, c := range choices_ {
+			choices[i] = c
+		}
+		mask := NewMask(choices, seed+callnumber, model.NewSeeder(seedField, seed+callnumber))
+		callnumber++
+		return mask.Mask(input)
+	}
 }
