@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1657899052055,
+  "lastUpdate": 1659103816284,
   "repoUrl": "https://github.com/CGI-FR/PIMO",
   "entries": {
     "Benchmark": [
@@ -1326,6 +1326,42 @@ window.BENCHMARK_DATA = {
             "value": 4456569,
             "unit": "ns/op\t  692271 B/op\t    6014 allocs/op",
             "extra": "2892 times\n2 procs"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "44274230+adrienaury@users.noreply.github.com",
+            "name": "Adrien Aury",
+            "username": "adrienaury"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "66efd5b7252421f000c1aeae3cc00668491db7ba",
+          "message": "feat(templatemasks): masks functions in templates (#65)\n\n* feat(templatemasks): wip proposal\r\n\r\n* feat(templatemasks): fix randomization\r\n\r\n* feat(templatemasks): test randomization\r\n\r\n* feat(template): fix template mask functions\r\n\r\n* Update masking_template.yml\r\n\r\n* fix(templatemasks): template mask seed\r\n\r\n* test(templatemasks): fix venom test\r\n\r\n* feat(template): use seeder in template\r\n\r\n* chore(ci): fix GitHub env vars\r\n\r\n* chore(ci): fix GitHub env vars\r\n\r\n* feat(templatemasks): impl randomChoices\r\n\r\n* feat(templatemasks): impl randomChoiceInUri\r\n\r\n* feat(templatemasks): impl randomInt\r\n\r\n* feat(templatemasks): impl randomDecimal\r\n\r\n* feat(templatemasks): impl command\r\n\r\n* feat(templatemasks): impl weightedChoice\r\n\r\n* fix(play): disallow mask Command in `masks` prop\r\n\r\n* feat(templatemasks): disallow MaskCommand in play\r\n\r\n* feat(templatemasks): impl hash\r\n\r\n* feat(templatemasks): impl hashInURI\r\n\r\n* feat(templatemasks): impl randDate\r\n\r\n* feat(templatemasks): impl duration\r\n\r\n* feat(templatemasks): impl dateparser\r\n\r\n* feat(templatemasks): impl randdura\r\n\r\n* feat(templatemasks): impl ff1\r\n\r\n* feat(templatemasks): impl range\r\n\r\n* feat(templatemasks): impl luhn + transcode\r\n\r\n* docs(templatemasks): readme + changelog\r\n\r\n* feat(templatemasks): simplify code",
+          "timestamp": "2022-07-29T16:05:11+02:00",
+          "tree_id": "aa2e3becd160e6f3e1033df1a310482a26850aa0",
+          "url": "https://github.com/CGI-FR/PIMO/commit/66efd5b7252421f000c1aeae3cc00668491db7ba"
+        },
+        "date": 1659103815651,
+        "tool": "go",
+        "benches": [
+          {
+            "name": "BenchmarkPimoRun",
+            "value": 325642,
+            "unit": "ns/op\t   16585 B/op\t     186 allocs/op",
+            "extra": "34093 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge",
+            "value": 4331854,
+            "unit": "ns/op\t  692444 B/op\t    6014 allocs/op",
+            "extra": "2678 times\n2 procs"
           }
         ]
       }
