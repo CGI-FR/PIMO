@@ -6,6 +6,7 @@ import (
 	"io/fs"
 	"net/http"
 	"net/url"
+	"strconv"
 	"strings"
 
 	"github.com/cgi-fr/pimo/pkg/jsonline"
@@ -67,6 +68,7 @@ func play(ctx echo.Context) error {
 	// data := ctx.FormValue("data")
 	yaml := fmt.Sprintf("%v", dataInput["masking"])
 	data := fmt.Sprintf("%v", dataInput["data"])
+	jsonl, _ := strconv.ParseBool(fmt.Sprintf("%v", dataInput["jsonl"]))
 
 	pdef, err := model.LoadPipelineDefinitionFromYAML([]byte(yaml))
 	if err != nil {
@@ -74,20 +76,42 @@ func play(ctx echo.Context) error {
 		return ctx.String(http.StatusInternalServerError, err.Error())
 	}
 
-	input, err := jsonline.JSONToDictionary([]byte(data))
-	if err != nil {
-		log.Err(err).Msg("Cannot load pipeline definition")
-		return ctx.String(http.StatusInternalServerError, err.Error())
-	}
-
-	if ctx.Get("enableSecurity") == true {
-		if err := checkSecurityRequirements(pdef); err != nil {
-			log.Err(err).Msg("Forbidden request")
+	inputs := []model.Dictionary{}
+	if !jsonl {
+		input, err := jsonline.JSONToDictionary([]byte(data))
+		if err != nil {
+			log.Err(err).Msg("Cannot load pipeline definition")
 			return ctx.String(http.StatusInternalServerError, err.Error())
+		}
+
+		if ctx.Get("enableSecurity") == true {
+			if err := checkSecurityRequirements(pdef); err != nil {
+				log.Err(err).Msg("Forbidden request")
+				return ctx.String(http.StatusInternalServerError, err.Error())
+			}
+		}
+		inputs = append(inputs, input)
+
+	} else {
+		for _, line := range strings.Split(strings.TrimRight(data, "\n"), "\n") {
+			input, err := jsonline.JSONToDictionary([]byte(line))
+			if err != nil {
+				log.Err(err).Msg("Cannot load pipeline definition")
+				return ctx.String(http.StatusInternalServerError, err.Error())
+			}
+
+			if ctx.Get("enableSecurity") == true {
+				if err := checkSecurityRequirements(pdef); err != nil {
+					log.Err(err).Msg("Forbidden request")
+					return ctx.String(http.StatusInternalServerError, err.Error())
+				}
+			}
+
+			inputs = append(inputs, input)
 		}
 	}
 
-	config.SingleInput = &input
+	config.MultipleInput = inputs
 	context := NewContext(pdef)
 
 	if err := context.Configure(config); err != nil {

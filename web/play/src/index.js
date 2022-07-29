@@ -7,19 +7,19 @@ import { setDiagnosticsOptions } from 'monaco-yaml';
 const modelUri = Uri.parse('file://masking.yml');
 
 setDiagnosticsOptions({
-  enableSchemaRequest: true,
-  hover: true,
-  completion: true,
-  validate: true,
-  format: true,
-  schemas: [
-    {
-      // Id of the first schema
-      uri: 'https://raw.githubusercontent.com/CGI-FR/PIMO/{{ version }}/schema/v1/pimo.schema.json',
-      // Associate with our model
-      fileMatch: [String(modelUri)],
-    },
-  ],
+    enableSchemaRequest: true,
+    hover: true,
+    completion: true,
+    validate: true,
+    format: true,
+    schemas: [
+        {
+            // Id of the first schema
+            uri: 'https://raw.githubusercontent.com/CGI-FR/PIMO/{{ version }}/schema/v1/pimo.schema.json',
+            // Associate with our model
+            fileMatch: [String(modelUri)],
+        },
+    ],
 });
 
 // editor.defineTheme("PIMO", {
@@ -44,26 +44,26 @@ if (urlParams.has('i')) {
 }
 
 var editorYaml = editor.create(document.getElementById('editor-yaml'), {
-  automaticLayout: true,
-  tabSize: 2,
-  scrollBeyondLastLine: false,
-  minimap: {enabled: false},
-  model: editor.createModel(masking, 'yaml', modelUri),
+    automaticLayout: true,
+    tabSize: 2,
+    scrollBeyondLastLine: false,
+    minimap: { enabled: false },
+    model: editor.createModel(masking, 'yaml', modelUri),
 });
 
 var editorJson = editor.create(document.getElementById('editor-json'), {
-  automaticLayout: true,
-  scrollBeyondLastLine: false,
-  minimap: {enabled: false},
-  model: editor.createModel(input, 'json', Uri.parse('file://data.jsonl')),
+    automaticLayout: true,
+    scrollBeyondLastLine: false,
+    minimap: { enabled: false },
+    model: editor.createModel(input, 'json', Uri.parse('file://data.jsonl')),
 });
 
 var resultJson = editor.create(document.getElementById('result-json'), {
-  automaticLayout: true,
-  scrollBeyondLastLine: false,
-  minimap: {enabled: false},
-  readOnly: true,
-  model: editor.createModel('', 'json', Uri.parse('file://result.jsonl')),
+    automaticLayout: true,
+    scrollBeyondLastLine: false,
+    minimap: { enabled: false },
+    readOnly: true,
+    model: editor.createModel('', 'plaintext', Uri.parse('file://result.jsonl')),
 });
 
 document.getElementById('loading').remove();
@@ -157,49 +157,50 @@ document.getElementById("reset-link").onclick = () => {
 ///////////////////////////////////////////////////////////
 
 async function postData() {
-  const postData = {
-      data: editorJson.getValue(),
-      masking: editorYaml.getValue()
-  }
-  console.log(postData)
+    const postData = {
+        data: editorJson.getValue(),
+        masking: editorYaml.getValue(),
+        jsonl: document.querySelector('input[type="checkbox"]').checked
+    }
+    console.log(postData)
+    console.log(typeof data)
+    // update URL for sharing
+    var c = LZString.compressToEncodedURIComponent(postData.masking);
+    var i = LZString.compressToEncodedURIComponent(postData.data);
+    window.history.replaceState(null, null, `${location.protocol}//${location.host}${location.pathname}?c=${c}&i=${i}`);
 
-  // update URL for sharing
-  var c = LZString.compressToEncodedURIComponent(postData.masking);
-  var i = LZString.compressToEncodedURIComponent(postData.data);
-  window.history.replaceState(null, null, `${location.protocol}//${location.host}${location.pathname}?c=${c}&i=${i}`);
+    try {
+        const res = await fetch(`/play`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(postData)
+        })
 
-  try {
-      const res = await fetch(`/play`, {
-          method: "POST",
-          headers: {
-              "Content-Type": "application/json"
-          },
-          body: JSON.stringify(postData)
-      })
-
-      if (!res.ok) {
-        if (res.status == 500) {
-          const data = await res.text()
-          throw new Error(data)
+        if (!res.ok) {
+            if (res.status == 500) {
+                const data = await res.text()
+                throw new Error(data)
+            }
+            const message = `An error has occurred: ${res.status} - ${res.statusText}`
+            throw new Error(message)
         }
-        const message = `An error has occurred: ${res.status} - ${res.statusText}`
-        throw new Error(message)
-      }
 
-      const data = await res.json()
+        const data = await res.text()
 
-      resultJson.setValue(JSON.stringify(data, null, 2))
-      document.getElementById('result-error').innerText = ""
-  } catch (err) {
-      console.log(err)
-      document.getElementById('result-error').innerText = err
-  } finally {
-    document.getElementById('refresh-spinner').style.display = 'none';
-    document.getElementById('refresh-button').style.display = 'inline';
-  }
+        resultJson.setValue(data)
+        document.getElementById('result-error').innerText = ""
+    } catch (err) {
+        console.log(err)
+        document.getElementById('result-error').innerText = err
+    } finally {
+        document.getElementById('refresh-spinner').style.display = 'none';
+        document.getElementById('refresh-button').style.display = 'inline';
+    }
 }
 
-function debounce(func, timeout = 300){
+function debounce(func, timeout = 300) {
     let timer;
     return (...args) => {
         document.getElementById('refresh-spinner').style.display = 'inline';
@@ -220,3 +221,24 @@ document.getElementById('editor-json').onpaste = autoPostData;
 document.getElementById('editor-json').oncut = autoPostData;
 document.getElementById('refresh-button').onclick = autoPostData;
 autoPostData();
+
+
+// Switch JSON - JSONL
+document.addEventListener('DOMContentLoaded', function () {
+    var checkbox = document.querySelector('input[type="checkbox"]');
+
+    checkbox.addEventListener('change', function () {
+        if (checkbox.checked) {
+            editor.setModelLanguage(editorJson.getModel(), "plaintext")
+            console.log('JSONL Checked');
+            console.log(editorJson.getValue());
+
+        } else {
+            editor.setModelLanguage(editorJson.getModel(), "json")
+            console.log('JSONL Not checked');
+            console.log(resultJson.getValue())
+        }
+    });
+});
+
+

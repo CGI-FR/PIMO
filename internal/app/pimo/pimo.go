@@ -64,6 +64,7 @@ import (
 type CachedMaskEngineFactories func(model.MaskEngine) model.MaskEngine
 
 type Config struct {
+	MultipleInput    []model.Dictionary
 	SingleInput      *model.Dictionary
 	EmptyInput       bool
 	RepeatUntil      string
@@ -109,6 +110,9 @@ func (ctx *Context) Configure(cfg Config) error {
 	case cfg.SingleInput != nil:
 		over.MDC().Set("context", "single-input")
 		ctx.source = model.NewSourceFromSlice([]model.Dictionary{*cfg.SingleInput})
+	case cfg.MultipleInput != nil:
+		over.MDC().Set("context", "multiple-input")
+		ctx.source = model.NewSourceFromSlice(cfg.MultipleInput)
 	default:
 		over.MDC().Set("context", "stdin")
 		ctx.source = jsonline.NewSource(os.Stdin)
