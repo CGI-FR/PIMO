@@ -446,6 +446,16 @@ The template mask can format the fields used. The following example will create 
 
 Available functions for templates come from <http://masterminds.github.io/sprig/>.
 
+Most masks will be available as functions in template in the form : MaskCapitalizedMaskName.
+
+```yaml
+  - selector:
+      jsonpath: "mail"
+    masks:
+      - add: ""
+      - template: '{{MaskRegex "[a-z]{10}"}}.{{MaskRegex "[a-z]{10}"}}.{{MaskRandomInt 0 100}}@gmail.com'
+```
+
 [Return to list of masks](#possible-masks)
 
 ### Template each
@@ -514,6 +524,8 @@ This example will create the field `newField` containing the value `newvalue`. T
 
 The field will be created in every input jsonline that doesn't already contains this field.
 
+Note: add can contains template strings (see the [Template](#template) mask for more information).
+
 [Return to list of masks](#possible-masks)
 
 ### Add-Transient
@@ -530,6 +542,8 @@ This example will create the field `newField` containing the value `newvalue`. T
 The field will be created in every input jsonline that doesn't already contains this field, and it will be removed from the final JSONLine output.
 
 This mask is used for temporary field that is only available to other fields during the execution.
+
+Note: add-transient can contains template strings (see the [Template](#template) mask for more information).
 
 [Return to list of masks](#possible-masks)
 

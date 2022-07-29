@@ -17,6 +17,7 @@ Types of changes
 ## [1.15.0]
 
 - `Added` functions section in masking configuration
+- `Added` possibility to use masks as template functions (most mask are available as `Mask<mask_name>` : MaskRandDate, MaskRegex, ...)
 - `Security` in PIMO Play : disallow usage of mask Command in `masks` property
 
 ## [1.14.1]
