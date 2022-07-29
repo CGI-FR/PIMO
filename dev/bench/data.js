@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1659103816284,
+  "lastUpdate": 1659106031768,
   "repoUrl": "https://github.com/CGI-FR/PIMO",
   "entries": {
     "Benchmark": [
@@ -1362,6 +1362,42 @@ window.BENCHMARK_DATA = {
             "value": 4331854,
             "unit": "ns/op\t  692444 B/op\t    6014 allocs/op",
             "extra": "2678 times\n2 procs"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "89643755+giraud10@users.noreply.github.com",
+            "name": "giraud10",
+            "username": "giraud10"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "bf2c6dca3eec616e41841eb1b293afad23cd8be7",
+          "message": "feat(play): save masking.yml on ctrl+s (#153)\n\n* feat(play): PIMO Play save masking.yml on ctrl+s\r\n\r\n* fix(play): masking default filename\r\n\r\nCo-authored-by: laam2022 <109791240+laam2022@users.noreply.github.com>\r\nCo-authored-by: Adrien Aury <44274230+adrienaury@users.noreply.github.com>",
+          "timestamp": "2022-07-29T16:43:12+02:00",
+          "tree_id": "adabfd943cd640db8740b887de4f534a2387e87a",
+          "url": "https://github.com/CGI-FR/PIMO/commit/bf2c6dca3eec616e41841eb1b293afad23cd8be7"
+        },
+        "date": 1659106030976,
+        "tool": "go",
+        "benches": [
+          {
+            "name": "BenchmarkPimoRun",
+            "value": 258815,
+            "unit": "ns/op\t   16681 B/op\t     204 allocs/op",
+            "extra": "44730 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge",
+            "value": 3297541,
+            "unit": "ns/op\t  692325 B/op\t    6014 allocs/op",
+            "extra": "3590 times\n2 procs"
           }
         ]
       }
