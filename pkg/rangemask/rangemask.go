@@ -18,7 +18,9 @@
 package rangemask
 
 import (
+	"errors"
 	"fmt"
+	"math"
 	"strconv"
 
 	"github.com/cgi-fr/pimo/pkg/model"
@@ -57,4 +59,82 @@ func Factory(conf model.MaskFactoryConfiguration) (model.MaskEngine, bool, error
 		return NewMask(conf.Masking.Mask.RangeMask), true, nil
 	}
 	return nil, false, nil
+}
+
+func Func(seed int64, seedField string) interface{} {
+	var callnumber int64
+	return func(maybescale interface{}, input model.Entry) (model.Entry, error) {
+		var err error
+		var scale int
+		switch typedscale := maybescale.(type) {
+		case string:
+			scale, err = strconv.Atoi(typedscale)
+			if err != nil {
+				return nil, err
+			}
+		case int:
+			scale = typedscale
+		case int64:
+			if typedscale > math.MaxInt || typedscale < math.MinInt {
+				return nil, errors.New("scale is out of range")
+			}
+			scale = int(typedscale)
+		case int32:
+			scale = int(typedscale)
+		case int16:
+			scale = int(typedscale)
+		case int8:
+			scale = int(typedscale)
+		case uint:
+			scale = int(typedscale)
+		case uint64:
+			if typedscale > math.MaxInt {
+				return nil, errors.New("scale is out of range")
+			}
+			scale = int(typedscale)
+		case uint32:
+			scale = int(typedscale)
+		case uint16:
+			scale = int(typedscale)
+		case uint8:
+			scale = int(typedscale)
+		}
+		mask := NewMask(scale)
+		callnumber++
+		return mask.Mask(tryConvertToFloat64(input))
+	}
+}
+
+func tryConvertToFloat64(input model.Entry) model.Entry {
+	switch typedinput := input.(type) {
+	case string:
+		if v, err := strconv.ParseFloat(typedinput, 64); err == nil {
+			return v
+		} else {
+			log.Warn().Err(err).Msg("")
+		}
+	case int:
+		return float64(typedinput)
+	case int64:
+		return float64(typedinput)
+	case int32:
+		return float64(typedinput)
+	case int16:
+		return float64(typedinput)
+	case int8:
+		return float64(typedinput)
+	case uint:
+		return float64(typedinput)
+	case uint64:
+		return float64(typedinput)
+	case uint32:
+		return float64(typedinput)
+	case uint16:
+		return float64(typedinput)
+	case uint8:
+		return float64(typedinput)
+	case float32:
+		return float64(typedinput)
+	}
+	return input
 }
