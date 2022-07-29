@@ -591,9 +591,10 @@
           "enum": [
             "null",
             "empty",
-            "blank"
+            "blank",
+            "notInCache"
           ],
-          "description": "Preserve (do not mask) some values : null = preserve null value, empty = preserve empty strings, blank = preserve both null and empty values"
+          "description": "Preserve (do not mask) some values : null = preserve null value, empty = preserve empty strings, blank = preserve both null and empty values, notInCache = preverse value even if not present in cache (fromCache mask)"
         },
         "seed": {
           "$ref": "#/$defs/SeedType",
