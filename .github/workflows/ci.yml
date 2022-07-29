@@ -36,7 +36,7 @@ jobs:
       - name: Init env
         run: docker-compose -f .devcontainer/docker-compose.yml exec -T -u root -w /workspace vscode make init
 
-      - uses: FranzDiebold/github-env-vars-action@v2
+      - uses: FranzDiebold/github-env-vars-action@v2.4.0
       - name: Run CI # up to test-int (info → refresh → lint → test → release → test-int)
         run: |
           docker-compose -f .devcontainer/docker-compose.yml exec \

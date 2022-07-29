@@ -76,7 +76,7 @@ func Factory(conf model.MaskFactoryConfiguration) (model.MaskEngine, bool, error
 		h := fnv.New64a()
 		h.Write([]byte(conf.Masking.Selector.Jsonpath))
 		conf.Seed += int64(h.Sum64())
-		seeder := model.NewSeeder(conf.Masking, conf.Seed)
+		seeder := model.NewSeeder(conf.Masking.Seed.Field, conf.Seed)
 		if classes := conf.Masking.Mask.Transcode.Classes; len(classes) > 0 {
 			return NewMask(classes, conf.Seed, seeder), true, nil
 		}
@@ -95,4 +95,13 @@ func defaultClasses() []model.Class {
 	upper := "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 	digits := "0123456789"
 	return []model.Class{{Input: lower, Output: lower}, {Input: upper, Output: upper}, {Input: digits, Output: digits}}
+}
+
+func Func(seed int64, seedField string) interface{} {
+	var callnumber int64
+	return func(input model.Entry) (model.Entry, error) {
+		mask := NewMask(defaultClasses(), seed+callnumber, model.NewSeeder(seedField, seed+callnumber))
+		callnumber++
+		return mask.Mask(input)
+	}
 }

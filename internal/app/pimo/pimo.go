@@ -53,6 +53,7 @@ import (
 	"github.com/cgi-fr/pimo/pkg/remove"
 	"github.com/cgi-fr/pimo/pkg/replacement"
 	"github.com/cgi-fr/pimo/pkg/statistics"
+	"github.com/cgi-fr/pimo/pkg/template"
 	"github.com/cgi-fr/pimo/pkg/templateeach"
 	"github.com/cgi-fr/pimo/pkg/templatemask"
 	"github.com/cgi-fr/pimo/pkg/transcode"
@@ -134,6 +135,7 @@ func (ctx *Context) Configure(cfg Config) error {
 		Process(model.NewRepeaterProcess(cfg.Iteration))
 	over.AddGlobalFields("input-line")
 
+	injectTemplateFuncs()
 	model.InjectMaskContextFactories(injectMaskContextFactories())
 	model.InjectMaskFactories(injectMaskFactories())
 	model.InjectConfig(cfg.SkipLineOnError, cfg.SkipFieldOnError)
@@ -299,6 +301,29 @@ func injectMaskFactories() []model.MaskFactory {
 		markov.Factory,
 		transcode.Factory,
 	}
+}
+
+func injectTemplateFuncs() {
+	template.InjectSeededFuncGenerator("MaskRegex", regex.Func)
+	template.InjectSeededFuncGenerator("MaskRandomChoice", randomlist.Func)
+	template.InjectSeededFuncGenerator("MaskRandomChoiceInUri", randomuri.Func)
+	template.InjectSeededFuncGenerator("MaskRandomChoiceInURI", randomuri.Func)
+	template.InjectSeededFuncGenerator("MaskRandomInt", randomint.Func)
+	template.InjectSeededFuncGenerator("MaskRandomDecimal", randomdecimal.Func)
+	template.InjectSeededFuncGenerator("MaskCommand", command.Func)
+	template.InjectSeededFuncGenerator("MaskWeightedChoice", weightedchoice.Func)
+	template.InjectSeededFuncGenerator("MaskHash", hash.Func)
+	template.InjectSeededFuncGenerator("MaskHashInUri", hash.FuncInUri)
+	template.InjectSeededFuncGenerator("MaskHashInURI", hash.FuncInUri)
+	template.InjectSeededFuncGenerator("MaskRandDate", randdate.Func)
+	template.InjectSeededFuncGenerator("MaskDuration", duration.Func)
+	template.InjectSeededFuncGenerator("MaskDateParser", dateparser.Func)
+	template.InjectSeededFuncGenerator("MaskRandomDuration", randdura.Func)
+	template.InjectSeededFuncGenerator("MaskFF1", ff1.Func)
+	template.InjectSeededFuncGenerator("MaskFf1", ff1.Func)
+	template.InjectSeededFuncGenerator("MaskRange", rangemask.Func)
+	template.InjectSeededFuncGenerator("MaskLuhn", luhn.Func)
+	template.InjectSeededFuncGenerator("MaskTranscode", transcode.Func)
 }
 
 var re = regexp.MustCompile(`(\[\d*\])?$`)

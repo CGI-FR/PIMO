@@ -108,3 +108,13 @@ func Factory(conf model.MaskFactoryConfiguration) (model.MaskEngine, bool, error
 	}
 	return nil, false, nil
 }
+
+func Func(seed int64, seedField string) interface{} {
+	return func(durastr string, input model.Entry) (model.Entry, error) {
+		mask, err := NewMask(durastr)
+		if err != nil {
+			return nil, err
+		}
+		return mask.Mask(input)
+	}
+}

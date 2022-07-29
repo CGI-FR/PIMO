@@ -11,6 +11,13 @@ import (
 	"golang.org/x/text/unicode/norm"
 )
 
+//nolint:checknoglobals
+var seededFuncs = map[string]interface{}{}
+
+func InjectSeededFuncGenerator(name string, f interface{}) {
+	seededFuncs[name] = f
+}
+
 // Engine is a template engine
 type Engine struct {
 	*template.Template
@@ -25,10 +32,17 @@ func rmAcc(s string) string {
 }
 
 // NewEngine create a template Engine
-func NewEngine(text string, funcMap template.FuncMap) (*Engine, error) {
+func NewEngine(text string, funcMap template.FuncMap, seed int64, seedField string) (*Engine, error) {
 	funcMap["ToUpper"] = strings.ToUpper
 	funcMap["ToLower"] = strings.ToLower
 	funcMap["NoAccent"] = rmAcc
+
+	for k, v := range seededFuncs {
+		if f, ok := v.(func(int64, string) interface{}); ok {
+			funcMap[k] = f(seed, seedField)
+		}
+	}
+
 	temp, err := template.New("template").Funcs(sprig.TxtFuncMap()).Funcs(funcMap).Parse(text)
 	return &Engine{temp}, err
 }
