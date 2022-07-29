@@ -96,3 +96,12 @@ func defaultClasses() []model.Class {
 	digits := "0123456789"
 	return []model.Class{{Input: lower, Output: lower}, {Input: upper, Output: upper}, {Input: digits, Output: digits}}
 }
+
+func Func(seed int64, seedField string) interface{} {
+	var callnumber int64
+	return func(input model.Entry) (model.Entry, error) {
+		mask := NewMask(defaultClasses(), seed+callnumber, model.NewSeeder(seedField, seed+callnumber))
+		callnumber++
+		return mask.Mask(input)
+	}
+}

@@ -73,3 +73,13 @@ masking:
     masks:
       - add: 27
       - template: '{{MaskRange 5 .range}}'
+  - selector:
+      jsonpath: "luhn"
+    masks:
+      - add: "123456789"
+      - template: '{{MaskLuhn .luhn}}'
+  - selector:
+      jsonpath: "transcode"
+    masks:
+      - add: "AB-123-CD"
+      - template: '{{MaskTranscode .transcode}}'
