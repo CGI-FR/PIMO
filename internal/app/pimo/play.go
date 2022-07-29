@@ -109,14 +109,13 @@ func play(ctx echo.Context) error {
 
 func checkSecurityRequirements(pdef model.Definition) error {
 	for _, mask := range pdef.Masking {
-		// usage of command is not allowed with pimo play
-		if len(mask.Mask.Command) > 0 {
-			return fmt.Errorf("Usage of `command` mask is forbidden")
+		if err := checkMask(mask.Mask); err != nil {
+			return err
 		}
 
 		for _, m := range mask.Masks {
-			if len(m.Command) > 0 {
-				return fmt.Errorf("Usage of `command` mask is forbidden")
+			if err := checkMask(m); err != nil {
+				return err
 			}
 		}
 
@@ -135,6 +134,36 @@ func checkSecurityRequirements(pdef model.Definition) error {
 
 		if err := checkUriScheme(mask.Mask.RandomChoiceInURI); err != nil {
 			return err
+		}
+	}
+
+	return nil
+}
+
+func checkMask(mask model.MaskType) error {
+	// usage of command is not allowed with pimo play
+	if len(mask.Command) > 0 {
+		return fmt.Errorf("Usage of `command` mask is forbidden")
+	}
+
+	// usage of MaskCommand in templates is not allowed
+	if len(mask.Template) > 0 {
+		if strings.Contains(mask.Template, "MaskCommand") {
+			return fmt.Errorf("Usage of `command` mask is forbidden")
+		}
+	}
+
+	// usage of MaskCommand in templates is not allowed
+	if tmplstr, ok := mask.Add.(string); ok {
+		if strings.Contains(tmplstr, "MaskCommand") {
+			return fmt.Errorf("Usage of `command` mask is forbidden")
+		}
+	}
+
+	// usage of MaskCommand in templates is not allowed
+	if tmplstr, ok := mask.AddTransient.(string); ok {
+		if strings.Contains(tmplstr, "MaskCommand") {
+			return fmt.Errorf("Usage of `command` mask is forbidden")
 		}
 	}
 
