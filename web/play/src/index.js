@@ -202,7 +202,6 @@ async function postData() {
       data: editorJson.getValue(),
       masking: editorYaml.getValue()
   }
-  console.log(postData)
 
   // update URL for sharing
   var c = LZString.compressToEncodedURIComponent(postData.masking);
@@ -282,7 +281,6 @@ async function postFlow() {
     const postFlow = {
         masking: editorYaml.getValue()
     }
-    console.log(postFlow)
 
     // update URL for sharing
     var c = LZString.compressToEncodedURIComponent(postFlow.masking);
@@ -297,12 +295,9 @@ async function postFlow() {
             body: JSON.stringify(postFlow)
         })
 
-        console.log(res)
-
         if (!res.ok) {
           if (res.status == 500) {
             const data = await res.text()
-            console.log(data)
             throw new Error(data)
           }
           const message = `An error has occurred: ${res.status} - ${res.statusText}`
@@ -312,7 +307,6 @@ async function postFlow() {
         const data = await res.text();
 
         if (mermaid.parse(data)) {
-            console.log("ok")
             mermaid.render('flowchartGraph', data, null, resultFlowchart);
             document.getElementById('result-error').innerText = ""
         }

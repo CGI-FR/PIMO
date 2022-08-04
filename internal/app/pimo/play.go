@@ -69,8 +69,6 @@ func play(ctx echo.Context) error {
 	// data := ctx.FormValue("data")
 	yaml := fmt.Sprintf("%v", dataInput["masking"])
 	data := fmt.Sprintf("%v", dataInput["data"])
-	log.Info().Msg(yaml)
-	log.Info().Msg(data)
 
 	pdef, err := model.LoadPipelineDefinitionFromYAML([]byte(yaml))
 	if err != nil {
@@ -136,7 +134,6 @@ func flowchart(ctx echo.Context) error {
 	}
 
 	log.Info().Msg("Mask flowchart generated")
-	log.Info().Msg(flowchart)
 	return ctx.JSONBlob(http.StatusOK, []byte(flowchart))
 }
 
