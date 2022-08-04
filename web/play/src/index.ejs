@@ -16,11 +16,19 @@
       <div class="grow"></div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>mermaid.initialize({startOnLoad:true});</script>
+
     <div class="px-4 md:px-8 lg:px-16">
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-8">
-        <div class="flex flex-col">
+        <div class="flex flex-col dev-container">
           <div class="flex-none font-sans text-xl pb-2">Masking Configuration</div>
+          <div id="tabArea" style="position: relative; box-sizing: border-box; top: 0px; left: 0px; width: 50%; height: 5%;">
+            <span id="maskingTab" class="tab active">masking.yml</span>
+            <span id="flowchartTab" class="tab">flowchart.mmd</span>
+          </div>
           <div class="grow shadow-lg h-[300px] md:h-[600px]" id="editor-yaml"></div>
+          <div id="flowchart" class="mermaid" style="display: none;"></div>
         </div>
 
         <div class="flex flex-col">

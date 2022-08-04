@@ -32,15 +32,23 @@ setDiagnosticsOptions({
 // });
 // editor.setTheme("PIMO");
 
-var masking = 'version: "1"\nmasking:\n  - selector:\n      jsonpath: "name"\n    mask:\n      randomChoiceInUri: "pimo://nameFR"\n';
-var input = '{\n  "name": "Bill"\n}';
+var data = {
+    masking: {
+        model: editor.createModel('version: "1"\nmasking:\n  - selector:\n      jsonpath: "name"\n    mask:\n      randomChoiceInUri: "pimo://nameFR"\n', 'yaml', modelUri),
+        state: null
+    },
+    input: {
+        model: editor.createModel('{\n  "name": "Bill"\n}', 'json'),
+        state: null
+    }
+}
 
 const urlParams = new URLSearchParams(window.location.search);
 if (urlParams.has('c')) {
-    masking = LZString.decompressFromEncodedURIComponent(urlParams.get('c'));
+    data.masking.model = LZString.decompressFromEncodedURIComponent(urlParams.get('c'));
 }
 if (urlParams.has('i')) {
-    input = LZString.decompressFromEncodedURIComponent(urlParams.get('i'));
+    data.input.model = LZString.decompressFromEncodedURIComponent(urlParams.get('i'));
 }
 
 var editorYaml = editor.create(document.getElementById('editor-yaml'), {
@@ -48,14 +56,14 @@ var editorYaml = editor.create(document.getElementById('editor-yaml'), {
   tabSize: 2,
   scrollBeyondLastLine: false,
   minimap: {enabled: false},
-  model: editor.createModel(masking, 'yaml', modelUri),
+  model: data.masking.model,
 });
 
 var editorJson = editor.create(document.getElementById('editor-json'), {
   automaticLayout: true,
   scrollBeyondLastLine: false,
   minimap: {enabled: false},
-  model: editor.createModel(input, 'json', Uri.parse('file://data.jsonl')),
+  model: data.input.model,
 });
 
 var resultJson = editor.create(document.getElementById('result-json'), {
@@ -66,7 +74,40 @@ var resultJson = editor.create(document.getElementById('result-json'), {
   model: editor.createModel('', 'json', Uri.parse('file://result.jsonl')),
 });
 
+var resultFlowchart = document.getElementById('flowchart');
+
 document.getElementById('loading').remove();
+
+var tabArea = document.getElementById("tabArea");
+var maskingTab = document.getElementById("maskingTab");
+var flowchartTab = document.getElementById("flowchartTab");
+maskingTab.onclick = function() { changeTab(maskingTab, 'masking')};
+flowchartTab.onclick = function() { changeTab(flowchartTab, 'flowchart')};
+
+function changeTab(selectedTabNode, desiredModelId) {
+    for (var i = 0; i < tabArea.childNodes.length; i++) {
+        var child = tabArea.childNodes[i];
+        if (/tab/.test(child.className)) {
+            child.className = 'tab';
+        }
+    }
+    selectedTabNode.className = 'tab active';
+
+    if (selectedTabNode === maskingTab) {
+        editorYaml.setModel(data[desiredModelId].model);
+        editorYaml.restoreViewState(data[desiredModelId].state);
+        editorYaml.focus();
+        resultFlowchart.style = "display: none;"
+        document.getElementById('editor-yaml').style = "display: block;";
+    } else {
+        data.masking.state = editorYaml.saveViewState();
+        data.masking.model = editorYaml.getModel();
+        document.getElementById('editor-yaml').style = "display: none;";
+        postFlow();
+        resultFlowchart.style = "display: block;"
+    }
+
+}
 
 // Examples ///////////////////////////////////////////////
 
@@ -148,9 +189,9 @@ examples_other.forEach((params, name) => {
 examples_other_a.remove()
 
 document.getElementById("reset-link").onclick = () => {
-    editorYaml.setValue(masking);
-    editorJson.setValue(input);
-    resultJson.setValue("");
+    editorYaml.setModel(data.masking.model);
+    editorJson.setModel(data.input.model);
+    resultJson.setModel(editor.createModel('', 'json', Uri.parse('file://result.jsonl')));
     autoPostData();
 }
 
@@ -236,3 +277,50 @@ document.addEventListener("keydown", function(e) {
         aDownloadMasking.remove()
     }
 }, false);
+
+async function postFlow() {
+    const postFlow = {
+        masking: editorYaml.getValue()
+    }
+    console.log(postFlow)
+
+    // update URL for sharing
+    var c = LZString.compressToEncodedURIComponent(postFlow.masking);
+    window.history.replaceState(null, null, `${location.protocol}//${location.host}${location.pathname}?c=${c}`);
+
+    try {
+        const res = await fetch(`/flow`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(postFlow)
+        })
+
+        console.log(res)
+
+        if (!res.ok) {
+          if (res.status == 500) {
+            const data = await res.text()
+            console.log(data)
+            throw new Error(data)
+          }
+          const message = `An error has occurred: ${res.status} - ${res.statusText}`
+          throw new Error(message)
+        }
+
+        const data = await res.text();
+
+        if (mermaid.parse(data)) {
+            console.log("ok")
+            mermaid.render('flowchartGraph', data, null, resultFlowchart);
+            document.getElementById('result-error').innerText = ""
+        }
+    } catch (err) {
+        console.log(err)
+        document.getElementById('result-error').innerText = err
+    } finally {
+      document.getElementById('refresh-spinner').style.display = 'none';
+      document.getElementById('refresh-button').style.display = 'inline';
+    }
+  }
