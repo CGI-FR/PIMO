@@ -119,7 +119,6 @@ func flowchart(ctx echo.Context) error {
 	}
 
 	yaml := fmt.Sprintf("%v", dataInput["masking"])
-	log.Info().Msg(yaml)
 
 	pdef, err := model.LoadPipelineDefinitionFromYAML([]byte(yaml))
 	if err != nil {

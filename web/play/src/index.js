@@ -2,6 +2,8 @@ import './style.css';
 import LZString from 'lz-string';
 import { editor, Uri } from 'monaco-editor';
 import { setDiagnosticsOptions } from 'monaco-yaml';
+import * as d3 from 'd3';
+import mermaid from 'mermaid';
 
 // The uri is used for the schema file match.
 const modelUri = Uri.parse('file://masking.yml');
@@ -45,10 +47,10 @@ var data = {
 
 const urlParams = new URLSearchParams(window.location.search);
 if (urlParams.has('c')) {
-    data.masking.model = LZString.decompressFromEncodedURIComponent(urlParams.get('c'));
+    data.masking.model.setValue(LZString.decompressFromEncodedURIComponent(urlParams.get('c')));
 }
 if (urlParams.has('i')) {
-    data.input.model = LZString.decompressFromEncodedURIComponent(urlParams.get('i'));
+    data.input.model.setValue(LZString.decompressFromEncodedURIComponent(urlParams.get('i')));
 }
 
 var editorYaml = editor.create(document.getElementById('editor-yaml'), {
@@ -75,6 +77,7 @@ var resultJson = editor.create(document.getElementById('result-json'), {
 });
 
 var resultFlowchart = document.getElementById('flowchart');
+mermaid.initialize({startOnLoad:true});
 
 document.getElementById('loading').remove();
 
@@ -112,7 +115,8 @@ function changeTab(selectedTabNode, desiredModelId) {
 // Examples ///////////////////////////////////////////////
 
 function loadExample(params) {
-    editorYaml.setValue(LZString.decompressFromEncodedURIComponent(params[0]));
+    data.masking.model.setValue(LZString.decompressFromEncodedURIComponent(params[0]));
+    // editorYaml.setValue();
     editorJson.setValue(LZString.decompressFromEncodedURIComponent(params[1]));
     resultJson.setValue("");
     autoPostData();
@@ -307,7 +311,16 @@ async function postFlow() {
         const data = await res.text();
 
         if (mermaid.parse(data)) {
-            mermaid.render('flowchartGraph', data, null, resultFlowchart);
+            const cb = function (svgGraph) {
+                if (document.getElementById('div')) {
+                    resultFlowchart.removeChild(document.getElementById('dflowchartGraph'));
+                }
+                var graph = document.createElement('dflowchartGraph');
+                graph.id = 'dflowchartGraph'
+                graph.innerHTML = svgGraph;
+                resultFlowchart.appendChild(graph);
+            };
+            mermaid.render('flowchartGraph', data, cb, resultFlowchart);
             document.getElementById('result-error').innerText = ""
         }
     } catch (err) {
@@ -317,4 +330,30 @@ async function postFlow() {
       document.getElementById('refresh-spinner').style.display = 'none';
       document.getElementById('refresh-button').style.display = 'inline';
     }
-  }
+}
+
+window.addEventListener('load', function () {
+    var svgs = d3.selectAll("dflowchartGraph > svg");
+    svgs.each(function() {
+      var svg = d3.select(this);
+      svg.html("<g>" + svg.html() + "</g>");
+      var inner = svg.select("g");
+      var zoom = d3.zoom().on("zoom", function(event) {
+        inner.attr("transform", event.transform);
+      });
+      svg.call(zoom);
+    });
+  });
+
+  window.addEventListener('wheel', function () {
+    var svgs = d3.selectAll("dflowchartGraph > svg");
+    svgs.each(function() {
+      var svg = d3.select(this);
+      svg.html("<g>" + svg.html() + "</g>");
+      var inner = svg.select("g");
+      var zoom = d3.zoom().on("zoom", function(event) {
+        inner.attr("transform", event.transform);
+      });
+      svg.call(zoom);
+    });
+  });
