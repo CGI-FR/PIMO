@@ -119,6 +119,8 @@ function loadExample(params) {
     // editorYaml.setValue();
     editorJson.setValue(LZString.decompressFromEncodedURIComponent(params[1]));
     resultJson.setValue("");
+    resultFlowchart.removeChild(document.getElementById('dflowchartGraph'));
+    postFlow();
     autoPostData();
 }
 
@@ -326,9 +328,6 @@ async function postFlow() {
     } catch (err) {
         console.log(err)
         document.getElementById('result-error').innerText = err
-    } finally {
-      document.getElementById('refresh-spinner').style.display = 'none';
-      document.getElementById('refresh-button').style.display = 'inline';
     }
 }
 
