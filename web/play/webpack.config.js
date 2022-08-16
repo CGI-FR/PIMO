@@ -17,7 +17,13 @@ export default {
   devServer: {
     proxy: {
       '/play': 'http://localhost:3010',
+      '/flow': 'http://localhost:3010',
     },
+  },
+  watchOptions: {
+    ignored: /node_modules/,
+    aggregateTimeout: 200,
+    poll: 1000
   },
   plugins: [
     new HtmlWebPackPlugin(),

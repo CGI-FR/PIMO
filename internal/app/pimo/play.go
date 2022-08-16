@@ -8,6 +8,7 @@ import (
 	"net/url"
 	"strings"
 
+	"github.com/cgi-fr/pimo/pkg/flow"
 	"github.com/cgi-fr/pimo/pkg/jsonline"
 	"github.com/cgi-fr/pimo/pkg/model"
 	"github.com/labstack/echo/v4"
@@ -38,6 +39,7 @@ func Play(enableSecurity bool) *echo.Echo {
 
 	router.GET("/*", echo.WrapHandler(handleClient()))
 	router.POST("/play", play)
+	router.POST("/flow", flowchart)
 
 	return router
 }
@@ -105,6 +107,33 @@ func play(ctx echo.Context) error {
 
 	log.Info().Interface("stats", stats).Msg("Input masked")
 	return ctx.JSONBlob(http.StatusOK, []byte(result.String()))
+}
+
+func flowchart(ctx echo.Context) error {
+	var dataInput map[string]interface{}
+
+	err := ctx.Bind(&dataInput)
+	if err != nil {
+		log.Err(err).Msg("Failed to bind client data")
+		return ctx.String(http.StatusInternalServerError, err.Error())
+	}
+
+	yaml := fmt.Sprintf("%v", dataInput["masking"])
+
+	pdef, err := model.LoadPipelineDefinitionFromYAML([]byte(yaml))
+	if err != nil {
+		log.Err(err).Msg("Cannot load pipeline definition")
+		return ctx.String(http.StatusInternalServerError, err.Error())
+	}
+
+	flowchart, err := flow.Export(pdef)
+	if err != nil {
+		log.Err(err).Msg("Cannot generate flowchart")
+		return ctx.String(http.StatusInternalServerError, err.Error())
+	}
+
+	log.Info().Msg("Mask flowchart generated")
+	return ctx.JSONBlob(http.StatusOK, []byte(flowchart))
 }
 
 func checkSecurityRequirements(pdef model.Definition) error {
