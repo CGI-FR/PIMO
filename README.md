@@ -828,7 +828,7 @@ name       | description
 `nameEN`   | english female or male names
 `nameENF`  | english female names
 `nameENM`  | english male names
-`nameFR`   |  french female or male names
+`nameFR`   | french female or male names
 `nameFRF`  | french female names
 `nameFRM`  | french male names
 `surnameFR`| french surnames
