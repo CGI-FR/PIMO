@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1659625558882,
+  "lastUpdate": 1661883526386,
   "repoUrl": "https://github.com/CGI-FR/PIMO",
   "entries": {
     "Benchmark": [
@@ -1506,6 +1506,42 @@ window.BENCHMARK_DATA = {
             "value": 3318628,
             "unit": "ns/op\t  692287 B/op\t    6013 allocs/op",
             "extra": "3588 times\n2 procs"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "youen.peron@cgi.com",
+            "name": "Youen Péron",
+            "username": "youen"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "4fce58d58ee0598daf373446f54c93a23bd46b7e",
+          "message": "Merge pull request #159 from CGI-FR/154-proposal-pimo-play-add-mermaid-view\n\nfeat(mermaid): adds a tab to visualize a mermaid graph of the masking",
+          "timestamp": "2022-08-16T16:34:45+02:00",
+          "tree_id": "8c6ef863f659d0fd5b6256c943499de2b7b8a7f8",
+          "url": "https://github.com/CGI-FR/PIMO/commit/4fce58d58ee0598daf373446f54c93a23bd46b7e"
+        },
+        "date": 1661883525986,
+        "tool": "go",
+        "benches": [
+          {
+            "name": "BenchmarkPimoRun",
+            "value": 258095,
+            "unit": "ns/op\t   16685 B/op\t     204 allocs/op",
+            "extra": "44450 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge",
+            "value": 3289246,
+            "unit": "ns/op\t  692307 B/op\t    6014 allocs/op",
+            "extra": "3567 times\n2 procs"
           }
         ]
       }
