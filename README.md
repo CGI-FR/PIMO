@@ -819,6 +819,23 @@ By default, if not specified otherwise, these classes will be used (input -> out
 
 [Return to list of masks](#possible-masks)
 
+## `pimo://` scheme
+
+Pimo embed a usefule list of fake data. URIs that begin with a pimo:// sheme point to the pseudo files bellow.
+
+name       | description 
+-----------|-----------------------------
+`nameEN`   | english female or male names
+`nameENF`  | english female names
+`nameENM`  | english male names
+`nameFR`   | french female or male names
+`nameFRF`  | french female names
+`nameFRM`  | french male names
+`surnameFR`| french surnames
+`townFR`   | french towns names
+
+The content of built-in lists are in [the `maskingdata` package](pkg/maskingdata)
+
 ## Flow chart
 
 PIMO can generate a Mermaid syntax flow chart to visualize the transformation process.
