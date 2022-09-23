@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1661883526386,
+  "lastUpdate": 1663943318883,
   "repoUrl": "https://github.com/CGI-FR/PIMO",
   "entries": {
     "Benchmark": [
@@ -1542,6 +1542,42 @@ window.BENCHMARK_DATA = {
             "value": 3289246,
             "unit": "ns/op\t  692307 B/op\t    6014 allocs/op",
             "extra": "3567 times\n2 procs"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "youen.peron@cgi.com",
+            "name": "Youen Péron",
+            "username": "youen"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "630c8f0817358606c536b9486e03a1127c9e1c0d",
+          "message": "docs(maskingdata): add list in readme (#163)\n\n* docs(maskingdata): add list in readme\r\n\r\n* Update README.md",
+          "timestamp": "2022-09-23T16:23:02+02:00",
+          "tree_id": "9165477bd45a3f033bd0de52418a4fee7357bcb1",
+          "url": "https://github.com/CGI-FR/PIMO/commit/630c8f0817358606c536b9486e03a1127c9e1c0d"
+        },
+        "date": 1663943318439,
+        "tool": "go",
+        "benches": [
+          {
+            "name": "BenchmarkPimoRun",
+            "value": 355172,
+            "unit": "ns/op\t   16734 B/op\t     204 allocs/op",
+            "extra": "33114 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge",
+            "value": 4469778,
+            "unit": "ns/op\t  692273 B/op\t    6013 allocs/op",
+            "extra": "2820 times\n2 procs"
           }
         ]
       }
