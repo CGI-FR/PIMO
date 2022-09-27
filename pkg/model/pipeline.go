@@ -66,7 +66,7 @@ func BuildCaches(caches map[string]CacheDefinition, existing map[string]Cache) m
 	return existing
 }
 
-func BuildFuncMap(funcs map[string]Function) (tmpl.FuncMap, error) {
+func BuildFuncMap(funcs map[string]Function, fns tmpl.FuncMap) (tmpl.FuncMap, error) {
 	b := functions.Builder{
 		Definitions: map[string]functions.Definition{},
 	}
@@ -83,12 +83,12 @@ func BuildFuncMap(funcs map[string]Function) (tmpl.FuncMap, error) {
 		}
 	}
 
-	return b.Build()
+	return b.Build(fns)
 }
 
-func BuildPipeline(pipeline Pipeline, conf Definition, caches map[string]Cache) (Pipeline, map[string]Cache, error) {
+func BuildPipeline(pipeline Pipeline, conf Definition, caches map[string]Cache, functions tmpl.FuncMap) (Pipeline, map[string]Cache, error) {
 	caches = BuildCaches(conf.Caches, caches)
-	functions, err := BuildFuncMap(conf.Functions)
+	functions, err := BuildFuncMap(conf.Functions, functions)
 	if err != nil {
 		return nil, nil, err
 	}

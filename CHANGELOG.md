@@ -16,11 +16,12 @@ Types of changes
 
 ## [1.15.0]
 
+- `Security` in PIMO Play : disallow usage of mask Command in `masks` property
 - `Added` functions section in masking configuration
 - `Added` possibility to use masks as template functions (most mask are available as `Mask<mask_name>` : MaskRandDate, MaskRegex, ...)
-- `Fixed` preserve notInCache enum in the jsonschema
-- `Security` in PIMO Play : disallow usage of mask Command in `masks` property
 - `Added` in PIMO Play: adds a tab to visualize a mermaid graph flow of the masking
+- `Fixed` preserve notInCache enum in the jsonschema
+- `Fixed` functions call from a pipe mask crash pipeline
 
 ## [1.14.1]
 

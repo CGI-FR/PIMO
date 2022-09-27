@@ -40,7 +40,7 @@ func TestMaskEngineShouldMaskNestedArray(t *testing.T) {
 	var result []model.Dictionary
 
 	model.InjectMaskFactories([]model.MaskFactory{templatemask.Factory})
-	pipe, err := pipe.NewMask(42, "parent", "root", map[string]model.Cache{}, "",
+	pipe, err := pipe.NewMask(42, "parent", "root", map[string]model.Cache{}, nil, "",
 		model.Masking{
 			Selector: model.SelectorType{Jsonpath: "name"},
 			Mask: model.MaskType{
