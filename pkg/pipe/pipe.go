@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"hash/fnv"
 	"regexp"
+	"text/template"
 
 	over "github.com/Trendyol/overlog"
 	"github.com/cgi-fr/pimo/pkg/model"
@@ -36,7 +37,7 @@ type MaskEngine struct {
 }
 
 // NewMask return a MaskEngine from a value
-func NewMask(seed int64, injectParent string, injectRoot string, caches map[string]model.Cache, filename string, masking ...model.Masking) (MaskEngine, error) {
+func NewMask(seed int64, injectParent string, injectRoot string, caches map[string]model.Cache, fns template.FuncMap, filename string, masking ...model.Masking) (MaskEngine, error) {
 	var definition model.Definition
 	var err error
 	if len(filename) > 0 {
@@ -50,7 +51,7 @@ func NewMask(seed int64, injectParent string, injectRoot string, caches map[stri
 		definition = model.Definition{Seed: seed + 1, Masking: masking}
 	}
 	pipeline := model.NewPipeline(nil)
-	pipeline, _, err = model.BuildPipeline(pipeline, definition, caches)
+	pipeline, _, err = model.BuildPipeline(pipeline, definition, caches, fns)
 	return MaskEngine{"", pipeline, injectParent, injectRoot}, err
 }
 
@@ -119,7 +120,7 @@ func Factory(conf model.MaskFactoryConfiguration) (model.MaskContextEngine, bool
 		h := fnv.New64a()
 		h.Write([]byte(conf.Masking.Selector.Jsonpath))
 		conf.Seed += int64(h.Sum64())
-		mask, err := NewMask(conf.Seed, conf.Masking.Mask.Pipe.InjectParent, conf.Masking.Mask.Pipe.InjectRoot, conf.Cache, conf.Masking.Mask.Pipe.DefinitionFile, conf.Masking.Mask.Pipe.Masking...)
+		mask, err := NewMask(conf.Seed, conf.Masking.Mask.Pipe.InjectParent, conf.Masking.Mask.Pipe.InjectRoot, conf.Cache, conf.Functions, conf.Masking.Mask.Pipe.DefinitionFile, conf.Masking.Mask.Pipe.Masking...)
 		if err != nil {
 			return mask, true, err
 		}

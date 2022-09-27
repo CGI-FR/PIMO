@@ -93,8 +93,11 @@ func (d Definition) AsCall(name string, args ...interface{}) string {
 }
 
 // Build returns a FuncMap (map[string]interface{}) that can be used in Go Template API, with all functions.
-func (b Builder) Build() (template.FuncMap, error) {
-	funcMap := make(template.FuncMap, len(b.Definitions))
+func (b Builder) Build(fns template.FuncMap) (template.FuncMap, error) {
+	funcMap := fns
+	if fns == nil {
+		funcMap = make(template.FuncMap, len(b.Definitions))
+	}
 
 	if len(b.Definitions) == 0 {
 		return funcMap, nil

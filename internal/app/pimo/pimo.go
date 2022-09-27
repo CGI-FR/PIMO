@@ -141,7 +141,7 @@ func (ctx *Context) Configure(cfg Config) error {
 	model.InjectConfig(cfg.SkipLineOnError, cfg.SkipFieldOnError)
 
 	var err error
-	ctx.pipeline, ctx.caches, err = model.BuildPipeline(ctx.pipeline, ctx.pdef, nil)
+	ctx.pipeline, ctx.caches, err = model.BuildPipeline(ctx.pipeline, ctx.pdef, nil, nil)
 	if err != nil {
 		return fmt.Errorf("Cannot build pipeline: %w", err)
 	}

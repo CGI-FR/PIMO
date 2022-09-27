@@ -133,5 +133,5 @@ testcases:
       echo '{"personne":[{ "spi":"158178940"},{"spi":"4588574950"}]}' | pimo
     assertions:
     - result.code ShouldEqual 0
-    - result.systemout ShouldEqual {"addValue":"15","subValue":"5"}
+    - result.systemout ShouldEqual {"personne":[{"spi":"423"},{"spi":"372"}]}
     - result.systemerr ShouldBeEmpty
