@@ -30,7 +30,8 @@
         "spikespaz.vscode-smoothtype",
         "EditorConfig.EditorConfig",
         "redhat.vscode-yaml",
-        "bradlc.vscode-tailwindcss"
+        "bradlc.vscode-tailwindcss",
+        "elmTooling.elm-ls-vscode",
     ],
     "settings": {
         // General settings

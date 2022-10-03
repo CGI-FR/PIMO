@@ -1,127 +1,141 @@
+'use strict';
 import './style.css';
-import LZString from 'lz-string';
 import { editor, Uri } from 'monaco-editor';
 import { setDiagnosticsOptions } from 'monaco-yaml';
-import * as d3 from 'd3';
-import mermaid from 'mermaid';
+import { Elm } from './Main';
+import LZString from 'lz-string';
+
+
+var app = Elm.Main.init({ "masking": "master" });
 
 // The uri is used for the schema file match.
 const modelUri = Uri.parse('file://masking.yml');
 
+
 setDiagnosticsOptions({
-  enableSchemaRequest: true,
-  hover: true,
-  completion: true,
-  validate: true,
-  format: true,
-  schemas: [
-    {
-      // Id of the first schema
-      uri: 'https://raw.githubusercontent.com/CGI-FR/PIMO/{{ version }}/schema/v1/pimo.schema.json',
-      // Associate with our model
-      fileMatch: [String(modelUri)],
-    },
-  ],
+    enableSchemaRequest: true,
+    hover: true,
+    completion: true,
+    validate: true,
+    format: true,
+    schemas: [
+        {
+            // Id of the first schema
+            uri: 'https://raw.githubusercontent.com/CGI-FR/PIMO/master/schema/v1/pimo.schema.json',
+            // Associate with our model
+            fileMatch: [String(modelUri)],
+        },
+    ],
 });
 
-// editor.defineTheme("PIMO", {
-//   base: "vs",
-//   inherit: true,
-//   rules: [{ background: 'EDF9FA' }],
-//   colors: {
-//     'editor.background': '#EDF9FA',
-//   }
-// });
-// editor.setTheme("PIMO");
 
-var data = {
-    masking: {
-        model: editor.createModel('version: "1"\nmasking:\n  - selector:\n      jsonpath: "name"\n    mask:\n      randomChoiceInUri: "pimo://nameFR"\n', 'yaml', modelUri),
-        state: null
-    },
-    input: {
-        model: editor.createModel('{\n  "name": "Bill"\n}', 'json'),
-        state: null
-    }
+
+function debounce(func, timeout = 300) {
+    let timer;
+    return (...args) => {
+        clearTimeout(timer);
+        timer = setTimeout(() => { func.apply(this, args); }, timeout);
+    };
 }
 
-const urlParams = new URLSearchParams(window.location.search);
-if (urlParams.has('c')) {
-    data.masking.model.setValue(LZString.decompressFromEncodedURIComponent(urlParams.get('c')));
-}
-if (urlParams.has('i')) {
-    data.input.model.setValue(LZString.decompressFromEncodedURIComponent(urlParams.get('i')));
-}
 
-var editorYaml = editor.create(document.getElementById('editor-yaml'), {
-  automaticLayout: true,
-  tabSize: 2,
-  scrollBeyondLastLine: false,
-  minimap: {enabled: false},
-  model: data.masking.model,
-});
+/**
+ * Masking.yml Editor
+ */
 
-var editorJson = editor.create(document.getElementById('editor-json'), {
-  automaticLayout: true,
-  scrollBeyondLastLine: false,
-  minimap: {enabled: false},
-  model: data.input.model,
-});
+var editorYaml = null;
 
-var resultJson = editor.create(document.getElementById('result-json'), {
-  automaticLayout: true,
-  scrollBeyondLastLine: false,
-  minimap: {enabled: false},
-  readOnly: true,
-  model: editor.createModel('', 'json', Uri.parse('file://result.jsonl')),
-});
+app.ports.initMaskingEditor.subscribe(masking => {
+    editorYaml = editor.create(document.getElementById('editor-yaml'), {
+        automaticLayout: true,
+        tabSize: 2,
+        scrollBeyondLastLine: false,
+        minimap: { enabled: false },
+        model: editor.createModel(masking, 'yaml', modelUri),
+    });
 
-var resultFlowchart = document.getElementById('flowchart');
-mermaid.initialize({startOnLoad:true});
+    let updateMasking = debounce(() => app.ports.maskingUpdater.send(editorYaml.getValue()), 500);
+    document.getElementById('editor-yaml').onkeyup = updateMasking;
+    document.getElementById('editor-yaml').oninput = updateMasking;
+    document.getElementById('editor-yaml').onpaste = updateMasking;
+    document.getElementById('editor-yaml').oncut = updateMasking;
+})
 
-document.getElementById('loading').remove();
+app.ports.updateMaskingEditor.subscribe(masking => {
+    if (editorYaml == undefined) { return };
+    editorYaml.setValue(masking);
+})
 
-var tabArea = document.getElementById("tabArea");
-var maskingTab = document.getElementById("maskingTab");
-var flowchartTab = document.getElementById("flowchartTab");
-maskingTab.onclick = function() { changeTab(maskingTab, 'masking')};
-flowchartTab.onclick = function() { changeTab(flowchartTab, 'flowchart')};
 
-function changeTab(selectedTabNode, desiredModelId) {
-    for (var i = 0; i < tabArea.childNodes.length; i++) {
-        var child = tabArea.childNodes[i];
-        if (/tab/.test(child.className)) {
-            child.className = 'tab';
-        }
-    }
-    selectedTabNode.className = 'tab active';
+let editorJson;
 
-    if (selectedTabNode === maskingTab) {
-        editorYaml.setModel(data[desiredModelId].model);
-        editorYaml.restoreViewState(data[desiredModelId].state);
-        editorYaml.focus();
-        resultFlowchart.style = "display: none;"
-        document.getElementById('editor-yaml').style = "display: block;";
-    } else {
-        data.masking.state = editorYaml.saveViewState();
-        data.masking.model = editorYaml.getModel();
-        document.getElementById('editor-yaml').style = "display: none;";
-        postFlow();
-        resultFlowchart.style = "display: block;"
-    }
+/**
+ * Input Json Editor
+ */
+app.ports.initInputEditor.subscribe(input => {
 
-}
+
+    editorJson = editor.create(document.getElementById('editor-json'), {
+        automaticLayout: true,
+        tabSize: 2,
+        scrollBeyondLastLine: false,
+        minimap: { enabled: false },
+        model: editor.createModel(input, 'json', Uri.parse('file://input.jsonl')),
+    });
+
+    let updateInput = debounce(() => app.ports.inputUpdater.send(editorJson.getValue()), 500);
+    document.getElementById('editor-json').onkeyup = updateInput;
+    document.getElementById('editor-json').oninput = updateInput;
+    document.getElementById('editor-json').onpaste = updateInput;
+    document.getElementById('editor-json').oncut = updateInput;
+})
+
+app.ports.updateInputEditor.subscribe(input => {
+    if (editorJson == undefined) { return };
+    editorJson.setValue(JSON.stringify(JSON.parse(input), null, 2));
+})
+
+
+
+/**
+ * Result JSON editor
+ */
+
+let resultJson;
+
+app.ports.initOutputEditor.subscribe(output => {
+
+
+    resultJson = editor.create(document.getElementById('result-json'), {
+        automaticLayout: true,
+        tabSize: 2,
+        scrollBeyondLastLine: false,
+        minimap: { enabled: false },
+        model: editor.createModel(output, 'json', Uri.parse('file://result.jsonl')),
+    });
+
+
+})
+
+app.ports.updateOutputEditor.subscribe(output => {
+    console.log(output);
+
+    if (resultJson == undefined) { return };
+
+    resultJson.setValue(JSON.stringify(JSON.parse(output), null, 2));
+})
+
 
 // Examples ///////////////////////////////////////////////
 
+
 function loadExample(params) {
-    data.masking.model.setValue(LZString.decompressFromEncodedURIComponent(params[0]));
-    // editorYaml.setValue();
-    editorJson.setValue(LZString.decompressFromEncodedURIComponent(params[1]));
-    resultJson.setValue("");
-    resultFlowchart.removeChild(document.getElementById('dflowchartGraph'));
-    postFlow();
-    autoPostData();
+    app.ports.maskingAndinputUpdater.send(
+        {
+            "masking": LZString.decompressFromEncodedURIComponent(params[0])
+            , "input": LZString.decompressFromEncodedURIComponent(params[1])
+        }
+    )
 }
 
 let examples_generation = new Map([
@@ -193,166 +207,3 @@ examples_other.forEach((params, name) => {
     examples_other_a.parentElement.appendChild(link)
 });
 examples_other_a.remove()
-
-document.getElementById("reset-link").onclick = () => {
-    editorYaml.setModel(data.masking.model);
-    editorJson.setModel(data.input.model);
-    resultJson.setModel(editor.createModel('', 'json', Uri.parse('file://result.jsonl')));
-    autoPostData();
-}
-
-///////////////////////////////////////////////////////////
-
-async function postData() {
-  const postData = {
-      data: editorJson.getValue(),
-      masking: editorYaml.getValue()
-  }
-
-  // update URL for sharing
-  var c = LZString.compressToEncodedURIComponent(postData.masking);
-  var i = LZString.compressToEncodedURIComponent(postData.data);
-  window.history.replaceState(null, null, `${location.protocol}//${location.host}${location.pathname}?c=${c}&i=${i}`);
-
-  try {
-      const res = await fetch(`/play`, {
-          method: "POST",
-          headers: {
-              "Content-Type": "application/json"
-          },
-          body: JSON.stringify(postData)
-      })
-
-      if (!res.ok) {
-        if (res.status == 500) {
-          const data = await res.text()
-          throw new Error(data)
-        }
-        const message = `An error has occurred: ${res.status} - ${res.statusText}`
-        throw new Error(message)
-      }
-
-      const data = await res.json()
-
-      resultJson.setValue(JSON.stringify(data, null, 2))
-      document.getElementById('result-error').innerText = ""
-  } catch (err) {
-      console.log(err)
-      document.getElementById('result-error').innerText = err
-  } finally {
-    document.getElementById('refresh-spinner').style.display = 'none';
-    document.getElementById('refresh-button').style.display = 'inline';
-  }
-}
-
-function debounce(func, timeout = 300){
-    let timer;
-    return (...args) => {
-        document.getElementById('refresh-spinner').style.display = 'inline';
-        document.getElementById('refresh-button').style.display = 'none';
-        clearTimeout(timer);
-        timer = setTimeout(() => { func.apply(this, args); }, timeout);
-    };
-}
-
-let autoPostData = debounce(postData, 500);
-document.getElementById('editor-yaml').onkeyup = autoPostData;
-document.getElementById('editor-yaml').oninput = autoPostData;
-document.getElementById('editor-yaml').onpaste = autoPostData;
-document.getElementById('editor-yaml').oncut = autoPostData;
-document.getElementById('editor-json').onkeyup = autoPostData;
-document.getElementById('editor-json').oninput = autoPostData;
-document.getElementById('editor-json').onpaste = autoPostData;
-document.getElementById('editor-json').oncut = autoPostData;
-document.getElementById('refresh-button').onclick = autoPostData;
-autoPostData();
-
-
-// CTRL + S download masking.yaml file
-document.addEventListener("keydown", function(e) {
-    if ((e.key === "s" || e.key === "S") && (navigator.userAgentData.platform.match("Mac") ? e.metaKey : e.ctrlKey)) {
-        e.preventDefault();
-
-        var encodedMasking = encodeURIComponent(editorYaml.getValue());
-        var aDownloadMasking = document.createElement("a")
-
-        aDownloadMasking.setAttribute("href", `data:text/yaml,${encodedMasking}`)
-        aDownloadMasking.setAttribute("download", "masking.yml")
-        aDownloadMasking.click()
-        aDownloadMasking.remove()
-    }
-}, false);
-
-async function postFlow() {
-    const postFlow = {
-        masking: editorYaml.getValue()
-    }
-
-    // update URL for sharing
-    var c = LZString.compressToEncodedURIComponent(postFlow.masking);
-    window.history.replaceState(null, null, `${location.protocol}//${location.host}${location.pathname}?c=${c}`);
-
-    try {
-        const res = await fetch(`/flow`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(postFlow)
-        })
-
-        if (!res.ok) {
-          if (res.status == 500) {
-            const data = await res.text()
-            throw new Error(data)
-          }
-          const message = `An error has occurred: ${res.status} - ${res.statusText}`
-          throw new Error(message)
-        }
-
-        const data = await res.text();
-
-        if (mermaid.parse(data)) {
-            const cb = function (svgGraph) {
-                if (document.getElementById('div')) {
-                    resultFlowchart.removeChild(document.getElementById('dflowchartGraph'));
-                }
-                var graph = document.createElement('dflowchartGraph');
-                graph.id = 'dflowchartGraph'
-                graph.innerHTML = svgGraph;
-                resultFlowchart.appendChild(graph);
-            };
-            mermaid.render('flowchartGraph', data, cb, resultFlowchart);
-            document.getElementById('result-error').innerText = ""
-        }
-    } catch (err) {
-        console.log(err)
-        document.getElementById('result-error').innerText = err
-    }
-}
-
-window.addEventListener('load', function () {
-    var svgs = d3.selectAll("dflowchartGraph > svg");
-    svgs.each(function() {
-      var svg = d3.select(this);
-      svg.html("<g>" + svg.html() + "</g>");
-      var inner = svg.select("g");
-      var zoom = d3.zoom().on("zoom", function(event) {
-        inner.attr("transform", event.transform);
-      });
-      svg.call(zoom);
-    });
-  });
-
-  window.addEventListener('wheel', function () {
-    var svgs = d3.selectAll("dflowchartGraph > svg");
-    svgs.each(function() {
-      var svg = d3.select(this);
-      svg.html("<g>" + svg.html() + "</g>");
-      var inner = svg.select("g");
-      var zoom = d3.zoom().on("zoom", function(event) {
-        inner.attr("transform", event.transform);
-      });
-      svg.call(zoom);
-    });
-  });

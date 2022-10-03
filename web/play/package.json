@@ -4,8 +4,10 @@
     "private": true,
     "type": "module",
     "scripts": {
-        "start": "webpack serve --open --mode development",
-        "build": "webpack --mode production"
+        "test": "elm-test",
+        "start": "webpack serve --open --config webpack.config.dev.js",
+        "build": "webpack --config webpack.config.prod.js",
+        "analyse": "elm-analyse -s -p 3001 -o"
     },
     "dependencies": {
         "d3": "^7.6.1",
@@ -18,6 +20,13 @@
     "devDependencies": {
         "css-loader": "^6.0.0",
         "cssnano": "^5.1.12",
+        "elm": "^0.19.1-5",
+        "elm-analyse": "^0.16.5",
+        "elm-format": "^0.8.5",
+        "elm-hot-webpack-loader": "^1.1.8",
+        "elm-tailwind-modules": "^0.4.0",
+        "elm-test": "^0.19.1-revision7",
+        "elm-webpack-loader": "^7.0.1",
         "html-webpack-plugin": "^5.0.0",
         "postcss": "^8.4.14",
         "postcss-loader": "^7.0.0",
