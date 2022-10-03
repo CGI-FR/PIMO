@@ -2,10 +2,12 @@ module Header exposing (..)
 
 import Html.Styled exposing (..)
 import Html.Styled.Attributes as Attr exposing (..)
+import Play exposing (Msg(..), init_sandbox)
+import Style exposing (onCustomClick)
 import Tailwind.Utilities as Tw exposing (..)
 
 
-view : String -> Html msg
+view : String -> Html Msg
 view version =
     div
         [ Attr.css [ mb_5, flex, space_x_4, items_baseline, bg_black, text_white ] ]
@@ -15,6 +17,7 @@ view version =
             [ a
                 [ Attr.id "reset-link"
                 , Attr.css [ cursor_pointer ]
+                , onCustomClick <| UpdateMaskingAndInput init_sandbox
                 ]
                 [ text "PIMO Play" ]
             ]

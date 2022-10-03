@@ -4,26 +4,12 @@ import Html exposing (Attribute)
 import Html.Events exposing (custom)
 import Html.Styled exposing (..)
 import Html.Styled.Attributes as Attr exposing (class, href, id)
-import Json.Decode as JD
 import Play exposing (..)
-import Style exposing (h_x_px)
+import Style exposing (h_x_px, onCustomClick)
 import Svg.Styled as Svg exposing (path, svg)
 import Svg.Styled.Attributes as SvgAttr
 import Tailwind.Breakpoints as Breakpoints
-import Tailwind.Utilities as Tw exposing (..)
-
-
-onCustomClick : Msg -> Html.Styled.Attribute Msg
-onCustomClick msg =
-    Attr.fromUnstyled <|
-        custom
-            "click"
-            (JD.succeed
-                { message = msg
-                , stopPropagation = True
-                , preventDefault = True
-                }
-            )
+import Tailwind.Utilities exposing (..)
 
 
 spinner : Html msg

@@ -24,16 +24,12 @@ import Tailwind.Utilities as Tw exposing (..)
 init : () -> ( Model, Cmd Msg )
 init () =
     ( { version = "master"
-      , sandbox = { masking = "masking", input = "{}" }
+      , sandbox = init_sandbox
       , output = "{}"
       , error = ""
       , status = Loading
       }
-    , Cmd.batch
-        [ initMaskingEditor "masking"
-        , initInputEditor "{}"
-        , initOutputEditor "{}"
-        ]
+    , Cmd.none
     )
 
 
@@ -49,27 +45,25 @@ update message model =
         UpdateInput input ->
             let
                 newModel =
-                    Loading
-                        |> asStatusIn
-                            (input
-                                |> asInputIn model.sandbox
-                                |> asSandboxIn model
-                            )
+                    { model
+                        | status = Loading
+                        , sandbox = input |> asInputIn model.sandbox
+                        , output = ""
+                    }
             in
-            ( newModel, maskRequest newModel )
+            ( newModel, maskRequest newModel.sandbox )
 
         UpdateMasking masking ->
             let
                 newModel =
-                    Loading
-                        |> asStatusIn
-                            (masking
-                                |> asMaskingIn model.sandbox
-                                |> asSandboxIn model
-                            )
+                    { model
+                        | status = Loading
+                        , sandbox = masking |> asMaskingIn model.sandbox
+                        , output = ""
+                    }
             in
             ( newModel
-            , maskRequest newModel
+            , maskRequest newModel.sandbox
             )
 
         Refresh ->
@@ -79,7 +73,7 @@ update message model =
                         |> asStatusIn model
             in
             ( newModel
-            , maskRequest newModel
+            , maskRequest newModel.sandbox
             )
 
         GotMaskedData result ->
@@ -108,11 +102,14 @@ update message model =
         UpdateMaskingAndInput sandbox ->
             let
                 newModel =
-                    Loading
-                        |> (asStatusIn <| (sandbox |> asSandboxIn model))
+                    { model
+                        | status = Loading
+                        , sandbox = sandbox
+                        , output = ""
+                    }
             in
             ( newModel
-            , Cmd.batch [ updateMaskingEditor sandbox.masking, updateInputEditor sandbox.input, maskRequest newModel ]
+            , Cmd.batch [ updateOutputEditor newModel.output, updateMaskingEditor sandbox.masking, updateInputEditor sandbox.input, maskRequest newModel.sandbox ]
             )
 
         Error errorMessage ->
@@ -218,18 +215,18 @@ sandboxDecoder =
         (JD.field "input" JD.string)
 
 
-maskRequestEncoder : Model -> JE.Value
-maskRequestEncoder model =
+maskRequestEncoder : Sandbox -> JE.Value
+maskRequestEncoder sandbox =
     JE.object
-        [ ( "masking", JE.string model.sandbox.masking )
-        , ( "data", JE.string model.sandbox.input )
+        [ ( "masking", JE.string sandbox.masking )
+        , ( "data", JE.string sandbox.input )
         ]
 
 
-maskRequest : Model -> Cmd Msg
-maskRequest model =
+maskRequest : Sandbox -> Cmd Msg
+maskRequest sandbox =
     Http.post
         { url = "/play"
-        , body = Http.jsonBody <| maskRequestEncoder model
+        , body = Http.jsonBody <| maskRequestEncoder sandbox
         , expect = Http.Detailed.expectString GotMaskedData
         }

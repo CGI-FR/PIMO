@@ -5,11 +5,8 @@ import Json.Decode as JD
 
 
 -- ---------------------------
--- PORTS
+-- PORTS YAML Editor
 -- ---------------------------
-
-
-port initMaskingEditor : String -> Cmd msg
 
 
 port maskingUpdater : (String -> msg) -> Sub msg
@@ -18,7 +15,10 @@ port maskingUpdater : (String -> msg) -> Sub msg
 port updateMaskingEditor : String -> Cmd msg
 
 
-port initInputEditor : String -> Cmd msg
+
+-- ---------------------------
+-- PORTS JSON input Editor
+-- ---------------------------
 
 
 port inputUpdater : (String -> msg) -> Sub msg
@@ -27,10 +27,19 @@ port inputUpdater : (String -> msg) -> Sub msg
 port updateInputEditor : String -> Cmd msg
 
 
-port initOutputEditor : String -> Cmd msg
+
+-- ---------------------------
+-- PORTS JSON output Editor
+-- ---------------------------
 
 
 port updateOutputEditor : String -> Cmd msg
+
+
+
+-- ---------------------------
+-- PORTS Loading example
+-- ---------------------------
 
 
 port maskingAndinputUpdater : (JD.Value -> msg) -> Sub msg

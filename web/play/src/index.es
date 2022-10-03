@@ -38,61 +38,93 @@ function debounce(func, timeout = 300) {
     };
 }
 
+function updateUrl() {
+    // update URL for sharing
+    var c = LZString.compressToEncodedURIComponent(editorYaml.getValue());
+    var i = LZString.compressToEncodedURIComponent(editorJson.getValue());
+    window.history.replaceState(null, null, `${location.protocol}//${location.host}${location.pathname}?c=${c}&i=${i}`);
+
+}
 
 /**
  * Masking.yml Editor
  */
 
-var editorYaml = null;
+let editorYaml;
+let editorJson;
 
-app.ports.initMaskingEditor.subscribe(masking => {
-    editorYaml = editor.create(document.getElementById('editor-yaml'), {
-        automaticLayout: true,
-        tabSize: 2,
-        scrollBeyondLastLine: false,
-        minimap: { enabled: false },
-        model: editor.createModel(masking, 'yaml', modelUri),
-    });
+const urlParams = new URLSearchParams(window.location.search);
+let masking = 'version: "1"\nmasking:\n  - selector :\n      jsonpath : "field_name"\n    masks:\n      - add: ""\n'
+let input = '{}'
 
-    let updateMasking = debounce(() => app.ports.maskingUpdater.send(editorYaml.getValue()), 500);
-    document.getElementById('editor-yaml').onkeyup = updateMasking;
-    document.getElementById('editor-yaml').oninput = updateMasking;
-    document.getElementById('editor-yaml').onpaste = updateMasking;
-    document.getElementById('editor-yaml').oncut = updateMasking;
-})
+if (urlParams.has('c')) {
+    masking = LZString.decompressFromEncodedURIComponent(urlParams.get('c'))
+}
+if (urlParams.has('i')) {
+    input = LZString.decompressFromEncodedURIComponent(urlParams.get('i'))
+}
+
+app.ports.maskingAndinputUpdater.send({ masking: masking, input: input });
+
+editorYaml = editor.create(document.getElementById('editor-yaml'), {
+    automaticLayout: true,
+    tabSize: 2,
+    scrollBeyondLastLine: false,
+    minimap: { enabled: false },
+    model: editor.createModel(masking, 'yaml', modelUri),
+});
+
+
+
+let updateMasking = debounce(() => {
+    app.ports.maskingUpdater.send(editorYaml.getValue());
+    updateUrl();
+}, 500);
+document.getElementById('editor-yaml').onkeyup = updateMasking;
+document.getElementById('editor-yaml').oninput = updateMasking;
+document.getElementById('editor-yaml').onpaste = updateMasking;
+document.getElementById('editor-yaml').oncut = updateMasking;
+
 
 app.ports.updateMaskingEditor.subscribe(masking => {
     if (editorYaml == undefined) { return };
     editorYaml.setValue(masking);
+    updateUrl();
+
 })
 
 
-let editorJson;
+
 
 /**
  * Input Json Editor
  */
-app.ports.initInputEditor.subscribe(input => {
 
 
-    editorJson = editor.create(document.getElementById('editor-json'), {
-        automaticLayout: true,
-        tabSize: 2,
-        scrollBeyondLastLine: false,
-        minimap: { enabled: false },
-        model: editor.createModel(input, 'json', Uri.parse('file://input.jsonl')),
-    });
+editorJson = editor.create(document.getElementById('editor-json'), {
+    automaticLayout: true,
+    tabSize: 2,
+    scrollBeyondLastLine: false,
+    minimap: { enabled: false },
+    model: editor.createModel(input, 'json', Uri.parse('file://input.jsonl')),
+});
 
-    let updateInput = debounce(() => app.ports.inputUpdater.send(editorJson.getValue()), 500);
-    document.getElementById('editor-json').onkeyup = updateInput;
-    document.getElementById('editor-json').oninput = updateInput;
-    document.getElementById('editor-json').onpaste = updateInput;
-    document.getElementById('editor-json').oncut = updateInput;
-})
+let updateInput = debounce(() => {
+    app.ports.inputUpdater.send(editorJson.getValue());
+    updateUrl();
+
+}, 500);
+
+document.getElementById('editor-json').onkeyup = updateInput;
+document.getElementById('editor-json').oninput = updateInput;
+document.getElementById('editor-json').onpaste = updateInput;
+document.getElementById('editor-json').oncut = updateInput;
+
 
 app.ports.updateInputEditor.subscribe(input => {
     if (editorJson == undefined) { return };
     editorJson.setValue(JSON.stringify(JSON.parse(input), null, 2));
+    updateUrl();
 })
 
 
@@ -103,26 +135,35 @@ app.ports.updateInputEditor.subscribe(input => {
 
 let resultJson;
 
-app.ports.initOutputEditor.subscribe(output => {
 
 
-    resultJson = editor.create(document.getElementById('result-json'), {
-        automaticLayout: true,
-        tabSize: 2,
-        scrollBeyondLastLine: false,
-        minimap: { enabled: false },
-        model: editor.createModel(output, 'json', Uri.parse('file://result.jsonl')),
-    });
+resultJson = editor.create(document.getElementById('result-json'), {
+    automaticLayout: true,
+    tabSize: 2,
+    scrollBeyondLastLine: false,
+    minimap: { enabled: false },
+    model: editor.createModel("", 'json', Uri.parse('file://result.jsonl')),
+});
 
 
-})
+
 
 app.ports.updateOutputEditor.subscribe(output => {
-    console.log(output);
 
     if (resultJson == undefined) { return };
 
-    resultJson.setValue(JSON.stringify(JSON.parse(output), null, 2));
+    if (output === "") {
+        resultJson.setValue("");
+    } else {
+        try {
+
+            resultJson.setValue(JSON.stringify(JSON.parse(output), null, 2));
+        } catch (error) {
+            console.log(error)
+            resultJson.setValue(output);
+
+        }
+    }
 })
 
 
