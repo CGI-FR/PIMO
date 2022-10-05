@@ -30,6 +30,8 @@ type alias Model =
     , output : String
     , error : String
     , status : Status
+    , maskingView : MaskingView
+    , flow :  String
     }
 
 
@@ -45,13 +47,20 @@ type Status
     | Failure
 
 
+type MaskingView
+    = YamlView
+    | GraphView
+
+
 type Msg
     = GotMaskedData (Result (Http.Detailed.Error String) ( Http.Metadata, String ))
+    | GotFlowData (Result (Http.Detailed.Error String) ( Http.Metadata, String ))
     | UpdateMasking String
     | UpdateInput String
     | UpdateMaskingAndInput Sandbox
     | Refresh
     | Error String
+    | ChangeMaskingView MaskingView
 
 
 asMaskingIn : Sandbox -> String -> Sandbox

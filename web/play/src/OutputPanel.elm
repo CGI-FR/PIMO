@@ -1,9 +1,7 @@
 module OutputPanel exposing (..)
 
-import Html exposing (Attribute)
-import Html.Events exposing (custom)
 import Html.Styled exposing (..)
-import Html.Styled.Attributes as Attr exposing (class, href, id)
+import Html.Styled.Attributes as Attr
 import Play exposing (..)
 import Style exposing (h_x_px, onCustomClick)
 import Svg.Styled as Svg exposing (path, svg)

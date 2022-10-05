@@ -1,10 +1,11 @@
 'use strict';
-import './style.css';
 import { editor, Uri } from 'monaco-editor';
 import { setDiagnosticsOptions } from 'monaco-yaml';
 import { Elm } from './Main';
 import LZString from 'lz-string';
-
+import * as d3 from 'd3';
+import mermaid from 'mermaid';
+import { text } from 'd3';
 
 var app = Elm.Main.init({ "masking": "master" });
 
@@ -166,6 +167,35 @@ app.ports.updateOutputEditor.subscribe(output => {
     }
 })
 
+var resultFlowchart = document.getElementById('flowchart');
+mermaid.initialize({ startOnLoad: true });
+
+app.ports.updateFlow.subscribe(data => {
+    try {
+        mermaid.parse(data)
+        const cb = function (svgGraph) {
+            if (document.getElementById('div')) {
+                resultFlowchart.removeChild(document.getElementById('dflowchartGraph'));
+            }
+            var graph = document.createElement('dflowchartGraph');
+            graph.id = 'dflowchartGraph'
+            graph.innerHTML = svgGraph;
+            resultFlowchart.appendChild(graph);
+        };
+        mermaid.render('flowchartGraph', data, cb, resultFlowchart);
+
+
+
+    } catch (error) {
+        let error_msg = document.createElement('span');
+        error_msg.appendChild(document.createTextNode('flow chart is not in mermaid format : ' + error.str))
+        let src = document.createElement('span');
+        src.appendChild(document.createTextNode(data))
+
+        resultFlowchart.replaceChildren(error_msg, src);
+
+    }
+})
 
 // Examples ///////////////////////////////////////////////
 

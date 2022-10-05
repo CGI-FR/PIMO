@@ -43,3 +43,12 @@ port updateOutputEditor : String -> Cmd msg
 
 
 port maskingAndinputUpdater : (JD.Value -> msg) -> Sub msg
+
+
+
+-- ---------------------------
+-- PORTS updateFlow
+-- ---------------------------
+
+
+port updateFlow : String -> Cmd msg

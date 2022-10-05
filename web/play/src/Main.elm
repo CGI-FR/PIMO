@@ -1,9 +1,7 @@
 module Main exposing (init, main, update, view)
 
 import Browser
-import Css
 import Css.Global
-import Debug exposing (toString)
 import Error
 import Examples
 import Header exposing (view)
@@ -13,6 +11,7 @@ import Http
 import Http.Detailed
 import Json.Decode as JD
 import Json.Encode as JE
+import Masking
 import OutputPanel
 import Play exposing (..)
 import Ports exposing (..)
@@ -28,6 +27,8 @@ init () =
       , output = "{}"
       , error = ""
       , status = Loading
+      , maskingView = YamlView
+      , flow = ""
       }
     , Cmd.none
     )
@@ -99,6 +100,27 @@ update message model =
                     in
                     ( { model | error = errorMessage, status = Failure }, Cmd.none )
 
+        GotFlowData result ->
+            case result of
+                Ok ( _, flow ) ->
+                    ( { model
+                        | flow = flow
+                      }
+                    , updateFlow flow
+                    )
+
+                Err error ->
+                    let
+                        errorMessage =
+                            case error of
+                                Http.Detailed.BadStatus _ body ->
+                                    body
+
+                                _ ->
+                                    "Server Error"
+                    in
+                    ( { model | error = errorMessage, status = Failure }, Cmd.none )
+
         UpdateMaskingAndInput sandbox ->
             let
                 newModel =
@@ -111,6 +133,9 @@ update message model =
             ( newModel
             , Cmd.batch [ updateOutputEditor newModel.output, updateMaskingEditor sandbox.masking, updateInputEditor sandbox.input, maskRequest newModel.sandbox ]
             )
+
+        ChangeMaskingView maskingView ->
+            ( { model | maskingView = maskingView }, Cmd.none )
 
         Error errorMessage ->
             ( { model | error = errorMessage }, Cmd.none )
@@ -134,19 +159,7 @@ view model =
                 [ div
                     [ Attr.css [ Tw.grid, Breakpoints.sm [ Tw.grid_cols_2 ], Tw.gap_4, Breakpoints.md [ gap_8 ] ] --  "grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-8"
                     ]
-                    [ div
-                        [ Attr.css [ Tw.flex, Tw.flex_col ]
-                        ]
-                        [ div
-                            [ Attr.css [ flex_none, font_sans, text_xl, pb_2 ]
-                            ]
-                            [ text "Masking Configuration" ]
-                        , div
-                            [ Attr.css [ grow, shadow_lg, h_x_px 300, Breakpoints.md [ h_x_px 600 ] ]
-                            , Attr.id "editor-yaml"
-                            ]
-                            []
-                        ]
+                    [ Masking.view model.maskingView
                     , div
                         [ Attr.css [ flex, flex_col ]
                         ]
@@ -223,10 +236,24 @@ maskRequestEncoder sandbox =
         ]
 
 
+flowRequestEncoder : String -> JE.Value
+flowRequestEncoder masking =
+    JE.object
+        [ ( "masking", JE.string masking )
+        ]
+
+
 maskRequest : Sandbox -> Cmd Msg
 maskRequest sandbox =
-    Http.post
-        { url = "/play"
-        , body = Http.jsonBody <| maskRequestEncoder sandbox
-        , expect = Http.Detailed.expectString GotMaskedData
-        }
+    Cmd.batch
+        [ Http.post
+            { url = "/play"
+            , body = Http.jsonBody <| maskRequestEncoder sandbox
+            , expect = Http.Detailed.expectString GotMaskedData
+            }
+        , Http.post
+            { url = "/flow"
+            , body = Http.jsonBody <| flowRequestEncoder sandbox.masking
+            , expect = Http.Detailed.expectString GotFlowData
+            }
+        ]
