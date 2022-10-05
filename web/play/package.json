@@ -5,6 +5,7 @@
     "type": "module",
     "scripts": {
         "test": "elm-test",
+        "tailwind-elm": "elm-tailwind-modules --tailwind-config ./tailwind.config.cjs --dir gen/",
         "start": "webpack serve --open --config webpack.config.dev.js",
         "build": "webpack --config webpack.config.prod.js",
         "analyse": "elm-analyse -s -p 3001 -o"
@@ -18,6 +19,9 @@
         "monaco-yaml": "^4.0.0-alpha.3"
     },
     "devDependencies": {
+        "@tailwindcss/aspect-ratio": "^0.4.2",
+        "@tailwindcss/forms": "^0.5.3",
+        "@tailwindcss/typography": "^0.5.7",
         "css-loader": "^6.0.0",
         "cssnano": "^5.1.12",
         "elm": "^0.19.1-5",
