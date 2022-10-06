@@ -46,7 +46,7 @@ refreshButton =
     a
         [ Attr.href "#"
         , Attr.id "refresh-button"
-        , Attr.css [ text_2xl, font_medium ]
+        , Attr.css [ text_xl, font_medium ]
         , onCustomClick Refresh
         ]
         [ text "↻" ]
