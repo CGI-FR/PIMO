@@ -106,7 +106,7 @@ update message model =
                 Ok ( _, flow ) ->
                     let 
                         cmd = case model.maskingView of 
-                            GraphView -> updateFlow model.flow 
+                            GraphView -> updateFlow flow 
                             _ -> Cmd.none
                     in 
                     ( { model
