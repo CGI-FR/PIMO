@@ -13,7 +13,7 @@ selected : Attribute msg
 selected =
     css
         [ inline_block
-        , p_4
+        , p_1
         , text_blue_600
         , bg_gray_100
         , rounded_t_lg
@@ -24,7 +24,7 @@ notSelected : Attribute msg
 notSelected =
     css
         [ inline_block
-        , p_4
+        , p_1
         , rounded_t_lg
         , Css.hover
             [ text_gray_600

@@ -20,9 +20,9 @@ import Tailwind.Breakpoints as Breakpoints
 import Tailwind.Utilities as Tw exposing (..)
 
 
-init : () -> ( Model, Cmd Msg )
-init () =
-    ( { version = "master"
+init : String -> ( Model, Cmd Msg )
+init version =
+    ( { version = version
       , sandbox = init_sandbox
       , output = "{}"
       , error = ""
@@ -77,6 +77,7 @@ update message model =
             , maskRequest newModel.sandbox
             )
 
+
         GotMaskedData result ->
             case result of
                 Ok ( _, output ) ->
@@ -99,6 +100,7 @@ update message model =
                                     "Server Error"
                     in
                     ( { model | error = errorMessage, status = Failure }, Cmd.none )
+
 
         GotFlowData result ->
             case result of
@@ -135,7 +137,7 @@ update message model =
             )
 
         ChangeMaskingView maskingView ->
-            ( { model | maskingView = maskingView }, Cmd.none )
+            ( { model | maskingView = maskingView },  updateFlow model.flow )
 
         Error errorMessage ->
             ( { model | error = errorMessage }, Cmd.none )
@@ -188,7 +190,7 @@ view model =
 -- ---------------------------
 
 
-main : Program () Model Msg
+main : Program String Model Msg
 main =
     Browser.document
         { init = init

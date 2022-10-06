@@ -3,11 +3,9 @@ import { editor, Uri } from 'monaco-editor';
 import { setDiagnosticsOptions } from 'monaco-yaml';
 import { Elm } from './Main';
 import LZString from 'lz-string';
-import * as d3 from 'd3';
 import mermaid from 'mermaid';
-import { text } from 'd3';
 
-var app = Elm.Main.init({ "masking": "master" });
+var app = Elm.Main.init({ flags: "{{ version }}" });
 
 // The uri is used for the schema file match.
 const modelUri = Uri.parse('file://masking.yml');
@@ -22,7 +20,7 @@ setDiagnosticsOptions({
     schemas: [
         {
             // Id of the first schema
-            uri: 'https://raw.githubusercontent.com/CGI-FR/PIMO/master/schema/v1/pimo.schema.json',
+            uri: 'https://raw.githubusercontent.com/CGI-FR/PIMO/{{ version }}/schema/v1/pimo.schema.json',
             // Associate with our model
             fileMatch: [String(modelUri)],
         },
