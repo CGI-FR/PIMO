@@ -15,12 +15,14 @@ init_sandbox : Sandbox
 init_sandbox =
     { masking = """version: "1"
 masking:
-  - selector :
-      jsonpath : "field_name"
-    masks:
-      - add: ""
+  - selector:
+      jsonpath: "name"
+    mask:
+      randomChoiceInUri: "pimo://nameFR"
      """
-    , input = "{}"
+    , input = """{
+  "name": "Bill"
+}"""
     }
 
 

@@ -77,7 +77,6 @@ update message model =
             , maskRequest newModel.sandbox
             )
 
-
         GotMaskedData result ->
             case result of
                 Ok ( _, output ) ->
@@ -105,10 +104,15 @@ update message model =
         GotFlowData result ->
             case result of
                 Ok ( _, flow ) ->
+                    let 
+                        cmd = case model.maskingView of 
+                            GraphView -> updateFlow model.flow 
+                            _ -> Cmd.none
+                    in 
                     ( { model
                         | flow = flow
                       }
-                    , updateFlow flow
+                    , cmd
                     )
 
                 Err error ->
@@ -137,7 +141,12 @@ update message model =
             )
 
         ChangeMaskingView maskingView ->
-            ( { model | maskingView = maskingView },  updateFlow model.flow )
+            let 
+              cmd = case maskingView of 
+                GraphView -> updateFlow model.flow 
+                _ -> Cmd.none
+            in 
+            ( { model | maskingView = maskingView },  cmd )
 
         Error errorMessage ->
             ( { model | error = errorMessage }, Cmd.none )
@@ -174,7 +183,7 @@ view model =
                             , Attr.id "editor-json"
                             ]
                             []
-                         ]
+                                                     ]
                             ++ OutputPanel.view model.status
                         )
                     ]

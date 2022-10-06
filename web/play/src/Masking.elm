@@ -98,23 +98,13 @@ view maskingView =
             ++ [ div
                     [ Attr.css [ grow, shadow_lg, h_x_px 300, Bp.md [ h_x_px 600 ] ]
                     , Attr.id "editor-yaml"
-                    , case maskingView of
-                        YamlView ->
-                            Attr.hidden False
-
-                        _ ->
-                            Attr.hidden True
+                    , Attr.hidden (maskingView /= YamlView)
                     ]
                     []
                , div
                     [ Attr.css [ grow, shadow_lg, h_x_px 300, Bp.md [ h_x_px 600 ] ]
                     , Attr.id "flowchart"
-                    , case maskingView of
-                        GraphView ->
-                            Attr.hidden False
-
-                        _ ->
-                            Attr.hidden True
+                    ,  Attr.hidden (maskingView /= GraphView)
                     ]
                     []
                ]

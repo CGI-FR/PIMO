@@ -4,6 +4,8 @@ import { setDiagnosticsOptions } from 'monaco-yaml';
 import { Elm } from './Main';
 import LZString from 'lz-string';
 import mermaid from 'mermaid';
+import * as d3 from 'd3';
+
 
 var app = Elm.Main.init({ flags: "{{ version }}" });
 
@@ -53,8 +55,8 @@ let editorYaml;
 let editorJson;
 
 const urlParams = new URLSearchParams(window.location.search);
-let masking = 'version: "1"\nmasking:\n  - selector :\n      jsonpath : "field_name"\n    masks:\n      - add: ""\n'
-let input = '{}'
+let masking = 'version: "1"\nmasking:\n  - selector:\n      jsonpath: "name"\n    mask:\n      randomChoiceInUri: "pimo://nameFR"'
+let input = '{\n    "name": "Bill"\n  }'
 
 if (urlParams.has('c')) {
     masking = LZString.decompressFromEncodedURIComponent(urlParams.get('c'))
@@ -194,6 +196,32 @@ app.ports.updateFlow.subscribe(data => {
 
     }
 })
+
+window.addEventListener('load', function () {
+    var svgs = d3.selectAll("dflowchartGraph > svg");
+    svgs.each(function () {
+        var svg = d3.select(this);
+        svg.html("<g>" + svg.html() + "</g>");
+        var inner = svg.select("g");
+        var zoom = d3.zoom().on("zoom", function (event) {
+            inner.attr("transform", event.transform);
+        });
+        svg.call(zoom);
+    });
+});
+
+window.addEventListener('wheel', function () {
+    var svgs = d3.selectAll("dflowchartGraph > svg");
+    svgs.each(function () {
+        var svg = d3.select(this);
+        svg.html("<g>" + svg.html() + "</g>");
+        var inner = svg.select("g");
+        var zoom = d3.zoom().on("zoom", function (event) {
+            inner.attr("transform", event.transform);
+        });
+        svg.call(zoom);
+    });
+});
 
 // Examples ///////////////////////////////////////////////
 
