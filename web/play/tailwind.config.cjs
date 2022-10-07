@@ -1,7 +1,12 @@
+/** @type {import('tailwindcss').Config} */
 module.exports = {
-    content: ['./src/*.ejs'],
     theme: {
-      extend: {},
+        extend: {},
     },
-    plugins: [],
-  }
+    variants: [],
+    plugins: [
+        require("@tailwindcss/typography"),
+        require("@tailwindcss/forms"),
+        require("@tailwindcss/aspect-ratio")
+    ],
+}
