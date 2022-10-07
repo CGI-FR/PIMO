@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1664285388198,
+  "lastUpdate": 1665149405505,
   "repoUrl": "https://github.com/CGI-FR/PIMO",
   "entries": {
     "Benchmark": [
@@ -1686,6 +1686,42 @@ window.BENCHMARK_DATA = {
             "value": 4348358,
             "unit": "ns/op\t  691821 B/op\t    5951 allocs/op",
             "extra": "2856 times\n2 procs"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "youen.peron@cgi.com",
+            "name": "Youen Péron",
+            "username": "youen"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "23fd07fb5411982c66ca1e5b81bfb7f1143033b2",
+          "message": "Merge pull request #169 from CGI-FR/test-elm\n\nrefactor(play): use elm framework",
+          "timestamp": "2022-10-07T15:23:16+02:00",
+          "tree_id": "8dd3a21c58ad7c6bfbfce584be78c4b204bedde5",
+          "url": "https://github.com/CGI-FR/PIMO/commit/23fd07fb5411982c66ca1e5b81bfb7f1143033b2"
+        },
+        "date": 1665149404874,
+        "tool": "go",
+        "benches": [
+          {
+            "name": "BenchmarkPimoRun",
+            "value": 258460,
+            "unit": "ns/op\t   16547 B/op\t     186 allocs/op",
+            "extra": "45134 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge",
+            "value": 3282001,
+            "unit": "ns/op\t  692253 B/op\t    6013 allocs/op",
+            "extra": "3552 times\n2 procs"
           }
         ]
       }
