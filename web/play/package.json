@@ -25,7 +25,6 @@
         "css-loader": "^6.0.0",
         "cssnano": "^5.1.12",
         "elm": "^0.19.1-5",
-        "elm-analyse": "^0.16.5",
         "elm-format": "^0.8.5",
         "elm-hot-webpack-loader": "^1.1.8",
         "elm-tailwind-modules": "^0.4.0",
