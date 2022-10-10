@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1665149405505,
+  "lastUpdate": 1665387953955,
   "repoUrl": "https://github.com/CGI-FR/PIMO",
   "entries": {
     "Benchmark": [
@@ -1722,6 +1722,42 @@ window.BENCHMARK_DATA = {
             "value": 3282001,
             "unit": "ns/op\t  692253 B/op\t    6013 allocs/op",
             "extra": "3552 times\n2 procs"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "youen.peron@cgi.com",
+            "name": "Youen Péron",
+            "username": "youen"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "5e5426a1ae69e10c3c0bc8bfd4de1edb0ea646b4",
+          "message": "Update package.json (#170)\n\n* Update package.json\r\n\r\n* fix(play): remove unsed dependences",
+          "timestamp": "2022-10-10T09:37:53+02:00",
+          "tree_id": "3d200145256dedcc2f7502ec8480302bff3e4cb7",
+          "url": "https://github.com/CGI-FR/PIMO/commit/5e5426a1ae69e10c3c0bc8bfd4de1edb0ea646b4"
+        },
+        "date": 1665387953313,
+        "tool": "go",
+        "benches": [
+          {
+            "name": "BenchmarkPimoRun",
+            "value": 329077,
+            "unit": "ns/op\t   16682 B/op\t     204 allocs/op",
+            "extra": "35593 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge",
+            "value": 4217704,
+            "unit": "ns/op\t  692222 B/op\t    6014 allocs/op",
+            "extra": "2955 times\n2 procs"
           }
         ]
       }
