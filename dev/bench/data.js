@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1665387953955,
+  "lastUpdate": 1665997959420,
   "repoUrl": "https://github.com/CGI-FR/PIMO",
   "entries": {
     "Benchmark": [
@@ -1758,6 +1758,42 @@ window.BENCHMARK_DATA = {
             "value": 4217704,
             "unit": "ns/op\t  692222 B/op\t    6014 allocs/op",
             "extra": "2955 times\n2 procs"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "youen.peron@cgi.com",
+            "name": "Youen Péron",
+            "username": "youen"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "4ab438192d9a24c1cf38a4b6aa9c3d02ca9caaf1",
+          "message": "Merge pull request #175 from CGI-FR/171-proposal-pimo-play-save-masking-with-ctrl+s\n\nfeat(play): save masking with ctrl+s",
+          "timestamp": "2022-10-17T11:05:58+02:00",
+          "tree_id": "5ff46e5892fdc004faa29992d170b8ac85e366c9",
+          "url": "https://github.com/CGI-FR/PIMO/commit/4ab438192d9a24c1cf38a4b6aa9c3d02ca9caaf1"
+        },
+        "date": 1665997958794,
+        "tool": "go",
+        "benches": [
+          {
+            "name": "BenchmarkPimoRun",
+            "value": 200423,
+            "unit": "ns/op\t   16740 B/op\t     204 allocs/op",
+            "extra": "51624 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge",
+            "value": 2856603,
+            "unit": "ns/op\t  692515 B/op\t    6013 allocs/op",
+            "extra": "4201 times\n2 procs"
           }
         ]
       }
