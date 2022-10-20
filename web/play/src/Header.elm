@@ -4,13 +4,15 @@ import Html.Styled exposing (..)
 import Html.Styled.Attributes as Attr exposing (..)
 import Play exposing (Msg(..), init_sandbox)
 import Style exposing (onCustomClick)
+import Tailwind.Breakpoints as Breakpoints
 import Tailwind.Utilities as Tw exposing (..)
-
+import Dropdown
 
 view : String -> Html Msg
 view version =
     div
         [ Attr.css [ mb_5, flex, space_x_4, items_baseline, bg_black, text_white ] ]
+        -- ([ div
         [ div
             [ Attr.css [ m_5, font_sans, text_4xl, font_bold ]
             ]
@@ -37,4 +39,13 @@ view version =
             [ Attr.css [ grow ]
             ]
             []
+        , div
+            [ Attr.css [ Tw.px_4, Breakpoints.lg [ Tw.px_16 ], Breakpoints.md [ Tw.px_8 ] ] ]
+            [ div
+                [ Attr.css [ Tw.grid, Breakpoints.sm [ Tw.grid_cols_2 ], Tw.gap_4, Breakpoints.md [ gap_8 ] ]
+                ]
+                []
+            ]
         ]
+        -- ++ Dropdown.view
+        -- )
