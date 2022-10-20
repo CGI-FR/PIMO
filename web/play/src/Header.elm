@@ -11,7 +11,7 @@ import Dropdown
 view : String -> Html Msg
 view version =
     div
-        [ Attr.css [ mb_5, flex, space_x_4, items_baseline, bg_black, text_white ] ]
+        [ Attr.css [ flex, space_x_4, items_baseline, bg_black, text_white ] ]
         -- ([ div
         [ div
             [ Attr.css [ m_5, font_sans, text_4xl, font_bold ]

@@ -39,13 +39,23 @@ off =
 view : DropdownView -> Html Msg
 view dropdownView =
     div
-        [ Attr.css [ flex, flex_col ]
+        [ css
+            [ Tw.flex
+            , Tw.flex_row_reverse
+            , Tw.mb_5
+            , Tw.neg_mt_10
+            , Tw.bg_black
+            , Tw.text_white
+            ]
         ]
         [button
-            [ Attr.id "dropdownDefault"
-            , Attr.attribute "data-dropdown-toggle" "dropdown"
+            [ Attr.id "dropdownBottomButton"
+            , Attr.attribute "data-dropdown-toggle" "dropdownBottom"
+            , Attr.attribute "data-dropdown-placement" "bottom"
             , css
-                [ Tw.text_white
+                [ Tw.mr_3
+                , Tw.mb_3
+                , Tw.text_white
                 , Tw.bg_blue_700
                 , Tw.font_medium
                 , Tw.rounded_lg
@@ -63,26 +73,27 @@ view dropdownView =
                 , Css.hover
                     [ Tw.bg_blue_800
                     ]
+                , Bp.md
+                    [ Tw.mb_0
+                    ]
                 ]
             , Attr.type_ "button"
             , onCustomClick <| ChangeDropdownView Open
             ]
-            [ text "Dropdown button", svg
+            [ text "Options", svg
                 [ SvgAttr.css
                     [ Tw.ml_2
                     , Tw.w_4
                     , Tw.h_4
                     ]
                 , Attr.attribute "aria-hidden" "true"
-                , SvgAttr.fill "none"
-                , SvgAttr.stroke "currentColor"
-                , SvgAttr.viewBox "0 0 24 24"
+                , SvgAttr.fill "currentColor"
+                , SvgAttr.viewBox "0 0 20 20"
                 ]
-                [ Svg.path
-                    [ SvgAttr.strokeLinecap "round"
-                    , SvgAttr.strokeLinejoin "round"
-                    , SvgAttr.strokeWidth "2"
-                    , SvgAttr.d "M19 9l-7 7-7-7"
+                [ path
+                    [ SvgAttr.fillRule "evenodd"
+                    , SvgAttr.d "M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                    , SvgAttr.clipRule "evenodd"
                     ]
                     []
                 ]
@@ -102,7 +113,7 @@ view dropdownView =
                     , Tw.text_sm
                     , Tw.text_gray_700
                     ]
-                , Attr.attribute "aria-labelledby" "dropdownDefault"
+                , Attr.attribute "aria-labelledby" "dropdownBottomButton"
                 ]
                 [ li []
                     [ a
