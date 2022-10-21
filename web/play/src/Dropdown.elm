@@ -115,7 +115,7 @@ view dropdownView =
                     ]
                 , Attr.attribute "aria-labelledby" "dropdownBottomButton"
                 ]
-                [ li []
+                [ li [Attr.id "share"]
                     [ a
                         [ Attr.href "#"
                         , css
