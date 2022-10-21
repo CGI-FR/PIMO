@@ -111,7 +111,7 @@ view dropdownView =
                 [ css
                     [ Tw.py_1
                     , Tw.text_sm
-                    , Tw.text_gray_700
+                    , Tw.text_white
                     ]
                 , Attr.attribute "aria-labelledby" "dropdownBottomButton"
                 ]
@@ -123,13 +123,13 @@ view dropdownView =
                             , Tw.py_2
                             , Tw.px_4
                             , Css.hover
-                                [ Tw.bg_gray_100
+                                [ Tw.bg_blue_700
                                 ]
                             ]
                         ]
                         [ text "Share : Copy link" ]
                     ]
-                , li []
+                , li [Attr.id "venom"]
                     [ a
                         [ Attr.href "#"
                         , css
@@ -137,7 +137,7 @@ view dropdownView =
                             , Tw.py_2
                             , Tw.px_4
                             , Css.hover
-                                [ Tw.bg_gray_100
+                                [ Tw.bg_blue_700
                                 ]
                             ]
                         ]
