@@ -6,13 +6,11 @@ import Play exposing (Msg(..), init_sandbox)
 import Style exposing (onCustomClick)
 import Tailwind.Breakpoints as Breakpoints
 import Tailwind.Utilities as Tw exposing (..)
-import Dropdown
 
 view : String -> Html Msg
 view version =
     div
         [ Attr.css [ flex, space_x_4, items_baseline, bg_black, text_white ] ]
-        -- ([ div
         [ div
             [ Attr.css [ m_5, font_sans, text_4xl, font_bold ]
             ]
@@ -47,5 +45,3 @@ view version =
                 []
             ]
         ]
-        -- ++ Dropdown.view
-        -- )
