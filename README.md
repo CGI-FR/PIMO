@@ -1,3 +1,11 @@
+![GitHub Workflow Status](https://img.shields.io/github/workflow/status/CGI-FR/PIMO/CI)
+[![Go Report Card](https://goreportcard.com/badge/github.com/cgi-fr/pimo)](https://goreportcard.com/report/github.com/cgi-fr/pimo)
+![GitHub all releases](https://img.shields.io/github/downloads/CGI-FR/PIMO/total)
+![GitHub](https://img.shields.io/github/license/CGI-FR/PIMO)
+![GitHub Repo stars](https://img.shields.io/github/stars/CGI-FR/PIMO)
+![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/CGI-FR/PIMO)
+![GitHub release (latest by date)](https://img.shields.io/github/v/release/CGI-FR/PIMO)
+
 # PIMO : Private Input, Masked Output
 
 PIMO is a tool for data masking. It can mask data from a JSONline stream and return another JSONline stream thanks to a masking configuration contained in a yaml file.
