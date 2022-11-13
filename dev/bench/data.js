@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1665997959420,
+  "lastUpdate": 1668356365762,
   "repoUrl": "https://github.com/CGI-FR/PIMO",
   "entries": {
     "Benchmark": [
@@ -1794,6 +1794,42 @@ window.BENCHMARK_DATA = {
             "value": 2856603,
             "unit": "ns/op\t  692515 B/op\t    6013 allocs/op",
             "extra": "4201 times\n2 procs"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "youen.peron@cgi.com",
+            "name": "Youen Péron",
+            "username": "youen"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "6890dcf0c4860c227b82f3839ec062a702a65431",
+          "message": "Merge pull request #181 from CGI-FR/chore-badges-proposal\n\nchore: badges proposal in README",
+          "timestamp": "2022-11-13T17:10:37+01:00",
+          "tree_id": "9dae54eb190ec0d8932b5eb7e39dba4ab89c7fa1",
+          "url": "https://github.com/CGI-FR/PIMO/commit/6890dcf0c4860c227b82f3839ec062a702a65431"
+        },
+        "date": 1668356365120,
+        "tool": "go",
+        "benches": [
+          {
+            "name": "BenchmarkPimoRun",
+            "value": 341696,
+            "unit": "ns/op\t   16696 B/op\t     204 allocs/op",
+            "extra": "34894 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge",
+            "value": 4425704,
+            "unit": "ns/op\t  692410 B/op\t    6014 allocs/op",
+            "extra": "2773 times\n2 procs"
           }
         ]
       }
