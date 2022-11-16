@@ -18,7 +18,7 @@
 package model
 
 import (
-	over "github.com/Trendyol/overlog"
+	over "github.com/adrienaury/zeromdc"
 	"github.com/cgi-fr/pimo/pkg/statistics"
 	"github.com/rs/zerolog/log"
 )

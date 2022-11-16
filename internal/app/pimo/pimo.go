@@ -25,7 +25,7 @@ import (
 	"regexp"
 	"time"
 
-	over "github.com/Trendyol/overlog"
+	over "github.com/adrienaury/zeromdc"
 	"github.com/cgi-fr/pimo/pkg/add"
 	"github.com/cgi-fr/pimo/pkg/addtransient"
 	"github.com/cgi-fr/pimo/pkg/command"

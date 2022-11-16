@@ -22,7 +22,7 @@ import (
 	"encoding/json"
 	"io"
 
-	over "github.com/Trendyol/overlog"
+	over "github.com/adrienaury/zeromdc"
 	"github.com/cgi-fr/pimo/pkg/model"
 )
 
