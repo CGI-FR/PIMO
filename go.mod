@@ -8,7 +8,7 @@ require (
 	github.com/capitalone/fpe v1.2.1
 	github.com/goccy/go-yaml v1.9.5
 	github.com/invopop/jsonschema v0.6.0
-	github.com/labstack/echo/v4 v4.9.0
+	github.com/labstack/echo/v4 v4.9.1
 	github.com/mattn/anko v0.1.9
 	github.com/mattn/go-isatty v0.0.16
 	github.com/rs/zerolog v1.27.0
@@ -32,7 +32,7 @@ require (
 	github.com/iancoleman/orderedmap v0.0.0-20190318233801-ac98e3ecb4b0 // indirect
 	github.com/imdario/mergo v0.3.11 // indirect
 	github.com/inconshreveable/mousetrap v1.0.1 // indirect
-	github.com/labstack/gommon v0.3.1 // indirect
+	github.com/labstack/gommon v0.4.0 // indirect
 	github.com/mattn/go-colorable v0.1.12 // indirect
 	github.com/mitchellh/copystructure v1.0.0 // indirect
 	github.com/mitchellh/reflectwalk v1.0.0 // indirect
