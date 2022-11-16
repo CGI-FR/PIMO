@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1668356365762,
+  "lastUpdate": 1668621240069,
   "repoUrl": "https://github.com/CGI-FR/PIMO",
   "entries": {
     "Benchmark": [
@@ -1830,6 +1830,42 @@ window.BENCHMARK_DATA = {
             "value": 4425704,
             "unit": "ns/op\t  692410 B/op\t    6014 allocs/op",
             "extra": "2773 times\n2 procs"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "49699333+dependabot[bot]@users.noreply.github.com",
+            "name": "dependabot[bot]",
+            "username": "dependabot[bot]"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "8ae4850b9268a332f4bd91345e474f2892f70498",
+          "message": "chore(deps): bump loader-utils from 1.4.0 to 1.4.2 in /web/play (#182)\n\nBumps [loader-utils](https://github.com/webpack/loader-utils) from 1.4.0 to 1.4.2.\r\n- [Release notes](https://github.com/webpack/loader-utils/releases)\r\n- [Changelog](https://github.com/webpack/loader-utils/blob/v1.4.2/CHANGELOG.md)\r\n- [Commits](https://github.com/webpack/loader-utils/compare/v1.4.0...v1.4.2)\r\n\r\n---\r\nupdated-dependencies:\r\n- dependency-name: loader-utils\r\n  dependency-type: indirect\r\n...\r\n\r\nSigned-off-by: dependabot[bot] <support@github.com>\r\n\r\nSigned-off-by: dependabot[bot] <support@github.com>\r\nCo-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>",
+          "timestamp": "2022-11-16T18:46:01+01:00",
+          "tree_id": "0cb36d2cade9124e97055707203cb3f0aef7c5b5",
+          "url": "https://github.com/CGI-FR/PIMO/commit/8ae4850b9268a332f4bd91345e474f2892f70498"
+        },
+        "date": 1668621239315,
+        "tool": "go",
+        "benches": [
+          {
+            "name": "BenchmarkPimoRun",
+            "value": 317126,
+            "unit": "ns/op\t   16551 B/op\t     186 allocs/op",
+            "extra": "35762 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge",
+            "value": 4125308,
+            "unit": "ns/op\t  692119 B/op\t    6013 allocs/op",
+            "extra": "3061 times\n2 procs"
           }
         ]
       }
