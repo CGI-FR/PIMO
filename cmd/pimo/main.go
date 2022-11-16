@@ -23,7 +23,7 @@ import (
 	"runtime"
 	"strings"
 
-	over "github.com/Trendyol/overlog"
+	over "github.com/adrienaury/zeromdc"
 	"github.com/cgi-fr/pimo/internal/app/pimo"
 	"github.com/cgi-fr/pimo/pkg/flow"
 	"github.com/cgi-fr/pimo/pkg/model"

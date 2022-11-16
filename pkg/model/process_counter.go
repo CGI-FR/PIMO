@@ -1,7 +1,7 @@
 package model
 
 import (
-	over "github.com/Trendyol/overlog"
+	over "github.com/adrienaury/zeromdc"
 )
 
 type CounterProcess struct {
