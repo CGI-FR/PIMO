@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1668670666525,
+  "lastUpdate": 1668707730091,
   "repoUrl": "https://github.com/CGI-FR/PIMO",
   "entries": {
     "Benchmark": [
@@ -2082,6 +2082,42 @@ window.BENCHMARK_DATA = {
             "value": 2487725,
             "unit": "ns/op\t  691323 B/op\t    5889 allocs/op",
             "extra": "4664 times\n2 procs"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "49699333+dependabot[bot]@users.noreply.github.com",
+            "name": "dependabot[bot]",
+            "username": "dependabot[bot]"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "2c09b0ff451edda82a7b0d612e9c0ed70600d6e7",
+          "message": "chore(deps): bump golang.org/x/text from 0.3.7 to 0.4.0 (#177)\n\n* chore(deps): bump golang.org/x/text from 0.3.7 to 0.4.0\r\n\r\nBumps [golang.org/x/text](https://github.com/golang/text) from 0.3.7 to 0.4.0.\r\n- [Release notes](https://github.com/golang/text/releases)\r\n- [Commits](https://github.com/golang/text/compare/v0.3.7...v0.4.0)\r\n\r\n---\r\nupdated-dependencies:\r\n- dependency-name: golang.org/x/text\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-minor\r\n...\r\n\r\nSigned-off-by: dependabot[bot] <support@github.com>\r\n\r\n* chore: fix deps\r\n\r\nSigned-off-by: dependabot[bot] <support@github.com>\r\nCo-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>\r\nCo-authored-by: Adrien Aury <adrien.aury@cgi.com>",
+          "timestamp": "2022-11-17T18:48:48+01:00",
+          "tree_id": "73bb023204b48faa79ed15cbad5af46c5b56c077",
+          "url": "https://github.com/CGI-FR/PIMO/commit/2c09b0ff451edda82a7b0d612e9c0ed70600d6e7"
+        },
+        "date": 1668707729729,
+        "tool": "go",
+        "benches": [
+          {
+            "name": "BenchmarkPimoRun",
+            "value": 30582,
+            "unit": "ns/op\t   16470 B/op\t     168 allocs/op",
+            "extra": "379284 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge",
+            "value": 2007438,
+            "unit": "ns/op\t  691502 B/op\t    5890 allocs/op",
+            "extra": "5570 times\n2 procs"
           }
         ]
       }
