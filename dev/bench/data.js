@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1668635491510,
+  "lastUpdate": 1668668277567,
   "repoUrl": "https://github.com/CGI-FR/PIMO",
   "entries": {
     "Benchmark": [
@@ -2010,6 +2010,42 @@ window.BENCHMARK_DATA = {
             "value": 1977000,
             "unit": "ns/op\t  691423 B/op\t    5890 allocs/op",
             "extra": "5658 times\n2 procs"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "49699333+dependabot[bot]@users.noreply.github.com",
+            "name": "dependabot[bot]",
+            "username": "dependabot[bot]"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "4204a97d89d83bc46b3ca6ff077a8ff5c634cc3e",
+          "message": "chore(deps): bump github.com/invopop/jsonschema from 0.6.0 to 0.7.0 (#184)\n\nBumps [github.com/invopop/jsonschema](https://github.com/invopop/jsonschema) from 0.6.0 to 0.7.0.\r\n- [Release notes](https://github.com/invopop/jsonschema/releases)\r\n- [Commits](https://github.com/invopop/jsonschema/compare/v0.6.0...v0.7.0)\r\n\r\n---\r\nupdated-dependencies:\r\n- dependency-name: github.com/invopop/jsonschema\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-minor\r\n...\r\n\r\nSigned-off-by: dependabot[bot] <support@github.com>\r\n\r\nSigned-off-by: dependabot[bot] <support@github.com>\r\nCo-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>",
+          "timestamp": "2022-11-17T07:49:38+01:00",
+          "tree_id": "2769ba81b92a7aac5af6524c22954c05c505f6a0",
+          "url": "https://github.com/CGI-FR/PIMO/commit/4204a97d89d83bc46b3ca6ff077a8ff5c634cc3e"
+        },
+        "date": 1668668276927,
+        "tool": "go",
+        "benches": [
+          {
+            "name": "BenchmarkPimoRun",
+            "value": 36033,
+            "unit": "ns/op\t   16446 B/op\t     168 allocs/op",
+            "extra": "313292 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge",
+            "value": 2582182,
+            "unit": "ns/op\t  691508 B/op\t    5890 allocs/op",
+            "extra": "4396 times\n2 procs"
           }
         ]
       }
