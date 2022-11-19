@@ -20,7 +20,6 @@ package pimo_test
 import (
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"testing"
 	"time"
@@ -100,7 +99,7 @@ func BenchmarkPimoRun(b *testing.B) {
 	}
 
 	b.ResetTimer()
-	_, err = ctx.Execute(ioutil.Discard)
+	_, err = ctx.Execute(io.Discard)
 	if err != nil {
 		b.FailNow()
 	}
@@ -304,7 +303,7 @@ func BenchmarkPimoRunLarge(b *testing.B) {
 }
 
 func LoadJsonLineFromDocument(filename string) (model.Dictionary, error) {
-	jsonBytes, err := ioutil.ReadFile("testdata/" + filename)
+	jsonBytes, err := os.ReadFile("testdata/" + filename)
 	if err != nil {
 		return model.NewDictionary(), fmt.Errorf(": %w", err)
 	}
