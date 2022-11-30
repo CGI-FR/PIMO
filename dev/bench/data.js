@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1668707730091,
+  "lastUpdate": 1669797743487,
   "repoUrl": "https://github.com/CGI-FR/PIMO",
   "entries": {
     "Benchmark": [
@@ -2118,6 +2118,42 @@ window.BENCHMARK_DATA = {
             "value": 2007438,
             "unit": "ns/op\t  691502 B/op\t    5890 allocs/op",
             "extra": "5570 times\n2 procs"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "49699333+dependabot[bot]@users.noreply.github.com",
+            "name": "dependabot[bot]",
+            "username": "dependabot[bot]"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "e0789adaec2b445fd0a06755bbf448f9f6ec2ca5",
+          "message": "chore(deps): bump github.com/Masterminds/sprig/v3 from 3.2.2 to 3.2.3 (#187)\n\nBumps [github.com/Masterminds/sprig/v3](https://github.com/Masterminds/sprig) from 3.2.2 to 3.2.3.\r\n- [Release notes](https://github.com/Masterminds/sprig/releases)\r\n- [Changelog](https://github.com/Masterminds/sprig/blob/master/CHANGELOG.md)\r\n- [Commits](https://github.com/Masterminds/sprig/compare/v3.2.2...v3.2.3)\r\n\r\n---\r\nupdated-dependencies:\r\n- dependency-name: github.com/Masterminds/sprig/v3\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-patch\r\n...\r\n\r\nSigned-off-by: dependabot[bot] <support@github.com>\r\n\r\nSigned-off-by: dependabot[bot] <support@github.com>\r\nCo-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>",
+          "timestamp": "2022-11-30T09:35:21+01:00",
+          "tree_id": "6e81f27508a3dcedc5b8b2d4fdd38e4e6acff710",
+          "url": "https://github.com/CGI-FR/PIMO/commit/e0789adaec2b445fd0a06755bbf448f9f6ec2ca5"
+        },
+        "date": 1669797742720,
+        "tool": "go",
+        "benches": [
+          {
+            "name": "BenchmarkPimoRun",
+            "value": 31164,
+            "unit": "ns/op\t   16473 B/op\t     168 allocs/op",
+            "extra": "377970 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge",
+            "value": 2109329,
+            "unit": "ns/op\t  691806 B/op\t    5890 allocs/op",
+            "extra": "4990 times\n2 procs"
           }
         ]
       }
