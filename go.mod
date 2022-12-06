@@ -6,7 +6,7 @@ require (
 	github.com/Masterminds/sprig/v3 v3.2.3
 	github.com/adrienaury/zeromdc v0.0.0-20221116212822-6a366c26ee61
 	github.com/capitalone/fpe v1.2.1
-	github.com/goccy/go-yaml v1.9.6
+	github.com/goccy/go-yaml v1.9.7
 	github.com/invopop/jsonschema v0.7.0
 	github.com/labstack/echo/v4 v4.9.1
 	github.com/mattn/anko v0.1.9
