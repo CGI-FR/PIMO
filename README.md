@@ -20,29 +20,29 @@ seed: 42
 functions:
     # Optional define functions
 masking:
-  - selector:
-      jsonpath: "example.example"
-    mask:
-      type: "argument"
-    # Optional cache (coherence preservation)
-    cache: "cacheName"
-    # Optional custom seed for this mask
-    seed:
-      field: "example.example"
+    - selector:
+          jsonpath: "example.example"
+      mask:
+          type: "argument"
+      # Optional cache (coherence preservation)
+      cache: "cacheName"
+      # Optional custom seed for this mask
+      seed:
+          field: "example.example"
 
-  # another mask on a different location
-  - selector:
-      jsonpath: "example.example2"
-    mask:
-      type: "argument"
-    preserve: "null"
+    # another mask on a different location
+    - selector:
+          jsonpath: "example.example2"
+      mask:
+          type: "argument"
+      preserve: "null"
 
 caches:
-  cacheName:
-    # Optional bijective cache (enable re-identification if the cache is dumped on disk)
-    unique: true
-    # Use reverse cache dictionnary
-    reverse: true
+    cacheName:
+        # Optional bijective cache (enable re-identification if the cache is dumped on disk)
+        unique: true
+        # Use reverse cache dictionnary
+        reverse: true
 ```
 
 `version` is the version of the masking file.
@@ -58,9 +58,9 @@ caches:
 Multiple masks can be applied on the same jsonpath location, like in this example :
 
 ```yaml
-  - selector:
+- selector:
       jsonpath: "example"
-    masks:
+  masks:
       - add: "hello"
       - template: "{{.example}} World!"
       - remove: true
@@ -69,10 +69,10 @@ Multiple masks can be applied on the same jsonpath location, like in this exampl
 Masks can be applied on multiple selectors, like in this example:
 
 ```yaml
-  - selectors:
+- selectors:
       - jsonpath: "example"
       - jsonpath: "example2"
-    mask:
+  mask:
       add: "hello"
 ```
 
@@ -80,68 +80,68 @@ It is possible to define functions and reuse them later in the masks, like in th
 
 ```yaml
 functions:
-  add20:
-    params:
-      - name: "i"
-    body: |-
-      return i + 20
-  sub:
-    params:
-      - name: "x"
-      - name: "y"
-    body: |-
-      return x - y
+    add20:
+        params:
+            - name: "i"
+        body: |-
+            return i + 20
+    sub:
+        params:
+            - name: "x"
+            - name: "y"
+        body: |-
+            return x - y
 masking:
-  - selector:
-      jsonpath: "addValue"
-    mask:
-      template: '{{add20 5}}'
-  - selector:
-      jsonpath: "subValue"
-    mask:
-      template: '{{sub 10 5}}'
+    - selector:
+          jsonpath: "addValue"
+      mask:
+          template: "{{add20 5}}"
+    - selector:
+          jsonpath: "subValue"
+      mask:
+          template: "{{sub 10 5}}"
 ```
 
 ## Possible masks
 
 The following types of masks can be used :
 
-* Pure randomization masks
-  * [`regex`](#regex) is to mask using a regular expression given in argument.
-  * [`randomInt`](#randomInt) is to mask with a random int from a range with arguments min and max.
-  * [`randomDecimal`](#randomDecimal) is to mask with a random decimal from a range with arguments min, max and precision.
-  * [`randDate`](#randDate) is to mask a date with a random date between `dateMin` and `dateMax`.
-  * [`randomDuration`](#randomDuration) is to mask a date by adding or removing a random time between `Min` and `Max`.
-  * [`randomChoice`](#randomChoice) is to mask with a random value from a list in argument.
-  * [`weightedChoice`](#weightedChoice) is to mask with a random value from a list with probability, both given with the arguments `choice` and `weight`.
-  * [`randomChoiceInUri`](#randomChoiceInUri) is to mask with a random value from an external resource.
-  * [`transcode`](#transcode) is to mask a value randomly with character class preservation.
-* K-Anonymization
-  * [`range`](#range) is to mask a integer value by a range of value (e.g. replace `5` by `[0,10]`).
-  * [`duration`](#duration) is to mask a date by adding or removing a certain number of days.
-* Re-identification and coherence preservation
-  * [`hash`](#hash) is to mask with a value from a list by matching the original value, allowing to mask a value the same way every time.
-  * [`hashInUri`](#hashInUri) is to mask with a value from an external resource, by matching the original value, allowing to mask a value the same way every time.
-  * [`fromCache`](#fromCache) is a mask to obtain a value from a cache.
-  * [`ff1`](#ff1) mask allows the use of <abbr title="Format Preserving Encryption">FPE</abbr> which enable private-key based re-identification.
-* Formatting
-  * [`dateParser`](#dateParser) is to change a date format.
-  * [`template`](#template) is to mask a data with a template using other values from the jsonline.
-  * [`template-each`](#template-each) is like template but will apply on each value of an array.
-  * [`fromjson`](#fromjson) is to convert string field values to parsed JSON, e.g. "[1,2,3]" -> [1,2,3].
-* Data structure manipulation
-  * [`remove`](#remove) is to mask a field by completely removing it.
-  * [`add`](#add) is a mask to add a field to the jsonline.
-  * [`add-transient`](#add-transient) same as `add` but the field is not exported in the output jsonline.
-* Others
-  * [`constant`](#constant) is to mask the value by a constant value given in argument.
-  * [`command`](#command) is to mask with the output of a console command given in argument.
-  * [`incremental`](#incremental) is to mask data with incremental value starting from `start` with a step of `increment`.
-  * [`fluxUri`](#fluxUri) is to replace by a sequence of values defined in an external resource.
-  * [`replacement`](#replacement) is to mask a data with another data from the jsonline.
-  * [`pipe`](#pipe) is a mask to handle complex nested array structures, it can read an array as an object stream and process it with a sub-pipeline.
-  * [`luhn`](#luhn) can generate valid numbers using the Luhn algorithm (e.g. french SIRET or SIREN).
-  * [`markov`](#markov) can generate pseudo text based on a sample text.
+-   Pure randomization masks
+    -   [`regex`](#regex) is to mask using a regular expression given in argument.
+    -   [`randomInt`](#randomInt) is to mask with a random int from a range with arguments min and max.
+    -   [`randomDecimal`](#randomDecimal) is to mask with a random decimal from a range with arguments min, max and precision.
+    -   [`randDate`](#randDate) is to mask a date with a random date between `dateMin` and `dateMax`.
+    -   [`randomDuration`](#randomDuration) is to mask a date by adding or removing a random time between `Min` and `Max`.
+    -   [`randomChoice`](#randomChoice) is to mask with a random value from a list in argument.
+    -   [`weightedChoice`](#weightedChoice) is to mask with a random value from a list with probability, both given with the arguments `choice` and `weight`.
+    -   [`randomChoiceInUri`](#randomChoiceInUri) is to mask with a random value from an external resource.
+    -   [`transcode`](#transcode) is to mask a value randomly with character class preservation.
+-   K-Anonymization
+    -   [`range`](#range) is to mask a integer value by a range of value (e.g. replace `5` by `[0,10]`).
+    -   [`duration`](#duration) is to mask a date by adding or removing a certain number of days.
+-   Re-identification and coherence preservation
+    -   [`hash`](#hash) is to mask with a value from a list by matching the original value, allowing to mask a value the same way every time.
+    -   [`hashInUri`](#hashInUri) is to mask with a value from an external resource, by matching the original value, allowing to mask a value the same way every time.
+    -   [`fromCache`](#fromCache) is a mask to obtain a value from a cache.
+    -   [`ff1`](#ff1) mask allows the use of <abbr title="Format Preserving Encryption">FPE</abbr> which enable private-key based re-identification.
+-   Formatting
+    -   [`dateParser`](#dateParser) is to change a date format.
+    -   [`template`](#template) is to mask a data with a template using other values from the jsonline.
+    -   [`template-each`](#template-each) is like template but will apply on each value of an array.
+    -   [`fromjson`](#fromjson) is to convert string field values to parsed JSON, e.g. "[1,2,3]" -> [1,2,3].
+-   Data structure manipulation
+    -   [`remove`](#remove) is to mask a field by completely removing it.
+    -   [`add`](#add) is a mask to add a field to the jsonline.
+    -   [`add-transient`](#add-transient) same as `add` but the field is not exported in the output jsonline.
+-   Others
+    -   [`constant`](#constant) is to mask the value by a constant value given in argument.
+    -   [`command`](#command) is to mask with the output of a console command given in argument.
+    -   [`incremental`](#incremental) is to mask data with incremental value starting from `start` with a step of `increment`.
+    -   [`fluxUri`](#fluxUri) is to replace by a sequence of values defined in an external resource.
+    -   [`replacement`](#replacement) is to mask a data with another data from the jsonline.
+    -   [`pipe`](#pipe) is a mask to handle complex nested array structures, it can read an array as an object stream and process it with a sub-pipeline.
+    -   [`luhn`](#luhn) can generate valid numbers using the Luhn algorithm (e.g. french SIRET or SIREN).
+    -   [`markov`](#markov) can generate pseudo text based on a sample text.
 
 A full `masking.yml` file example, using every kind of mask, is given with the source code.
 
@@ -157,19 +157,20 @@ To use PIMO to mask a `data.json`, use in the following way :
 
 This takes the `data.json` file, masks the data contained inside it and put the result in a `maskedData.json` file. If data are in a table (for example multiple names), then each field of this table will be masked using the given mask. The following flags can be used:
 
-* `--repeat=N` This flag will make pimo mask every input N-times (useful for dataset generation).
-* `--skip-line-on-error` This flag will totally skip a line if an error occurs masking a field.
-* `--skip-field-on-error` This flag will return output without a field if an error occurs masking this field.
-* `--empty-input` This flag will give PIMO a `{}` input, usable with `--repeat` flag.
-* `--config=filename.yml` This flag allow to use another file for config than the default `masking.yml`.
-* `--load-cache cacheName=filename.json` This flag load an initial cache content from a file (json line format `{"key":"a", "value":"b"}`).
-* `--dump-cache cacheName=filename.json` This flag dump final cache content to a file (json line format `{"key":"a", "value":"b"}`).
-* `--verbosity <level>` or `-v<level>` This flag increase verbosity on the stderr output, possible values: none (0), error (1), warn (2), info (3), debug (4), trace (5).
-* `--debug` This flag complete the logs with debug information (source file, line number).
-* `--log-json` Set this flag to produce JSON formatted logs ([demo9](demo/demo9) goes deeper into logging and structured logging)
-* `--mask` Declare a simple masking definition in command line (minified YAML format: `--mask "value={fluxUri: 'pimo://nameFR'}"`, or `--mask "value=[{add: ''},{fluxUri: 'pimo://nameFR'}]"` for multiple masks). For advanced use case (e.g. if caches needed) `masking.yml` file definition will be preferred.
-* `--repeat-until <condition>` This flag will make PIMO keep masking every input until the condition is met. Condition format is using [Template](https://pkg.go.dev/text/template). Last output verifies the condition.
-* `--repeat-while <condition>` This flag will make PIMO keep masking every input while the condition is met. Condition format is using [Template](https://pkg.go.dev/text/template).
+-   `--repeat=N` This flag will make pimo mask every input N-times (useful for dataset generation).
+-   `--skip-line-on-error` This flag will totally skip a line if an error occurs masking a field.
+-   `--skip-field-on-error` This flag will return output without a field if an error occurs masking this field.
+-   `--empty-input` This flag will give PIMO a `{}` input, usable with `--repeat` flag.
+-   `--config=filename.yml` This flag allow to use another file for config than the default `masking.yml`.
+-   `--load-cache cacheName=filename.json` This flag load an initial cache content from a file (json line format `{"key":"a", "value":"b"}`).
+-   `--dump-cache cacheName=filename.json` This flag dump final cache content to a file (json line format `{"key":"a", "value":"b"}`).
+-   `--verbosity <level>` or `-v<level>` This flag increase verbosity on the stderr output, possible values: none (0), error (1), warn (2), info (3), debug (4), trace (5).
+-   `--debug` This flag complete the logs with debug information (source file, line number).
+-   `--log-json` Set this flag to produce JSON formatted logs ([demo9](demo/demo9) goes deeper into logging and structured logging)
+-   `--seed <int>` Set this flage to declare seed in command line.
+-   `--mask` Declare a simple masking definition in command line (minified YAML format: `--mask "value={fluxUri: 'pimo://nameFR'}"`, or `--mask "value=[{add: ''},{fluxUri: 'pimo://nameFR'}]"` for multiple masks). For advanced use case (e.g. if caches needed) `masking.yml` file definition will be preferred.
+-   `--repeat-until <condition>` This flag will make PIMO keep masking every input until the condition is met. Condition format is using [Template](https://pkg.go.dev/text/template). Last output verifies the condition.
+-   `--repeat-while <condition>` This flag will make PIMO keep masking every input while the condition is met. Condition format is using [Template](https://pkg.go.dev/text/template).
 
 ### PIMO Play
 
@@ -193,9 +194,9 @@ Please check the [demo folder](demo) for more advanced examples.
 ### Regex
 
 ```yaml
-  - selector:
+- selector:
       jsonpath: "phone"
-    mask:
+  mask:
       regex: "0[1-7]( ([0-9]){2}){4}"
 ```
 
@@ -206,9 +207,9 @@ This example will mask the `phone` field of the input jsonlines with a random st
 ### Constant
 
 ```yaml
-  - selector:
+- selector:
       jsonpath: "name"
-    mask:
+  mask:
       constant: "Bill"
 ```
 
@@ -219,13 +220,13 @@ This example will mask the `name` field of the input jsonlines with the value of
 ### RandomChoice
 
 ```yaml
-  - selector:
+- selector:
       jsonpath: "name"
-    mask:
+  mask:
       randomChoice:
-       - "Mickael"
-       - "Mathieu"
-       - "Marcelle"
+          - "Mickael"
+          - "Mathieu"
+          - "Marcelle"
 ```
 
 This example will mask the `name` field of the input jsonlines with random values from the `randomChoice` list.
@@ -235,9 +236,9 @@ This example will mask the `name` field of the input jsonlines with random value
 ### RandomChoiceInUri
 
 ```yaml
-  - selector:
+- selector:
       jsonpath: "name"
-    mask:
+  mask:
       randomChoiceInUri: "file://names.txt"
 ```
 
@@ -250,12 +251,12 @@ A value can be injected in URI with the template syntax. For example, `file://na
 ### RandomInt
 
 ```yaml
-  - selector:
+- selector:
       jsonpath: "age"
-    mask:
+  mask:
       randomInt:
-        min: 25
-        max: 32
+          min: 25
+          max: 32
 ```
 
 This example will mask the `age` field of the input jsonlines with a random number between `min` and `max` included.
@@ -265,13 +266,13 @@ This example will mask the `age` field of the input jsonlines with a random numb
 ### RandomDecimal
 
 ```yaml
-  - selector:
+- selector:
       jsonpath: "score"
-    mask:
+  mask:
       randomDecimal:
-        min: 0
-        max: 17.23
-        precision: 2
+          min: 0
+          max: 17.23
+          precision: 2
 ```
 
 This example will mask the `score` field of the input jsonlines with a random float between `min` and `max`, with the number of decimal chosen in the `precision` field.
@@ -281,9 +282,9 @@ This example will mask the `score` field of the input jsonlines with a random fl
 ### Command
 
 ```yaml
-  - selector:
+- selector:
       jsonpath: "name"
-    mask:
+  mask:
       command: "echo -n Dorothy"
 ```
 
@@ -294,14 +295,14 @@ This example will mask the `name` field of the input jsonlines with the output o
 ### WeightedChoice
 
 ```yaml
-  - selector:
+- selector:
       jsonpath: "surname"
-    mask:
+  mask:
       weightedChoice:
-        - choice: "Dupont"
-          weight: 9
-        - choice: "Dupond"
-          weight: 1
+          - choice: "Dupont"
+            weight: 9
+          - choice: "Dupond"
+            weight: 1
 ```
 
 This example will mask the `surname` field of the input jsonlines with a random value in the `weightedChoice` list with a probability proportional at the `weight` field.
@@ -311,13 +312,13 @@ This example will mask the `surname` field of the input jsonlines with a random 
 ### Hash
 
 ```yaml
-  - selector:
+- selector:
       jsonpath: "town"
-    mask:
+  mask:
       hash:
-        - "Emerald City"
-        - "Ruby City"
-        - "Sapphire City"
+          - "Emerald City"
+          - "Ruby City"
+          - "Sapphire City"
 ```
 
 This example will mask the `town` field of the input jsonlines with a value from the `hash` list. The value will be chosen thanks to a hashing of the original value, allowing the output to be always the same in case of identical inputs.
@@ -327,9 +328,9 @@ This example will mask the `town` field of the input jsonlines with a value from
 ### HashInUri
 
 ```yaml
-  - selector:
+- selector:
       jsonpath: "name"
-    mask:
+  mask:
       hashInUri: "pimo://nameFR"
 ```
 
@@ -340,12 +341,12 @@ This example will mask the `name` field of the input jsonlines with a value from
 ### RandDate
 
 ```yaml
-  - selector:
+- selector:
       jsonpath: "date"
-    mask:
+  mask:
       randDate:
-        dateMin: "1970-01-01T00:00:00Z"
-        dateMax: "2020-01-01T00:00:00Z"
+          dateMin: "1970-01-01T00:00:00Z"
+          dateMax: "2020-01-01T00:00:00Z"
 ```
 
 This example will mask the `date` field of the input jsonlines with a random date between `dateMin` and `dateMax`. In this case the date will be between the 1st January 1970 and the 1st January 2020.
@@ -355,9 +356,9 @@ This example will mask the `date` field of the input jsonlines with a random dat
 ### Duration
 
 ```yaml
-  - selector:
+- selector:
       jsonpath: "last_contact"
-    mask:
+  mask:
       duration: "-P2D"
 ```
 
@@ -368,12 +369,12 @@ This example will mask the `last_contact` field of the input jsonlines by decrea
 ### DateParser
 
 ```yaml
-  - selector:
+- selector:
       jsonpath: "date"
-    mask:
+  mask:
       dateParser:
-        inputFormat: "2006-01-02"
-        outputFormat: "01/02/06"
+          inputFormat: "2006-01-02"
+          outputFormat: "01/02/06"
 ```
 
 This example will change every date from the date field from the `inputFormat` to the `outputFormat`. The format should always display the following date : `Mon Jan 2 15:04:05 -0700 MST 2006`. Either field is optional and in case a field is not defined, the default format is RFC3339, which is the base format for PIMO, needed for `duration` mask and given by `randDate` mask. It is possible to use the Unix time format by specifying `inputFormat: "unixEpoch"` or `outputFormat: "unixEpoch"`.
@@ -383,12 +384,12 @@ This example will change every date from the date field from the `inputFormat` t
 ### RandomDuration
 
 ```yaml
-  - selector:
+- selector:
       jsonpath: "date"
-    mask:
+  mask:
       randomDuration:
-        min: "-P2D"
-        max: "-P27D"
+          min: "-P2D"
+          max: "-P27D"
 ```
 
 This example will mask the `date` field of the input jsonlines by decreasing its value by a random value between 2 and 27 days. The durations should match the ISO 8601 standard.
@@ -398,12 +399,12 @@ This example will mask the `date` field of the input jsonlines by decreasing its
 ### Incremental
 
 ```yaml
-  - selector:
+- selector:
       jsonpath: "id"
-    mask:
+  mask:
       incremental:
-        start: 1
-        increment: 1
+          start: 1
+          increment: 1
 ```
 
 This example will mask the `id` field of the input jsonlines with incremental values. The first jsonline's `id` will be masked by 1, the second's by 2, etc...
@@ -413,9 +414,9 @@ This example will mask the `id` field of the input jsonlines with incremental va
 ### Replacement
 
 ```yaml
-  - selector:
+- selector:
       jsonpath: "name4"
-    mask:
+  mask:
       replacement: "name"
 ```
 
@@ -426,18 +427,18 @@ This example will mask the `name4` field of the input jsonlines with the field `
 ### Template
 
 ```yaml
-  - selector:
+- selector:
       jsonpath: "mail"
-    mask:
+  mask:
       template: "{{.surname}}.{{.name}}@gmail.com"
 ```
 
 This example will mask the `mail` field of the input jsonlines respecting the given template. In the `masking.yml` config file, this selector must be placed after the fields contained in the template to mask with the new values and before the other fields to be masked with the old values. In the case of a nested json, the template must respect the following example :
 
 ```yaml
-  - selector:
+- selector:
       jsonpath: "user.mail"
-    mask:
+  mask:
       template: "{{.user.surname}}.{{.user.name}}@gmail.com"
 ```
 
@@ -446,9 +447,9 @@ The format for the template should respect the `text/template` package : <https:
 The template mask can format the fields used. The following example will create a mail address without accent or upper case:
 
 ```yaml
-  - selector:
+- selector:
       jsonpath: "user.mail"
-    mask:
+  mask:
       template: "{{.surname | NoAccent | upper}}.{{.name | NoAccent | lower}}@gmail.com"
 ```
 
@@ -457,9 +458,9 @@ Available functions for templates come from <http://masterminds.github.io/sprig/
 Most masks will be available as functions in template in the form : MaskCapitalizedMaskName.
 
 ```yaml
-  - selector:
+- selector:
       jsonpath: "mail"
-    masks:
+  masks:
       - add: ""
       - template: '{{MaskRegex "[a-z]{10}"}}.{{MaskRegex "[a-z]{10}"}}.{{MaskRandomInt 0 100}}@gmail.com'
 ```
@@ -469,12 +470,12 @@ Most masks will be available as functions in template in the form : MaskCapitali
 ### Template each
 
 ```yaml
-  - selector:
+- selector:
       jsonpath: "array"
-    mask:
+  mask:
       template-each:
-        template: "{{title .value}}"
-        item: "value"
+          template: "{{title .value}}"
+          item: "value"
 ```
 
 This will affect every values in the array field. The field must be an array (`{"array": ["value1", "value2]`).
@@ -489,29 +490,29 @@ See also the [Template mask](#template) for other options, all functions are app
 ### Fromjson
 
 ```yaml
-  - selector:
+- selector:
       jsonpath: "targetfield"
-    mask:
+  mask:
       fromjson: "sourcefield"
 ```
 
 This example will mask the `targetfield` field of the input jsonlines with the parsed JSON from field `sourcefield` of the jsonline. This mask changes the type of the input string (`sourcefield`) :
 
-* null : nil
-* string: string
-* number: float64
-* array:  slice
-* object: map
-* bool: bool
+-   null : nil
+-   string: string
+-   number: float64
+-   array: slice
+-   object: map
+-   bool: bool
 
 [Return to list of masks](#possible-masks)
 
 ### Remove
 
 ```yaml
-  - selector:
+- selector:
       jsonpath: "useless-field"
-    mask:
+  mask:
       remove: true
 ```
 
@@ -522,9 +523,9 @@ This field will mask the `useless-field` of the input jsonlines by completely de
 ### Add
 
 ```yaml
-  - selector:
+- selector:
       jsonpath: "newField"
-    mask:
+  mask:
       add: "newvalue"
 ```
 
@@ -539,9 +540,9 @@ Note: add can contains template strings (see the [Template](#template) mask for 
 ### Add-Transient
 
 ```yaml
-  - selector:
+- selector:
       jsonpath: "newField"
-    mask:
+  mask:
       add-transient: "newvalue"
 ```
 
@@ -558,9 +559,9 @@ Note: add-transient can contains template strings (see the [Template](#template)
 ### FluxURI
 
 ```yaml
-  - selector:
+- selector:
       jsonpath: "id"
-    mask:
+  mask:
       fluxURI: "file://id.csv"
 ```
 
@@ -591,12 +592,12 @@ A `reverse` option is available in the `caches` section to use the reverse cache
 ### FF1
 
 ```yaml
-  - selector:
+- selector:
       jsonpath: "siret"
-    mask:
+  mask:
       ff1:
-        radix: 10
-        keyFromEnv: "FF1_ENCRYPTION_KEY"
+          radix: 10
+          keyFromEnv: "FF1_ENCRYPTION_KEY"
 ```
 
 This example will encrypt the `siret` column with the private key base64-encoded in the FF1_ENCRYPTION_KEY environment variable. Use the same mask with the option `decrypt: true` to re-identify the unmasked value.
@@ -608,9 +609,9 @@ Be sure to check [the full FPE demo](demo/demo7) to get more details about this 
 ### Range
 
 ```yaml
-  - selector:
+- selector:
       jsonpath: "age"
-    mask:
+  mask:
       range: 5
 ```
 
@@ -667,29 +668,29 @@ If the data structure contains arrays of object like in the example below, this 
 version: "1"
 seed: 42
 masking:
-  - selector:
-      # this path points to an array of persons
-      jsonpath: "organizations.persons"
-    mask:
-      # it will be piped to the masking pipeline definition below
-      pipe:
-        # the parent object (a domain) will be accessible with the "_" variable name
-        injectParent: "_"
-        masking:
-          - selector:
-              jsonpath: "name"
-            mask:
-              # fields inside the person object can be accessed directly
-              template: "{{ title .name }}"
-          - selector:
-              jsonpath: "surname"
-            mask:
-              template: "{{ title .surname }}"
-          - selector:
-              jsonpath: "email"
-            mask:
-              # the value stored inside the parent object is accessible through "_" thanks to the parent injection
-              template: "{{ lower .name }}.{{ lower .surname }}@{{ ._.domain }}"
+    - selector:
+          # this path points to an array of persons
+          jsonpath: "organizations.persons"
+      mask:
+          # it will be piped to the masking pipeline definition below
+          pipe:
+              # the parent object (a domain) will be accessible with the "_" variable name
+              injectParent: "_"
+              masking:
+                  - selector:
+                        jsonpath: "name"
+                    mask:
+                        # fields inside the person object can be accessed directly
+                        template: "{{ title .name }}"
+                  - selector:
+                        jsonpath: "surname"
+                    mask:
+                        template: "{{ title .surname }}"
+                  - selector:
+                        jsonpath: "email"
+                    mask:
+                        # the value stored inside the parent object is accessible through "_" thanks to the parent injection
+                        template: "{{ lower .name }}.{{ lower .surname }}@{{ ._.domain }}"
 ```
 
 In addition to the `injectParent` property, this mask also provide the `injectRoot` property to inject the whole structure of data.
@@ -700,12 +701,12 @@ It is possible to simplify the `masking.yml` file by referencing an external yam
 version: "1"
 seed: 42
 masking:
-  - selector:
-      jsonpath: "organizations.persons"
-    mask:
-      pipe:
-        injectParent: "domain"
-        file: "./masking-person.yml"
+    - selector:
+          jsonpath: "organizations.persons"
+      mask:
+          pipe:
+              injectParent: "domain"
+              file: "./masking-person.yml"
 ```
 
 Be sure to check [demo](demo/demo8) to get more details about this mask.
@@ -719,9 +720,9 @@ The [Luhn](https://en.wikipedia.org/wiki/Luhn_algorithm) algorithm is a simple c
 The `luhn` mask can calculate the checksum for any value.
 
 ```yaml
-  - selector:
+- selector:
       jsonpath: "siret"
-    mask:
+  mask:
       luhn: {}
 ```
 
@@ -730,15 +731,14 @@ In this example, the `siret` value will be appended with the correct checksum, t
 The mask can be parametered to use a different universe of valid characters, internally using the [Luhn mod N](https://en.wikipedia.org/wiki/Luhn_mod_N_algorithm) algorithm.
 
 ```yaml
-  - selector:
+- selector:
       jsonpath: "siret"
-    mask:
+  mask:
       luhn:
-        universe: "abcde"
+          universe: "abcde"
 ```
 
 [Return to list of masks](#possible-masks)
-
 
 ### Markov
 
@@ -754,13 +754,13 @@ I need a cheese cake
 **masking.yml**
 
 ```yaml
-  - selector:
+- selector:
       jsonpath: "comment"
-    mask:
+  mask:
       markov:
-        max-size: 20
-        sample: "file://sample.txt"
-        separator: " "
+          max-size: 20
+          sample: "file://sample.txt"
+          separator: " "
 ```
 
 This example will mask the surname comment of the input jsonlines with a random value comment generated by the markov mask with an order of `2`. The different possibilities generated from **sample.txt** will be :
@@ -784,12 +784,12 @@ This mask produce a random string by preserving character classes from the origi
 
 ```yaml
 - selector:
-    jsonpath: "id"
+      jsonpath: "id"
   mask:
-    transcode:
-      classes:
-      - input: "0123456789abcdefABCDEF"
-        output: "0123456789abcdef"
+      transcode:
+          classes:
+              - input: "0123456789abcdefABCDEF"
+                output: "0123456789abcdef"
 ```
 
 This example will mask the original id value by replacing every characters from the `input` class by a random character from the `output` class.
@@ -801,28 +801,28 @@ $ echo '{"id": "1ef619-90F"}' | pimo
 
 By default, if not specified otherwise, these classes will be used (input -> output):
 
-* lowercase letters -> lowercase letters
-* UPPERCASE LETTERS -> UPPERCASE LETTERS
-* Digits -> Digits
+-   lowercase letters -> lowercase letters
+-   UPPERCASE LETTERS -> UPPERCASE LETTERS
+-   Digits -> Digits
 
 ```yaml
 # this configuration:
 - selector:
-    jsonpath: "id"
+      jsonpath: "id"
   mask:
-    transcode: {}
+      transcode: {}
 # is equivalent to:
 - selector:
-    jsonpath: "id"
+      jsonpath: "id"
   mask:
-    transcode:
-      classes:
-        - input: "abcdefghijklmnopqrstuvwxyz"
-          output: "abcdefghijklmnopqrstuvwxyz"
-        - input: "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-          output: "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-        - input: "0123456789"
-          output: "0123456789"
+      transcode:
+          classes:
+              - input: "abcdefghijklmnopqrstuvwxyz"
+                output: "abcdefghijklmnopqrstuvwxyz"
+              - input: "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                output: "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+              - input: "0123456789"
+                output: "0123456789"
 ```
 
 [Return to list of masks](#possible-masks)
@@ -831,16 +831,16 @@ By default, if not specified otherwise, these classes will be used (input -> out
 
 Pimo embed a usefule list of fake data. URIs that begin with a pimo:// sheme point to the pseudo files bellow.
 
-name       | description 
------------|-----------------------------
-`nameEN`   | english female or male names
-`nameENF`  | english female names
-`nameENM`  | english male names
-`nameFR`   | french female or male names
-`nameFRF`  | french female names
-`nameFRM`  | french male names
-`surnameFR`| french surnames
-`townFR`   | french towns names
+| name        | description                  |
+| ----------- | ---------------------------- |
+| `nameEN`    | english female or male names |
+| `nameENF`   | english female names         |
+| `nameENM`   | english male names           |
+| `nameFR`    | french female or male names  |
+| `nameFRF`   | french female names          |
+| `nameFRM`   | french male names            |
+| `surnameFR` | french surnames              |
+| `townFR`    | french towns names           |
 
 The content of built-in lists are in [the `maskingdata` package](pkg/maskingdata)
 
@@ -860,9 +860,9 @@ Then, edit your Visual Studio Code settings `yaml.schemas` to containing the fol
 
 ```json
 {
-  "yaml.schemas": {
-    "https://raw.githubusercontent.com/CGI-FR/PIMO/main/schema/v1/pimo.schema.json": "/**/*masking*.yml"
-  }
+    "yaml.schemas": {
+        "https://raw.githubusercontent.com/CGI-FR/PIMO/main/schema/v1/pimo.schema.json": "/**/*masking*.yml"
+    }
 }
 ```
 
@@ -870,8 +870,8 @@ Using this configuration, the schema will be applied on every YAML file containi
 
 ## Contributors
 
-* CGI France ✉[Contact support](mailto:LINO.fr@cgi.com)
-* Pole Emploi
+-   CGI France ✉[Contact support](mailto:LINO.fr@cgi.com)
+-   Pole Emploi
 
 ## Licence
 
@@ -884,9 +884,8 @@ the Free Software Foundation, either version 3 of the License, or
 
 PIMO is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
- along with PIMO.  If not, see <http://www.gnu.org/licenses/>.
-
+along with PIMO. If not, see <http://www.gnu.org/licenses/>.

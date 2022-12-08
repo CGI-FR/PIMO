@@ -53,8 +53,7 @@ var (
 	cachesToLoad     map[string]string
 	skipLineOnError  bool
 	skipFieldOnError bool
-	// nolint: goimports
-	seedValue 		 int64
+	seedValue        int64
 	maskingOneLiner  []string
 	repeatUntil      string
 	repeatWhile      string
