@@ -6,15 +6,16 @@ testcases:
       - script: |-
           cat > masking.yml <<EOF
           version: "1"
-          seed : 42
+          seed: 42
           masking:
             - selector:
                 jsonpath: "name"
-              mask:
-                randomChoiceInUri: "pimo://nameFR"
+              masks:
+                - add: ""
+                - randomChoiceInUri: "pimo://nameFR"
           EOF
       - script: |-
-          echo pimo --empty-input
+          pimo --empty-input -c masking.yml
         assertions:
           - result.code ShouldEqual 0
           - result.systemoutjson.name ShouldEqual Rolande
@@ -26,15 +27,16 @@ testcases:
       - script: |-
           cat > masking.yml <<EOF
           version: "1"
-          seed : 42
+          seed: 42
           masking:
             - selector:
                 jsonpath: "name"
-              mask:
-                randomChoiceInUri: "pimo://nameFR"
+              masks:
+                - add: ""
+                - randomChoiceInUri: "pimo://nameFR"
           EOF
       - script: |-
-          echo pimo --empty-input --seed 41
+          pimo --empty-input --seed 41 -c masking.yml
         assertions:
           - result.code ShouldEqual 0
           - result.systemoutjson.name ShouldEqual Zacharie
@@ -46,15 +48,16 @@ testcases:
       - script: |-
           cat > masking.yml <<EOF
           version: "1"
-          seed : 42
+          seed: 42
           masking:
             - selector:
                 jsonpath: "name"
-              mask:
-                randomChoiceInUri: "pimo://nameFR"
+              masks:
+                - add: ""
+                - randomChoiceInUri: "pimo://nameFR"
           EOF
       - script: |-
-          echo pimo --empty-input -s 0
+          pimo --empty-input -s 0 -c masking.yml
         assertions:
           - result.code ShouldEqual 0
           - result.systemoutjson.name ShouldNotBeEmpty

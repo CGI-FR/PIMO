@@ -22,6 +22,7 @@ import (
 	"os"
 	"runtime"
 	"strings"
+	"time"
 
 	over "github.com/adrienaury/zeromdc"
 	"github.com/cgi-fr/pimo/internal/app/pimo"
@@ -52,6 +53,8 @@ var (
 	cachesToLoad     map[string]string
 	skipLineOnError  bool
 	skipFieldOnError bool
+	// nolint: goimports
+	seedValue 		 int64
 	maskingOneLiner  []string
 	repeatUntil      string
 	repeatWhile      string
@@ -83,6 +86,7 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 	rootCmd.PersistentFlags().StringToStringVar(&cachesToLoad, "load-cache", map[string]string{}, "path for loading cache from file")
 	rootCmd.PersistentFlags().BoolVar(&skipLineOnError, "skip-line-on-error", false, "skip a line if an error occurs while masking a field")
 	rootCmd.PersistentFlags().BoolVar(&skipFieldOnError, "skip-field-on-error", false, "remove a field if an error occurs while masking this field")
+	rootCmd.PersistentFlags().Int64VarP(&seedValue, "seed", "s", -1, "set seed")
 	rootCmd.PersistentFlags().StringArrayVarP(&maskingOneLiner, "mask", "m", []string{}, "one liner masking")
 	rootCmd.PersistentFlags().StringVar(&repeatUntil, "repeat-until", "", "mask each input repeatedly until the given condition is met")
 	rootCmd.PersistentFlags().StringVar(&repeatWhile, "repeat-while", "", "mask each input repeatedly while the given condition is met")
@@ -160,6 +164,13 @@ func run() {
 		pdef, err = model.LoadPipelineDefintionFromOneLiner(maskingOneLiner)
 	} else {
 		pdef, err = model.LoadPipelineDefinitionFromFile(maskingFile)
+	}
+
+	switch {
+	case seedValue != -1:
+		pdef.Seed = seedValue
+	case seedValue == 0:
+		pdef.Seed = time.Now().UnixNano()
 	}
 
 	if err != nil {
