@@ -22,11 +22,13 @@ import (
 	"os"
 	"runtime"
 	"strings"
+	"time"
 
 	over "github.com/adrienaury/zeromdc"
 	"github.com/cgi-fr/pimo/internal/app/pimo"
 	"github.com/cgi-fr/pimo/pkg/flow"
 	"github.com/cgi-fr/pimo/pkg/model"
+	"github.com/cgi-fr/pimo/pkg/statistics"
 	"github.com/mattn/go-isatty"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
@@ -55,6 +57,7 @@ var (
 	maskingOneLiner  []string
 	repeatUntil      string
 	repeatWhile      string
+	dumpStatistics   bool
 )
 
 func main() {
@@ -86,6 +89,7 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 	rootCmd.PersistentFlags().StringArrayVarP(&maskingOneLiner, "mask", "m", []string{}, "one liner masking")
 	rootCmd.PersistentFlags().StringVar(&repeatUntil, "repeat-until", "", "mask each input repeatedly until the given condition is met")
 	rootCmd.PersistentFlags().StringVar(&repeatWhile, "repeat-while", "", "mask each input repeatedly while the given condition is met")
+	rootCmd.PersistentFlags().BoolVarP(&dumpStatistics, "stats", "S", false, "generate execution statistics in a dump file (default: pimo-stats.json)")
 
 	rootCmd.AddCommand(&cobra.Command{
 		Use: "jsonschema",
@@ -176,6 +180,8 @@ func run() {
 		os.Exit(1)
 	}
 
+	startTime := time.Now()
+
 	stats, err := ctx.Execute(os.Stdout)
 	if err != nil {
 		log.Err(err).Msg("Cannot execute pipeline")
@@ -183,7 +189,9 @@ func run() {
 		os.Exit(stats.GetErrorCode())
 	}
 
-	log.Info().RawJSON("stats", stats.ToJSON()).Int("return", 0).Msg("End PIMO")
+	duration := time.Since(startTime)
+	statistics.SetDuration(duration)
+	dumpStats(stats)
 	os.Exit(0)
 }
 
@@ -229,4 +237,22 @@ func initLog() {
 	}
 	over.MDC().Set("config", maskingFile)
 	over.SetGlobalFields([]string{"config"})
+}
+
+func dumpStats(stats statistics.ExecutionStats) {
+	if dumpStatistics {
+		file, err := os.Create("pimo-stats.json")
+		if err != nil {
+			log.Error().Err(err).Msg("Error generating statistics dump file")
+		}
+		defer file.Close()
+
+		_, err = file.Write(stats.ToJSON())
+		if err != nil {
+			log.Error().Err(err).Msg("Error writing statistics to dump file")
+		}
+		log.Info().Msgf("Statistics exported to file %s", file.Name())
+	}
+
+	log.Info().RawJSON("stats", stats.ToJSON()).Int("return", 0).Msg("End PIMO")
 }

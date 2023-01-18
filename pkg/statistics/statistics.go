@@ -2,6 +2,7 @@ package statistics
 
 import (
 	"encoding/json"
+	"time"
 
 	over "github.com/adrienaury/zeromdc"
 	"github.com/rs/zerolog/log"
@@ -14,15 +15,17 @@ type ExecutionStats interface {
 	GetIgnoredPathsCount() int  // counter for path not found in data
 	GetIgnoredLinesCount() int  // counter for line skipped (flag --skip-line-on-error)
 	GetIgnoredFieldsCount() int // counter for field skipped (flag --skip-field-on-error)
+	GetDuration() time.Duration
 
 	ToJSON() []byte
 }
 
 type stats struct {
 	errorCode            int
-	IgnoredPathsCounter  int `json:"ignoredPaths"`
-	IgnoredLinesCounter  int `json:"skippedLines"`
-	IgnoredFieldsCounter int `json:"skippedFields"`
+	IgnoredPathsCounter  int           `json:"ignoredPaths"`
+	IgnoredLinesCounter  int           `json:"skippedLines"`
+	IgnoredFieldsCounter int           `json:"skippedFields"`
+	Duration             time.Duration `json:"duration"`
 }
 
 // Reset all statistics to zero
@@ -100,4 +103,13 @@ func getStats() *stats {
 	}
 	log.Warn().Msg("Statistics uncorrectly initialized")
 	return &stats{}
+}
+
+func SetDuration(duration time.Duration) {
+	stats := getStats()
+	stats.Duration = duration
+}
+
+func (s *stats) GetDuration() time.Duration {
+	return s.Duration
 }
