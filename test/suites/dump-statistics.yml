@@ -14,7 +14,7 @@ testcases:
             add: "Dorothy"
       EOF
   - script: |-
-      echo '{ "name": "John" }' | pimo -v 3 --stats
+      echo '{ "name": "John" }' | pimo -v 3 --stats pimo-stats.json
     assertions:
     - result.code ShouldEqual 0
     - result.systemerr ShouldContainSubstring Statistics exported to file
@@ -26,7 +26,7 @@ testcases:
 - name: dump file - short command
   steps:
   - script: rm -f masking.yml
-  - script: rm -f pimo-stats.json
+  - script: rm -f pimo-stats-short-command.json
   - script: |-
       cat > masking.yml <<EOF
       version: "1"
@@ -37,7 +37,7 @@ testcases:
             add: "Dorothy"
       EOF
   - script: |-
-      echo '{ "name": "John" }' | pimo -v 3 --log-json -S
+      echo '{ "name": "John" }' | pimo -v 3 --log-json -S pimo-stats-short-command.json
     assertions:
     - result.code ShouldEqual 0
     - result.systemerr ShouldContainSubstring Statistics exported to file

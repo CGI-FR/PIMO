@@ -57,7 +57,7 @@ var (
 	maskingOneLiner  []string
 	repeatUntil      string
 	repeatWhile      string
-	dumpStatistics   bool
+	statisticsFile   string
 )
 
 func main() {
@@ -89,7 +89,7 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 	rootCmd.PersistentFlags().StringArrayVarP(&maskingOneLiner, "mask", "m", []string{}, "one liner masking")
 	rootCmd.PersistentFlags().StringVar(&repeatUntil, "repeat-until", "", "mask each input repeatedly until the given condition is met")
 	rootCmd.PersistentFlags().StringVar(&repeatWhile, "repeat-while", "", "mask each input repeatedly while the given condition is met")
-	rootCmd.PersistentFlags().BoolVarP(&dumpStatistics, "stats", "S", false, "generate execution statistics in a dump file (default: pimo-stats.json)")
+	rootCmd.PersistentFlags().StringVarP(&statisticsFile, "stats", "S", "", "generate execution statistics in the specified dump file")
 
 	rootCmd.AddCommand(&cobra.Command{
 		Use: "jsonschema",
@@ -240,8 +240,8 @@ func initLog() {
 }
 
 func dumpStats(stats statistics.ExecutionStats) {
-	if dumpStatistics {
-		file, err := os.Create("pimo-stats.json")
+	if statisticsFile != "" {
+		file, err := os.Create(statisticsFile)
 		if err != nil {
 			log.Error().Err(err).Msg("Error generating statistics dump file")
 		}
