@@ -3,6 +3,7 @@ testcases:
 - name: dump file
   steps:
   - script: rm -f masking.yml
+  - script: rm -f pimo-stats.json
   - script: |-
       cat > masking.yml <<EOF
       version: "1"
@@ -25,6 +26,7 @@ testcases:
 - name: dump file - short command
   steps:
   - script: rm -f masking.yml
+  - script: rm -f pimo-stats.json
   - script: |-
       cat > masking.yml <<EOF
       version: "1"
