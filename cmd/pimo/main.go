@@ -18,10 +18,14 @@
 package main
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
+	netHttp "net/http"
 	"os"
 	"runtime"
 	"strings"
+	"text/template"
 	"time"
 
 	over "github.com/adrienaury/zeromdc"
@@ -43,21 +47,22 @@ var (
 	buildDate string
 	builtBy   string
 
-	verbosity        string
-	debug            bool
-	jsonlog          bool
-	colormode        string
-	iteration        int
-	emptyInput       bool
-	maskingFile      string
-	cachesToDump     map[string]string
-	cachesToLoad     map[string]string
-	skipLineOnError  bool
-	skipFieldOnError bool
-	maskingOneLiner  []string
-	repeatUntil      string
-	repeatWhile      string
-	statisticsFile   string
+	verbosity             string
+	debug                 bool
+	jsonlog               bool
+	colormode             string
+	iteration             int
+	emptyInput            bool
+	maskingFile           string
+	cachesToDump          map[string]string
+	cachesToLoad          map[string]string
+	skipLineOnError       bool
+	skipFieldOnError      bool
+	maskingOneLiner       []string
+	repeatUntil           string
+	repeatWhile           string
+	statisticsDestination string
+	statsTemplate         string
 )
 
 func main() {
@@ -89,7 +94,8 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 	rootCmd.PersistentFlags().StringArrayVarP(&maskingOneLiner, "mask", "m", []string{}, "one liner masking")
 	rootCmd.PersistentFlags().StringVar(&repeatUntil, "repeat-until", "", "mask each input repeatedly until the given condition is met")
 	rootCmd.PersistentFlags().StringVar(&repeatWhile, "repeat-while", "", "mask each input repeatedly while the given condition is met")
-	rootCmd.PersistentFlags().StringVarP(&statisticsFile, "stats", "S", "", "generate execution statistics in the specified dump file")
+	rootCmd.PersistentFlags().StringVarP(&statisticsDestination, "stats", "S", "", "generate execution statistics in the specified dump file")
+	rootCmd.PersistentFlags().StringVar(&statsTemplate, "statsTemplate", "", "template file to add stats to")
 
 	rootCmd.AddCommand(&cobra.Command{
 		Use: "jsonschema",
@@ -240,19 +246,55 @@ func initLog() {
 }
 
 func dumpStats(stats statistics.ExecutionStats) {
-	if statisticsFile != "" {
-		file, err := os.Create(statisticsFile)
+	statsToWrite := stats.ToJSON()
+	if statsTemplate != "" {
+		tmpl, err := template.New("").ParseFiles(statsTemplate)
 		if err != nil {
-			log.Error().Err(err).Msg("Error generating statistics dump file")
+			log.Error().Err(err).Msg(("Error loading statistics template"))
 		}
-		defer file.Close()
-
-		_, err = file.Write(stats.ToJSON())
+		var output bytes.Buffer
+		err = tmpl.ExecuteTemplate(&output, statsTemplate, Stats{Stats: string(stats.ToJSON())})
 		if err != nil {
-			log.Error().Err(err).Msg("Error writing statistics to dump file")
+			log.Error().Err(err).Msg("Error adding stats to template")
 		}
-		log.Info().Msgf("Statistics exported to file %s", file.Name())
+		statsToWrite = output.Bytes()
+	}
+	if statisticsDestination != "" {
+		if strings.HasPrefix(statisticsDestination, "http") {
+			sendMetrics(statisticsDestination, statsToWrite)
+		} else {
+			writeMetricsToFile(statisticsDestination, statsToWrite)
+		}
 	}
 
 	log.Info().RawJSON("stats", stats.ToJSON()).Int("return", 0).Msg("End PIMO")
+}
+
+func writeMetricsToFile(statsFile string, statsByte []byte) {
+	file, err := os.Create(statsFile)
+	if err != nil {
+		log.Error().Err(err).Msg("Error generating statistics dump file")
+	}
+	defer file.Close()
+
+	_, err = file.Write(statsByte)
+	if err != nil {
+		log.Error().Err(err).Msg("Error writing statistics to dump file")
+	}
+	log.Info().Msgf("Statistics exported to file %s", file.Name())
+}
+
+func sendMetrics(statsDestination string, statsByte []byte) {
+	postBody, _ := json.Marshal(string(statsByte))
+	responseBody := bytes.NewBuffer(postBody)
+	// nolint: gosec
+	_, err := netHttp.Post(statsDestination, "application/json", responseBody)
+	if err != nil {
+		log.Error().Err(err).Msgf("An error occurred trying to send metrics to %s", statsDestination)
+	}
+	log.Info().Msgf("Statistics sent to %s", statsDestination)
+}
+
+type Stats struct {
+	Stats interface{} `json:"stats"`
 }

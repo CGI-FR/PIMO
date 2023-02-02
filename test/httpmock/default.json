@@ -1,0 +1,10 @@
+[
+    {
+        "httpRequest": {
+            "path": "/api/v1/stats"
+        },
+        "httpResponse": {
+            "statusCode": 200
+        }
+    }
+]
