@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1675387220912,
+  "lastUpdate": 1675388429742,
   "repoUrl": "https://github.com/CGI-FR/PIMO",
   "entries": {
     "Benchmark": [
@@ -2226,6 +2226,42 @@ window.BENCHMARK_DATA = {
             "value": 2564718,
             "unit": "ns/op\t  681681 B/op\t    5892 allocs/op",
             "extra": "4322 times\n2 procs"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "89643755+giraud10@users.noreply.github.com",
+            "name": "giraud10",
+            "username": "giraud10"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "1e299680046ab392530cf09658901a6c2b4bb064",
+          "message": "feat: set seed from command line argument (#191)\n\n* test: add venom test\r\n\r\n* feat: add seed from command line argument\r\n\r\n* fix: goimport linter\r\n\r\n* fix: markdown formatting\r\n\r\n* fix: last LF character\r\n\r\n---------\r\n\r\nCo-authored-by: Marie Giraud <marie.giraud01-ext@pole-emploi.fr>\r\nCo-authored-by: Adrien Aury <44274230+adrienaury@users.noreply.github.com>",
+          "timestamp": "2023-02-03T02:33:39+01:00",
+          "tree_id": "3145bc406722d703e5c5961e50663e13675ce2a0",
+          "url": "https://github.com/CGI-FR/PIMO/commit/1e299680046ab392530cf09658901a6c2b4bb064"
+        },
+        "date": 1675388429012,
+        "tool": "go",
+        "benches": [
+          {
+            "name": "BenchmarkPimoRun",
+            "value": 30171,
+            "unit": "ns/op\t   16450 B/op\t     168 allocs/op",
+            "extra": "386647 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge",
+            "value": 2042977,
+            "unit": "ns/op\t  681790 B/op\t    5891 allocs/op",
+            "extra": "5176 times\n2 procs"
           }
         ]
       }
