@@ -14,6 +14,10 @@ Types of changes
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [1.16.0]
+
+- `Added` flag to declare seed in command line
+
 ## [1.15.0]
 
 - `Security` in PIMO Play : disallow usage of mask Command in `masks` property

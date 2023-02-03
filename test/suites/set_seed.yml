@@ -1,0 +1,64 @@
+name: set seed from command line argument
+testcases:
+  - name: empty argument
+    steps:
+      - script: rm -f masking.yml
+      - script: |-
+          cat > masking.yml <<EOF
+          version: "1"
+          seed: 42
+          masking:
+            - selector:
+                jsonpath: "name"
+              masks:
+                - add: ""
+                - randomChoiceInUri: "pimo://nameFR"
+          EOF
+      - script: |-
+          pimo --empty-input -c masking.yml
+        assertions:
+          - result.code ShouldEqual 0
+          - result.systemoutjson.name ShouldEqual Rolande
+          - result.systemerr ShouldBeEmpty
+
+  - name: with argument
+    steps:
+      - script: rm -f masking.yml
+      - script: |-
+          cat > masking.yml <<EOF
+          version: "1"
+          seed: 42
+          masking:
+            - selector:
+                jsonpath: "name"
+              masks:
+                - add: ""
+                - randomChoiceInUri: "pimo://nameFR"
+          EOF
+      - script: |-
+          pimo --empty-input --seed 41 -c masking.yml
+        assertions:
+          - result.code ShouldEqual 0
+          - result.systemoutjson.name ShouldEqual Zacharie
+          - result.systemerr ShouldBeEmpty
+
+  - name: with seed 0
+    steps:
+      - script: rm -f masking.yml
+      - script: |-
+          cat > masking.yml <<EOF
+          version: "1"
+          seed: 42
+          masking:
+            - selector:
+                jsonpath: "name"
+              masks:
+                - add: ""
+                - randomChoiceInUri: "pimo://nameFR"
+          EOF
+      - script: |-
+          pimo --empty-input -s 0 -c masking.yml
+        assertions:
+          - result.code ShouldEqual 0
+          - result.systemoutjson.name ShouldNotBeEmpty
+          - result.systemerr ShouldBeEmpty
