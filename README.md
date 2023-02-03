@@ -1,4 +1,4 @@
-![GitHub Workflow Status](https://img.shields.io/github/workflow/status/CGI-FR/PIMO/CI)
+![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/CGI-FR/PIMO/ci.yml?branch=main)
 [![Go Report Card](https://goreportcard.com/badge/github.com/cgi-fr/pimo)](https://goreportcard.com/report/github.com/cgi-fr/pimo)
 ![GitHub all releases](https://img.shields.io/github/downloads/CGI-FR/PIMO/total)
 ![GitHub](https://img.shields.io/github/license/CGI-FR/PIMO)
