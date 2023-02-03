@@ -58,7 +58,7 @@ testcases:
   - script: rm -f masking.yml
   - script: cp ../masking_template_masks.yml masking.yml
   - script: |-
-      FF1_ENCRYPTION_KEY="70NZ2NWAqk9/A21vBPxqlA==" pimo > result.json <<EOF
+      FF1_ENCRYPTION_KEY="70NZ2NWAqk9/A21vBPxqlA==" TZ="" pimo > result.json <<EOF
       {"regex": ""}
       EOF
     assertions:

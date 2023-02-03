@@ -20,7 +20,7 @@ package model
 import (
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"os"
 	"strings"
 	tmpl "text/template"
 	"time"
@@ -201,7 +201,7 @@ func LoadPipelineDefinitionFromYAML(source []byte) (Definition, error) {
 }
 
 func LoadPipelineDefinitionFromFile(filename string) (Definition, error) {
-	source, err := ioutil.ReadFile(filename)
+	source, err := os.ReadFile(filename)
 	if err != nil {
 		return Definition{}, err
 	}

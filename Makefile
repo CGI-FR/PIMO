@@ -27,6 +27,7 @@ init:
 	@chmod 0600 ~/.dockerhub.yml
 	@touch ~/.github.yml
 	@chmod 0600 ~/.github.yml
+	@git config --global --add safe.directory /workspace
 	@git config --local core.hooksPath githooks
 
 .PHONY: warning
