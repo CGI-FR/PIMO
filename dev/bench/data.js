@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1671208011092,
+  "lastUpdate": 1675387220912,
   "repoUrl": "https://github.com/CGI-FR/PIMO",
   "entries": {
     "Benchmark": [
@@ -2190,6 +2190,42 @@ window.BENCHMARK_DATA = {
             "value": 2163939,
             "unit": "ns/op\t  691659 B/op\t    5889 allocs/op",
             "extra": "5145 times\n2 procs"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "44274230+adrienaury@users.noreply.github.com",
+            "name": "Adrien Aury",
+            "username": "adrienaury"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "798f91d7e0852b95840adfb7b33d1b0cc692a6e8",
+          "message": "chore(devcontainer): upgrade to go 1.19 (#185)\n\n* chore(devcontainer): upgrade to go 1.19\r\n\r\n* chore: fix git init\r\n\r\n* test: fix default timezone pb in venom tests\r\n\r\n* chore: adapt release test command for go 1.18\r\n\r\nsee: https://goreleaser.com/customization/build/#why-is-there-a-_v1-suffix-on-amd64-builds\r\n\r\n* chore: resynchronize gosum",
+          "timestamp": "2023-02-03T02:12:20+01:00",
+          "tree_id": "bb1807b45e5342414f55b5f5359531a02ce98055",
+          "url": "https://github.com/CGI-FR/PIMO/commit/798f91d7e0852b95840adfb7b33d1b0cc692a6e8"
+        },
+        "date": 1675387220540,
+        "tool": "go",
+        "benches": [
+          {
+            "name": "BenchmarkPimoRun",
+            "value": 36695,
+            "unit": "ns/op\t   16426 B/op\t     168 allocs/op",
+            "extra": "319232 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge",
+            "value": 2564718,
+            "unit": "ns/op\t  681681 B/op\t    5892 allocs/op",
+            "extra": "4322 times\n2 procs"
           }
         ]
       }
