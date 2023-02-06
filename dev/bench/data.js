@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1675388429742,
+  "lastUpdate": 1675698507242,
   "repoUrl": "https://github.com/CGI-FR/PIMO",
   "entries": {
     "Benchmark": [
@@ -2262,6 +2262,42 @@ window.BENCHMARK_DATA = {
             "value": 2042977,
             "unit": "ns/op\t  681790 B/op\t    5891 allocs/op",
             "extra": "5176 times\n2 procs"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "44274230+adrienaury@users.noreply.github.com",
+            "name": "Adrien Aury",
+            "username": "adrienaury"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "f7a32b80d7b7e1bfe03d3390ec6524337d8fc0ab",
+          "message": "fix(play): regression with s flag (#200)\n\n* fix(play): regression with s flag\r\n\r\n* test(play): add venom test",
+          "timestamp": "2023-02-06T16:41:35+01:00",
+          "tree_id": "fbd665cf32943113a75d710f1e24f538d6543eef",
+          "url": "https://github.com/CGI-FR/PIMO/commit/f7a32b80d7b7e1bfe03d3390ec6524337d8fc0ab"
+        },
+        "date": 1675698506856,
+        "tool": "go",
+        "benches": [
+          {
+            "name": "BenchmarkPimoRun",
+            "value": 29963,
+            "unit": "ns/op\t   16471 B/op\t     168 allocs/op",
+            "extra": "375907 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge",
+            "value": 2043140,
+            "unit": "ns/op\t  681809 B/op\t    5891 allocs/op",
+            "extra": "5190 times\n2 procs"
           }
         ]
       }
