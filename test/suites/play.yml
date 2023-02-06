@@ -1,0 +1,25 @@
+name: pimo play is running
+testcases:
+- name: pimo play should start a web server on port 3010
+  steps:
+  - type: exec
+    script: |
+      pimo play &
+      sleep 2
+      curl http://127.0.0.1:3010
+      kill %1
+    assertions:
+      - result.systemout ShouldContainSubstring <!doctype html>
+      - result.systemout ShouldContainSubstring http server started on [::]:3010
+
+- name: pimo play should start a web server on port specified by flag
+  steps:
+  - type: exec
+    script: |
+      pimo play -p 3011 &
+      sleep 2
+      curl http://127.0.0.1:3011
+      kill %1
+    assertions:
+      - result.systemout ShouldContainSubstring <!doctype html>
+      - result.systemout ShouldContainSubstring http server started on [::]:3011
