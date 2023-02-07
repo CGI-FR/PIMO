@@ -170,7 +170,7 @@ This takes the `data.json` file, masks the data contained inside it and put the 
 * `--mask` Declare a simple masking definition in command line (minified YAML format: `--mask "value={fluxUri: 'pimo://nameFR'}"`, or `--mask "value=[{add: ''},{fluxUri: 'pimo://nameFR'}]"` for multiple masks). For advanced use case (e.g. if caches needed) `masking.yml` file definition will be preferred.
 * `--repeat-until <condition>` This flag will make PIMO keep masking every input until the condition is met. Condition format is using [Template](https://pkg.go.dev/text/template). Last output verifies the condition.
 * `--repeat-while <condition>` This flag will make PIMO keep masking every input while the condition is met. Condition format is using [Template](https://pkg.go.dev/text/template).
-* `--stats <filename | url>` or `-S <filename | url>` This flag either outputs run statistics to the specified file or send them to specified url (has to start with `http` or `https`).
+* `--stats <filename | url>` This flag either outputs run statistics to the specified file or send them to specified url (has to start with `http` or `https`).
 * `--statsTemplate <string>` This flag will have PIMO use the value as a template to generate statistics. Please use go templating format to include statistics. To include them you have to specify them as `{{ .Stats }}`. (i.e. `{"software":"PIMO","stats":{{ .Stats }}}`)
 
 ### PIMO Play

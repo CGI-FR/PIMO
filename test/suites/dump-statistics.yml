@@ -23,29 +23,6 @@ testcases:
     - result.code ShouldEqual 0
     - result.systemout ShouldContainSubstring "ignoredPaths":0
     - result.systemout ShouldContainSubstring duration
-- name: dump file - short command
-  steps:
-  - script: rm -f masking.yml
-  - script: rm -f pimo-stats-short-command.json
-  - script: |-
-      cat > masking.yml <<EOF
-      version: "1"
-      masking:
-        - selector:
-            jsonpath: "name"
-          mask:
-            add: "Dorothy"
-      EOF
-  - script: |-
-      echo '{ "name": "John" }' | pimo -v 3 --log-json -S pimo-stats-short-command.json
-    assertions:
-    - result.code ShouldEqual 0
-    - result.systemerr ShouldContainSubstring Statistics exported to file
-  - script: cat pimo-stats.json
-    assertions:
-    - result.code ShouldEqual 0
-    - result.systemout ShouldContainSubstring "ignoredPaths":0
-    - result.systemout ShouldContainSubstring duration
 
 - name: dump file with template
   steps:
@@ -61,7 +38,7 @@ testcases:
             add: "Dorothy"
       EOF
   - script: |-
-      echo '{ "name": "John" }' | pimo -v 3 --log-json -S pimo-stats-template.json --statsTemplate '{"software":"PIMO","stats":{{ .Stats }}}'
+      echo '{ "name": "John" }' | pimo -v 3 --log-json --stats pimo-stats-template.json --statsTemplate '{"software":"PIMO","stats":{{ .Stats }}}'
     assertions:
     - result.code ShouldEqual 0
     - result.systemerr ShouldContainSubstring Statistics exported to file
@@ -89,7 +66,7 @@ testcases:
             add: "Dorothy"
       EOF
   - script: |-
-      echo '{ "name": "John" }' | pimo -v 3 --log-json -S http://httpmock:1080/api/v1/stats --statsTemplate '{"software":"PIMO","stats":{{ .Stats }}}'
+      echo '{ "name": "John" }' | pimo -v 3 --log-json --stats http://httpmock:1080/api/v1/stats --statsTemplate '{"software":"PIMO","stats":{{ .Stats }}}'
     assertions:
     - result.code ShouldEqual 0
     - result.systemerr ShouldContainSubstring Statistics sent to http://httpmock:1080/api/v1/stats
