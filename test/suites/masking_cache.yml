@@ -583,3 +583,41 @@ testcases:
     - result.code ShouldEqual 0
     - result.systemout ShouldContainSubstring '{"sexe":"M"}'
     - result.systemerr ShouldBeEmpty
+
+- name: bug cache should apply on whole block
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat  > masking.yml <<EOF
+      version: "1"
+      caches:
+        mycache:
+          unique: true
+      masking:
+        - selector:
+            jsonpath: "test"
+          masks:
+            - incremental:
+                start: 0
+                increment: 1
+            - template: "#[[.test]]"
+          cache: mycache
+      EOF
+  - script: sed -i  "s/\[\[/\{\{/g"  masking.yml
+  - script: sed -i  "s/\]\]/\}\}/g"  masking.yml
+  - script: |-
+      cat > data.jsonl <<EOF
+      {"test":"A"}
+      {"test":"B"}
+      {"test":"C"}
+      EOF
+  - script: |-
+      pimo --dump-cache mycache=cache.jsonl < data.jsonl
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemerr ShouldBeEmpty
+  - script: |-
+      cat cache.jsonl | sort | tr '\n' ' ' | tr -d ' '
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldEqual '{"key":"A","value":"#0"}{"key":"B","value":"#1"}{"key":"C","value":"#2"}'

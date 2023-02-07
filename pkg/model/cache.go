@@ -22,6 +22,7 @@ import (
 )
 
 type Cache interface {
+	SetLookupValue(key Entry)
 	Get(key Entry) (Entry, bool)
 	Put(key Entry, value Entry)
 	Subscribe(key Entry, observer Observer)
@@ -39,8 +40,9 @@ type Observer interface {
 
 // MemCache is a cache in memory
 type MemCache struct {
-	cache     map[Entry]Entry
-	observers map[Entry][]Observer
+	lookupValue Entry
+	cache       map[Entry]Entry
+	observers   map[Entry][]Observer
 }
 
 func (mc *MemCache) Iterate() Source {
@@ -54,12 +56,20 @@ func (mc *MemCache) Iterate() Source {
 	return collector
 }
 
+func (mc *MemCache) SetLookupValue(key Entry) {
+	mc.lookupValue = key
+}
+
 func (mc *MemCache) Get(key Entry) (Entry, bool) {
 	value, ok := mc.cache[key]
 	return value, ok
 }
 
 func (mc *MemCache) Put(key Entry, value Entry) {
+	if mc.lookupValue != nil {
+		key = mc.lookupValue
+	}
+
 	observers, ok := mc.observers[key]
 	if ok {
 		for _, observer := range observers {
@@ -78,7 +88,7 @@ func (mc *MemCache) Subscribe(key Entry, observer Observer) {
 }
 
 func NewUniqueMemCache() UniqueCache {
-	return &UniqueMemCache{MemCache{map[Entry]Entry{}, map[Entry][]Observer{}}, map[Entry]struct{}{}}
+	return &UniqueMemCache{MemCache{nil, map[Entry]Entry{}, map[Entry][]Observer{}}, map[Entry]struct{}{}}
 }
 
 type UniqueMemCache struct {
@@ -99,7 +109,7 @@ func (mc *UniqueMemCache) PutUnique(key Entry, value Entry) bool {
 }
 
 func NewMemCache() Cache {
-	return &MemCache{map[Entry]Entry{}, map[Entry][]Observer{}}
+	return &MemCache{nil, map[Entry]Entry{}, map[Entry][]Observer{}}
 }
 
 // MaskCacheEngine is a struct to create a cahed mask
@@ -140,7 +150,8 @@ func NewMaskContextCacheEngine(cache Cache, original MaskContextEngine) MaskCont
 // MaskContext masks run maskContext with cache
 func (mcce MaskContextCacheEngine) MaskContext(context Dictionary,
 	key string,
-	contexts ...Dictionary) (Dictionary, error) {
+	contexts ...Dictionary,
+) (Dictionary, error) {
 	e, _ := context.GetValue(key)
 	if _, isInCache := mcce.Cache.Get(e); isInCache {
 		return context, nil
@@ -197,7 +208,8 @@ func NewUniqueMaskContextCacheEngine(cache UniqueCache, original MaskContextEngi
 // MaskContext masks run mask with cache
 func (umcce UniqueMaskContextCacheEngine) MaskContext(context Dictionary,
 	key string,
-	contexts ...Dictionary) (Dictionary, error) {
+	contexts ...Dictionary,
+) (Dictionary, error) {
 	e, _ := context.GetValue(key)
 	if _, isInCache := umcce.cache.Get(e); isInCache {
 		return context, nil
@@ -273,4 +285,35 @@ func (p *FromCacheProcess) Notify(key Entry, value Entry) {
 			p.readiness.Collect(collector.Value())
 		}
 	}
+}
+
+type LookupValueSetter struct {
+	cache    Cache
+	selector Selector
+}
+
+func (lvs *LookupValueSetter) Open() error {
+	return nil
+}
+
+func (lvs *LookupValueSetter) ProcessDictionary(e Dictionary, c Collector) error {
+	if entry, ok := lvs.selector.Read(e); ok {
+		lvs.cache.SetLookupValue(entry)
+	}
+	c.Collect(e)
+	return nil
+}
+
+type LookupValueDiscarder struct {
+	cache Cache
+}
+
+func (lvd *LookupValueDiscarder) Open() error {
+	return nil
+}
+
+func (lvd *LookupValueDiscarder) ProcessDictionary(e Dictionary, c Collector) error {
+	lvd.cache.SetLookupValue(nil)
+	c.Collect(e)
+	return nil
 }

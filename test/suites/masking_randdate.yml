@@ -93,7 +93,7 @@ testcases:
               field: "date"
         EOF
     - script: |-
-        echo -e '{"date":1}\n{"date":2}\n{"date":3}\n{"date":2}\n{"date":1}\n{"date":3}' | pimo | head -c -1 | tr '\n' ' '
+        echo -e '{"date":1}\n{"date":2}\n{"date":3}\n{"date":2}\n{"date":1}\n{"date":3}' | TZ="" pimo | head -c -1 | tr '\n' ' '
       assertions:
       - result.code ShouldEqual 0
       - result.systemout ShouldEqual {"date":"1997-03-05T16:24:29Z"} {"date":"1997-02-10T20:31:21Z"} {"date":"1997-08-01T07:12:23Z"} {"date":"1997-02-10T20:31:21Z"} {"date":"1997-03-05T16:24:29Z"} {"date":"1997-08-01T07:12:23Z"}
