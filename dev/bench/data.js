@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1675768049669,
+  "lastUpdate": 1675783114320,
   "repoUrl": "https://github.com/CGI-FR/PIMO",
   "entries": {
     "Benchmark": [
@@ -2334,6 +2334,42 @@ window.BENCHMARK_DATA = {
             "value": 2554992,
             "unit": "ns/op\t  681459 B/op\t    5891 allocs/op",
             "extra": "4551 times\n2 procs"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "youen.peron@cgi.com",
+            "name": "Youen Péron",
+            "username": "youen"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "2d5df0be058082c54658309ab8ca40e453cd2d7b",
+          "message": "Merge pull request #197 from CGI-FR/196-proposal-add-a-command-to-generate-json-dump-file-with-execution-stats\n\nfeat(stats): adds a command to generate a stat file",
+          "timestamp": "2023-02-07T16:11:28+01:00",
+          "tree_id": "c5db0c114cc206322b4f2b848819e024c3a86efe",
+          "url": "https://github.com/CGI-FR/PIMO/commit/2d5df0be058082c54658309ab8ca40e453cd2d7b"
+        },
+        "date": 1675783113900,
+        "tool": "go",
+        "benches": [
+          {
+            "name": "BenchmarkPimoRun",
+            "value": 31060,
+            "unit": "ns/op\t   16480 B/op\t     168 allocs/op",
+            "extra": "371839 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge",
+            "value": 2161704,
+            "unit": "ns/op\t  681812 B/op\t    5891 allocs/op",
+            "extra": "5181 times\n2 procs"
           }
         ]
       }
