@@ -17,6 +17,7 @@ Types of changes
 ## [1.16.0]
 
 - `Added` flag to declare seed in command line
+- `Fixed` cache now apply once on whole masking item, instead of each mask in the block
 
 ## [1.15.0]
 
