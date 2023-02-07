@@ -103,6 +103,10 @@ func BuildPipeline(pipeline Pipeline, conf Definition, caches map[string]Cache, 
 		for _, sel := range allSelectors {
 			nbArg := 0
 
+			if cache, ok := caches[masking.Cache]; ok {
+				pipeline = pipeline.Process(&LookupValueSetter{cache, NewPathSelector(sel.Jsonpath)})
+			}
+
 			allMasksDefinition := append([]MaskType{masking.Mask}, masking.Masks...)
 
 			for _, maskDefinition := range allMasksDefinition {
@@ -176,6 +180,11 @@ func BuildPipeline(pipeline Pipeline, conf Definition, caches map[string]Cache, 
 					}
 				}
 			}
+
+			if cache, ok := caches[masking.Cache]; ok {
+				pipeline = pipeline.Process(&LookupValueDiscarder{cache})
+			}
+
 			if nbArg == 0 {
 				return pipeline, nil, errors.New("No masks defined for " + masking.Selector.Jsonpath)
 			}
