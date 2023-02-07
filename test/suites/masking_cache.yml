@@ -617,7 +617,7 @@ testcases:
     - result.code ShouldEqual 0
     - result.systemerr ShouldBeEmpty
   - script: |-
-      cat cache.jsonl
+      cat cache.jsonl | sort | tr '\n' ' ' | tr -d ' '
     assertions:
     - result.code ShouldEqual 0
-    - result.systemout ShouldContainSubstring '{"key":"A","value":"#0"}\n{"key":"B","value":"#1"}\n{"key":"C","value":"#2"}'
+    - result.systemout ShouldEqual '{"key":"A","value":"#0"}{"key":"B","value":"#1"}{"key":"C","value":"#2"}'
