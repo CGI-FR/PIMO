@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1675698507242,
+  "lastUpdate": 1675768049669,
   "repoUrl": "https://github.com/CGI-FR/PIMO",
   "entries": {
     "Benchmark": [
@@ -2298,6 +2298,42 @@ window.BENCHMARK_DATA = {
             "value": 2043140,
             "unit": "ns/op\t  681809 B/op\t    5891 allocs/op",
             "extra": "5190 times\n2 procs"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "youen.peron@cgi.com",
+            "name": "Youen Péron",
+            "username": "youen"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "b8aefc9b94a97662b65597b6940a1682f8703433",
+          "message": "Merge pull request #199 from CGI-FR/fix-apply-cache-whole-item\n\nfix: cache should apply to whole selector block",
+          "timestamp": "2023-02-07T11:59:21+01:00",
+          "tree_id": "27f90c9b9d66bb5ae821cf58d3125596e35eb327",
+          "url": "https://github.com/CGI-FR/PIMO/commit/b8aefc9b94a97662b65597b6940a1682f8703433"
+        },
+        "date": 1675768048782,
+        "tool": "go",
+        "benches": [
+          {
+            "name": "BenchmarkPimoRun",
+            "value": 36613,
+            "unit": "ns/op\t   16440 B/op\t     168 allocs/op",
+            "extra": "313122 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge",
+            "value": 2554992,
+            "unit": "ns/op\t  681459 B/op\t    5891 allocs/op",
+            "extra": "4551 times\n2 procs"
           }
         ]
       }
