@@ -51,7 +51,6 @@ testcases:
   steps:
   - script: rm -f masking.yml
   - script: rm -f pimo-stats-template.json
-  - script: rm -f stats-template.json
   - script: |-
       cat > masking.yml <<EOF
       version: "1"
@@ -61,9 +60,8 @@ testcases:
           mask:
             add: "Dorothy"
       EOF
-  - script: echo '{"software":"PIMO","stats":{{ .Stats }}}' > stats-template.json
   - script: |-
-      echo '{ "name": "John" }' | pimo -v 3 --log-json -S pimo-stats-template.json --statsTemplate stats-template.json
+      echo '{ "name": "John" }' | pimo -v 3 --log-json -S pimo-stats-template.json --statsTemplate '{"software":"PIMO","stats":{{ .Stats }}}'
     assertions:
     - result.code ShouldEqual 0
     - result.systemerr ShouldContainSubstring Statistics exported to file
@@ -77,7 +75,6 @@ testcases:
 - name: send stats over HTTP
   steps:
   - script: rm -f masking.yml
-  - script: rm -f stats-template.json
   - script: cp ../httpmock/default.json .
   - script: sudo docker-compose -p pimo stop httpmock
   - script: sudo docker-compose -p pimo rm -f httpmock
@@ -91,9 +88,8 @@ testcases:
           mask:
             add: "Dorothy"
       EOF
-  - script: echo '{"software":"PIMO","stats":{{ .Stats }}}' > stats-template.json
   - script: |-
-      echo '{ "name": "John" }' | pimo -v 3 --log-json -S http://httpmock:1080/api/v1/stats --statsTemplate stats-template.json
+      echo '{ "name": "John" }' | pimo -v 3 --log-json -S http://httpmock:1080/api/v1/stats --statsTemplate '{"software":"PIMO","stats":{{ .Stats }}}'
     assertions:
     - result.code ShouldEqual 0
     - result.systemerr ShouldContainSubstring Statistics sent to http://httpmock:1080/api/v1/stats

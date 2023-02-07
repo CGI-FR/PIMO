@@ -171,7 +171,7 @@ This takes the `data.json` file, masks the data contained inside it and put the 
 * `--repeat-until <condition>` This flag will make PIMO keep masking every input until the condition is met. Condition format is using [Template](https://pkg.go.dev/text/template). Last output verifies the condition.
 * `--repeat-while <condition>` This flag will make PIMO keep masking every input while the condition is met. Condition format is using [Template](https://pkg.go.dev/text/template).
 * `--stats <filename | url>` or `-S <filename | url>` This flag either outputs run statistics to the specified file or send them to specified url (has to start with `http` or `https`).
-* `--statsTemplate <filename>` This flag will have PIMO use the file as a template to generate statistics. Please use go templating format to include statistics. To include them you have to specify them as `{{ .Stats }}`.
+* `--statsTemplate <string>` This flag will have PIMO use the value as a template to generate statistics. Please use go templating format to include statistics. To include them you have to specify them as `{{ .Stats }}`. (i.e. `{"software":"PIMO","stats":{{ .Stats }}}`)
 
 ### PIMO Play
 

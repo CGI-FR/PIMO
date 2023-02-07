@@ -95,7 +95,7 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 	rootCmd.PersistentFlags().StringVar(&repeatUntil, "repeat-until", "", "mask each input repeatedly until the given condition is met")
 	rootCmd.PersistentFlags().StringVar(&repeatWhile, "repeat-while", "", "mask each input repeatedly while the given condition is met")
 	rootCmd.PersistentFlags().StringVarP(&statisticsDestination, "stats", "S", "", "generate execution statistics in the specified dump file")
-	rootCmd.PersistentFlags().StringVar(&statsTemplate, "statsTemplate", "", "template file to add stats to")
+	rootCmd.PersistentFlags().StringVar(&statsTemplate, "statsTemplate", "", "template string to format stats (to include them you have to specify them as `{{ .Stats }}` like `{\"software\":\"PIMO\",\"stats\":{{ .Stats }}}`)")
 
 	rootCmd.AddCommand(&cobra.Command{
 		Use: "jsonschema",
@@ -248,12 +248,12 @@ func initLog() {
 func dumpStats(stats statistics.ExecutionStats) {
 	statsToWrite := stats.ToJSON()
 	if statsTemplate != "" {
-		tmpl, err := template.New("").ParseFiles(statsTemplate)
+		tmpl, err := template.New("statsTemplate").Parse(statsTemplate)
 		if err != nil {
-			log.Error().Err(err).Msg(("Error loading statistics template"))
+			log.Error().Err(err).Msg(("Error parsing statistics template"))
 		}
 		var output bytes.Buffer
-		err = tmpl.ExecuteTemplate(&output, statsTemplate, Stats{Stats: string(stats.ToJSON())})
+		err = tmpl.ExecuteTemplate(&output, "statsTemplate", Stats{Stats: string(stats.ToJSON())})
 		if err != nil {
 			log.Error().Err(err).Msg("Error adding stats to template")
 		}
