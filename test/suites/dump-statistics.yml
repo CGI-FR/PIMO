@@ -1,0 +1,50 @@
+name: dump statistics file features
+testcases:
+- name: dump file
+  steps:
+  - script: rm -f masking.yml
+  - script: rm -f pimo-stats.json
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "name"
+          mask:
+            add: "Dorothy"
+      EOF
+  - script: |-
+      echo '{ "name": "John" }' | pimo -v 3 --stats pimo-stats.json
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemerr ShouldContainSubstring Statistics exported to file
+  - script: cat pimo-stats.json
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldContainSubstring "ignoredPaths":0
+    - result.systemout ShouldContainSubstring duration
+
+- name: dump file with template
+  steps:
+  - script: rm -f masking.yml
+  - script: rm -f pimo-stats-template.json
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "name"
+          mask:
+            add: "Dorothy"
+      EOF
+  - script: |-
+      echo '{ "name": "John" }' | pimo -v 3 --log-json --stats pimo-stats-template.json --statsTemplate '{"software":"PIMO","stats":{{ .Stats }}}'
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemerr ShouldContainSubstring Statistics exported to file
+  - script: cat pimo-stats-template.json
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldContainSubstring {"software":"PIMO","stats"
+    - result.systemout ShouldContainSubstring ignoredPaths":0
+    - result.systemout ShouldContainSubstring duration
