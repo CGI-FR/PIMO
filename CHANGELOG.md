@@ -17,6 +17,8 @@ Types of changes
 ## [1.16.0]
 
 - `Added` flag to declare seed in command line
+- `Added` flag `--stats` to generate a stat file or HTTP POST
+- `Added` flag `--statsTemplate` to control the format of generated stats
 - `Fixed` cache now apply once on whole masking item, instead of each mask in the block
 
 ## [1.15.0]
