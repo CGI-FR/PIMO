@@ -57,6 +57,7 @@ var (
 	cachesToLoad          map[string]string
 	skipLineOnError       bool
 	skipFieldOnError      bool
+	seedValue             int64
 	maskingOneLiner       []string
 	repeatUntil           string
 	repeatWhile           string
