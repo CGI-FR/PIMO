@@ -63,16 +63,15 @@ var (
 	repeatWhile           string
 	statisticsDestination string
 	statsTemplate         string
-	statsDestinationEnv = os.Getenv("PIMO_STATS_URL")
-	statsTemplateEnv    = os.Getenv("PIMO_STATS_TEMPLATE")
+	statsDestinationEnv   = os.Getenv("PIMO_STATS_URL")
+	statsTemplateEnv      = os.Getenv("PIMO_STATS_TEMPLATE")
 )
-
 
 func main() {
 	rootCmd := &cobra.Command{
 		Use:   "pimo",
 		Short: "Command line to mask data from jsonlines",
-		Long:  `Pimo is a tool to mask private data contained in jsonlines by using masking configurations
+		Long: `Pimo is a tool to mask private data contained in jsonlines by using masking configurations
 
 Environment Variables:
   PIMO_STATS_URL      The URL where statistics will be sent
