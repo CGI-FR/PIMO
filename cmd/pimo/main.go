@@ -63,13 +63,20 @@ var (
 	repeatWhile           string
 	statisticsDestination string
 	statsTemplate         string
+	statsDestinationEnv   = os.Getenv("PIMO_STATS_URL")
+	statsTemplateEnv      = os.Getenv("PIMO_STATS_TEMPLATE")
 )
 
 func main() {
 	rootCmd := &cobra.Command{
 		Use:   "pimo",
 		Short: "Command line to mask data from jsonlines",
-		Long:  `Pimo is a tool to mask private data contained in jsonlines by using masking configurations`,
+		Long: `Pimo is a tool to mask private data contained in jsonlines by using masking configurations
+
+Environment Variables:
+  PIMO_STATS_URL      The URL where statistics will be sent
+  PIMO_STATS_TEMPLATE The template string to format statistics`,
+
 		Version: fmt.Sprintf(`%v (commit=%v date=%v by=%v)
 Copyright (C) 2021 CGI France
 License GPLv3: GNU GPL version 3 <https://gnu.org/licenses/gpl.html>.
@@ -95,8 +102,8 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 	rootCmd.PersistentFlags().StringArrayVarP(&maskingOneLiner, "mask", "m", []string{}, "one liner masking")
 	rootCmd.PersistentFlags().StringVar(&repeatUntil, "repeat-until", "", "mask each input repeatedly until the given condition is met")
 	rootCmd.PersistentFlags().StringVar(&repeatWhile, "repeat-while", "", "mask each input repeatedly while the given condition is met")
-	rootCmd.PersistentFlags().StringVar(&statisticsDestination, "stats", "", "generate execution statistics in the specified dump file")
-	rootCmd.PersistentFlags().StringVar(&statsTemplate, "statsTemplate", "", "template string to format stats (to include them you have to specify them as `{{ .Stats }}` like `{\"software\":\"PIMO\",\"stats\":{{ .Stats }}}`)")
+	rootCmd.PersistentFlags().StringVar(&statisticsDestination, "stats", statsDestinationEnv, "generate execution statistics in the specified dump file")
+	rootCmd.PersistentFlags().StringVar(&statsTemplate, "statsTemplate", statsTemplateEnv, "template string to format stats (to include them you have to specify them as `{{ .Stats }}` like `{\"software\":\"PIMO\",\"stats\":{{ .Stats }}}`)")
 
 	rootCmd.AddCommand(&cobra.Command{
 		Use: "jsonschema",
