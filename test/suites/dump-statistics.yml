@@ -64,7 +64,7 @@ testcases:
             add: "Dorothy"
       EOF
   - script: |-
-      PIMO_STATS_TEMPLATE= '{"software":"PIMO","stats":{{ .Stats }}}' PIMO_STATS_URL=pimo-stats-template.json  echo '{ "name": "John" }' | pimo -v 3 --log-json
+      echo '{ "name": "John" }' | PIMO_STATS_TEMPLATE='{"software":"PIMO","stats":{{ .Stats }}}' PIMO_STATS_URL=pimo-stats-template.json pimo -v 3 --log-json
     assertions:
     - result.code ShouldEqual 0
     - result.systemerr ShouldContainSubstring Statistics exported to file
