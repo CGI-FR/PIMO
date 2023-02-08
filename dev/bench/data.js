@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1675785948265,
+  "lastUpdate": 1675871675810,
   "repoUrl": "https://github.com/CGI-FR/PIMO",
   "entries": {
     "Benchmark": [
@@ -2406,6 +2406,42 @@ window.BENCHMARK_DATA = {
             "value": 2024375,
             "unit": "ns/op\t  681670 B/op\t    5891 allocs/op",
             "extra": "5449 times\n2 procs"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "youen.peron@cgi.com",
+            "name": "Youen Péron",
+            "username": "youen"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "9c4c8ea50d348aa3b925cac38a66b214569c3338",
+          "message": "feat(stats): add environment variables to controls URL and template (#202)\n\n* feat(stats): add environment variables to controls URL and template",
+          "timestamp": "2023-02-08T16:47:19+01:00",
+          "tree_id": "095760b8368e14ce8e739da6013bb24999932603",
+          "url": "https://github.com/CGI-FR/PIMO/commit/9c4c8ea50d348aa3b925cac38a66b214569c3338"
+        },
+        "date": 1675871675182,
+        "tool": "go",
+        "benches": [
+          {
+            "name": "BenchmarkPimoRun",
+            "value": 30908,
+            "unit": "ns/op\t   16488 B/op\t     168 allocs/op",
+            "extra": "367722 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge",
+            "value": 2168129,
+            "unit": "ns/op\t  681415 B/op\t    5892 allocs/op",
+            "extra": "4831 times\n2 procs"
           }
         ]
       }
