@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1678130827743,
+  "lastUpdate": 1678131306674,
   "repoUrl": "https://github.com/CGI-FR/PIMO",
   "entries": {
     "Benchmark": [
@@ -2622,6 +2622,42 @@ window.BENCHMARK_DATA = {
             "value": 2860449,
             "unit": "ns/op\t  681828 B/op\t    5891 allocs/op",
             "extra": "3976 times\n2 procs"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "49699333+dependabot[bot]@users.noreply.github.com",
+            "name": "dependabot[bot]",
+            "username": "dependabot[bot]"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "fb8b92e0f253a9adb246be81d9e94ef99ac5c422",
+          "message": "chore(deps): bump @braintree/sanitize-url in /web/play (#209)\n\nBumps [@braintree/sanitize-url](https://github.com/braintree/sanitize-url) from 6.0.0 to 6.0.2.\r\n- [Release notes](https://github.com/braintree/sanitize-url/releases)\r\n- [Changelog](https://github.com/braintree/sanitize-url/blob/main/CHANGELOG.md)\r\n- [Commits](https://github.com/braintree/sanitize-url/compare/v6.0.0...v6.0.2)\r\n\r\n---\r\nupdated-dependencies:\r\n- dependency-name: \"@braintree/sanitize-url\"\r\n  dependency-type: indirect\r\n...\r\n\r\nSigned-off-by: dependabot[bot] <support@github.com>\r\nCo-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>",
+          "timestamp": "2023-03-06T20:28:05+01:00",
+          "tree_id": "6b3f8f94a38665b80de5e93dc99dbbb991921aad",
+          "url": "https://github.com/CGI-FR/PIMO/commit/fb8b92e0f253a9adb246be81d9e94ef99ac5c422"
+        },
+        "date": 1678131305872,
+        "tool": "go",
+        "benches": [
+          {
+            "name": "BenchmarkPimoRun",
+            "value": 30226,
+            "unit": "ns/op\t   16455 B/op\t     168 allocs/op",
+            "extra": "383983 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge",
+            "value": 2039992,
+            "unit": "ns/op\t  681845 B/op\t    5891 allocs/op",
+            "extra": "5079 times\n2 procs"
           }
         ]
       }
