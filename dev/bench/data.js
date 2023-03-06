@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1678124380581,
+  "lastUpdate": 1678130827743,
   "repoUrl": "https://github.com/CGI-FR/PIMO",
   "entries": {
     "Benchmark": [
@@ -2586,6 +2586,42 @@ window.BENCHMARK_DATA = {
             "value": 2048647,
             "unit": "ns/op\t  681816 B/op\t    5892 allocs/op",
             "extra": "5101 times\n2 procs"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "49699333+dependabot[bot]@users.noreply.github.com",
+            "name": "dependabot[bot]",
+            "username": "dependabot[bot]"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "fba5ef8c57e411ff51e6fd18daee85982449002e",
+          "message": "chore(deps): bump json5 from 1.0.1 to 1.0.2 in /web/play (#208)\n\nBumps [json5](https://github.com/json5/json5) from 1.0.1 to 1.0.2.\r\n- [Release notes](https://github.com/json5/json5/releases)\r\n- [Changelog](https://github.com/json5/json5/blob/main/CHANGELOG.md)\r\n- [Commits](https://github.com/json5/json5/compare/v1.0.1...v1.0.2)\r\n\r\n---\r\nupdated-dependencies:\r\n- dependency-name: json5\r\n  dependency-type: indirect\r\n...\r\n\r\nSigned-off-by: dependabot[bot] <support@github.com>\r\nCo-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>",
+          "timestamp": "2023-03-06T20:18:13+01:00",
+          "tree_id": "c0b91d65a68a27be4a0eae8d07e9d4ec7a0e2d81",
+          "url": "https://github.com/CGI-FR/PIMO/commit/fba5ef8c57e411ff51e6fd18daee85982449002e"
+        },
+        "date": 1678130827090,
+        "tool": "go",
+        "benches": [
+          {
+            "name": "BenchmarkPimoRun",
+            "value": 46590,
+            "unit": "ns/op\t   16423 B/op\t     168 allocs/op",
+            "extra": "256218 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge",
+            "value": 2860449,
+            "unit": "ns/op\t  681828 B/op\t    5891 allocs/op",
+            "extra": "3976 times\n2 procs"
           }
         ]
       }
