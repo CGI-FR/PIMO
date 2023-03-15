@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1678176088106,
+  "lastUpdate": 1678878783704,
   "repoUrl": "https://github.com/CGI-FR/PIMO",
   "entries": {
     "Benchmark": [
@@ -2694,6 +2694,42 @@ window.BENCHMARK_DATA = {
             "value": 2173583,
             "unit": "ns/op\t  681913 B/op\t    5892 allocs/op",
             "extra": "4938 times\n2 procs"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "49699333+dependabot[bot]@users.noreply.github.com",
+            "name": "dependabot[bot]",
+            "username": "dependabot[bot]"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "e92a31629eb3a7a4b64ea4602aee2536447841aa",
+          "message": "chore(deps-dev): bump webpack from 5.73.0 to 5.76.0 in /web/play (#211)\n\nBumps [webpack](https://github.com/webpack/webpack) from 5.73.0 to 5.76.0.\r\n- [Release notes](https://github.com/webpack/webpack/releases)\r\n- [Commits](https://github.com/webpack/webpack/compare/v5.73.0...v5.76.0)\r\n\r\n---\r\nupdated-dependencies:\r\n- dependency-name: webpack\r\n  dependency-type: direct:development\r\n...\r\n\r\nSigned-off-by: dependabot[bot] <support@github.com>\r\nCo-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>",
+          "timestamp": "2023-03-15T12:03:59+01:00",
+          "tree_id": "679df293b1847e7b68dedb559a746ec122c1c3f9",
+          "url": "https://github.com/CGI-FR/PIMO/commit/e92a31629eb3a7a4b64ea4602aee2536447841aa"
+        },
+        "date": 1678878783034,
+        "tool": "go",
+        "benches": [
+          {
+            "name": "BenchmarkPimoRun",
+            "value": 45762,
+            "unit": "ns/op\t   16434 B/op\t     168 allocs/op",
+            "extra": "252494 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge",
+            "value": 2826592,
+            "unit": "ns/op\t  681795 B/op\t    5891 allocs/op",
+            "extra": "4040 times\n2 procs"
           }
         ]
       }
