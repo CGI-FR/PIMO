@@ -3,4 +3,4 @@ bin
 .env
 test/workspace
 dist/
-
+venom*.log
