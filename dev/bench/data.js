@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1678878783704,
+  "lastUpdate": 1678896429538,
   "repoUrl": "https://github.com/CGI-FR/PIMO",
   "entries": {
     "Benchmark": [
@@ -2730,6 +2730,42 @@ window.BENCHMARK_DATA = {
             "value": 2826592,
             "unit": "ns/op\t  681795 B/op\t    5891 allocs/op",
             "extra": "4040 times\n2 procs"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "44274230+adrienaury@users.noreply.github.com",
+            "name": "Adrien Aury",
+            "username": "adrienaury"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "4d9382e5ef7b6685b91144ff40f9ebea18f3336b",
+          "message": "chore: upgrave devcontainer and go 1.20 (#212)",
+          "timestamp": "2023-03-15T16:57:31+01:00",
+          "tree_id": "b5173f7036d7c7bd687519bd646c1aad79c6313e",
+          "url": "https://github.com/CGI-FR/PIMO/commit/4d9382e5ef7b6685b91144ff40f9ebea18f3336b"
+        },
+        "date": 1678896428644,
+        "tool": "go",
+        "benches": [
+          {
+            "name": "BenchmarkPimoRun",
+            "value": 46526,
+            "unit": "ns/op\t   16458 B/op\t     168 allocs/op",
+            "extra": "244246 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge",
+            "value": 2924947,
+            "unit": "ns/op\t  681453 B/op\t    5892 allocs/op",
+            "extra": "3921 times\n2 procs"
           }
         ]
       }
