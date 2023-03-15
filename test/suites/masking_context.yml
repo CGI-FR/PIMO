@@ -49,8 +49,6 @@ testcases:
     - result.systemoutjson.baz ShouldEqual BAZ
     - result.systemerr ShouldBeEmpty
 
-name: arrays context features
-testcases:
 - name: use parent data in template mask
   steps:
   - script: rm -f masking.yml

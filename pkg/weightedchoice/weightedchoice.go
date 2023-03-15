@@ -72,7 +72,7 @@ type MaskEngine struct {
 
 // NewMask returns a WeightedMaskList from slice of model.Entry and weights
 func NewMask(list []model.WeightedChoiceType, seed int64, seeder model.Seeder) MaskEngine {
-	rand.Seed(seed)
+	rand.Seed(seed) //nolint:staticcheck
 	cs := []Choice{}
 	for k := range list {
 		cs = append(cs, Choice{Item: list[k].Choice, Weight: list[k].Weight})

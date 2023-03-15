@@ -15,6 +15,7 @@ Types of changes
 - `Security` in case of vulnerabilities.
 
 ## [1.17.0]
+
 - `Added` Environment variable `PIMO_STATS_TEMPLATE` to control the format of generated stats
 - `Added` Environment variable `PIMO_STATS_URL` to generate a stat file or HTTP POST
 

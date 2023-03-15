@@ -286,6 +286,7 @@ targets:
     doc: "Run all integration tests"
     depends: ["info", "refresh", "lint", "test", "bench", "release"]
     steps:
+      - delete: venom*.log
       - delete: ={TEST_WS_DIR}/**
       - mkdir: =TEST_WS_DIR
       - copy: "**/*.yml"

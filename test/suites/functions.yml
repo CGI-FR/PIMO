@@ -7,7 +7,7 @@ testcases:
       cat > masking.yml <<EOF
       version: "1"
       functions:
-        add:
+        add10:
           params:
             - name: "i"
           body: |-
@@ -16,13 +16,13 @@ testcases:
         - selector:
             jsonpath: "value"
           mask:
-            template: '{{add 5}}'
+            template: '{{add10 5}}'
       EOF
   - script: |-
       echo '{"value": "1"}' | pimo
     assertions:
     - result.code ShouldEqual 0
-    - result.systemoutjson.value ShouldEqual 15
+    - result.systemout ShouldEqual {"value":"15"}
     - result.systemerr ShouldBeEmpty
 
 - name: declaring fonctions with string parameter
@@ -71,7 +71,7 @@ testcases:
       cat > masking.yml <<EOF
       version: "1"
       functions:
-        add:
+        add10:
           params:
             - name: "i"
           body: |-
@@ -86,7 +86,7 @@ testcases:
         - selector:
             jsonpath: "addValue"
           mask:
-            template: '{{add 5}}'
+            template: '{{add10 5}}'
         - selector:
             jsonpath: "subValue"
           mask:
