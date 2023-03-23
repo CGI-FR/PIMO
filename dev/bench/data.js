@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1678896429538,
+  "lastUpdate": 1679553225440,
   "repoUrl": "https://github.com/CGI-FR/PIMO",
   "entries": {
     "Benchmark": [
@@ -2766,6 +2766,42 @@ window.BENCHMARK_DATA = {
             "value": 2924947,
             "unit": "ns/op\t  681453 B/op\t    5892 allocs/op",
             "extra": "3921 times\n2 procs"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "49699333+dependabot[bot]@users.noreply.github.com",
+            "name": "dependabot[bot]",
+            "username": "dependabot[bot]"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "38d92c538d39efa72712752130b88e1e98a180a7",
+          "message": "chore(deps): bump github.com/mattn/go-isatty from 0.0.17 to 0.0.18 (#215)\n\nBumps [github.com/mattn/go-isatty](https://github.com/mattn/go-isatty) from 0.0.17 to 0.0.18.\r\n- [Release notes](https://github.com/mattn/go-isatty/releases)\r\n- [Commits](https://github.com/mattn/go-isatty/compare/v0.0.17...v0.0.18)\r\n\r\n---\r\nupdated-dependencies:\r\n- dependency-name: github.com/mattn/go-isatty\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-patch\r\n...\r\n\r\nSigned-off-by: dependabot[bot] <support@github.com>\r\nCo-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>",
+          "timestamp": "2023-03-23T07:26:24+01:00",
+          "tree_id": "e5f538dbad3ef12a406f8bb52d9e02b506c1b0bb",
+          "url": "https://github.com/CGI-FR/PIMO/commit/38d92c538d39efa72712752130b88e1e98a180a7"
+        },
+        "date": 1679553224730,
+        "tool": "go",
+        "benches": [
+          {
+            "name": "BenchmarkPimoRun",
+            "value": 29786,
+            "unit": "ns/op\t   16447 B/op\t     168 allocs/op",
+            "extra": "388153 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge",
+            "value": 2079191,
+            "unit": "ns/op\t  681970 B/op\t    5892 allocs/op",
+            "extra": "5029 times\n2 procs"
           }
         ]
       }
