@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1679553225440,
+  "lastUpdate": 1680070877396,
   "repoUrl": "https://github.com/CGI-FR/PIMO",
   "entries": {
     "Benchmark": [
@@ -2802,6 +2802,42 @@ window.BENCHMARK_DATA = {
             "value": 2079191,
             "unit": "ns/op\t  681970 B/op\t    5892 allocs/op",
             "extra": "5029 times\n2 procs"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "49699333+dependabot[bot]@users.noreply.github.com",
+            "name": "dependabot[bot]",
+            "username": "dependabot[bot]"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "29a48b474aad952667df5c54587b44b90fda78cb",
+          "message": "chore(deps): bump github.com/goccy/go-yaml from 1.10.0 to 1.10.1 (#216)\n\nBumps [github.com/goccy/go-yaml](https://github.com/goccy/go-yaml) from 1.10.0 to 1.10.1.\r\n- [Release notes](https://github.com/goccy/go-yaml/releases)\r\n- [Changelog](https://github.com/goccy/go-yaml/blob/master/CHANGELOG.md)\r\n- [Commits](https://github.com/goccy/go-yaml/compare/v1.10.0...v1.10.1)\r\n\r\n---\r\nupdated-dependencies:\r\n- dependency-name: github.com/goccy/go-yaml\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-patch\r\n...\r\n\r\nSigned-off-by: dependabot[bot] <support@github.com>\r\nCo-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>",
+          "timestamp": "2023-03-29T08:11:23+02:00",
+          "tree_id": "b4cd7e419fe5e77d292b0727bb68ef5e0f4a6802",
+          "url": "https://github.com/CGI-FR/PIMO/commit/29a48b474aad952667df5c54587b44b90fda78cb"
+        },
+        "date": 1680070876685,
+        "tool": "go",
+        "benches": [
+          {
+            "name": "BenchmarkPimoRun",
+            "value": 48343,
+            "unit": "ns/op\t   16485 B/op\t     168 allocs/op",
+            "extra": "235930 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge",
+            "value": 3023678,
+            "unit": "ns/op\t  681646 B/op\t    5893 allocs/op",
+            "extra": "3548 times\n2 procs"
           }
         ]
       }
