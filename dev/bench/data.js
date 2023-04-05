@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1680512084768,
+  "lastUpdate": 1680689213240,
   "repoUrl": "https://github.com/CGI-FR/PIMO",
   "entries": {
     "Benchmark": [
@@ -2874,6 +2874,42 @@ window.BENCHMARK_DATA = {
             "value": 2230136,
             "unit": "ns/op\t  681477 B/op\t    5892 allocs/op",
             "extra": "4834 times\n2 procs"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "49699333+dependabot[bot]@users.noreply.github.com",
+            "name": "dependabot[bot]",
+            "username": "dependabot[bot]"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "280fefc0e9871bd17ee40ffdbd0b945210fffdbe",
+          "message": "chore(deps): bump github.com/spf13/cobra from 1.6.1 to 1.7.0 (#218)\n\nBumps [github.com/spf13/cobra](https://github.com/spf13/cobra) from 1.6.1 to 1.7.0.\r\n- [Release notes](https://github.com/spf13/cobra/releases)\r\n- [Commits](https://github.com/spf13/cobra/compare/v1.6.1...v1.7.0)\r\n\r\n---\r\nupdated-dependencies:\r\n- dependency-name: github.com/spf13/cobra\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-minor\r\n...\r\n\r\nSigned-off-by: dependabot[bot] <support@github.com>\r\nCo-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>",
+          "timestamp": "2023-04-05T11:59:15+02:00",
+          "tree_id": "cce1026cb40ff06cb732adc7ffa300d9f709099b",
+          "url": "https://github.com/CGI-FR/PIMO/commit/280fefc0e9871bd17ee40ffdbd0b945210fffdbe"
+        },
+        "date": 1680689212812,
+        "tool": "go",
+        "benches": [
+          {
+            "name": "BenchmarkPimoRun",
+            "value": 30828,
+            "unit": "ns/op\t   16495 B/op\t     168 allocs/op",
+            "extra": "364716 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge",
+            "value": 2190816,
+            "unit": "ns/op\t  681938 B/op\t    5893 allocs/op",
+            "extra": "5084 times\n2 procs"
           }
         ]
       }
