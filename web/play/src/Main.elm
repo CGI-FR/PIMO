@@ -199,40 +199,36 @@ view model =
                 ]
             ]
 
-popupStyle : List Style
+popupStyle : List (Attribute Msg)
 popupStyle =
-    [ position fixed
-    , top (pct 50)
-    , left (pct 50)
-    , transform (translateX (pct -50) :: translateY (pct -50) :: [])
-    , backgroundColor (rgb255 255 255)
-    , padding (px 24)
-    , borderRadius (px 4)
-    , boxShadow4 zero (px 4) (px 6) (rgba 0 0 0 0.2)
-    , zIndex (int 999)
+    [ centerX
+    , centerY
+    , Background.color (rgb255 255 255)
+    , padding 24
+    , Border.rounded 4
+    , Border.shadow  <| Border.shadowWith { offset = ( 0, 4 ), blur = 6, color = rgba 0 0 0 0.2 }
+    , zIndex 999
     ]
 
-closeButtonStyle : List Style
+closeButtonStyle : List (Attribute Msg)
 closeButtonStyle =
-    [ backgroundColor (rgb255 0 0)
-    , color (rgb255 255 255)
-    , borderRadius (px 4)
-    , padding2 (px 6) (px 12)
-    , cursor pointer
-    , marginTop (px 12)
-    , textDecoration none
+    [ Background.color (rgb255 0 0)
+    , Font.color (rgb255 255 255)
+    , Border.rounded 4
+    , paddingEach { top = 6, bottom = 6, left = 12, right = 12 }
+    , Font.size 16
+    , marginTop 12
     ]
 
-popup : Model -> Html Msg
+popup : Model -> Element Msg
 popup model =
     if model.popupVisible then
-        div
-            [ Attr.css popupStyle ]
-            [ p [] [ text "Ne jamais utiliser des données personnelles sur ce service." ]
-            , button [ Attr.css closeButtonStyle, onClick ClosePopup ] [ text "OK" ]
+        column popupStyle
+            [ paragraph [] [ text "Ne jamais utiliser des données personnelles sur ce service." ]
+            , button closeButtonStyle ClosePopup [ text "OK" ]
             ]
     else
-        text ""
+        none
 
 
 -- ---------------------------
