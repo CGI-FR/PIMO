@@ -7,6 +7,7 @@ import Examples
 import Header exposing (view)
 import Html.Styled as Html exposing (..)
 import Html.Styled.Attributes as Attr exposing (..)
+import Html.Styled.Events exposing (onClick)
 import Http
 import Http.Detailed
 import Json.Decode as JD
@@ -199,36 +200,72 @@ view model =
                 ]
             ]
 
-popupStyle : List (Attribute Msg)
-popupStyle =
-    [ centerX
-    , centerY
-    , Background.color (rgb255 255 255)
-    , padding 24
-    , Border.rounded 4
-    , Border.shadow  <| Border.shadowWith { offset = ( 0, 4 ), blur = 6, color = rgba 0 0 0 0.2 }
-    , zIndex 999
-    ]
-
-closeButtonStyle : List (Attribute Msg)
-closeButtonStyle =
-    [ Background.color (rgb255 0 0)
-    , Font.color (rgb255 255 255)
-    , Border.rounded 4
-    , paddingEach { top = 6, bottom = 6, left = 12, right = 12 }
-    , Font.size 16
-    , marginTop 12
-    ]
-
-popup : Model -> Element Msg
+popup : Model -> Html Msg
 popup model =
     if model.popupVisible then
-        column popupStyle
-            [ paragraph [] [ text "Ne jamais utiliser des données personnelles sur ce service." ]
-            , button closeButtonStyle ClosePopup [ text "OK" ]
+        div []
+        [ div
+            [ Attr.id "overlay"
+            , css
+                [ Tw.fixed
+                , Tw.inset_0
+                , Tw.bg_black
+                , Tw.bg_opacity_50
+                , Tw.z_40
+                ]
+            ]
+            []
+            , div
+                [ css
+                    [ Tw.fixed
+                    , Tw.inset_0
+                    , Tw.flex
+                    , Tw.items_center
+                    , Tw.justify_center
+                    , Tw.z_50
+                    ]
+                ]
+                [ div
+                    [ css
+                        [ Tw.bg_white
+                        , Tw.p_6
+                        , Tw.w_1over3
+                        , Tw.rounded
+                        , Tw.shadow_lg
+                        ]
+                    ]
+                    [ h2
+                        [ css
+                            [ Tw.text_2xl
+                            , Tw.mb_4
+                            ]
+                        ]
+                        [ text "Welcome to PIMO Play !" ]
+                    , p
+                        [ css
+                            [ Tw.text_gray_700
+                            ]
+                        ]
+                        [ text "Please, never use real data on this service." ]
+                    , button
+                        [ onClick ClosePopup
+                        , css
+                            [ Tw.mt_4
+                            , Tw.bg_blue_500
+                            , Tw.text_white
+                            , Tw.font_bold
+                            , Tw.py_2
+                            , Tw.px_4
+                            , Tw.rounded
+                            ]
+                        ]
+                        [ text "I agree" ]
+                    ]
+                ]
             ]
     else
-        none
+        text ""
+
 
 
 -- ---------------------------
