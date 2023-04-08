@@ -40,6 +40,7 @@ func Play(enableSecurity bool) *echo.Echo {
 	router.GET("/*", echo.WrapHandler(handleClient()))
 	router.POST("/play", play)
 	router.POST("/flow", flowchart)
+	router.GET("/options", options)
 
 	return router
 }
@@ -218,4 +219,15 @@ func handleClient() http.Handler {
 		log.Err(err).Msg("cannot find subtree")
 	}
 	return http.FileServer(http.FS(fSys))
+}
+
+// options returns server configuration
+func options(ctx echo.Context) error {
+	options := struct {
+		Secure bool `json:"secure"`
+	}{Secure: false}
+	if ctx.Get("enableSecurity") == true {
+		options.Secure = true
+	}
+	return ctx.JSON(http.StatusOK, options)
 }

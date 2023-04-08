@@ -14,6 +14,10 @@ Types of changes
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [1.18.0]
+
+- `Added` warning popup on pimo play when started on secure mode.
+
 ## [1.17.0]
 
 - `Added` Environment variable `PIMO_STATS_TEMPLATE` to control the format of generated stats

@@ -65,6 +65,7 @@ type Msg
     | Error String
     | ChangeMaskingView MaskingView
     | ClosePopup
+    | ReceiveSecure (Result Http.Error Bool)
 
 
 asMaskingIn : Sandbox -> String -> Sandbox

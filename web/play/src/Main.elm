@@ -20,7 +20,6 @@ import Style exposing (h_x_px)
 import Tailwind.Breakpoints as Breakpoints
 import Tailwind.Utilities as Tw exposing (..)
 
-
 init : String -> ( Model, Cmd Msg )
 init version =
     ( { version = version
@@ -32,9 +31,16 @@ init version =
       , flow = ""
       , popupVisible = True
       }
-    , Cmd.none
+    , fetchSecure
     )
 
+secureDecoder : JD.Decoder Bool
+secureDecoder =
+    JD.field "secure" JD.bool
+
+fetchSecure : Cmd Msg
+fetchSecure =
+    Http.get {url = "/options", expect = Http.expectJson ReceiveSecure secureDecoder}
 
 
 -- ---------------------------
@@ -158,6 +164,13 @@ update message model =
             , Cmd.none
             )
 
+        ReceiveSecure result ->
+            case result of
+                Ok secure ->
+                    ( { model | popupVisible = secure }, Cmd.none )
+
+                Err _ ->
+                    ( model, Cmd.none )
 
 
 -- ---------------------------
