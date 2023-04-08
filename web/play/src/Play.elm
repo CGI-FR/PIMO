@@ -34,6 +34,7 @@ type alias Model =
     , status : Status
     , maskingView : MaskingView
     , flow :  String
+    , popupVisible : Bool
     }
 
 
@@ -63,6 +64,7 @@ type Msg
     | Refresh
     | Error String
     | ChangeMaskingView MaskingView
+    | ClosePopup
 
 
 asMaskingIn : Sandbox -> String -> Sandbox

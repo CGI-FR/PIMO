@@ -29,6 +29,7 @@ init version =
       , status = Loading
       , maskingView = YamlView
       , flow = ""
+      , popupVisible = True
       }
     , Cmd.none
     )
@@ -104,11 +105,11 @@ update message model =
         GotFlowData result ->
             case result of
                 Ok ( _, flow ) ->
-                    let 
-                        cmd = case model.maskingView of 
-                            GraphView -> updateFlow flow 
+                    let
+                        cmd = case model.maskingView of
+                            GraphView -> updateFlow flow
                             _ -> Cmd.none
-                    in 
+                    in
                     ( { model
                         | flow = flow
                       }
@@ -141,15 +142,20 @@ update message model =
             )
 
         ChangeMaskingView maskingView ->
-            let 
-              cmd = case maskingView of 
-                GraphView -> updateFlow model.flow 
+            let
+              cmd = case maskingView of
+                GraphView -> updateFlow model.flow
                 _ -> Cmd.none
-            in 
+            in
             ( { model | maskingView = maskingView },  cmd )
 
         Error errorMessage ->
             ( { model | error = errorMessage }, Cmd.none )
+
+        ClosePopup ->
+            ( { model | popupVisible = False }
+            , Cmd.none
+            )
 
 
 
@@ -165,6 +171,7 @@ view model =
             []
             [ Css.Global.global Tw.globalStyles
             , Header.view model.version
+            , popup model
             , div
                 [ Attr.css [ Tw.px_4, Breakpoints.lg [ Tw.px_16 ], Breakpoints.md [ Tw.px_8 ] ] ]
                 [ div
@@ -192,6 +199,40 @@ view model =
                 ]
             ]
 
+popupStyle : List Style
+popupStyle =
+    [ position fixed
+    , top (pct 50)
+    , left (pct 50)
+    , transform (translateX (pct -50) :: translateY (pct -50) :: [])
+    , backgroundColor (rgb255 255 255)
+    , padding (px 24)
+    , borderRadius (px 4)
+    , boxShadow4 zero (px 4) (px 6) (rgba 0 0 0 0.2)
+    , zIndex (int 999)
+    ]
+
+closeButtonStyle : List Style
+closeButtonStyle =
+    [ backgroundColor (rgb255 0 0)
+    , color (rgb255 255 255)
+    , borderRadius (px 4)
+    , padding2 (px 6) (px 12)
+    , cursor pointer
+    , marginTop (px 12)
+    , textDecoration none
+    ]
+
+popup : Model -> Html Msg
+popup model =
+    if model.popupVisible then
+        div
+            [ Attr.css popupStyle ]
+            [ p [] [ text "Ne jamais utiliser des données personnelles sur ce service." ]
+            , button [ Attr.css closeButtonStyle, onClick ClosePopup ] [ text "OK" ]
+            ]
+    else
+        text ""
 
 
 -- ---------------------------
