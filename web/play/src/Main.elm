@@ -29,7 +29,7 @@ init version =
       , status = Loading
       , maskingView = YamlView
       , flow = ""
-      , popupVisible = True
+      , popupVisible = False
       }
     , fetchSecure
     )
