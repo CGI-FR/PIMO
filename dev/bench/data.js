@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1680862072419,
+  "lastUpdate": 1681482149428,
   "repoUrl": "https://github.com/CGI-FR/PIMO",
   "entries": {
     "Benchmark": [
@@ -2946,6 +2946,42 @@ window.BENCHMARK_DATA = {
             "value": 2195667,
             "unit": "ns/op\t  682030 B/op\t    5893 allocs/op",
             "extra": "5042 times\n2 procs"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "49699333+dependabot[bot]@users.noreply.github.com",
+            "name": "dependabot[bot]",
+            "username": "dependabot[bot]"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "296296af698a6802347e4d27f99e1654292534c9",
+          "message": "chore(deps): bump github.com/rs/zerolog from 1.29.0 to 1.29.1 (#221)\n\nBumps [github.com/rs/zerolog](https://github.com/rs/zerolog) from 1.29.0 to 1.29.1.\r\n- [Release notes](https://github.com/rs/zerolog/releases)\r\n- [Commits](https://github.com/rs/zerolog/compare/v1.29.0...v1.29.1)\r\n\r\n---\r\nupdated-dependencies:\r\n- dependency-name: github.com/rs/zerolog\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-patch\r\n...\r\n\r\nSigned-off-by: dependabot[bot] <support@github.com>\r\nCo-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>",
+          "timestamp": "2023-04-14T16:13:35+02:00",
+          "tree_id": "03dcc852d8892e39fc97814c736b73f28a2f7bd2",
+          "url": "https://github.com/CGI-FR/PIMO/commit/296296af698a6802347e4d27f99e1654292534c9"
+        },
+        "date": 1681482148638,
+        "tool": "go",
+        "benches": [
+          {
+            "name": "BenchmarkPimoRun",
+            "value": 36996,
+            "unit": "ns/op\t   16457 B/op\t     168 allocs/op",
+            "extra": "306104 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge",
+            "value": 2620863,
+            "unit": "ns/op\t  681776 B/op\t    5892 allocs/op",
+            "extra": "4274 times\n2 procs"
           }
         ]
       }
