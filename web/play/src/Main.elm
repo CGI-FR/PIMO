@@ -259,7 +259,7 @@ popup model =
                             [ Tw.text_gray_700
                             ]
                         ]
-                        [ text "Please, never use real data on this service." ]
+                        [ text "To ensure the privacy and safety of both personal and sensitive organizational data, please avoid sharing any real or sensitive information about yourself, others, or any organization while using this platform." ]
                     , button
                         [ onClick ClosePopup
                         , css
@@ -272,7 +272,7 @@ popup model =
                             , Tw.rounded
                             ]
                         ]
-                        [ text "I agree" ]
+                        [ text "I Agree" ]
                     ]
                 ]
             ]
