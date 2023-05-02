@@ -65,10 +65,11 @@ func (fme FunctionMaskContextEngine) MaskContext(e Dictionary, key string, conte
 }
 
 type MaskFactoryConfiguration struct {
-	Masking   Masking
-	Seed      int64
-	Cache     map[string]Cache
-	Functions tmpl.FuncMap
+	Masking       Masking
+	Seed          int64
+	SeedFromClock bool
+	Cache         map[string]Cache
+	Functions     tmpl.FuncMap
 }
 
 type MaskFactory func(MaskFactoryConfiguration) (MaskEngine, bool, error)
@@ -221,11 +222,12 @@ type Param struct {
 }
 
 type Definition struct {
-	Version   string                     `yaml:"version" json:"version" jsonschema_description:"Version of the pipeline definition, use the value 1"`
-	Seed      int64                      `yaml:"seed,omitempty" json:"seed,omitempty" jsonschema_description:"Initialize the Pseaudo-Random-Generator with the given value"`
-	Functions map[string]Function        `yaml:"functions,omitempty" json:"functions,omitempty" jsonschema_description:"Declare functions to be used in the masking"`
-	Masking   []Masking                  `yaml:"masking" json:"masking" jsonschema_description:"Masking pipeline definition"`
-	Caches    map[string]CacheDefinition `yaml:"caches,omitempty" json:"caches,omitempty" jsonschema_description:"Declare in-memory caches"`
+	Version       string                     `yaml:"version" json:"version" jsonschema_description:"Version of the pipeline definition, use the value 1"`
+	Seed          int64                      `yaml:"seed,omitempty" json:"seed,omitempty" jsonschema_description:"Initialize the Pseaudo-Random-Generator with the given value"`
+	Functions     map[string]Function        `yaml:"functions,omitempty" json:"functions,omitempty" jsonschema_description:"Declare functions to be used in the masking"`
+	Masking       []Masking                  `yaml:"masking" json:"masking" jsonschema_description:"Masking pipeline definition"`
+	Caches        map[string]CacheDefinition `yaml:"caches,omitempty" json:"caches,omitempty" jsonschema_description:"Declare in-memory caches"`
+	SeedFromClock bool                       `yaml:"-" json:"-"`
 }
 
 /***************
@@ -306,7 +308,7 @@ func (source *SourceFromSlice) Open() error {
 }
 
 func NewRepeaterUntilProcess(source *TempSource, text, mode string) (Processor, error) {
-	eng, err := template.NewEngine(text, tmpl.FuncMap{}, 0, "")
+	eng, err := template.NewEngine(text, tmpl.FuncMap{}, 0, "", false)
 
 	return RepeaterUntilProcess{eng, source, mode}, err
 }
@@ -609,7 +611,7 @@ func (pipeline SimpleSinkedPipeline) Run() (err error) {
 
 type Seeder func(Dictionary) (int64, bool, error)
 
-func NewSeeder(sourceField string, seed int64) Seeder {
+func NewSeeder(sourceField string, seed int64, seedFromClock bool) Seeder {
 	var seeder Seeder
 
 	if jpath := sourceField; jpath != "" {
@@ -622,7 +624,10 @@ func NewSeeder(sourceField string, seed int64) Seeder {
 			}
 			hash.Reset()
 			_, err := hash.Write([]byte(fmt.Sprintf("%v", e)))
-			return int64(hash.Sum64()), true, err
+			if seedFromClock {
+				return int64(hash.Sum64()), true, err
+			}
+			return int64(hash.Sum64()) + seed, true, err
 		}
 	} else {
 		seeder = func(context Dictionary) (int64, bool, error) {

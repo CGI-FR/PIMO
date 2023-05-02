@@ -32,8 +32,8 @@ type MaskEngine struct {
 }
 
 // NewMask create a MaskEngine
-func NewMask(text string, funcs tmpl.FuncMap, seed int64, seedField string) (MaskEngine, error) {
-	temp, err := template.NewEngine(text, funcs, seed, seedField)
+func NewMask(text string, funcs tmpl.FuncMap, seed int64, seedField string, seedFromClock bool) (MaskEngine, error) {
+	temp, err := template.NewEngine(text, funcs, seed, seedField, seedFromClock)
 	return MaskEngine{temp}, err
 }
 
@@ -48,7 +48,7 @@ func (tmpl MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.E
 // Factory create a mask from a yaml config
 func Factory(conf model.MaskFactoryConfiguration) (model.MaskEngine, bool, error) {
 	if len(conf.Masking.Mask.Template) != 0 {
-		mask, err := NewMask(conf.Masking.Mask.Template, conf.Functions, conf.Seed, conf.Masking.Seed.Field)
+		mask, err := NewMask(conf.Masking.Mask.Template, conf.Functions, conf.Seed, conf.Masking.Seed.Field, conf.SeedFromClock)
 		if err != nil {
 			return nil, false, err
 		}

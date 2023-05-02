@@ -57,7 +57,7 @@ func Factory(conf model.MaskFactoryConfiguration) (model.MaskEngine, bool, error
 	return nil, false, nil
 }
 
-func Func(seed int64, seedField string) interface{} {
+func Func(seed int64, seedField string, seedFromClock bool) interface{} {
 	return func(cmd string) (model.Entry, error) {
 		mask := NewMask(cmd)
 		return mask.Mask(nil)

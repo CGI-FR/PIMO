@@ -65,7 +65,7 @@ func Factory(conf model.MaskFactoryConfiguration) (model.MaskEngine, bool, error
 	return nil, false, nil
 }
 
-func Func(seed int64, seedField string) interface{} {
+func Func(seed int64, seedField string, seedFromClock bool) interface{} {
 	return func(choices_ []interface{}, input model.Entry) (model.Entry, error) {
 		choices := make([]model.Entry, len(choices_))
 		for i, c := range choices_ {
@@ -76,7 +76,7 @@ func Func(seed int64, seedField string) interface{} {
 	}
 }
 
-func FuncInUri(seed int64, seedField string) interface{} {
+func FuncInUri(seed int64, seedField string, seedFromClock bool) interface{} {
 	return func(uristr string, input model.Entry) (model.Entry, error) {
 		log.Warn().Msg("Using MaskHashInUri from a template can cause performance issues")
 		list, err := uri.Read(uristr)

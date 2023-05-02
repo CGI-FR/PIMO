@@ -129,7 +129,7 @@ func BuildPipeline(pipeline Pipeline, conf Definition, caches map[string]Cache, 
 					nbArg++
 				}
 
-				configuration := MaskFactoryConfiguration{Masking: virtualMask, Seed: conf.Seed, Cache: caches, Functions: functions}
+				configuration := MaskFactoryConfiguration{Masking: virtualMask, Seed: conf.Seed, Cache: caches, Functions: functions, SeedFromClock: conf.SeedFromClock}
 
 				for _, factory := range maskFactories {
 					mask, present, err := factory(configuration)
@@ -205,6 +205,7 @@ func LoadPipelineDefinitionFromYAML(source []byte) (Definition, error) {
 	}
 	if conf.Seed == 0 {
 		conf.Seed = time.Now().UnixNano()
+		conf.SeedFromClock = true
 	}
 	return conf, nil
 }

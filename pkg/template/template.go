@@ -32,14 +32,14 @@ func rmAcc(s string) string {
 }
 
 // NewEngine create a template Engine
-func NewEngine(text string, funcMap template.FuncMap, seed int64, seedField string) (*Engine, error) {
+func NewEngine(text string, funcMap template.FuncMap, seed int64, seedField string, seedFromClock bool) (*Engine, error) {
 	funcMap["ToUpper"] = strings.ToUpper
 	funcMap["ToLower"] = strings.ToLower
 	funcMap["NoAccent"] = rmAcc
 
 	for k, v := range seededFuncs {
-		if f, ok := v.(func(int64, string) interface{}); ok {
-			funcMap[k] = f(seed, seedField)
+		if f, ok := v.(func(int64, string, bool) interface{}); ok {
+			funcMap[k] = f(seed, seedField, seedFromClock)
 		}
 	}
 

@@ -109,7 +109,7 @@ func Factory(conf model.MaskFactoryConfiguration) (model.MaskEngine, bool, error
 		h := fnv.New64a()
 		h.Write([]byte(conf.Masking.Selector.Jsonpath))
 		conf.Seed += int64(h.Sum64())
-		mask, err := NewMask(conf.Masking.Mask.RandomDuration.Min, conf.Masking.Mask.RandomDuration.Max, conf.Seed, model.NewSeeder(conf.Masking.Seed.Field, conf.Seed))
+		mask, err := NewMask(conf.Masking.Mask.RandomDuration.Min, conf.Masking.Mask.RandomDuration.Max, conf.Seed, model.NewSeeder(conf.Masking.Seed.Field, conf.Seed, conf.SeedFromClock))
 		if err != nil {
 			return nil, false, err
 		}
@@ -118,10 +118,10 @@ func Factory(conf model.MaskFactoryConfiguration) (model.MaskEngine, bool, error
 	return nil, false, nil
 }
 
-func Func(seed int64, seedField string) interface{} {
+func Func(seed int64, seedField string, seedFromClock bool) interface{} {
 	var callnumber int64
 	return func(mindurastr, maxdurastr string, input model.Entry) (model.Entry, error) {
-		mask, err := NewMask(mindurastr, maxdurastr, seed+callnumber, model.NewSeeder(seedField, seed+callnumber))
+		mask, err := NewMask(mindurastr, maxdurastr, seed+callnumber, model.NewSeeder(seedField, seed+callnumber, seedFromClock))
 		if err != nil {
 			return nil, err
 		}

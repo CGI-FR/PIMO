@@ -183,8 +183,10 @@ func run() {
 	switch {
 	case seedValue != -1:
 		pdef.Seed = seedValue
+		pdef.SeedFromClock = false
 	case seedValue == 0:
 		pdef.Seed = time.Now().UnixNano()
+		pdef.SeedFromClock = true
 	}
 
 	if err != nil {

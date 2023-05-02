@@ -1,0 +1,36 @@
+name: global seed and field seed interactions
+testcases:
+- name: global seed with field seed
+  steps:
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      seed: 42
+      masking:
+        - selector:
+            jsonpath: "test"
+          seed:
+            field: "test"
+          mask:
+            randomInt:
+              min: 0
+              max: 1000
+      EOF
+  - script: |-
+      echo '{"test":145}' | pimo -s 41
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldEqual {"test":695}
+    - result.systemerr ShouldBeEmpty
+  - script: |-
+      echo '{"test":145}' | pimo -s 42
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldEqual {"test":574}
+    - result.systemerr ShouldBeEmpty
+  - script: |-
+      echo '{"test":145}' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldEqual {"test":574}
+    - result.systemerr ShouldBeEmpty

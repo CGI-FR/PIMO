@@ -26,7 +26,7 @@ import (
 )
 
 func TestMaskingShouldAddField(t *testing.T) {
-	addMask, err := NewMask("newvalue", template.FuncMap{}, 0, "")
+	addMask, err := NewMask("newvalue", template.FuncMap{}, 0, "", false)
 	assert.NoError(t, err, "error should be nil")
 	data := model.NewDictionary().With("field", "SomeInformation")
 	result, err := addMask.MaskContext(data, "newfield", data)

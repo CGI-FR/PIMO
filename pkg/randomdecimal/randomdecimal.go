@@ -70,15 +70,15 @@ func Factory(conf model.MaskFactoryConfiguration) (model.MaskEngine, bool, error
 		h := fnv.New64a()
 		h.Write([]byte(conf.Masking.Selector.Jsonpath))
 		conf.Seed += int64(h.Sum64())
-		return NewMask(conf.Masking.Mask.RandomDecimal.Min, conf.Masking.Mask.RandomDecimal.Max, conf.Masking.Mask.RandomDecimal.Precision, conf.Seed, model.NewSeeder(conf.Masking.Seed.Field, conf.Seed)), true, nil
+		return NewMask(conf.Masking.Mask.RandomDecimal.Min, conf.Masking.Mask.RandomDecimal.Max, conf.Masking.Mask.RandomDecimal.Precision, conf.Seed, model.NewSeeder(conf.Masking.Seed.Field, conf.Seed, conf.SeedFromClock)), true, nil
 	}
 	return nil, false, nil
 }
 
-func Func(seed int64, seedField string) interface{} {
+func Func(seed int64, seedField string, seedFromClock bool) interface{} {
 	var callnumber int64
 	return func(min float64, max float64, precision int) (model.Entry, error) {
-		mask := NewMask(min, max, precision, seed+callnumber, model.NewSeeder(seedField, seed+callnumber))
+		mask := NewMask(min, max, precision, seed+callnumber, model.NewSeeder(seedField, seed+callnumber, seedFromClock))
 		callnumber++
 		return mask.Mask(nil)
 	}
