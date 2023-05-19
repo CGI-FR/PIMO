@@ -77,38 +77,27 @@ update message model =
             , maskRequest newModel.sandbox
             )
 
-        GotMaskedData result ->
-            case result of
-                Ok ( _, output ) ->
-                    ( { model
-                        | output = output
-                        , status = Success
-                        , error = ""
-                      }
-                    , updateOutputEditor output
-                    )
-
-                Err error ->
-                    let
-                        errorMessage =
-                            case error of
-                                Http.Detailed.BadStatus _ body ->
-                                    body
-
-                                _ ->
-                                    "Server Error"
-                    in
-                    ( { model | error = errorMessage, status = Failure }, Cmd.none )
-
+        GotMaskedData output ->
+            ( { model
+                | output = output
+                , status = Success
+                , error = ""
+              }
+            , updateOutputEditor output
+            )
 
         GotFlowData result ->
             case result of
                 Ok ( _, flow ) ->
-                    let 
-                        cmd = case model.maskingView of 
-                            GraphView -> updateFlow flow 
-                            _ -> Cmd.none
-                    in 
+                    let
+                        cmd =
+                            case model.maskingView of
+                                GraphView ->
+                                    updateFlow flow
+
+                                _ ->
+                                    Cmd.none
+                    in
                     ( { model
                         | flow = flow
                       }
@@ -141,12 +130,16 @@ update message model =
             )
 
         ChangeMaskingView maskingView ->
-            let 
-              cmd = case maskingView of 
-                GraphView -> updateFlow model.flow 
-                _ -> Cmd.none
-            in 
-            ( { model | maskingView = maskingView },  cmd )
+            let
+                cmd =
+                    case maskingView of
+                        GraphView ->
+                            updateFlow model.flow
+
+                        _ ->
+                            Cmd.none
+            in
+            ( { model | maskingView = maskingView }, cmd )
 
         Error errorMessage ->
             ( { model | error = errorMessage }, Cmd.none )
@@ -183,7 +176,7 @@ view model =
                             , Attr.id "editor-json"
                             ]
                             []
-                                                     ]
+                         ]
                             ++ OutputPanel.view model.status
                         )
                     ]
@@ -219,7 +212,18 @@ subscriptions _ =
         [ maskingUpdater UpdateMasking
         , inputUpdater UpdateInput
         , maskingAndinputUpdater mapMaskingAndinputUpdater
+        , outputUpdater mapOutputUpdater
         ]
+
+
+mapOutputUpdater : JD.Value -> Msg
+mapOutputUpdater outputJson =
+    case JD.decodeValue JD.string outputJson of
+        Ok output ->
+            GotMaskedData output
+
+        Err errorMessage ->
+            Error (JD.errorToString errorMessage)
 
 
 mapMaskingAndinputUpdater : JD.Value -> Msg
@@ -257,14 +261,5 @@ flowRequestEncoder masking =
 maskRequest : Sandbox -> Cmd Msg
 maskRequest sandbox =
     Cmd.batch
-        [ Http.post
-            { url = "/play"
-            , body = Http.jsonBody <| maskRequestEncoder sandbox
-            , expect = Http.Detailed.expectString GotMaskedData
-            }
-        , Http.post
-            { url = "/flow"
-            , body = Http.jsonBody <| flowRequestEncoder sandbox.masking
-            , expect = Http.Detailed.expectString GotFlowData
-            }
+        [ pimoMask sandbox
         ]

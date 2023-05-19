@@ -1,6 +1,7 @@
 port module Ports exposing (..)
 
 import Json.Decode as JD
+import Play exposing (..)
 
 
 
@@ -52,3 +53,15 @@ port maskingAndinputUpdater : (JD.Value -> msg) -> Sub msg
 
 
 port updateFlow : String -> Cmd msg
+
+
+
+-- ---------------------------
+-- PORTS mask
+-- ---------------------------
+
+
+port pimoMask : Sandbox -> Cmd msg
+
+
+port outputUpdater : (JD.Value -> msg) -> Sub msg

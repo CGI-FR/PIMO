@@ -33,7 +33,7 @@ type alias Model =
     , error : String
     , status : Status
     , maskingView : MaskingView
-    , flow :  String
+    , flow : String
     }
 
 
@@ -55,7 +55,7 @@ type MaskingView
 
 
 type Msg
-    = GotMaskedData (Result (Http.Detailed.Error String) ( Http.Metadata, String ))
+    = GotMaskedData String
     | GotFlowData (Result (Http.Detailed.Error String) ( Http.Metadata, String ))
     | UpdateMasking String
     | UpdateInput String
