@@ -180,12 +180,7 @@ func run() {
 		pdef, err = model.LoadPipelineDefinitionFromFile(maskingFile)
 	}
 
-	switch {
-	case seedValue != -1:
-		pdef.Seed = seedValue
-	case seedValue == 0:
-		pdef.Seed = time.Now().UnixNano()
-	}
+	model.SetSeed(&pdef, seedValue)
 
 	if err != nil {
 		log.Err(err).Msg("Cannot load pipeline definition from file")
