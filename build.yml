@@ -226,18 +226,18 @@ targets:
       - $: sed -i 's~{{ version }}~={realtag}~g' internal/app/pimo/client/main.js
       - $: git checkout -- internal/app/pimo/client
 
-  # run "neon -props '{buildpaths: ["path/to/main/package1","path/to/main/package2"]}' compile" to compile specific targets
-  # example : neon -props '{buildpaths: ["cmd/cli"]}' compile
+  # run "neon -props '{wasmbuildpaths: ["path/to/main/package1","path/to/main/package2"]}' wasm" to compile specific targets
+  # example : neon -props '{wasmbuildpaths: ["wasm/play"]}' wasm
   wasm:
     doc: "Compile js lib wasm"
     depends: ["info", "refresh"]
     steps:
       - ldflags = ldflags + " -X main.version=" + tag + " -X main.commit=" + commit + " -X main.buildDate=" + date + " -X main.builtBy=" + by
-      - if: len(buildpaths) == 0
+      - if: len(wasmbuildpaths) == 0
         then:
-          - buildpaths = appendpath("wasm", find("wasm", "*"))
+          - wasmbuildpaths = appendpath("wasm", find("wasm", "*"))
       - for: path
-        in: buildpaths
+        in: wasmbuildpaths
         do:
           - print: Building ={path}
           - |
