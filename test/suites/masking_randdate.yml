@@ -82,6 +82,7 @@ testcases:
     - script: |-
         cat > masking.yml <<EOF
         version: "1"
+        seed: 1
         masking:
           - selector:
               jsonpath: "date"
@@ -96,5 +97,5 @@ testcases:
         echo -e '{"date":1}\n{"date":2}\n{"date":3}\n{"date":2}\n{"date":1}\n{"date":3}' | TZ="" pimo | head -c -1 | tr '\n' ' '
       assertions:
       - result.code ShouldEqual 0
-      - result.systemout ShouldEqual {"date":"1997-03-05T16:24:29Z"} {"date":"1997-02-10T20:31:21Z"} {"date":"1997-08-01T07:12:23Z"} {"date":"1997-02-10T20:31:21Z"} {"date":"1997-03-05T16:24:29Z"} {"date":"1997-08-01T07:12:23Z"}
+      - result.systemout ShouldEqual {"date":"1997-10-30T16:13:09Z"} {"date":"1997-09-15T01:31:05Z"} {"date":"1997-05-30T12:42:07Z"} {"date":"1997-09-15T01:31:05Z"} {"date":"1997-10-30T16:13:09Z"} {"date":"1997-05-30T12:42:07Z"}
       - result.systemerr ShouldBeEmpty
