@@ -181,7 +181,7 @@ func run(cmd *cobra.Command) {
 	}
 
 	if cmd.Flags().Changed("seed") {
-		model.SetSeed(&pdef, seedValue)
+		(&pdef).SetSeed(seedValue)
 	}
 
 	if err != nil {

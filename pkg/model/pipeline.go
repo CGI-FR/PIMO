@@ -203,7 +203,7 @@ func LoadPipelineDefinitionFromYAML(source []byte) (Definition, error) {
 	if err != nil {
 		return conf, err
 	}
-	SetSeed(&conf, conf.Seed)
+	(&conf).SetSeed(conf.Seed)
 	return conf, nil
 }
 
@@ -235,12 +235,12 @@ func LoadPipelineDefintionFromOneLiner(oneLine []string) (Definition, error) {
 
 		conf.Masking = append(conf.Masking, masking)
 	}
-	SetSeed(&conf, conf.Seed)
+	(&conf).SetSeed(conf.Seed)
 	return conf, nil
 }
 
 // setSeed compute seed from current nano second if seedValue is 0
-func SetSeed(conf *Definition, seedValue int64) {
+func (conf *Definition) SetSeed(seedValue int64) {
 	switch {
 	case seedValue > 0:
 		conf.Seed = seedValue
