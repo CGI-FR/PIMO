@@ -83,7 +83,7 @@ License GPLv3: GNU GPL version 3 <https://gnu.org/licenses/gpl.html>.
 This is free software: you are free to change and redistribute it.
 There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDate, builtBy),
 		Run: func(cmd *cobra.Command, args []string) {
-			run()
+			run(cmd)
 		},
 	}
 
@@ -98,7 +98,7 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 	rootCmd.PersistentFlags().StringToStringVar(&cachesToLoad, "load-cache", map[string]string{}, "path for loading cache from file")
 	rootCmd.PersistentFlags().BoolVar(&skipLineOnError, "skip-line-on-error", false, "skip a line if an error occurs while masking a field")
 	rootCmd.PersistentFlags().BoolVar(&skipFieldOnError, "skip-field-on-error", false, "remove a field if an error occurs while masking this field")
-	rootCmd.Flags().Int64VarP(&seedValue, "seed", "s", -1, "set seed")
+	rootCmd.Flags().Int64VarP(&seedValue, "seed", "s", 0, "set seed")
 	rootCmd.PersistentFlags().StringArrayVarP(&maskingOneLiner, "mask", "m", []string{}, "one liner masking")
 	rootCmd.PersistentFlags().StringVar(&repeatUntil, "repeat-until", "", "mask each input repeatedly until the given condition is met")
 	rootCmd.PersistentFlags().StringVar(&repeatWhile, "repeat-while", "", "mask each input repeatedly while the given condition is met")
@@ -158,7 +158,7 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 	}
 }
 
-func run() {
+func run(cmd *cobra.Command) {
 	initLog()
 
 	config := pimo.Config{
@@ -180,7 +180,9 @@ func run() {
 		pdef, err = model.LoadPipelineDefinitionFromFile(maskingFile)
 	}
 
-	model.SetSeed(&pdef, seedValue)
+	if cmd.Flags().Changed("seed") {
+		model.SetSeed(&pdef, seedValue)
+	}
 
 	if err != nil {
 		log.Err(err).Msg("Cannot load pipeline definition from file")
