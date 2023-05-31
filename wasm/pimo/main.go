@@ -60,7 +60,9 @@ func play(yaml string, data string) (result interface{}, err error) {
 func main() {
 	c := make(chan bool)
 
-	js.Global().Set("pimo", js.FuncOf(func(this js.Value, inputs []js.Value) interface{} {
+	pimo := map[string]interface{}{}
+
+	pimo["play"] = js.FuncOf(func(this js.Value, inputs []js.Value) interface{} {
 		yaml := fmt.Sprintf("%v", inputs[0]) // masking
 		data := fmt.Sprintf("%v", inputs[1]) // data
 		handler := js.FuncOf(func(this js.Value, args []js.Value) interface{} {
@@ -84,6 +86,8 @@ func main() {
 
 		promiseConstructor := js.Global().Get("Promise")
 		return promiseConstructor.New(handler)
-	}))
+	})
+
+	js.Global().Set("pimo", pimo)
 	<-c // sleep for ever
 }
