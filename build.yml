@@ -39,6 +39,7 @@ properties:
   latest: false # Do not tag the Docker image with latest, specify othewise with `-props "{latest: true}"`
   ldflags: "" # Specify a additional ldflags with `-props "{ldflags: '<flags>'}"`
   buildpaths: [] # By default, all paths under the cmd/ folder are built, specify a different folder list with `-props "{buildpaths: ["other/path", "to/build"]}"`
+  wasmbuildpaths: [] # for wasm lib js buildpaths
 
   # List of linters to run on the lint target, if left empty : run all linters
   linters: [
