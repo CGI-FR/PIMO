@@ -58,8 +58,6 @@ func play(yaml string, data string) (result interface{}, err error) {
 }
 
 func main() {
-	c := make(chan bool)
-
 	pimo := map[string]interface{}{}
 
 	pimo["play"] = js.FuncOf(func(this js.Value, inputs []js.Value) interface{} {
@@ -88,6 +86,8 @@ func main() {
 		return promiseConstructor.New(handler)
 	})
 
+	// Expose pimo object
 	js.Global().Set("pimo", pimo)
-	<-c // sleep for ever
+
+	select {} // sleep forever
 }
