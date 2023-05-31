@@ -34,7 +34,9 @@ WebAssembly.instantiateStreaming(fetch("pimo.wasm"), go.importObject).then(async
    */
 
   pimo.play(lastSandbox.masking, lastSandbox.input).then(app.ports.outputUpdater.send).catch(app.ports.outputUpdater.send);
+  pimo.flow(lastSandbox.masking).then(app.ports.flowUpdater.send).catch(app.ports.flowUpdater.send);
   app.ports.pimoMask.subscribe((sandbox) => {
+    pimo.flow(sandbox.masking).then(app.ports.flowUpdater.send).catch(app.ports.flowUpdater.send);
     pimo.play(sandbox.masking, sandbox.input).then(app.ports.outputUpdater.send).catch(app.ports.outputUpdater.send);
   });
   inst = await WebAssembly.instantiate(mod, go.importObject); // reset instance

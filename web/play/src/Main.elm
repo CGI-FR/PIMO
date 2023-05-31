@@ -7,7 +7,6 @@ import Examples
 import Header exposing (view)
 import Html.Styled as Html exposing (..)
 import Html.Styled.Attributes as Attr exposing (..)
-import Http
 import Http.Detailed
 import Json.Decode as JD
 import Json.Encode as JE
@@ -86,35 +85,23 @@ update message model =
             , updateOutputEditor output
             )
 
-        GotFlowData result ->
-            case result of
-                Ok ( _, flow ) ->
-                    let
-                        cmd =
-                            case model.maskingView of
-                                GraphView ->
-                                    updateFlow flow
+        GotFlowData flow ->
+            let
+                cmd =
+                    case model.maskingView of
+                        GraphView ->
+                            updateFlow flow
 
-                                _ ->
-                                    Cmd.none
-                    in
-                    ( { model
-                        | flow = flow
-                      }
-                    , cmd
-                    )
-
-                Err error ->
-                    let
-                        errorMessage =
-                            case error of
-                                Http.Detailed.BadStatus _ body ->
-                                    body
-
-                                _ ->
-                                    "Server Error"
-                    in
-                    ( { model | error = errorMessage, status = Failure }, Cmd.none )
+                        _ ->
+                            Cmd.none
+            in
+            ( { model
+                | flow = flow
+                , status = Success
+                , error = ""
+              }
+            , cmd
+            )
 
         UpdateMaskingAndInput sandbox ->
             let
@@ -213,7 +200,18 @@ subscriptions _ =
         , inputUpdater UpdateInput
         , maskingAndinputUpdater mapMaskingAndinputUpdater
         , outputUpdater mapOutputUpdater
+        , flowUpdater mapFlowUpdater
         ]
+
+
+mapFlowUpdater : JD.Value -> Msg
+mapFlowUpdater flow =
+    case JD.decodeValue JD.string flow of
+        Ok data ->
+            GotFlowData data
+
+        Err errorMessage ->
+            Error (JD.errorToString errorMessage)
 
 
 mapOutputUpdater : JD.Value -> Msg

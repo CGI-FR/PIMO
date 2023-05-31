@@ -55,6 +55,9 @@ port maskingAndinputUpdater : (JD.Value -> msg) -> Sub msg
 port updateFlow : String -> Cmd msg
 
 
+port flowUpdater : (JD.Value -> msg) -> Sub msg
+
+
 
 -- ---------------------------
 -- PORTS mask

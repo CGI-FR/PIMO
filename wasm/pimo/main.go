@@ -9,6 +9,7 @@ import (
 	"syscall/js"
 
 	"github.com/cgi-fr/pimo/internal/app/pimo"
+	"github.com/cgi-fr/pimo/pkg/flow"
 	"github.com/cgi-fr/pimo/pkg/jsonline"
 	"github.com/cgi-fr/pimo/pkg/model"
 	"github.com/rs/zerolog/log"
@@ -60,6 +61,10 @@ func play(yaml string, data string) (result interface{}, err error) {
 func main() {
 	pimo := map[string]interface{}{}
 
+	// JS Constructor
+	errorConstructor := js.Global().Get("Error")
+	promiseConstructor := js.Global().Get("Promise")
+
 	pimo["play"] = js.FuncOf(func(this js.Value, inputs []js.Value) interface{} {
 		yaml := fmt.Sprintf("%v", inputs[0]) // masking
 		data := fmt.Sprintf("%v", inputs[1]) // data
@@ -71,7 +76,6 @@ func main() {
 				data, err := play(yaml, data)
 				if err != nil {
 					// err should be an instance of `error`, eg `errors.New("some error")`
-					errorConstructor := js.Global().Get("Error")
 					errorObject := errorConstructor.New(err.Error())
 					reject.Invoke(errorObject)
 				} else {
@@ -82,7 +86,37 @@ func main() {
 			return nil
 		})
 
-		promiseConstructor := js.Global().Get("Promise")
+		return promiseConstructor.New(handler)
+	})
+
+	pimo["flow"] = js.FuncOf(func(this js.Value, inputs []js.Value) interface{} {
+		yaml := fmt.Sprintf("%v", inputs[0]) // masking
+		handler := js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+			resolve := args[0]
+			reject := args[1]
+
+			go func() {
+				pdef, err := model.LoadPipelineDefinitionFromYAML([]byte(yaml))
+				if err != nil {
+					log.Err(err).Msg("Cannot load pipeline definition")
+					errorObject := errorConstructor.New(err.Error())
+					reject.Invoke(errorObject)
+					return
+				}
+
+				data, err := flow.Export(pdef)
+				if err != nil {
+					// err should be an instance of `error`, eg `errors.New("some error")`
+					errorObject := errorConstructor.New(err.Error())
+					reject.Invoke(errorObject)
+				} else {
+					resolve.Invoke(js.ValueOf(data))
+				}
+			}()
+
+			return nil
+		})
+
 		return promiseConstructor.New(handler)
 	})
 
