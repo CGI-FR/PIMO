@@ -5,6 +5,7 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"strings"
 	"syscall/js"
 
@@ -59,6 +60,9 @@ func play(yaml string, data string) (result interface{}, err error) {
 }
 
 func main() {
+	// Environement variable for FF1 encryption
+	os.Setenv("FF1_ENCRYPTION_KEY", "LW4gInNlY3JldDEyc2VjcmV0MTIiIA0K")
+
 	pimo := map[string]interface{}{}
 
 	// JS Constructor
