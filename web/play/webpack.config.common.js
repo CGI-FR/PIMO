@@ -1,9 +1,6 @@
 import HtmlWebPackPlugin from 'html-webpack-plugin';
 import MonacoWebpackPlugin from 'monaco-editor-webpack-plugin';
-import AddAssetHtmlPlugin from 'add-asset-html-webpack-plugin';
-import CopyWebpackPlugin from 'copy-webpack-plugin';
 
-import path from 'path';
 
 export default (isProd) => {
     return {
@@ -33,6 +30,12 @@ export default (isProd) => {
                 },
             ],
         },
+        devServer: {
+            proxy: {
+                '/play': 'http://localhost:3010',
+                '/flow': 'http://localhost:3010',
+            },
+        },
         watchOptions: {
             ignored: /node_modules/,
             aggregateTimeout: 200,
@@ -52,19 +55,6 @@ export default (isProd) => {
                         },
                     },
                 ],
-            }),
-            new CopyWebpackPlugin({
-                patterns: [
-                    {
-                        from: '../../bin/pimo.wasm',
-                        to: path.join('pimo.wasm')
-                    }
-                ]
-            }),
-            new AddAssetHtmlPlugin({
-                publicPath: ``,
-                outputPath: ``,
-                filepath: path.join('src', `wasm_exec.js`),
             })
         ],
     }

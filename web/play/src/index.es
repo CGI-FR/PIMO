@@ -10,39 +10,109 @@ var app = Elm.Main.init({ flags: "{{ version }}" });
 
 let lastSandbox;
 
-if (!WebAssembly.instantiateStreaming) {
-  // polyfill
-  WebAssembly.instantiateStreaming = async (resp, importObject) => {
-    const source = await (await resp).arrayBuffer();
-    return await WebAssembly.instantiate(source, importObject);
-  };
+if (typeof Go !== "undefined") {
+  initWasm();
+} else {
+  initBackend();
 }
 
-const go = new Go();
+function initWasm() {
+  if (!WebAssembly.instantiateStreaming) {
+    // polyfill
+    WebAssembly.instantiateStreaming = async (resp, importObject) => {
+      const source = await (await resp).arrayBuffer();
+      return await WebAssembly.instantiate(source, importObject);
+    };
+  }
 
-let mod, inst;
+  const go = new Go();
 
-WebAssembly.instantiateStreaming(fetch("pimo.wasm"), go.importObject).then(async (result) => {
-  mod = result.module;
-  inst = result.instance;
-  console.log("start go");
+  let mod, inst;
 
-  go.run(inst);
+  WebAssembly.instantiateStreaming(fetch("pimo.wasm"), go.importObject).then(async (result) => {
+    mod = result.module;
+    inst = result.instance;
+    console.log("start go");
 
+    go.run(inst);
+
+    /**
+     * Pimo mask
+     */
+
+    pimo
+      .play(lastSandbox.masking, lastSandbox.input)
+      .then(app.ports.outputUpdater.send)
+      .catch((err) => {
+        app.ports.errorUpdater.send(String(err));
+      });
+    pimo
+      .flow(lastSandbox.masking)
+      .then(app.ports.flowUpdater.send)
+      .catch((err) => {
+        app.ports.errorUpdater.send(String(err));
+      });
+    app.ports.pimoMask.subscribe((sandbox) => {
+      pimo
+        .flow(sandbox.masking)
+        .then(app.ports.flowUpdater.send)
+        .catch((err) => {
+          app.ports.errorUpdater.send(String(err));
+        });
+      pimo
+        .play(sandbox.masking, sandbox.input)
+        .then(app.ports.outputUpdater.send)
+        .catch((err) => {
+          app.ports.errorUpdater.send(String(err));
+        });
+    });
+    inst = await WebAssembly.instantiate(mod, go.importObject); // reset instance
+  });
+
+  // Save the sandbox
+  app.ports.pimoMask.subscribe((sandbox) => (lastSandbox = sandbox));
+}
+
+function initBackend() {
   /**
    * Pimo mask
    */
 
-  pimo.play(lastSandbox.masking, lastSandbox.input).then(app.ports.outputUpdater.send).catch((err) => { app.ports.errorUpdater.send(String(err));});
-  pimo.flow(lastSandbox.masking).then(app.ports.flowUpdater.send).catch((err) => {  app.ports.errorUpdater.send(String(err));});
   app.ports.pimoMask.subscribe((sandbox) => {
-    pimo.flow(sandbox.masking).then(app.ports.flowUpdater.send).catch((err) => { console.log(err); app.ports.errorUpdater.send(String(err));});
-    pimo.play(sandbox.masking, sandbox.input).then(app.ports.outputUpdater.send).catch((err) => { console.log(err); app.ports.errorUpdater.send(String(err));});
-  });
-  inst = await WebAssembly.instantiate(mod, go.importObject); // reset instance
-});
+    sandbox["data"] = sandbox["input"];
+    delete sandbox["input"];
 
-app.ports.pimoMask.subscribe((sandbox) => (lastSandbox = sandbox));
+    // masking data
+    fetch("/play", {
+      method: "POST",
+      body: JSON.stringify(sandbox),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((response) => response.text())
+      .then(app.ports.outputUpdater.send)
+      .catch((err) => {
+        console.log(err);
+        app.ports.errorUpdater.send(String(err));
+      });
+
+    // flow chart
+    fetch("/flow", {
+      method: "POST",
+      body: JSON.stringify(sandbox),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((response) => response.text())
+      .then(app.ports.flowUpdater.send)
+      .catch((err) => {
+        console.log(err);
+        app.ports.errorUpdater.send(String(err));
+      });
+  });
+}
 
 // The uri is used for the schema file match.
 const modelUri = Uri.parse("file://masking.yml");
