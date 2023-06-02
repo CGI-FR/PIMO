@@ -129,7 +129,12 @@ update message model =
             ( { model | maskingView = maskingView }, cmd )
 
         Error errorMessage ->
-            ( { model | error = errorMessage }, Cmd.none )
+            (
+                { model
+                | error = errorMessage
+                ,  status = Success
+                }
+            , Cmd.none )
 
 
 
@@ -201,6 +206,7 @@ subscriptions _ =
         , maskingAndinputUpdater mapMaskingAndinputUpdater
         , outputUpdater mapOutputUpdater
         , flowUpdater mapFlowUpdater
+        , errorUpdater mapErrorUpdater
         ]
 
 
@@ -223,6 +229,16 @@ mapOutputUpdater outputJson =
         Err errorMessage ->
             Error (JD.errorToString errorMessage)
 
+
+
+mapErrorUpdater : JD.Value -> Msg
+mapErrorUpdater errorJson =
+    case JD.decodeValue JD.string errorJson of
+        Ok error ->
+            Error error
+
+        Err errorMessage ->
+            Error (JD.errorToString errorMessage)
 
 mapMaskingAndinputUpdater : JD.Value -> Msg
 mapMaskingAndinputUpdater sandboxJson =

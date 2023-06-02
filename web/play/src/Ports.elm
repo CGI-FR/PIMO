@@ -68,3 +68,9 @@ port pimoMask : Sandbox -> Cmd msg
 
 
 port outputUpdater : (JD.Value -> msg) -> Sub msg
+
+-- ---------------------------
+-- PORTS error
+-- ---------------------------
+
+port errorUpdater : (JD.Value -> msg) -> Sub msg
