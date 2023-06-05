@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1684221273443,
+  "lastUpdate": 1685968689564,
   "repoUrl": "https://github.com/CGI-FR/PIMO",
   "entries": {
     "Benchmark": [
@@ -3018,6 +3018,42 @@ window.BENCHMARK_DATA = {
             "value": 2231000,
             "unit": "ns/op\t  681563 B/op\t    5893 allocs/op",
             "extra": "4684 times\n2 procs"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "youen.peron@cgi.com",
+            "name": "Youen Péron",
+            "username": "youen"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "c78eef30a78a17f65d7cafff60f030db8bb08f2d",
+          "message": "refactor: remove duplicate code seed from clock (#228)\n\n* refactor: remove duplicate code seef from clock\r\n\r\n* fix: allow -1 value for --seed flag\r\n\r\n* fix(seeder): use global seed and local\r\n\r\n* refactor(seed): SetSeed attach to the configuration Definition struct\r\n\r\n* chore(neon): add wasmpathdeclaration",
+          "timestamp": "2023-06-05T14:30:13+02:00",
+          "tree_id": "26f6b9a777f72d1e2eb57060096911b4f2e4e5ea",
+          "url": "https://github.com/CGI-FR/PIMO/commit/c78eef30a78a17f65d7cafff60f030db8bb08f2d"
+        },
+        "date": 1685968688877,
+        "tool": "go",
+        "benches": [
+          {
+            "name": "BenchmarkPimoRun",
+            "value": 31056,
+            "unit": "ns/op\t   16509 B/op\t     168 allocs/op",
+            "extra": "358320 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge",
+            "value": 2214930,
+            "unit": "ns/op\t  681895 B/op\t    5892 allocs/op",
+            "extra": "5067 times\n2 procs"
           }
         ]
       }
