@@ -62,3 +62,24 @@ testcases:
           - result.code ShouldEqual 0
           - result.systemoutjson.name ShouldNotBeEmpty
           - result.systemerr ShouldBeEmpty
+
+  - name: with seed -1
+    steps:
+      - script: rm -f masking.yml
+      - script: |-
+          cat > masking.yml <<EOF
+          version: "1"
+          seed: 42
+          masking:
+            - selector:
+                jsonpath: "name"
+              masks:
+                - add: ""
+                - randomChoiceInUri: "pimo://nameFR"
+          EOF
+      - script: |-
+          pimo --empty-input -s -1 -c masking.yml
+        assertions:
+          - result.code ShouldEqual 0
+          - result.systemoutjson.name ShouldEqual Rolande
+          - result.systemerr ShouldBeEmpty

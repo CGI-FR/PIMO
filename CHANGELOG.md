@@ -14,6 +14,11 @@ Types of changes
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [1.17.1]
+
+- `Fixed` `Seed` option on randomized mask use global configured `seed` and the hash of the value
+- `Fixed` `--seed` flag allow the `-1` value
+
 ## [1.17.0]
 
 - `Added` Environment variable `PIMO_STATS_TEMPLATE` to control the format of generated stats

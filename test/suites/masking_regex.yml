@@ -74,6 +74,7 @@ testcases:
   - script: |-
       cat > masking.yml <<EOF
       version: "1"
+      seed: 1
       masking:
         - selector:
             jsonpath: "name"
@@ -86,5 +87,5 @@ testcases:
       echo -e '{"name":1}\n{"name":2}\n{"name":3}\n{"name":2}\n{"name":1}\n{"name":3}' | pimo | head -c -1 | tr '\n' ' '
     assertions:
     - result.code ShouldEqual 0
-    - result.systemout ShouldEqual {"name":"dirov"} {"name":"proud"} {"name":"weubj"} {"name":"proud"} {"name":"dirov"} {"name":"weubj"}
+    - result.systemout ShouldEqual {"name":"rvktt"} {"name":"bjrxd"} {"name":"qlofi"} {"name":"bjrxd"} {"name":"rvktt"} {"name":"qlofi"}
     - result.systemerr ShouldBeEmpty

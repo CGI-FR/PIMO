@@ -87,6 +87,7 @@ testcases:
   - script: |-
       cat > masking.yml <<EOF
       version: "1"
+      seed: 1
       masking:
         - selector:
             jsonpath: "amount"
@@ -102,5 +103,5 @@ testcases:
       echo -e '{"amount":1}\n{"amount":2}\n{"amount":3}\n{"amount":2}\n{"amount":1}\n{"amount":3}' | pimo | head -c -1 | tr '\n' ' '
     assertions:
     - result.code ShouldEqual 0
-    - result.systemout ShouldEqual {"amount":1.306} {"amount":5.474} {"amount":4.137} {"amount":5.474} {"amount":1.306} {"amount":4.137}
+    - result.systemout ShouldEqual {"amount":6.926} {"amount":2.042} {"amount":0.512} {"amount":2.042} {"amount":6.926} {"amount":0.512}
     - result.systemerr ShouldBeEmpty
