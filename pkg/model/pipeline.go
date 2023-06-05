@@ -203,9 +203,7 @@ func LoadPipelineDefinitionFromYAML(source []byte) (Definition, error) {
 	if err != nil {
 		return conf, err
 	}
-	if conf.Seed == 0 {
-		conf.Seed = time.Now().UnixNano()
-	}
+	(&conf).SetSeed(conf.Seed)
 	return conf, nil
 }
 
@@ -237,8 +235,16 @@ func LoadPipelineDefintionFromOneLiner(oneLine []string) (Definition, error) {
 
 		conf.Masking = append(conf.Masking, masking)
 	}
-	if conf.Seed == 0 {
+	(&conf).SetSeed(conf.Seed)
+	return conf, nil
+}
+
+// setSeed compute seed from current nano second if seedValue is 0
+func (conf *Definition) SetSeed(seedValue int64) {
+	switch {
+	case seedValue > 0:
+		conf.Seed = seedValue
+	case seedValue == 0:
 		conf.Seed = time.Now().UnixNano()
 	}
-	return conf, nil
 }

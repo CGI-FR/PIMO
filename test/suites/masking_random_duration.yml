@@ -83,6 +83,7 @@ testcases:
   - script: |-
       cat > masking.yml <<EOF
       version: "1"
+      seed: 1
       masking:
         - selector:
             jsonpath: "date"
@@ -101,5 +102,5 @@ testcases:
       echo -e '{"index": 1, "date": "2020-01-01T00:00:00Z"}\n{"index": 2, "date": "2020-01-01T00:00:00Z"}\n{"index": 1, "date": "2020-01-01T00:00:00Z"}\n{"index": 2, "date": "2020-01-01T00:00:00Z"}' | pimo | head -c -1 | tr '\n' ' '
     assertions:
       - result.code ShouldEqual 0
-      - result.systemout ShouldEqual {"date":"2019-12-12T06:25:48.144603331Z"} {"date":"2019-12-22T18:10:35.317788519Z"} {"date":"2019-12-12T06:25:48.144603331Z"} {"date":"2019-12-22T18:10:35.317788519Z"}
+      - result.systemout ShouldEqual {"date":"2019-12-29T22:49:04.208101611Z"} {"date":"2019-12-25T10:44:05.019037735Z"} {"date":"2019-12-29T22:49:04.208101611Z"} {"date":"2019-12-25T10:44:05.019037735Z"}
       - result.systemerr ShouldBeEmpty
