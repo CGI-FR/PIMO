@@ -195,6 +195,8 @@ Please check the [demo folder](demo) for more advanced examples.
 
 ### Regex
 
+[![Try it](https://img.shields.io/badge/-Try%20it%20in%20PIMO%20Play-brightgreen)](https://cgi-fr.github.io/pimo-play/#c=G4UwTgzglg9gdgLgAQCICMKBQBbAhhAayjgHMFMkkBaJCEAGxAGMAXGMcyrpAKwngAOuFgAtkKASPggs3PIU7ckYECRAAPcQAYA2mioB2ALoAKJCZ1aqATiMBKAN4AmAL6OALC5RA&i=N4KABGBEAOAWD2A7AppAXFADARjJgTHgMx4AseArJCAL5A)
+
 ```yaml
   - selector:
       jsonpath: "phone"
