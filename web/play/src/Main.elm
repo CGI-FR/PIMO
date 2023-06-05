@@ -1,10 +1,12 @@
 module Main exposing (init, main, update, view)
 
 import Browser
+import Browser.Events exposing (onClick)
 import Css.Global
 import Error
 import Examples
 import Header exposing (view)
+import Dropdown exposing (view)
 import Html.Styled as Html exposing (..)
 import Html.Styled.Attributes as Attr exposing (..)
 import Http
@@ -29,6 +31,7 @@ init version =
       , status = Loading
       , maskingView = YamlView
       , flow = ""
+      , dropdownView = Close
       }
     , Cmd.none
     )
@@ -104,11 +107,11 @@ update message model =
         GotFlowData result ->
             case result of
                 Ok ( _, flow ) ->
-                    let 
-                        cmd = case model.maskingView of 
-                            GraphView -> updateFlow flow 
+                    let
+                        cmd = case model.maskingView of
+                            GraphView -> updateFlow flow
                             _ -> Cmd.none
-                    in 
+                    in
                     ( { model
                         | flow = flow
                       }
@@ -141,15 +144,18 @@ update message model =
             )
 
         ChangeMaskingView maskingView ->
-            let 
-              cmd = case maskingView of 
-                GraphView -> updateFlow model.flow 
+            let
+              cmd = case maskingView of
+                GraphView -> updateFlow model.flow
                 _ -> Cmd.none
-            in 
+            in
             ( { model | maskingView = maskingView },  cmd )
 
         Error errorMessage ->
             ( { model | error = errorMessage }, Cmd.none )
+
+        ChangeDropdownView dropdownView ->
+            ( { model | dropdownView = dropdownView }, Cmd.none )
 
 
 
@@ -165,6 +171,7 @@ view model =
             []
             [ Css.Global.global Tw.globalStyles
             , Header.view model.version
+            , Dropdown.view model.dropdownView
             , div
                 [ Attr.css [ Tw.px_4, Breakpoints.lg [ Tw.px_16 ], Breakpoints.md [ Tw.px_8 ] ] ]
                 [ div
@@ -219,6 +226,7 @@ subscriptions _ =
         [ maskingUpdater UpdateMasking
         , inputUpdater UpdateInput
         , maskingAndinputUpdater mapMaskingAndinputUpdater
+        , onClick (JD.succeed (ChangeDropdownView Close))
         ]
 
 

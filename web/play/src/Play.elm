@@ -25,7 +25,6 @@ masking:
 }"""
     }
 
-
 type alias Model =
     { version : String
     , sandbox : Sandbox
@@ -34,6 +33,7 @@ type alias Model =
     , status : Status
     , maskingView : MaskingView
     , flow :  String
+    , dropdownView : DropdownView
     }
 
 
@@ -54,6 +54,11 @@ type MaskingView
     | GraphView
 
 
+type DropdownView
+    = Open
+    | Close
+
+
 type Msg
     = GotMaskedData (Result (Http.Detailed.Error String) ( Http.Metadata, String ))
     | GotFlowData (Result (Http.Detailed.Error String) ( Http.Metadata, String ))
@@ -63,6 +68,7 @@ type Msg
     | Refresh
     | Error String
     | ChangeMaskingView MaskingView
+    | ChangeDropdownView DropdownView
 
 
 asMaskingIn : Sandbox -> String -> Sandbox
