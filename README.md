@@ -210,6 +210,8 @@ This example will mask the `phone` field of the input jsonlines with a random st
 
 ### Constant
 
+[![Try it](https://img.shields.io/badge/-Try%20it%20in%20PIMO%20Play-brightgreen)](https://cgi-fr.github.io/pimo-play/#c=G4UwTgzglg9gdgLgAQCICMKBQBbAhhAayjgHMFMkkBaJCEAGxAGMAXGMcyrpAKwngAOuFgAtkKOLmwgs3PIU7ckTeBBa44LcQCEo9eiiA&i=N4KABGBEB2CGC2BTSAuKApA9gC2pEAvkA)
+
 ```yaml
   - selector:
       jsonpath: "name"
