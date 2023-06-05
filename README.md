@@ -225,6 +225,8 @@ This example will mask the `name` field of the input jsonlines with the value of
 
 ### RandomChoice
 
+[![Try it](https://img.shields.io/badge/-Try%20it%20in%20PIMO%20Play-brightgreen)](https://cgi-fr.github.io/pimo-play/#c=G4UwTgzglg9gdgLgAQCICMKBQBbAhhAayjgHMFMkkBaJCEAGxAGMAXGMcyrpAKwngAOuFgAtkKOLmwgs3PIU7ckYXHAAmMbAGERMKExCKlNFAFl9BXA1lLqqU8JFQQAVxvH7uMAfqMUQA&i=N4KABGBEB2CGC2BTSAuKAhAlgG25EAvkA)
+
 ```yaml
   - selector:
       jsonpath: "name"
@@ -241,6 +243,8 @@ This example will mask the `name` field of the input jsonlines with random value
 
 ### RandomChoiceInUri
 
+[![Try it](https://img.shields.io/badge/-Try%20it%20in%20PIMO%20Play-brightgreen)](https://cgi-fr.github.io/pimo-play/#c=G4UwTgzglg9gdgLgAQCICMKBQBbAhhAayjgHMFMkkBaJCEAGxAGMAXGMcyrpAKwngAOuFgAtkKOLmwgs3PIU7ckYXHAAmMbAGERMKExABJOAFUwUcQKjYYCAPR3J0gKIA5FEA&i=N4KABGBEB2CGC2BTSAuKAhAlgG25EAvkA)
+
 ```yaml
   - selector:
       jsonpath: "name"
@@ -256,6 +260,8 @@ A value can be injected in URI with the template syntax. For example, `file://na
 
 ### RandomInt
 
+[![Try it](https://img.shields.io/badge/-Try%20it%20in%20PIMO%20Play-brightgreen)](https://cgi-fr.github.io/pimo-play/#c=G4UwTgzglg9gdgLgAQCICMKBQBbAhhAayjgHMFMkkBaJCEAGxAGMAXGMcyrpAKwngAOuFgAtkKXCRBZueQp25IwuOABMY2AJJwWCxUmzFkAJgCsFfQdwAPZAGZjQA&i=N4KABGBECGDmCmkBcYAsAGEBfIA)
+
 ```yaml
   - selector:
       jsonpath: "age"
@@ -270,6 +276,8 @@ This example will mask the `age` field of the input jsonlines with a random numb
 [Return to list of masks](#possible-masks)
 
 ### RandomDecimal
+
+[![Try it](https://img.shields.io/badge/-Try%20it%20in%20PIMO%20Play-brightgreen)](https://cgi-fr.github.io/pimo-play/#c=G4UwTgzglg9gdgLgAQCICMKBQBbAhhAayjgHMFMkkBaJCEAGxAGMAXGMcyrpAKwngAOuFgAtkKCE3Ygs3PIU7ckYXHAAmMbABFmUPPUVKk2YsgAMFI8dwAPZGgDsAOgBMAZktGBYXdHjIXIA&i=N4KABGBEDODGD2AnAppAXGADAOkyAvkA)
 
 ```yaml
   - selector:
