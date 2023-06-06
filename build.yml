@@ -21,7 +21,7 @@ configuration: ["~/.dockerhub.yml", "~/.github.yml"] # DO NOT COMMIT THESE FILES
 # ~/.dockerhub.yml should contains:
 # DOCKERHUB_USER: <your dockerhub user>
 # DOCKERHUB_PASS: <your dockerhub password or a dockerhub token>
-# ~/.github.yml should contains:
+# ~/.github.yml should contains:PIMO_PLAY_GIT_URL
 # GITHUB_TOKEN: <your github token>
 
 properties:
@@ -33,6 +33,7 @@ properties:
   BUILD_DIR: "bin" # Subfolder where the build will output, should be ignored by .gitignore
   TEST_WS_DIR: "test/workspace" # Workspace for integration tests
   DOCKERHUB_ORGANIZATION: "cgifr"
+  PIMO_PLAY_GIT_URL: "git@github.com:CGI-FR/pimo-play.git"
 
   # Build parameters (use the -props flag or change these default values)
   tag: "" # Default to the current branch or tag, can be overriden
@@ -217,7 +218,7 @@ targets:
 
   build-web:
     doc: "Build website and copy it to play.go path"
-    depends: ["info", "wasm"]
+    depends: ["info"]
     steps:
       - $: cd web/play && yarn install && yarn tailwind-elm && yarn build
       - $: touch web/play/node_modules/go.mod
@@ -226,6 +227,14 @@ targets:
       - $: sed -i 's~{{ version }}~={realtag}~g' internal/app/pimo/client/index.html
       - $: sed -i 's~{{ version }}~={realtag}~g' internal/app/pimo/client/main.js
       - $: git checkout -- internal/app/pimo/client
+
+  build-web-wasm:
+    doc: "Build website with wasm"
+    depends: ["info", "wasm"]
+    steps:
+      - $: rm -rf web/play/dist/
+      - $: cd web/play && yarn install && yarn tailwind-elm && yarn wasm
+      - $: sed -i 's~{{ version }}~={realtag}~g' web/play/dist/main.js
 
   # run "neon -props '{wasmbuildpaths: ["path/to/main/package1","path/to/main/package2"]}' wasm" to compile specific targets
   # example : neon -props '{wasmbuildpaths: ["wasm/play"]}' wasm
@@ -304,7 +313,7 @@ targets:
   # ex: neon -props '{testsuites: "mask_add_transient.yml"}' test-int
   test-int:
     doc: "Run all integration tests"
-    depends: ["info", "refresh", "lint", "test", "bench", "release"]
+    depends: ["info", "refresh", "lint", "test", "bench", "release", "build-web-wasm"]
     steps:
       - delete: venom*.log
       - delete: ={TEST_WS_DIR}/**

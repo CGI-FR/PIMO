@@ -50,6 +50,15 @@ jobs:
             -w /workspace \
             -e PATH=/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/go/bin:/home/vscode/go/bin:/workspace/bin \
             vscode \
-            neon -props "{tag: ${CI_ACTION_REF_NAME}, MODULE: github.com/${CI_REPOSITORY,,}, BY: ${CI_ACTOR}, dockerfiles: {'Dockerfile': '.'}, latest: true}" publish docker-push
+            neon -props "{tag: ${CI_ACTION_REF_NAME}, MODULE: github.com/${CI_REPOSITORY,,}, BY: ${CI_ACTOR}, dockerfiles: {'Dockerfile': '.'}, latest: true}" publish docker-push build-web-wasm
       - name: Test version
         run: docker-compose -f .devcontainer/docker-compose.yml exec -T -u root vscode /workspace/bin/dist/cmd/pimo_linux_amd64_v1/pimo --version
+      - name: Push pimo play to  github pages repository
+        uses: cpina/github-action-push-to-another-repository@v1.7.2
+        env:
+          SSH_DEPLOY_KEY: ${{ secrets.SSH_DEPLOY_KEY }}
+        with:
+          source-directory: 'web/play/dist'
+          destination-github-username: 'CGI-FR'
+          destination-repository-name: 'pimo-play'
+          target-branch: main
