@@ -21,7 +21,7 @@ configuration: ["~/.dockerhub.yml", "~/.github.yml"] # DO NOT COMMIT THESE FILES
 # ~/.dockerhub.yml should contains:
 # DOCKERHUB_USER: <your dockerhub user>
 # DOCKERHUB_PASS: <your dockerhub password or a dockerhub token>
-# ~/.github.yml should contains:PIMO_PLAY_GIT_URL
+# ~/.github.yml should contains:
 # GITHUB_TOKEN: <your github token>
 
 properties:
@@ -33,7 +33,6 @@ properties:
   BUILD_DIR: "bin" # Subfolder where the build will output, should be ignored by .gitignore
   TEST_WS_DIR: "test/workspace" # Workspace for integration tests
   DOCKERHUB_ORGANIZATION: "cgifr"
-  PIMO_PLAY_GIT_URL: "git@github.com:CGI-FR/pimo-play.git"
 
   # Build parameters (use the -props flag or change these default values)
   tag: "" # Default to the current branch or tag, can be overriden
