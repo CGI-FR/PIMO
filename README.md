@@ -195,6 +195,8 @@ Please check the [demo folder](demo) for more advanced examples.
 
 ### Regex
 
+[![Try it](https://img.shields.io/badge/-Try%20it%20in%20PIMO%20Play-brightgreen)](https://cgi-fr.github.io/pimo-play/#c=G4UwTgzglg9gdgLgAQCICMKBQBbAhhAayjgHMFMkkBaJCEAGxAGMAXGMcyrpAKwngAOuFgAtkKASPggs3PIU7ckYECRAAPcQAYA2mioB2ALoAKJCZ1aqATiMBKAN4AmAL6OALC5RA&i=N4KABGBEAOAWD2A7AppAXFADARjJgTHgMx4AseArJCAL5A)
+
 ```yaml
   - selector:
       jsonpath: "phone"
@@ -208,6 +210,8 @@ This example will mask the `phone` field of the input jsonlines with a random st
 
 ### Constant
 
+[![Try it](https://img.shields.io/badge/-Try%20it%20in%20PIMO%20Play-brightgreen)](https://cgi-fr.github.io/pimo-play/#c=G4UwTgzglg9gdgLgAQCICMKBQBbAhhAayjgHMFMkkBaJCEAGxAGMAXGMcyrpAKwngAOuFgAtkKOLmwgs3PIU7ckTeBBa44LcQCEo9eiiA&i=N4KABGBEB2CGC2BTSAuKApA9gC2pEAvkA)
+
 ```yaml
   - selector:
       jsonpath: "name"
@@ -220,6 +224,8 @@ This example will mask the `name` field of the input jsonlines with the value of
 [Return to list of masks](#possible-masks)
 
 ### RandomChoice
+
+[![Try it](https://img.shields.io/badge/-Try%20it%20in%20PIMO%20Play-brightgreen)](https://cgi-fr.github.io/pimo-play/#c=G4UwTgzglg9gdgLgAQCICMKBQBbAhhAayjgHMFMkkBaJCEAGxAGMAXGMcyrpAKwngAOuFgAtkKOLmwgs3PIU7ckYXHAAmMbAGERMKExCKlNFAFl9BXA1lLqqU8JFQQAVxvH7uMAfqMUQA&i=N4KABGBEB2CGC2BTSAuKAhAlgG25EAvkA)
 
 ```yaml
   - selector:
@@ -237,6 +243,8 @@ This example will mask the `name` field of the input jsonlines with random value
 
 ### RandomChoiceInUri
 
+[![Try it](https://img.shields.io/badge/-Try%20it%20in%20PIMO%20Play-brightgreen)](https://cgi-fr.github.io/pimo-play/#c=G4UwTgzglg9gdgLgAQCICMKBQBbAhhAayjgHMFMkkBaJCEAGxAGMAXGMcyrpAKwngAOuFgAtkKOLmwgs3PIU7ckYXHAAmMbAGERMKExABJOAFUwUcQKjYYCAPR3J0gKIA5FEA&i=N4KABGBEB2CGC2BTSAuKAhAlgG25EAvkA)
+
 ```yaml
   - selector:
       jsonpath: "name"
@@ -252,6 +260,8 @@ A value can be injected in URI with the template syntax. For example, `file://na
 
 ### RandomInt
 
+[![Try it](https://img.shields.io/badge/-Try%20it%20in%20PIMO%20Play-brightgreen)](https://cgi-fr.github.io/pimo-play/#c=G4UwTgzglg9gdgLgAQCICMKBQBbAhhAayjgHMFMkkBaJCEAGxAGMAXGMcyrpAKwngAOuFgAtkKXCRBZueQp25IwuOABMY2AJJwWCxUmzFkAJgCsFfQdwAPZAGZjQA&i=N4KABGBECGDmCmkBcYAsAGEBfIA)
+
 ```yaml
   - selector:
       jsonpath: "age"
@@ -266,6 +276,8 @@ This example will mask the `age` field of the input jsonlines with a random numb
 [Return to list of masks](#possible-masks)
 
 ### RandomDecimal
+
+[![Try it](https://img.shields.io/badge/-Try%20it%20in%20PIMO%20Play-brightgreen)](https://cgi-fr.github.io/pimo-play/#c=G4UwTgzglg9gdgLgAQCICMKBQBbAhhAayjgHMFMkkBaJCEAGxAGMAXGMcyrpAKwngAOuFgAtkKCE3Ygs3PIU7ckYXHAAmMbABFmUPPUVKk2YsgAMFI8dwAPZGgDsAOgBMAZktGBYXdHjIXIA&i=N4KABGBEDODGD2AnAppAXGADAOkyAvkA)
 
 ```yaml
   - selector:
@@ -296,6 +308,8 @@ This example will mask the `name` field of the input jsonlines with the output o
 
 ### WeightedChoice
 
+[![Try it](https://img.shields.io/badge/-Try%20it%20in%20PIMO%20Play-brightgreen)](https://cgi-fr.github.io/pimo-play/#c=G4UwTgzglg9gdgLgAQCICMKBQBbAhhAayjgHMFMkkBaJCEAGxAGMAXGMcyrpAKwngAOuFgAtkKCAFcwcXNhBZueQp25IA7iCgkRLEABMAwiJhQmIVWupImJsxdQARSQPgtFVrpu27kATgpPGltTc3FnVzh9D08NLR0WZDQgA&i=N4KABGBEDOCuBOA7AhgWwKaQFxQBLIBMCB7AYwGtIQBfIA)
+
 ```yaml
   - selector:
       jsonpath: "surname"
@@ -313,6 +327,8 @@ This example will mask the `surname` field of the input jsonlines with a random 
 
 ### Hash
 
+[![Try it](https://img.shields.io/badge/-Try%20it%20in%20PIMO%20Play-brightgreen)](https://cgi-fr.github.io/pimo-play/#c=G4UwTgzglg9gdgLgAQCICMKBQBbAhhAayjgHMFMkkBaJCEAGxAGMAXGMcyrpAKwngAOuFgAtkKNgHc4WbnkKduSEfjEUllGigCi2cLnoATJAGEoLAJ6yN1VACUArgCMLp81fUatAZVwCBIlBgIG6WKEA&i=N4KABGBEAuD2DuA7SAuKAFAhgJwJYGdIQBfIA)
+
 ```yaml
   - selector:
       jsonpath: "town"
@@ -329,6 +345,8 @@ This example will mask the `town` field of the input jsonlines with a value from
 
 ### HashInUri
 
+[![Try it](https://img.shields.io/badge/-Try%20it%20in%20PIMO%20Play-brightgreen)](https://cgi-fr.github.io/pimo-play/#c=G4UwTgzglg9gdgLgAQCICMKBQBbAhhAayjgHMFMkkBaJCEAGxAGMAXGMcyrpAKwngAOuFgAtkKOLmwgs3PIU7ckI-CICScAKpgo4gVGwwEAemOTpAMQBKKIA&i=N4KABGBEB2CGC2BTSAuKAhAlgG25EAvkA)
+
 ```yaml
   - selector:
       jsonpath: "name"
@@ -341,6 +359,8 @@ This example will mask the `name` field of the input jsonlines with a value from
 [Return to list of masks](#possible-masks)
 
 ### RandDate
+
+[![Try it](https://img.shields.io/badge/-Try%20it%20in%20PIMO%20Play-brightgreen)](https://cgi-fr.github.io/pimo-play/#c=G4UwTgzglg9gdgLgAQCICMKBQBbAhhAayjgHMFMkkBaJCEAGxAGMAXGMcyrpAKwngAOuFgAtkKACbCQWbnkKduSMLjgSAItMVKkUliACyxcWgCcAdgAMVS2htoAKpcsJnrywC1ZO3dIO4AD3EAJktQ+3snFzdnLyA&i=N4KABGBEAmCGAuBTSAuKkQF8g)
 
 ```yaml
   - selector:
@@ -357,6 +377,8 @@ This example will mask the `date` field of the input jsonlines with a random dat
 
 ### Duration
 
+[![Try it](https://img.shields.io/badge/-Try%20it%20in%20PIMO%20Play-brightgreen)](https://cgi-fr.github.io/pimo-play/#c=G4UwTgzglg9gdgLgAQCICMKBQBbAhhAayjgHMFMkkBaJCEAGxAGMAXGMcyrpAKwngAOuFgAtkKevhYB9JvBa5WWbnkKduSACYBXMMNiJUVAAoAmACIogA&i=N4KABGBEA2CGDOAXA+gYwPYDtG1YyAXFAEwAMZAtKQIxXUAqppBTLpAWpCAL5A)
+
 ```yaml
   - selector:
       jsonpath: "last_contact"
@@ -369,6 +391,8 @@ This example will mask the `last_contact` field of the input jsonlines by decrea
 [Return to list of masks](#possible-masks)
 
 ### DateParser
+
+[![Try it](https://img.shields.io/badge/-Try%20it%20in%20PIMO%20Play-brightgreen)](https://cgi-fr.github.io/pimo-play/#c=G4UwTgzglg9gdgLgAQCICMKBQBbAhhAayjgHMFMkkBaJCEAGxAGMAXGMcyrpAKwngAOuFgAtkKACbCQWbnkKduSKSxAAFXJHCKlSYgICuLAGLs8LcQCYADNYBsVa2keXZupDCOGTZ4eKcA9NaWQXYoQA&i=N4KABGBEAmCGAuBTSAuKAmADOgzAWkwDYCBWSEAXyA)
 
 ```yaml
   - selector:
@@ -385,6 +409,8 @@ This example will change every date from the date field from the `inputFormat` t
 
 ### RandomDuration
 
+[![Try it](https://img.shields.io/badge/-Try%20it%20in%20PIMO%20Play-brightgreen)](https://cgi-fr.github.io/pimo-play/#c=G4UwTgzglg9gdgLgAQCICMKBQBbAhhAayjgHMFMkkBaJCEAGxAGMAXGMcyrpAKwngAOuFgAtkKACbCQWbnkKduSMLjgSY2ACIBXFS1iIKSytmLiqABQBMm2caR4AHuesB2W0A&i=N4KABGBEAmCGAuBTSAuKAmADFgtJgjHvgCqaYpkWYBakIAvkA)
+
 ```yaml
   - selector:
       jsonpath: "date"
@@ -399,6 +425,8 @@ This example will mask the `date` field of the input jsonlines by decreasing its
 [Return to list of masks](#possible-masks)
 
 ### Incremental
+
+[![Try it](https://img.shields.io/badge/-Try%20it%20in%20PIMO%20Play-brightgreen)](https://cgi-fr.github.io/pimo-play/#c=G4UwTgzglg9gdgLgAQCICMKBQBbAhhAayjgHMFMkkBaJCEAGxAGMAXGMcyrpAKwngAOuFgAtkKKABMs3PIU7ckxJmBDYQcFrnoLFtLWBbI0FPUrgq1Go0jRA&i=N4KABGBECWAmkC4wAYQF8g)
 
 ```yaml
   - selector:
@@ -415,6 +443,8 @@ This example will mask the `id` field of the input jsonlines with incremental va
 
 ### Replacement
 
+[![Try it](https://img.shields.io/badge/-Try%20it%20in%20PIMO%20Play-brightgreen)](https://cgi-fr.github.io/pimo-play/#c=G4UwTgzglg9gdgLgAQCICMKBQBbAhhAayjgHMFMkkBaJCEAGxAGMAXGMcyrpAKwngAOuFgAtkKOLmwgALFm55CnbkjAgB9XExDS4LcZOkogA&i=N4KABGBEB2CGC2BTSAuKBBaATATgS8gBpwo4kAWVKAKQHs4AXAC1mkhAF8g)
+
 ```yaml
   - selector:
       jsonpath: "name4"
@@ -427,6 +457,8 @@ This example will mask the `name4` field of the input jsonlines with the field `
 [Return to list of masks](#possible-masks)
 
 ### Template
+
+[![Try it](https://img.shields.io/badge/-Try%20it%20in%20PIMO%20Play-brightgreen)](https://cgi-fr.github.io/pimo-play/#c=G4UwTgzglg9gdgLgAQCICMKBQBbAhhAayjgHMFMkkBaJCEAGxAGMAXGMcyrpAKwngAOuFgAtkKPFHpZueQp25IWIbAPrCQ4gN5aAdBACuYOLmwgkAHyQA5GAEEmTEHBaWk9GAHdwAXx+6dXRMzN1sHJxc3D28wPwABEkl6XSYYbBQgA&i=N4KABGBEDOCuBOA7AhgWwKaQFxQIKIBN4BLyAGnChQ2ygCkB7FAFwAtlFzLJVkBLADa1EsAQJABfIA)
 
 ```yaml
   - selector:
@@ -471,6 +503,8 @@ Most masks will be available as functions in template in the form : MaskCapitali
 
 ### Template each
 
+[![Try it](https://img.shields.io/badge/-Try%20it%20in%20PIMO%20Play-brightgreen)](https://cgi-fr.github.io/pimo-play/#c=G4UwTgzglg9gdgLgAQCICMKBQBbAhhAayjgHMFMkkBaJCEAGxAGMAXGMcyrpAKwngAOuFgAtkKXGDC4Anlm55CnbkhYhsA+sJBUQuJmIorKajVrXiA3pZZQWjJADpguegFcQAX0-zjSO+riLu4gKEA&i=N4KABGBECGBOvQJ6QFxgNqQG7QDYFcBTARkgBoocDCAmSAXRAF8g)
+
 ```yaml
   - selector:
       jsonpath: "array"
@@ -480,7 +514,7 @@ Most masks will be available as functions in template in the form : MaskCapitali
         item: "value"
 ```
 
-This will affect every values in the array field. The field must be an array (`{"array": ["value1", "value2]`).
+This will affect every values in the array field. The field must be an array (`{"array": ["value1", "value2"]}`).
 The `item` property is optional and defines the name of the current item in the templating string (defaults to "it"). There is another optional property `index`, if defined then a property with the given name will be available in the templating string (e.g. : `index: "idx"` can be used in template with `{{.idx}}`).
 
 The format for the template should respect the `text/template` package : <https://golang.org/pkg/text/template/>
@@ -490,6 +524,8 @@ See also the [Template mask](#template) for other options, all functions are app
 [Return to list of masks](#possible-masks)
 
 ### Fromjson
+
+[![Try it](https://img.shields.io/badge/-Try%20it%20in%20PIMO%20Play-brightgreen)](https://cgi-fr.github.io/pimo-play/#c=G4UwTgzglg9gdgLgAQCICMKBQBbAhhAayjgHMFMkkBaJCEAGxAGMAXGMcyrpAKwngAOuFgAtkKFrjAkQLAGZQGAEyzc8hTtyRywMbH3jj+AVzBMQC5SiA&i=N4KABGBEDOD2CuAnAxgUwGYEtUBsAmkAXFMADqQBWcAducQIwC+kANOFAC4CGiA5qhyy4CxavBw4QjIA)
 
 ```yaml
   - selector:
@@ -511,6 +547,8 @@ This example will mask the `targetfield` field of the input jsonlines with the p
 
 ### Remove
 
+[![Try it](https://img.shields.io/badge/-Try%20it%20in%20PIMO%20Play-brightgreen)](https://cgi-fr.github.io/pimo-play/#c=G4UwTgzglg9gdgLgAQCICMKBQBbAhhAayjgHMFMkkBaJCEAGxAGMAXGMcyrpAKwngAOuFgAtkKAK51GECFQBmUBgBMs3PIU7ckYENhihkLMBJBA&i=N4KABGBECuDOCmAbetYFoBmBLJATSAXFABZKID2kIAvkA)
+
 ```yaml
   - selector:
       jsonpath: "useless-field"
@@ -523,6 +561,8 @@ This field will mask the `useless-field` of the input jsonlines by completely de
 [Return to list of masks](#possible-masks)
 
 ### Add
+
+[![Try it](https://img.shields.io/badge/-Try%20it%20in%20PIMO%20Play-brightgreen)](https://cgi-fr.github.io/pimo-play/#c=G4UwTgzglg9gdgLgAQCICMKBQBbAhhAayjgHMFMkkBaJCEAGxAGMAXGMcyrpAKwngAOuFgAtkKOCADuAMSgMAJlm55CnbklwKF4yVOC56AVxAogA&i=N4XyA)
 
 ```yaml
   - selector:
@@ -540,6 +580,8 @@ Note: add can contains template strings (see the [Template](#template) mask for 
 [Return to list of masks](#possible-masks)
 
 ### Add-Transient
+
+[![Try it](https://img.shields.io/badge/-Try%20it%20in%20PIMO%20Play-brightgreen)](https://cgi-fr.github.io/pimo-play/#c=G4UwTgzglg9gdgLgAQCICMKBQEQgCbIAsATJgLYCGEA1lHAOYKaZJIC0SOANiAMYAuMME1aikAKwjwADhX4ALZCn5gKcaCDj8A+gDMoILnixjKNEWKQU8eNirUatSgN7PVcPAEEu0+RQByAK5kSADMAL7hWCzsnIZ8gsIxYpIycoqo+obGyUhm1BZi1gSoACryIEjyUDaaSMAUXIGVUBBIyK4AdPbqBlp6BkaRWEA&i=N4XyA)
 
 ```yaml
   - selector:
