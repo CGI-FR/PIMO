@@ -9,9 +9,11 @@ import * as d3 from "d3";
 var app = Elm.Main.init({ flags: "{{ version }}" });
 
 let lastSandbox;
+let debounceTimeOut = 500;
 
 if (typeof Go !== "undefined") {
   initWasm();
+  debounceTimeOut = 10; // wasm is faster !
 } else {
   initBackend();
 }
@@ -186,7 +188,7 @@ editorYaml = editor.create(document.getElementById("editor-yaml"), {
 let updateMasking = debounce(() => {
   app.ports.maskingUpdater.send(editorYaml.getValue());
   updateUrl();
-}, 10);
+}, debounceTimeOut);
 document.getElementById("editor-yaml").onkeyup = updateMasking;
 document.getElementById("editor-yaml").oninput = updateMasking;
 document.getElementById("editor-yaml").onpaste = updateMasking;
@@ -215,7 +217,7 @@ editorJson = editor.create(document.getElementById("editor-json"), {
 let updateInput = debounce(() => {
   app.ports.inputUpdater.send(editorJson.getValue());
   updateUrl();
-}, 10);
+}, debounceTimeOut);
 
 document.getElementById("editor-json").onkeyup = updateInput;
 document.getElementById("editor-json").oninput = updateInput;
