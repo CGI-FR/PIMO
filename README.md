@@ -443,6 +443,8 @@ This example will mask the `id` field of the input jsonlines with incremental va
 
 ### Replacement
 
+[![Try it](https://img.shields.io/badge/-Try%20it%20in%20PIMO%20Play-brightgreen)](https://cgi-fr.github.io/pimo-play/#c=G4UwTgzglg9gdgLgAQCICMKBQBbAhhAayjgHMFMkkBaJCEAGxAGMAXGMcyrpAKwngAOuFgAtkKOLmwgALFm55CnbkjAgB9XExDS4LcZOkogA&i=N4KABGBEB2CGC2BTSAuKBBaATATgS8gBpwo4kAWVKAKQHs4AXAC1mkhAF8g)
+
 ```yaml
   - selector:
       jsonpath: "name4"
@@ -455,6 +457,8 @@ This example will mask the `name4` field of the input jsonlines with the field `
 [Return to list of masks](#possible-masks)
 
 ### Template
+
+[![Try it](https://img.shields.io/badge/-Try%20it%20in%20PIMO%20Play-brightgreen)](https://cgi-fr.github.io/pimo-play/#c=G4UwTgzglg9gdgLgAQCICMKBQBbAhhAayjgHMFMkkBaJCEAGxAGMAXGMcyrpAKwngAOuFgAtkKPFHpZueQp25IWIbAPrCQ4gN5aAdBACuYOLmwgkAHyQA5GAEEmTEHBaWk9GAHdwAXx+6dXRMzN1sHJxc3D28wPwABEkl6XSYYbBQgA&i=N4KABGBEDOCuBOA7AhgWwKaQFxQIKIBN4BLyAGnChQ2ygCkB7FAFwAtlFzLJVkBLADa1EsAQJABfIA)
 
 ```yaml
   - selector:
@@ -499,6 +503,8 @@ Most masks will be available as functions in template in the form : MaskCapitali
 
 ### Template each
 
+[![Try it](https://img.shields.io/badge/-Try%20it%20in%20PIMO%20Play-brightgreen)](https://cgi-fr.github.io/pimo-play/#c=G4UwTgzglg9gdgLgAQCICMKBQBbAhhAayjgHMFMkkBaJCEAGxAGMAXGMcyrpAKwngAOuFgAtkKXGDC4Anlm55CnbkhYhsA+sJBUQuJmIorKajVrXiA3pZZQWjJADpguegFcQAX0-zjSO+riLu4gKEA&i=N4KABGBECGBOvQJ6QFxgNqQG7QDYFcBTARkgBoocDCAmSAXRAF8g)
+
 ```yaml
   - selector:
       jsonpath: "array"
@@ -508,7 +514,7 @@ Most masks will be available as functions in template in the form : MaskCapitali
         item: "value"
 ```
 
-This will affect every values in the array field. The field must be an array (`{"array": ["value1", "value2]`).
+This will affect every values in the array field. The field must be an array (`{"array": ["value1", "value2"]}`).
 The `item` property is optional and defines the name of the current item in the templating string (defaults to "it"). There is another optional property `index`, if defined then a property with the given name will be available in the templating string (e.g. : `index: "idx"` can be used in template with `{{.idx}}`).
 
 The format for the template should respect the `text/template` package : <https://golang.org/pkg/text/template/>
@@ -518,6 +524,8 @@ See also the [Template mask](#template) for other options, all functions are app
 [Return to list of masks](#possible-masks)
 
 ### Fromjson
+
+[![Try it](https://img.shields.io/badge/-Try%20it%20in%20PIMO%20Play-brightgreen)](https://cgi-fr.github.io/pimo-play/#c=G4UwTgzglg9gdgLgAQCICMKBQBbAhhAayjgHMFMkkBaJCEAGxAGMAXGMcyrpAKwngAOuFgAtkKFrjAkQLAGZQGAEyzc8hTtyRywMbH3jj+AVzBMQC5SiA&i=N4KABGBEDOD2CuAnAxgUwGYEtUBsAmkAXFMADqQBWcAducQIwC+kANOFAC4CGiA5qhyy4CxavBw4QjIA)
 
 ```yaml
   - selector:
@@ -539,6 +547,8 @@ This example will mask the `targetfield` field of the input jsonlines with the p
 
 ### Remove
 
+[![Try it](https://img.shields.io/badge/-Try%20it%20in%20PIMO%20Play-brightgreen)](https://cgi-fr.github.io/pimo-play/#c=G4UwTgzglg9gdgLgAQCICMKBQBbAhhAayjgHMFMkkBaJCEAGxAGMAXGMcyrpAKwngAOuFgAtkKAK51GECFQBmUBgBMs3PIU7ckYENhihkLMBJBA&i=N4KABGBECuDOCmAbetYFoBmBLJATSAXFABZKID2kIAvkA)
+
 ```yaml
   - selector:
       jsonpath: "useless-field"
@@ -551,6 +561,8 @@ This field will mask the `useless-field` of the input jsonlines by completely de
 [Return to list of masks](#possible-masks)
 
 ### Add
+
+[![Try it](https://img.shields.io/badge/-Try%20it%20in%20PIMO%20Play-brightgreen)](https://cgi-fr.github.io/pimo-play/#c=G4UwTgzglg9gdgLgAQCICMKBQBbAhhAayjgHMFMkkBaJCEAGxAGMAXGMcyrpAKwngAOuFgAtkKOCADuAMSgMAJlm55CnbklwKF4yVOC56AVxAogA&i=N4XyA)
 
 ```yaml
   - selector:
@@ -568,6 +580,8 @@ Note: add can contains template strings (see the [Template](#template) mask for 
 [Return to list of masks](#possible-masks)
 
 ### Add-Transient
+
+[![Try it](https://img.shields.io/badge/-Try%20it%20in%20PIMO%20Play-brightgreen)](https://cgi-fr.github.io/pimo-play/#c=G4UwTgzglg9gdgLgAQCICMKBQEQgCbIAsATJgLYCGEA1lHAOYKaZJIC0SOANiAMYAuMME1aikAKwjwADhX4ALZCn5gKcaCDj8A+gDMoILnixjKNEWKQU8eNirUatSgN7PVcPAEEu0+RQByAK5kSADMAL7hWCzsnIZ8gsIxYpIycoqo+obGyUhm1BZi1gSoACryIEjyUDaaSMAUXIGVUBBIyK4AdPbqBlp6BkaRWEA&i=N4XyA)
 
 ```yaml
   - selector:
