@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1685968689564,
+  "lastUpdate": 1686084644997,
   "repoUrl": "https://github.com/CGI-FR/PIMO",
   "entries": {
     "Benchmark": [
@@ -3054,6 +3054,42 @@ window.BENCHMARK_DATA = {
             "value": 2214930,
             "unit": "ns/op\t  681895 B/op\t    5892 allocs/op",
             "extra": "5067 times\n2 procs"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "44274230+adrienaury@users.noreply.github.com",
+            "name": "Adrien Aury",
+            "username": "adrienaury"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "2163ea066182f5164ad7d8c3200a6d69177a6538",
+          "message": "docs: add \"Try it in PIMO Play\" buttons (#230)\n\n* docs: one button on regex\r\n\r\n* docs: button for constant\r\n\r\n* docs: add buttons\r\n\r\n* docs: add buttons\r\n\r\n* docs: new buttons!",
+          "timestamp": "2023-06-06T22:43:13+02:00",
+          "tree_id": "9bb54a6e9e5bde4c78eace5aae053341e888e5e0",
+          "url": "https://github.com/CGI-FR/PIMO/commit/2163ea066182f5164ad7d8c3200a6d69177a6538"
+        },
+        "date": 1686084644627,
+        "tool": "go",
+        "benches": [
+          {
+            "name": "BenchmarkPimoRun",
+            "value": 30673,
+            "unit": "ns/op\t   16488 B/op\t     168 allocs/op",
+            "extra": "367944 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge",
+            "value": 2289964,
+            "unit": "ns/op\t  681474 B/op\t    5892 allocs/op",
+            "extra": "4826 times\n2 procs"
           }
         ]
       }
