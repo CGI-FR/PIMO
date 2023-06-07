@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1686084644997,
+  "lastUpdate": 1686109904928,
   "repoUrl": "https://github.com/CGI-FR/PIMO",
   "entries": {
     "Benchmark": [
@@ -3090,6 +3090,42 @@ window.BENCHMARK_DATA = {
             "value": 2289964,
             "unit": "ns/op\t  681474 B/op\t    5892 allocs/op",
             "extra": "4826 times\n2 procs"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "youen.peron@cgi.com",
+            "name": "Youen Péron",
+            "username": "youen"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "27f816cd9d937644afc1ae8d97fc0972e0ed2459",
+          "message": "feat: pimo as webassembly (#227)\n\n* feat: pimo as webassembly\r\n\r\n* chore: fix wasm build path conflict\r\n\r\n* fix: for security encode sandbox in fragment url component\r\n\r\n* chore(neon): add wasmpathdeclaration\r\n\r\n* refactor(wasm): expose pimo object with play function\r\n\r\n* refactor(wasm): use select to block main goroutine\r\n\r\n* feat(play): add flow as wasm js lib\r\n\r\n* fix(play): display pimo error detailed\r\n\r\n* fix(play): set envionment variable for FF1 mask\r\n\r\n* feat(play): embeded version without wasm\r\n\r\n* chore(play): wasm webpack\r\n\r\n* chore: publish pimo play on release\r\n\r\n* feat(play): adjust debounce timeout for wasm\r\n\r\n* fix: remove PIMO_PLAY_GIT_URL properties\r\n\r\n---------\r\n\r\nCo-authored-by: Adrien Aury <44274230+adrienaury@users.noreply.github.com>",
+          "timestamp": "2023-06-07T05:40:37+02:00",
+          "tree_id": "7f2935de16d65ee55b2c31ecb0d155a0e079c5c2",
+          "url": "https://github.com/CGI-FR/PIMO/commit/27f816cd9d937644afc1ae8d97fc0972e0ed2459"
+        },
+        "date": 1686109904509,
+        "tool": "go",
+        "benches": [
+          {
+            "name": "BenchmarkPimoRun",
+            "value": 30182,
+            "unit": "ns/op\t   16476 B/op\t     168 allocs/op",
+            "extra": "373780 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge",
+            "value": 2105207,
+            "unit": "ns/op\t  682007 B/op\t    5893 allocs/op",
+            "extra": "5163 times\n2 procs"
           }
         ]
       }
