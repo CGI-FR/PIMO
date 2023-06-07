@@ -8,6 +8,8 @@
         "tailwind-elm": "elm-tailwind-modules --tailwind-config ./tailwind.config.cjs --dir gen/",
         "start": "webpack serve --open --config webpack.config.dev.js",
         "build": "webpack --config webpack.config.prod.js",
+        "start-wasm": "webpack --config webpack.config.wasm.js",
+        "wasm": "webpack --config webpack.config.wasm.prod.js",
         "analyse": "elm-analyse -s -p 3001 -o"
     },
     "dependencies": {
@@ -22,6 +24,8 @@
         "@tailwindcss/aspect-ratio": "^0.4.0",
         "@tailwindcss/forms": "^0.5.2",
         "@tailwindcss/typography": "^0.5.4",
+        "add-asset-html-webpack-plugin": "^6.0.0",
+        "copy-webpack-plugin": "^11.0.0",
         "css-loader": "^6.0.0",
         "cssnano": "^5.1.12",
         "elm": "^0.19.1-5",

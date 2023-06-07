@@ -1,7 +1,5 @@
 module Play exposing (..)
 
-import Http
-import Http.Detailed
 import Json.Decode exposing (Error(..))
 
 
@@ -33,7 +31,7 @@ type alias Model =
     , error : String
     , status : Status
     , maskingView : MaskingView
-    , flow :  String
+    , flow : String
     }
 
 
@@ -55,8 +53,8 @@ type MaskingView
 
 
 type Msg
-    = GotMaskedData (Result (Http.Detailed.Error String) ( Http.Metadata, String ))
-    | GotFlowData (Result (Http.Detailed.Error String) ( Http.Metadata, String ))
+    = GotMaskedData String
+    | GotFlowData String
     | UpdateMasking String
     | UpdateInput String
     | UpdateMaskingAndInput Sandbox

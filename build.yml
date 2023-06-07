@@ -217,7 +217,7 @@ targets:
 
   build-web:
     doc: "Build website and copy it to play.go path"
-    depends: "info"
+    depends: ["info"]
     steps:
       - $: cd web/play && yarn install && yarn tailwind-elm && yarn build
       - $: touch web/play/node_modules/go.mod
@@ -226,6 +226,33 @@ targets:
       - $: sed -i 's~{{ version }}~={realtag}~g' internal/app/pimo/client/index.html
       - $: sed -i 's~{{ version }}~={realtag}~g' internal/app/pimo/client/main.js
       - $: git checkout -- internal/app/pimo/client
+
+  build-web-wasm:
+    doc: "Build website with wasm"
+    depends: ["info", "wasm"]
+    steps:
+      - $: rm -rf web/play/dist/
+      - $: cd web/play && yarn install && yarn tailwind-elm && yarn wasm
+      - $: sed -i 's~{{ version }}~={realtag}~g' web/play/dist/main.js
+
+  # run "neon -props '{wasmbuildpaths: ["path/to/main/package1","path/to/main/package2"]}' wasm" to compile specific targets
+  # example : neon -props '{wasmbuildpaths: ["wasm/play"]}' wasm
+  wasm:
+    doc: "Compile js lib wasm"
+    depends: ["info", "refresh"]
+    steps:
+      - ldflags = ldflags + " -X main.version=" + tag + " -X main.commit=" + commit + " -X main.buildDate=" + date + " -X main.builtBy=" + by
+      - if: len(wasmbuildpaths) == 0
+        then:
+          - wasmbuildpaths = appendpath("wasm", find("wasm", "*"))
+      - for: path
+        in: wasmbuildpaths
+        do:
+          - print: Building ={path}
+          - |
+            pathcomponents = split(unixpath(path), "/")
+            name = pathcomponents[len(pathcomponents)-1]
+          - $: GOOS=js GOARCH=wasm go build -ldflags "-X main.name=={name} ={ldflags} ={LDFLAGS}" -o ./={BUILD_DIR}/={name}.wasm ./={path}
 
   # run "neon -props '{buildpaths: ["path/to/main/package1","path/to/main/package2"]}' compile" to compile specific targets
   # example : neon -props '{buildpaths: ["cmd/cli"]}' compile
@@ -285,7 +312,7 @@ targets:
   # ex: neon -props '{testsuites: "mask_add_transient.yml"}' test-int
   test-int:
     doc: "Run all integration tests"
-    depends: ["info", "refresh", "lint", "test", "bench", "release"]
+    depends: ["info", "refresh", "lint", "test", "bench", "release", "build-web-wasm"]
     steps:
       - delete: venom*.log
       - delete: ={TEST_WS_DIR}/**
