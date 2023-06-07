@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1686109904928,
+  "lastUpdate": 1686124079957,
   "repoUrl": "https://github.com/CGI-FR/PIMO",
   "entries": {
     "Benchmark": [
@@ -3126,6 +3126,42 @@ window.BENCHMARK_DATA = {
             "value": 2105207,
             "unit": "ns/op\t  682007 B/op\t    5893 allocs/op",
             "extra": "5163 times\n2 procs"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "44274230+adrienaury@users.noreply.github.com",
+            "name": "Adrien Aury",
+            "username": "adrienaury"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "ced3cf0927013e7a1562f05d7741caa6d916bacd",
+          "message": "docs: add missing buttons",
+          "timestamp": "2023-06-07T09:34:12+02:00",
+          "tree_id": "f3ed1b6fbacd476a21300d230616d06f2c47dae7",
+          "url": "https://github.com/CGI-FR/PIMO/commit/ced3cf0927013e7a1562f05d7741caa6d916bacd"
+        },
+        "date": 1686124079167,
+        "tool": "go",
+        "benches": [
+          {
+            "name": "BenchmarkPimoRun",
+            "value": 36093,
+            "unit": "ns/op\t   16450 B/op\t     168 allocs/op",
+            "extra": "308961 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge",
+            "value": 2635324,
+            "unit": "ns/op\t  681677 B/op\t    5892 allocs/op",
+            "extra": "4344 times\n2 procs"
           }
         ]
       }
