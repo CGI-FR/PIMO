@@ -54,7 +54,7 @@ func ReadCsv(uri string, sep rune) ([][]string, error) {
 
 		return records, nil
 	case "http", "https":
-		rep, err := http.Get(uri)
+		rep, err := http.Get(uri) //nolint:gosec
 		if err != nil {
 			return nil, err
 		}

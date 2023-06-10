@@ -101,7 +101,6 @@ func (mrl MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.En
 			obj.Set(strconv.Itoa(i), value)
 		}
 		return obj, nil
-
 	}
 }
 
