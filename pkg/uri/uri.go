@@ -46,6 +46,7 @@ func ReadCsv(uri string, sep rune) ([][]string, error) {
 
 		csvReader := csv.NewReader(f)
 		csvReader.Comma = sep
+
 		records, err := csvReader.ReadAll()
 		if err != nil {
 			return nil, err
@@ -60,6 +61,8 @@ func ReadCsv(uri string, sep rune) ([][]string, error) {
 		defer rep.Body.Close()
 
 		csvReader := csv.NewReader(rep.Body)
+		csvReader.Comma = sep
+
 		records, err := csvReader.ReadAll()
 		if err != nil {
 			return nil, err
