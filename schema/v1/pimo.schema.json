@@ -222,6 +222,12 @@
         },
         {
           "required": [
+            "randomChoiceInCSV"
+          ],
+          "title": "randomChoiceInCSV"
+        },
+        {
+          "required": [
             "command"
           ],
           "title": "Command"
@@ -394,6 +400,11 @@
           "type": "string",
           "title": "Random Choice in URI",
           "description": "Replace the input value with a value chosen randomly from an external resource (1 line = 1 value)"
+        },
+        "randomChoiceInCSV": {
+          "$ref": "#/$defs/RandomChoiceInCSVType",
+          "title": "Random Choice in CSV",
+          "description": "Replace the input value with a record chosen randomly from an external CSV resource"
         },
         "command": {
           "type": "string",
@@ -678,6 +689,27 @@
       "required": [
         "min",
         "max"
+      ]
+    },
+    "RandomChoiceInCSVType": {
+      "properties": {
+        "uri": {
+          "type": "string",
+          "description": "URI of the CSV resource"
+        },
+        "header": {
+          "type": "boolean",
+          "description": "Does the CSV resource contains a header line"
+        },
+        "separator": {
+          "type": "string",
+          "description": "Separator character"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "uri"
       ]
     },
     "RandomDecimalType": {
