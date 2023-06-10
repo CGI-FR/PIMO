@@ -44,6 +44,7 @@ import (
 	"github.com/cgi-fr/pimo/pkg/pipe"
 	"github.com/cgi-fr/pimo/pkg/randdate"
 	"github.com/cgi-fr/pimo/pkg/randdura"
+	"github.com/cgi-fr/pimo/pkg/randomcsv"
 	"github.com/cgi-fr/pimo/pkg/randomdecimal"
 	"github.com/cgi-fr/pimo/pkg/randomint"
 	"github.com/cgi-fr/pimo/pkg/randomlist"
@@ -300,6 +301,7 @@ func injectMaskFactories() []model.MaskFactory {
 		luhn.Factory,
 		markov.Factory,
 		transcode.Factory,
+		randomcsv.Factory,
 	}
 }
 
@@ -324,6 +326,8 @@ func injectTemplateFuncs() {
 	template.InjectSeededFuncGenerator("MaskRange", rangemask.Func)
 	template.InjectSeededFuncGenerator("MaskLuhn", luhn.Func)
 	template.InjectSeededFuncGenerator("MaskTranscode", transcode.Func)
+	template.InjectSeededFuncGenerator("MaskRandomChoiceInCsv", randomcsv.Func)
+	template.InjectSeededFuncGenerator("MaskRandomChoiceInCSV", randomcsv.Func)
 }
 
 var re = regexp.MustCompile(`(\[\d*\])?$`)

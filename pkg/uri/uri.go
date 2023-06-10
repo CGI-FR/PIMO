@@ -19,6 +19,7 @@ package uri
 
 import (
 	"bufio"
+	"encoding/csv"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -28,6 +29,47 @@ import (
 	"github.com/cgi-fr/pimo/pkg/maskingdata"
 	"github.com/cgi-fr/pimo/pkg/model"
 )
+
+func ReadCsv(uri string, sep rune) ([][]string, error) {
+	u, err := url.Parse(uri)
+	if err != nil {
+		return nil, err
+	}
+
+	switch u.Scheme {
+	case "file":
+		f, err := os.Open(uri)
+		if err != nil {
+			return nil, err
+		}
+		defer f.Close()
+
+		csvReader := csv.NewReader(f)
+		csvReader.Comma = sep
+		records, err := csvReader.ReadAll()
+		if err != nil {
+			return nil, err
+		}
+
+		return records, nil
+	case "http", "https":
+		rep, err := http.Get(uri)
+		if err != nil {
+			return nil, err
+		}
+		defer rep.Body.Close()
+
+		csvReader := csv.NewReader(rep.Body)
+		records, err := csvReader.ReadAll()
+		if err != nil {
+			return nil, err
+		}
+
+		return records, nil
+	}
+
+	return nil, nil
+}
 
 func Read(uri string) ([]model.Entry, error) {
 	var result []model.Entry
