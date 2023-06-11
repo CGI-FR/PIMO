@@ -32,12 +32,15 @@ import (
 
 // MaskEngine is a list of masking value and a rand init to mask
 type MaskEngine struct {
-	rand     *rand.Rand
-	seeder   model.Seeder
-	template *template.Template
-	cache    map[string][][]string
-	header   bool
-	sep      rune
+	rand            *rand.Rand
+	seeder          model.Seeder
+	template        *template.Template
+	cache           map[string][][]string
+	header          bool
+	sep             rune
+	comment         rune
+	fieldsPerRecord int
+	trimSpaces      bool
 }
 
 // NewMaskSeeded create a MaskRandomList with a seed
@@ -47,8 +50,12 @@ func NewMask(conf model.RandomChoiceInCSVType, seed int64, seeder model.Seeder) 
 	if len(conf.Separator) > 0 {
 		sep, _ = utf8.DecodeRune([]byte(conf.Separator))
 	}
+	var comment rune
+	if len(conf.Comment) > 0 {
+		comment, _ = utf8.DecodeRune([]byte(conf.Comment))
+	}
 	// nolint: gosec
-	return MaskEngine{rand.New(rand.NewSource(seed)), seeder, template, map[string][][]string{}, conf.Header, sep}, err
+	return MaskEngine{rand.New(rand.NewSource(seed)), seeder, template, map[string][][]string{}, conf.Header, sep, comment, conf.FieldsPerRecord, conf.TrimLeadingSpace}, err
 }
 
 // Mask choose a mask value randomly
@@ -78,7 +85,7 @@ func (mrl MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.En
 	if recordsFromCache, ok := mrl.cache[filename]; ok {
 		records = recordsFromCache
 	} else {
-		recordsFromFile, err := uri.ReadCsv(filename, mrl.sep)
+		recordsFromFile, err := uri.ReadCsv(filename, mrl.sep, mrl.comment, mrl.fieldsPerRecord, mrl.trimSpaces)
 		if err != nil {
 			return nil, err
 		}

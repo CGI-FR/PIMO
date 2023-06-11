@@ -30,7 +30,7 @@ import (
 	"github.com/cgi-fr/pimo/pkg/model"
 )
 
-func ReadCsv(uri string, sep rune) ([][]string, error) {
+func ReadCsv(uri string, sep rune, comment rune, fieldsPerRecord int, trimLeadingSpaces bool) ([][]string, error) {
 	u, err := url.Parse(uri)
 	if err != nil {
 		return nil, err
@@ -46,6 +46,9 @@ func ReadCsv(uri string, sep rune) ([][]string, error) {
 
 		csvReader := csv.NewReader(f)
 		csvReader.Comma = sep
+		csvReader.Comment = comment
+		csvReader.FieldsPerRecord = fieldsPerRecord
+		csvReader.TrimLeadingSpace = trimLeadingSpaces
 
 		records, err := csvReader.ReadAll()
 		if err != nil {
@@ -62,6 +65,9 @@ func ReadCsv(uri string, sep rune) ([][]string, error) {
 
 		csvReader := csv.NewReader(rep.Body)
 		csvReader.Comma = sep
+		csvReader.Comment = comment
+		csvReader.FieldsPerRecord = fieldsPerRecord
+		csvReader.TrimLeadingSpace = trimLeadingSpaces
 
 		records, err := csvReader.ReadAll()
 		if err != nil {
