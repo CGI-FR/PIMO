@@ -303,6 +303,7 @@ func injectMaskFactories() []model.MaskFactory {
 		markov.Factory,
 		transcode.Factory,
 		randomcsv.Factory,
+		hashcsv.Factory,
 	}
 }
 
