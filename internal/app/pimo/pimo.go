@@ -36,6 +36,7 @@ import (
 	"github.com/cgi-fr/pimo/pkg/fluxuri"
 	"github.com/cgi-fr/pimo/pkg/fromjson"
 	"github.com/cgi-fr/pimo/pkg/hash"
+	"github.com/cgi-fr/pimo/pkg/hashcsv"
 	"github.com/cgi-fr/pimo/pkg/increment"
 	"github.com/cgi-fr/pimo/pkg/jsonline"
 	"github.com/cgi-fr/pimo/pkg/luhn"
@@ -328,6 +329,8 @@ func injectTemplateFuncs() {
 	template.InjectSeededFuncGenerator("MaskTranscode", transcode.Func)
 	template.InjectSeededFuncGenerator("MaskRandomChoiceInCsv", randomcsv.Func)
 	template.InjectSeededFuncGenerator("MaskRandomChoiceInCSV", randomcsv.Func)
+	template.InjectSeededFuncGenerator("MaskHashInCsv", hashcsv.Func)
+	template.InjectSeededFuncGenerator("MaskHashInCSV", hashcsv.Func)
 }
 
 var re = regexp.MustCompile(`(\[\d*\])?$`)

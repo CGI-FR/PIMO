@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with PIMO.  If not, see <http://www.gnu.org/licenses/>.
 
-package randomcsv
+package hashcsv
 
 import (
 	"bytes"
@@ -60,7 +60,7 @@ func NewMask(conf model.ChoiceInCSVType, seed int64, seeder model.Seeder) (MaskE
 
 // Mask choose a mask value randomly
 func (mrl MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Entry, error) {
-	log.Info().Msg("Mask randomChoiceInCsv")
+	log.Info().Msg("Mask hashInCSV")
 
 	if len(context) > 0 {
 		seed, ok, err := mrl.seeder(context[0])
@@ -94,7 +94,11 @@ func (mrl MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.En
 	}
 
 	if mrl.header {
-		record := records[1:][mrl.rand.Intn(len(records)-1)]
+		h := fnv.New32a()
+		if _, err := h.Write([]byte(e.(string))); err != nil {
+			return nil, err
+		}
+		record := records[1:][int(h.Sum32())%(len(records)-1)]
 		obj := model.NewDictionary()
 		headers := records[0]
 		for i, header := range headers {
@@ -102,7 +106,11 @@ func (mrl MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.En
 		}
 		return obj, nil
 	} else {
-		record := records[mrl.rand.Intn(len(records))]
+		h := fnv.New32a()
+		if _, err := h.Write([]byte(e.(string))); err != nil {
+			return nil, err
+		}
+		record := records[int(h.Sum32())%len(records)]
 		obj := model.NewDictionary()
 		for i, value := range record {
 			obj.Set(strconv.Itoa(i), value)
@@ -118,8 +126,8 @@ func Factory(conf model.MaskFactoryConfiguration) (model.MaskEngine, bool, error
 	h.Write([]byte(conf.Masking.Selector.Jsonpath))
 	conf.Seed += int64(h.Sum64())
 
-	if len(conf.Masking.Mask.RandomChoiceInCSV.URI) != 0 {
-		mask, err := NewMask(conf.Masking.Mask.RandomChoiceInCSV, conf.Seed, model.NewSeeder(conf.Masking.Seed.Field, conf.Seed))
+	if len(conf.Masking.Mask.HashInCSV.URI) != 0 {
+		mask, err := NewMask(conf.Masking.Mask.HashInCSV, conf.Seed, model.NewSeeder(conf.Masking.Seed.Field, conf.Seed))
 		return mask, true, err
 	}
 	return nil, false, nil
