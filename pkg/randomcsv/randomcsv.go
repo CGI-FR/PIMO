@@ -134,9 +134,9 @@ func Factory(conf model.MaskFactoryConfiguration) (model.MaskEngine, bool, error
 	return nil, false, nil
 }
 
-func Func(seed int64, seedField string, comment string, fieldsPerRecord int, trimSpaces bool) interface{} {
+func Func(seed int64, seedField string) interface{} {
 	var callnumber int64
-	return func(uri string, header bool, sep string) (model.Entry, error) {
+	return func(uri string, header bool, sep string, comment string, fieldsPerRecord int, trimSpaces bool) (model.Entry, error) {
 		mask, err := NewMask(model.ChoiceInCSVType{URI: uri, Header: header, Separator: sep, Comment: comment, FieldsPerRecord: fieldsPerRecord, TrimSpace: trimSpaces}, seed+callnumber, model.NewSeeder(seedField, seed+callnumber))
 		if err != nil {
 			return "", err
