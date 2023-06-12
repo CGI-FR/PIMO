@@ -169,3 +169,46 @@ testcases:
     - result.systemout ShouldEqual {"person":{"first_name":"Anissa","last_name":"Mercier","email":"anissa.mercier@yopmail.fr"}}
     - result.systemerr ShouldBeEmpty
 
+- name: random in CSV expect any number of fields
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      seed: 1
+      masking:
+        - selector:
+            jsonpath: "person"
+          mask:
+            randomChoiceInCSV:
+              uri: "file://../persons_dirty.csv"
+              fieldsPerRecord: -1
+      EOF
+  - script: |-
+      echo '{"person": null}' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldEqual {"person":{"0":"Anissa","1":"anissa.mercier@yopmail.fr"}}
+    - result.systemerr ShouldBeEmpty
+
+- name: random in CSV expect exactly 4 fields and error
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      seed: 1
+      masking:
+        - selector:
+            jsonpath: "person"
+          mask:
+            randomChoiceInCSV:
+              uri: "file://../persons.csv"
+              fieldsPerRecord: 4
+      EOF
+  - script: |-
+      echo '{"person": null}' | pimo
+    assertions:
+    - result.code ShouldNotEqual 0
+    - result.systemout ShouldBeEmpty
+    - result.systemerr ShouldNotBeEmpty

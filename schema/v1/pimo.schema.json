@@ -35,7 +35,7 @@
           "type": "string",
           "description": "Lines beginning with the comment character without preceding whitespace are ignored"
         },
-        "fieldsPerRecords": {
+        "fieldsPerRecord": {
           "type": "integer",
           "description": "FieldsPerRecord is the number of expected fields per record, 0 means the number of fields in the first record"
         },

@@ -160,7 +160,7 @@ type ChoiceInCSVType struct {
 	Header          bool   `yaml:"header,omitempty" json:"header,omitempty" jsonschema_description:"Does the CSV resource contains a header line"`
 	Separator       string `yaml:"separator,omitempty" json:"separator,omitempty" jsonschema_description:"Separator character"`
 	Comment         string `yaml:"comment,omitempty" json:"comment,omitempty" jsonschema_description:"Lines beginning with the comment character without preceding whitespace are ignored"`
-	FieldsPerRecord int    `yaml:"fieldsPerRecords,omitempty" json:"fieldsPerRecords,omitempty" jsonschema_description:"FieldsPerRecord is the number of expected fields per record, 0 means the number of fields in the first record"`
+	FieldsPerRecord int    `yaml:"fieldsPerRecord,omitempty" json:"fieldsPerRecord,omitempty" jsonschema_description:"FieldsPerRecord is the number of expected fields per record, 0 means the number of fields in the first record"`
 	TrimSpace       bool   `yaml:"trim,omitempty" json:"trim,omitempty" jsonschema_description:"If true leading white space in a field is ignored"`
 }
 
