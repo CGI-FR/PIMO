@@ -83,3 +83,12 @@ masking:
     masks:
       - add: "AB-123-CD"
       - template: '{{MaskTranscode .transcode}}'
+  - selector:
+      jsonpath: "randomChoiceInCSV"
+    masks:
+      - add: '{{MaskRandomChoiceInCSV "file://../persons_sep_comment_trim.csv" true "%" "#" 3 true}}'
+  - selector:
+      jsonpath: "hashInCSV"
+    masks:
+      - add: "1"
+      - template: '{{MaskHashInCSV "file://../persons_sep_comment_trim.csv" true "%" "#" 3 true}}'

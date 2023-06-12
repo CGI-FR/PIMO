@@ -108,24 +108,26 @@ The following types of masks can be used :
 
 * Pure randomization masks
   * [`regex`](#regex) is to mask using a regular expression given in argument.
-  * [`randomInt`](#randomInt) is to mask with a random int from a range with arguments min and max.
-  * [`randomDecimal`](#randomDecimal) is to mask with a random decimal from a range with arguments min, max and precision.
-  * [`randDate`](#randDate) is to mask a date with a random date between `dateMin` and `dateMax`.
-  * [`randomDuration`](#randomDuration) is to mask a date by adding or removing a random time between `Min` and `Max`.
-  * [`randomChoice`](#randomChoice) is to mask with a random value from a list in argument.
-  * [`weightedChoice`](#weightedChoice) is to mask with a random value from a list with probability, both given with the arguments `choice` and `weight`.
-  * [`randomChoiceInUri`](#randomChoiceInUri) is to mask with a random value from an external resource.
+  * [`randomInt`](#randomint) is to mask with a random int from a range with arguments min and max.
+  * [`randomDecimal`](#randomdecimal) is to mask with a random decimal from a range with arguments min, max and precision.
+  * [`randDate`](#randdate) is to mask a date with a random date between `dateMin` and `dateMax`.
+  * [`randomDuration`](#randomduration) is to mask a date by adding or removing a random time between `Min` and `Max`.
+  * [`randomChoice`](#randomchoice) is to mask with a random value from a list in argument.
+  * [`weightedChoice`](#weightedchoice) is to mask with a random value from a list with probability, both given with the arguments `choice` and `weight`.
+  * [`randomChoiceInUri`](#randomchoiceinuri) is to mask with a random value from an external resource.
+  * [`randomChoiceInCSV`](#randomchoiceincsv) is to mask with a random value from an external CSV resource.
   * [`transcode`](#transcode) is to mask a value randomly with character class preservation.
 * K-Anonymization
   * [`range`](#range) is to mask a integer value by a range of value (e.g. replace `5` by `[0,10]`).
   * [`duration`](#duration) is to mask a date by adding or removing a certain number of days.
 * Re-identification and coherence preservation
   * [`hash`](#hash) is to mask with a value from a list by matching the original value, allowing to mask a value the same way every time.
-  * [`hashInUri`](#hashInUri) is to mask with a value from an external resource, by matching the original value, allowing to mask a value the same way every time.
-  * [`fromCache`](#fromCache) is a mask to obtain a value from a cache.
+  * [`hashInUri`](#hashinuri) is to mask with a value from an external resource, by matching the original value, allowing to mask a value the same way every time.
+  * [`hashInCSV`](#hashincsv) is to mask with a value from an external CSV resource, by matching the original value, allowing to mask a value the same way every time.
+  * [`fromCache`](#fromcache) is a mask to obtain a value from a cache.
   * [`ff1`](#ff1) mask allows the use of <abbr title="Format Preserving Encryption">FPE</abbr> which enable private-key based re-identification.
 * Formatting
-  * [`dateParser`](#dateParser) is to change a date format.
+  * [`dateParser`](#dateparser) is to change a date format.
   * [`template`](#template) is to mask a data with a template using other values from the jsonline.
   * [`template-each`](#template-each) is like template but will apply on each value of an array.
   * [`fromjson`](#fromjson) is to convert string field values to parsed JSON, e.g. "[1,2,3]" -> [1,2,3].
@@ -137,7 +139,7 @@ The following types of masks can be used :
   * [`constant`](#constant) is to mask the value by a constant value given in argument.
   * [`command`](#command) is to mask with the output of a console command given in argument.
   * [`incremental`](#incremental) is to mask data with incremental value starting from `start` with a step of `increment`.
-  * [`fluxUri`](#fluxUri) is to replace by a sequence of values defined in an external resource.
+  * [`fluxUri`](#fluxuri) is to replace by a sequence of values defined in an external resource.
   * [`replacement`](#replacement) is to mask a data with another data from the jsonline.
   * [`pipe`](#pipe) is a mask to handle complex nested array structures, it can read an array as an object stream and process it with a sub-pipeline.
   * [`luhn`](#luhn) can generate valid numbers using the Luhn algorithm (e.g. french SIRET or SIREN).
@@ -258,6 +260,42 @@ A value can be injected in URI with the template syntax. For example, `file://na
 
 [Return to list of masks](#possible-masks)
 
+### RandomChoiceInCSV
+
+[![Try it](https://img.shields.io/badge/-Try%20it%20in%20PIMO%20Play-brightgreen)](https://cgi-fr.github.io/pimo-play/#c=G4UwTgzglg9gdgLgAQCICMKBQBbAhhAayjgHMFMkkBaJCEAGxAGMAXGMcyrpAKwngAOuFgAtkKATAIhs8LNzyFO3JGFxwAJjGwBhETChMQASTg6AygDVlKpAFcwUcSJYsBEBAHpPJKBBYAdL6idgBGdnRgTPAsIHCB0dieuGDYvvSMEJ5oAJwALKFMAGZFAMwArAAMlWggAOwgoeWluABMuAAcoXl5tV2tTABsnmoA7p45ra3VhZW4g3WlGuVGrWhoc7i4GnnlPSAag0x5NZVFgx11npLSsnABTBDA8rZIIiDb4MgsYHYgr1wAMRIGACFiwOC4ejIR7AN74JC4N4fDTgJD0YggCivOhCNRsDioAA0KABwNB4PgUJhTyQwChf1oIDxwnYSD8SCJ2NsiWwcRY4kBpIBSHJYIh1KQsKlMVwxAgMuwfPiCv8KXBpCQoygolF3JURSgDA0EAACuAAErMdgaZCVbhiymQ6FIOB2bChNEwIpIQ3GhUCNFga1gDRE9k++10FgKnVINjx96u92esAgn1++gm9lwRP-Q2QFiqEMaADcEddIBIwigoHDcBgUveTAI7IVeFRiM0xeiofbuAAnvDQIi6SkoLhQoxkx6vRmjVmIPruD8oNhvr9-iLKI6JS7V9haEIjDmx-Q-gr1BpkZ9IJggA&i=N4KABGBEAOD2DWBTAtrAdpAXGNBXANviAL5A)
+
+```yaml
+version: "1"
+masking:
+  - selector:
+      jsonpath: "pokemon"
+    mask:
+      randomChoiceInCSV:
+        uri: "https://gist.githubusercontent.com/armgilles/194bcff35001e7eb53a2a8b441e8b2c6/raw/92200bc0a673d5ce2110aaad4544ed6c4010f687/pokemon.csv"
+        header: true          # optional: csv has a header line, use it to name fields, default: false
+        separator: ","        # optional: csv value separator is , (default value)
+        comment: "#"          # optional: csv contains comments starting with #, if empty no comment is expected (default)
+        fieldsPerRecord: 0    # optional: number of fields per record, if 0 sets it to the number of fields in the first record (default)
+                              # if negative, no check is made and records may have a variable number of fields
+        trim: true            # optional: trim space in values and headers, default: false
+```
+
+The selected field's data will be masked with random values selected from a CSV file available at the specified URL (a GitHub gist in this case).
+
+Here is a detailed breakdown of the example configuration:
+
+* selector: The jsonpath: "pokemon" line means that this masking configuration is meant to apply to the field named "pokemon" in the JSON data.
+* mask: This defines the masking operation to be performed on the "pokemon" field.
+* randomChoiceInCSV: The mask will replace the value in the "pokemon" field with a random choice from the CSV file at the specified URL.
+* uri: The location of the CSV file to use for replacement values, `file` and `http`/`https` schemes can be used. This parameter can be a template.
+* header: This optional parameter is set to true, meaning the CSV file contains a header line that names the fields.
+* separator: This optional parameter specifies that the CSV values are separated by a comma, which is the default separator in CSV files.
+* comment: This optional parameter specifies that the CSV file may contain comments that start with a '#'.
+* fieldsPerRecord: This optional parameter is set to 0, meaning the number of fields per record will be set to the number of fields in the first record by default. If negative, no check is made and records may have a variable number of fields.
+* trim: This optional parameter is set to true, meaning any spaces in values and headers in the CSV file will be trimmed.
+
+[Return to list of masks](#possible-masks)
+
 ### RandomInt
 
 [![Try it](https://img.shields.io/badge/-Try%20it%20in%20PIMO%20Play-brightgreen)](https://cgi-fr.github.io/pimo-play/#c=G4UwTgzglg9gdgLgAQCICMKBQBbAhhAayjgHMFMkkBaJCEAGxAGMAXGMcyrpAKwngAOuFgAtkKXCRBZueQp25IwuOABMY2AJJwWCxUmzFkAJgCsFfQdwAPZAGZjQA&i=N4KABGBECGDmCmkBcYAsAGEBfIA)
@@ -355,6 +393,32 @@ This example will mask the `town` field of the input jsonlines with a value from
 ```
 
 This example will mask the `name` field of the input jsonlines with a value from the list nameFR contained in pimo, the same way as for `hash` mask. The different URI usable with this selector are : `pimo`, `file` and `http`/`https`.
+
+[Return to list of masks](#possible-masks)
+
+### HashInCSV
+
+[![Try it](https://img.shields.io/badge/-Try%20it%20in%20PIMO%20Play-brightgreen)](https://cgi-fr.github.io/pimo-play/#c=G4UwTgzglg9gdgLgAQCICMKBQBbAhhAayjgHMFMkkBaJCEAGxAGMAXGMcyrpAKwngAOuFgAtkKATAIhs8LNzyFO3JCPwiAknADCAZQBqylUgCuYKOJEsWAiAgD09klAgsAdM9EmARibpgmeBYQOHdA7HtcMGxnekYIezQATgAWbyYAMwyAZgBWAAZ8tBAAdhBvXOzcACZcAA5vFJTihuqmADZ7MFwAd3sk6urC9PzcdpLsgBNcphBqtDRR3FxJlNymkEn2phSi-Iz2upL7SWlZODcmCGB5Y1UQFfBkFjATEDuuAGIkGAEWWDguHoyCuwFU+CQuHujzASHoxBAFDudCE3TYHFQABoUB9vr9-vAgSDrkhgEC3rQQKjhOwkC4kJikcZwtgQixxJ8cR8kHi-gCiUhQYKgrhiBBhdhWaFxa4ov9SEgelBRDymSoMlAGJMIAAFcAAJWY7EmyHy3F5BMBwKQcBM2G84B+GSQGq14oEjrARrAk0xdOdZroLHFyqQbDDInetvtjpgztd9G1dLgEfeGsgLCQXsCPoA3P6bSASMIoKA-XAYILI0wCHTxXhJu9cHBJlnvUm8ABPcGgSGkqJQXDeRg2u0O2Fxl2axMQNXcF5QbDPV7vbmUC3860L7C0ISzZP9+hvcXN1uRmGzoA&i=N4KABGBEAOD2DWBTAtrAdpAXFAgpEAvkA)
+
+```yaml
+version: "1"
+masking:
+  - selector:
+      jsonpath: "pokemon"
+    mask:
+      hashInCSV:
+        uri: "https://gist.githubusercontent.com/armgilles/194bcff35001e7eb53a2a8b441e8b2c6/raw/92200bc0a673d5ce2110aaad4544ed6c4010f687/pokemon.csv"
+        header: true          # optional: csv has a header line, use it to name fields, default: false
+        separator: ","        # optional: csv value separator is , (default value)
+        comment: "#"          # optional: csv contains comments starting with #, if empty no comment is expected (default)
+        fieldsPerRecord: 0    # optional: number of fields per record, if 0 sets it to the number of fields in the first record (default)
+                              # if negative, no check is made and records may have a variable number of fields
+        trim: true            # optional: trim space in values and headers, default: false
+```
+
+The selected field's data will be masked with random values selected from a CSV file available at the specified URL (a GitHub gist in this case). The value will be chosen thanks to a hashing of the original value, allowing the output to be always the same in case of identical inputs.
+
+See [RandomChoiceInCSV](#randomchoiceincsv) for a detailed breakdown of the example configuration.
 
 [Return to list of masks](#possible-masks)
 

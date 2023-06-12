@@ -66,7 +66,7 @@ testcases:
     - result.systemerr ShouldBeEmpty
   - script : |-
       cat > expected.json <<EOF
-      {"regex":"05 30 85 92 14 / 04 40 20 85 81","randomChoice":"Marcelle","randomChoiceInUri":"Vincent","randomInt":"26","randomDecimal":"6.43","command":"Dorothy","weightedChoice":"Dupond","hash":"Ruby City","hashInUri":"Nathanaëlle","randDate":"2011-12-26 18:17:55 +0000 UTC","duration":"2011-12-24 19:17:55 +0000 UTC","dateParser":"29/07/22","randomDuration":"2011-12-03 06:48:40.768721325 +0000 UTC","ff1":"483494431","range":"[25;29]","luhn":"1234567897","transcode":"HR-803-TT"}
+      {"regex":"05 30 85 92 14 / 04 40 20 85 81","randomChoice":"Marcelle","randomChoiceInUri":"Vincent","randomInt":"26","randomDecimal":"6.43","command":"Dorothy","weightedChoice":"Dupond","hash":"Ruby City","hashInUri":"Nathanaëlle","randDate":"2011-12-26 18:17:55 +0000 UTC","duration":"2011-12-24 19:17:55 +0000 UTC","dateParser":"29/07/22","randomDuration":"2011-12-03 06:48:40.768721325 +0000 UTC","ff1":"483494431","range":"[25;29]","luhn":"1234567897","transcode":"HR-803-TT","randomChoiceInCSV":"{\"first_name\":\"Anissa\",\"last_name\":\"Mercier\",\"email\":\"anissa.mercier@yopmail.fr\"}","hashInCSV":"{\"first_name\":\"Gérard\",\"last_name\":\"Perez\",\"email\":\"gerard.perez@yopmail.fr\"}"}
       EOF
   - script: diff expected.json result.json
     assertions:

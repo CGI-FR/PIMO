@@ -1,0 +1,214 @@
+name: random in csv features
+testcases:
+
+- name: random mask
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      seed: 1
+      masking:
+        - selector:
+            jsonpath: "person"
+          mask:
+            randomChoiceInCSV:
+              uri: "file://../persons.csv"
+      EOF
+  - script: |-
+      echo '{"person": null}' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldEqual {"person":{"0":"Geoffroy","1":"Dupuis","2":"geoffroy.dupuis@yopmail.fr"}}
+    - result.systemerr ShouldBeEmpty
+
+- name: muliple random in csv with same source mask and header=true
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      seed: 1
+      masking:
+        - selector:
+            jsonpath: "person1"
+          mask:
+            randomChoiceInCSV:
+              uri: "file://../persons.csv"
+              header: true
+        - selector:
+            jsonpath: "person2"
+          mask:
+            randomChoiceInCSV:
+              uri: "file://../persons.csv"
+              header: true
+      EOF
+  - script: |-
+      echo '{"person1": null, "person2": null}' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemoutjson.person1.first_name ShouldEqual Aurèle
+    - result.systemoutjson.person2.first_name ShouldEqual Jean-Claude
+    - result.systemerr ShouldBeEmpty
+
+- name: random mask wih templated uri
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      seed: 1
+      masking:
+        - selector:
+            jsonpath: "person"
+          mask:
+            randomChoiceInCSV:
+              uri: "file://../{{.filename}}.csv"
+      EOF
+  - script: |-
+      echo '{"filename": "persons", "person": null}' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldEqual {"filename":"persons","person":{"0":"Geoffroy","1":"Dupuis","2":"geoffroy.dupuis@yopmail.fr"}}
+    - result.systemerr ShouldBeEmpty
+
+- name: random choice in csv with seeder
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      seed: 1
+      masking:
+        - selector:
+            jsonpath: "person"
+          masks:
+            - randomChoiceInCSV:
+                uri: "file://../persons.csv"
+                header: true
+            - template: "{{ .person.first_name }}"
+          seed:
+            field: "person"
+      EOF
+  - script: |-
+      echo -e '{"person":1}\n{"person":2}\n{"person":3}\n{"person":2}\n{"person":1}\n{"person":3}' | pimo | head -c -1 | tr '\n' ' '
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldEqual {"person":"Luce"} {"person":"Patricia"} {"person":"Luce"} {"person":"Patricia"} {"person":"Luce"} {"person":"Luce"}
+    - result.systemerr ShouldBeEmpty
+
+- name: random csv with different separator
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      seed: 1
+      masking:
+        - selector:
+            jsonpath: "person"
+          mask:
+            randomChoiceInCSV:
+              uri: "file://../persons_sep.csv"
+              header: true
+              separator: "%"
+      EOF
+  - script: |-
+      echo '{"person": null}' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldEqual {"person":{"first_name":"Anissa","last_name":"Mercier","email":"anissa.mercier@yopmail.fr"}}
+    - result.systemerr ShouldBeEmpty
+
+- name: random csv with comments
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      seed: 1
+      masking:
+        - selector:
+            jsonpath: "person"
+          mask:
+            randomChoiceInCSV:
+              uri: "file://../persons_sep_comment.csv"
+              header: true
+              separator: "%"
+              comment: "#"
+      EOF
+  - script: |-
+      echo '{"person": null}' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldEqual {"person":{"first_name":"Anissa","last_name":"Mercier","email":"anissa.mercier@yopmail.fr"}}
+    - result.systemerr ShouldBeEmpty
+
+- name: random csv with spaces
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      seed: 1
+      masking:
+        - selector:
+            jsonpath: "person"
+          mask:
+            randomChoiceInCSV:
+              uri: "file://../persons_sep_comment_trim.csv"
+              header: true
+              separator: "%"
+              comment: "#"
+              trim: true
+      EOF
+  - script: |-
+      echo '{"person": null}' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldEqual {"person":{"first_name":"Anissa","last_name":"Mercier","email":"anissa.mercier@yopmail.fr"}}
+    - result.systemerr ShouldBeEmpty
+
+- name: random in CSV expect any number of fields
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      seed: 1
+      masking:
+        - selector:
+            jsonpath: "person"
+          mask:
+            randomChoiceInCSV:
+              uri: "file://../persons_dirty.csv"
+              fieldsPerRecord: -1
+      EOF
+  - script: |-
+      echo '{"person": null}' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldEqual {"person":{"0":"Anissa","1":"anissa.mercier@yopmail.fr"}}
+    - result.systemerr ShouldBeEmpty
+
+- name: random in CSV expect exactly 4 fields and error
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      seed: 1
+      masking:
+        - selector:
+            jsonpath: "person"
+          mask:
+            randomChoiceInCSV:
+              uri: "file://../persons.csv"
+              fieldsPerRecord: 4
+      EOF
+  - script: |-
+      echo '{"person": null}' | pimo
+    assertions:
+    - result.code ShouldNotEqual 0
+    - result.systemout ShouldBeEmpty
+    - result.systemerr ShouldNotBeEmpty

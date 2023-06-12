@@ -17,6 +17,39 @@
       "additionalProperties": false,
       "type": "object"
     },
+    "ChoiceInCSVType": {
+      "properties": {
+        "uri": {
+          "type": "string",
+          "description": "URI of the CSV resource"
+        },
+        "header": {
+          "type": "boolean",
+          "description": "Does the CSV resource contains a header line"
+        },
+        "separator": {
+          "type": "string",
+          "description": "Separator character"
+        },
+        "comment": {
+          "type": "string",
+          "description": "Lines beginning with the comment character without preceding whitespace are ignored"
+        },
+        "fieldsPerRecord": {
+          "type": "integer",
+          "description": "FieldsPerRecord is the number of expected fields per record, 0 means the number of fields in the first record"
+        },
+        "trim": {
+          "type": "boolean",
+          "description": "If true leading white space in a field is ignored"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "uri"
+      ]
+    },
     "Class": {
       "properties": {
         "input": {
@@ -222,6 +255,12 @@
         },
         {
           "required": [
+            "randomChoiceInCSV"
+          ],
+          "title": "RandomChoiceInCSV"
+        },
+        {
+          "required": [
             "command"
           ],
           "title": "Command"
@@ -255,6 +294,12 @@
             "hashInUri"
           ],
           "title": "HashInURI"
+        },
+        {
+          "required": [
+            "hashInCSV"
+          ],
+          "title": "HashInCSV"
         },
         {
           "required": [
@@ -395,6 +440,11 @@
           "title": "Random Choice in URI",
           "description": "Replace the input value with a value chosen randomly from an external resource (1 line = 1 value)"
         },
+        "randomChoiceInCSV": {
+          "$ref": "#/$defs/ChoiceInCSVType",
+          "title": "Random Choice in CSV",
+          "description": "Replace the input value with a record chosen randomly from an external CSV resource"
+        },
         "command": {
           "type": "string",
           "title": "Command Mask",
@@ -422,12 +472,17 @@
           "items": true,
           "type": "array",
           "title": "Hash Mask",
-          "description": "Replace the input value with a value chosen deterministicly from a constant list, the same input will always be replaced by the same output"
+          "description": "Replace the input value with a value chosen deterministically from a constant list, the same input will always be replaced by the same output"
         },
         "hashInUri": {
           "type": "string",
           "title": "Hash in URI Mask",
-          "description": "Replace the input value with a value chosen deterministicly from an external resource (1 line = 1 value), the same input will always be replaced by the same output"
+          "description": "Replace the input value with a value chosen deterministically from an external resource (1 line = 1 value), the same input will always be replaced by the same output"
+        },
+        "hashInCSV": {
+          "$ref": "#/$defs/ChoiceInCSVType",
+          "title": "Hash in CSV",
+          "description": "Replace the input value with a record chosen deterministically from an external CSV resource, the same input will always be replaced by the same output"
         },
         "randDate": {
           "$ref": "#/$defs/RandDateType",

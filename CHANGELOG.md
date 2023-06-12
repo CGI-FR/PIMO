@@ -14,8 +14,9 @@ Types of changes
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
-## [1.17.1]
+## [1.18.0]
 
+- `Added` `randomChoiceInCSV` and `hashInCSV` mask to get values from CSV files
 - `Fixed` `Seed` option on randomized mask use global configured `seed` and the hash of the value
 - `Fixed` `--seed` flag allow the `-1` value
 

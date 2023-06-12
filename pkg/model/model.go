@@ -155,18 +155,29 @@ type TranscodeType struct {
 	Classes []Class `yaml:"classes,omitempty" json:"classes,omitempty" jsonschema_description:"Each class will define a rule to replace a set of characters by another"`
 }
 
+type ChoiceInCSVType struct {
+	URI             string `yaml:"uri" json:"uri" jsonschema_description:"URI of the CSV resource"`
+	Header          bool   `yaml:"header,omitempty" json:"header,omitempty" jsonschema_description:"Does the CSV resource contains a header line"`
+	Separator       string `yaml:"separator,omitempty" json:"separator,omitempty" jsonschema_description:"Separator character"`
+	Comment         string `yaml:"comment,omitempty" json:"comment,omitempty" jsonschema_description:"Lines beginning with the comment character without preceding whitespace are ignored"`
+	FieldsPerRecord int    `yaml:"fieldsPerRecord,omitempty" json:"fieldsPerRecord,omitempty" jsonschema_description:"FieldsPerRecord is the number of expected fields per record, 0 means the number of fields in the first record"`
+	TrimSpace       bool   `yaml:"trim,omitempty" json:"trim,omitempty" jsonschema_description:"If true leading white space in a field is ignored"`
+}
+
 type MaskType struct {
 	Add               Entry                `yaml:"add,omitempty" json:"add,omitempty" jsonschema:"oneof_required=Add,title=Add Mask,description=Add a new field in the JSON stream"`
 	AddTransient      Entry                `yaml:"add-transient,omitempty" json:"add-transient,omitempty" jsonschema:"oneof_required=AddTransient,title=Add Transient Mask" jsonschema_description:"Add a new temporary field, that will not show in the JSON output"`
 	Constant          Entry                `yaml:"constant,omitempty" json:"constant,omitempty" jsonschema:"oneof_required=Constant,title=Constant Mask" jsonschema_description:"Replace the input value with a constant field"`
 	RandomChoice      []Entry              `yaml:"randomChoice,omitempty" json:"randomChoice,omitempty" jsonschema:"oneof_required=RandomChoice,title=Random Choice Mask" jsonschema_description:"Replace the input value with a value chosen randomly from a constant list"`
 	RandomChoiceInURI string               `yaml:"randomChoiceInUri,omitempty" json:"randomChoiceInUri,omitempty" jsonschema:"oneof_required=RandomChoiceInURI,title=Random Choice in URI" jsonschema_description:"Replace the input value with a value chosen randomly from an external resource (1 line = 1 value)"`
+	RandomChoiceInCSV ChoiceInCSVType      `yaml:"randomChoiceInCSV,omitempty" json:"randomChoiceInCSV,omitempty" jsonschema:"oneof_required=RandomChoiceInCSV,title=Random Choice in CSV" jsonschema_description:"Replace the input value with a record chosen randomly from an external CSV resource"`
 	Command           string               `yaml:"command,omitempty" json:"command,omitempty" jsonschema:"oneof_required=Command,title=Command Mask" jsonschema_description:"Replace the input value with the result of the given system command"`
 	RandomInt         RandIntType          `yaml:"randomInt,omitempty" json:"randomInt,omitempty" jsonschema:"oneof_required=RandomInt,title=Random Integer Mask" jsonschema_description:"Replace the input value with a value chosen randomly from an integer range"`
 	WeightedChoice    []WeightedChoiceType `yaml:"weightedChoice,omitempty" json:"weightedChoice,omitempty" jsonschema:"oneof_required=WeightedChoice,title=Weighted Choice Mask" jsonschema_description:"Replace the input value with a value chosen randomly from a constant list, each value is given a weight (higher weight value has higher chance to be selected)"`
 	Regex             string               `yaml:"regex,omitempty" json:"regex,omitempty" jsonschema:"oneof_required=Regex,title=Regex Mask" jsonschema_description:"Replace the input value with a random generated value that match the given regular expression"`
-	Hash              []Entry              `yaml:"hash,omitempty" json:"hash,omitempty" jsonschema:"oneof_required=Hash,title=Hash Mask" jsonschema_description:"Replace the input value with a value chosen deterministicly from a constant list, the same input will always be replaced by the same output"`
-	HashInURI         string               `yaml:"hashInUri,omitempty" json:"hashInUri,omitempty" jsonschema:"oneof_required=HashInURI,title=Hash in URI Mask" jsonschema_description:"Replace the input value with a value chosen deterministicly from an external resource (1 line = 1 value), the same input will always be replaced by the same output"`
+	Hash              []Entry              `yaml:"hash,omitempty" json:"hash,omitempty" jsonschema:"oneof_required=Hash,title=Hash Mask" jsonschema_description:"Replace the input value with a value chosen deterministically from a constant list, the same input will always be replaced by the same output"`
+	HashInURI         string               `yaml:"hashInUri,omitempty" json:"hashInUri,omitempty" jsonschema:"oneof_required=HashInURI,title=Hash in URI Mask" jsonschema_description:"Replace the input value with a value chosen deterministically from an external resource (1 line = 1 value), the same input will always be replaced by the same output"`
+	HashInCSV         ChoiceInCSVType      `yaml:"hashInCSV,omitempty" json:"hashInCSV,omitempty" jsonschema:"oneof_required=HashInCSV,title=Hash in CSV" jsonschema_description:"Replace the input value with a record chosen deterministically from an external CSV resource, the same input will always be replaced by the same output"`
 	RandDate          RandDateType         `yaml:"randDate,omitempty" json:"randDate,omitempty" jsonschema:"oneof_required=RandDate,title=Random Date Mask" jsonschema_description:"Replace the input value with a value chosen randomly from an date range"`
 	Incremental       IncrementalType      `yaml:"incremental,omitempty" json:"incremental,omitempty" jsonschema:"oneof_required=Incremental,title=Incremental Mask" jsonschema_description:"Replace the input value with an incrementing integer sequence"`
 	Replacement       string               `yaml:"replacement,omitempty" json:"replacement,omitempty" jsonschema:"oneof_required=Replacement,title=Replacement Mask" jsonschema_description:"Replace the input value with the value of another field"`
