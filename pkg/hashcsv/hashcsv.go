@@ -19,6 +19,7 @@ package hashcsv
 
 import (
 	"bytes"
+	"fmt"
 	"hash/fnv"
 	"math/rand"
 	"strconv"
@@ -96,7 +97,7 @@ func (mrl MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.En
 
 	if mrl.header {
 		h := fnv.New32a()
-		if _, err := h.Write([]byte(e.(string))); err != nil {
+		if _, err := h.Write([]byte(fmt.Sprintf("%v", e))); err != nil {
 			return nil, err
 		}
 		record := records[1:][int(h.Sum32())%(len(records)-1)]
@@ -112,7 +113,7 @@ func (mrl MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.En
 		return obj, nil
 	} else {
 		h := fnv.New32a()
-		if _, err := h.Write([]byte(e.(string))); err != nil {
+		if _, err := h.Write([]byte(fmt.Sprintf("%v", e))); err != nil {
 			return nil, err
 		}
 		record := records[int(h.Sum32())%len(records)]

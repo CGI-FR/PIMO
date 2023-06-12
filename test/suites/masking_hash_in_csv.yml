@@ -1,0 +1,174 @@
+name: hash in csv features
+testcases:
+
+- name: hash in csv mask
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "person"
+          masks:
+            - hashInCSV:
+                uri: "file://../persons.csv"
+                header: true
+            - template: "{{ .person.first_name }}"
+      EOF
+  - script: |-
+      echo -e '{"person":1}\n{"person":2}\n{"person":3}\n{"person":2}\n{"person":1}\n{"person":3}' | pimo | head -c -1 | tr '\n' ' '
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldEqual {"person":"Gérard"} {"person":"Wilfried"} {"person":"Patricia"} {"person":"Wilfried"} {"person":"Gérard"} {"person":"Patricia"}
+    - result.systemerr ShouldBeEmpty
+
+- name: muliple hash in csv with same source mask and header=true
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "person1"
+          mask:
+            hashInCSV:
+              uri: "file://../persons.csv"
+              header: true
+        - selector:
+            jsonpath: "person2"
+          mask:
+            hashInCSV:
+              uri: "file://../persons.csv"
+              header: true
+        - selector:
+            jsonpath: "person3"
+          mask:
+            hashInCSV:
+              uri: "file://../persons.csv"
+              header: true
+      EOF
+  - script: |-
+      echo '{"person1": 1, "person2": 2, "person3": 1}' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemoutjson.person1.first_name ShouldEqual Gérard
+    - result.systemoutjson.person2.first_name ShouldEqual Wilfried
+    - result.systemoutjson.person3.first_name ShouldEqual Gérard
+    - result.systemerr ShouldBeEmpty
+
+- name: hash mask wih templated uri
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "person"
+          mask:
+            hashInCSV:
+              uri: "file://../{{.filename}}.csv"
+      EOF
+  - script: |-
+      echo '{"filename": "persons", "person": null}' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldEqual {"filename":"persons","person":{"0":"first_name","1":"last_name","2":"email"}}
+    - result.systemerr ShouldBeEmpty
+
+- name: hash choice in csv with seeder
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      seed: 1
+      masking:
+        - selector:
+            jsonpath: "person"
+          masks:
+            - hashInCSV:
+                uri: "file://../persons.csv"
+                header: true
+            - template: "{{ .person.first_name }}"
+          seed:
+            field: "person"
+      EOF
+  - script: |-
+      echo -e '{"person":1}\n{"person":2}\n{"person":3}\n{"person":2}\n{"person":1}\n{"person":3}' | pimo | head -c -1 | tr '\n' ' '
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldEqual {"person":"Gérard"} {"person":"Wilfried"} {"person":"Patricia"} {"person":"Wilfried"} {"person":"Gérard"} {"person":"Patricia"}
+    - result.systemerr ShouldBeEmpty
+
+- name: hash csv with different separator
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "person"
+          mask:
+            hashInCSV:
+              uri: "file://../persons_sep.csv"
+              header: true
+              separator: "%"
+      EOF
+  - script: |-
+      echo '{"person": null}' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldEqual {"person":{"first_name":"Gérard","last_name":"Perez","email":"gerard.perez@yopmail.fr"}}
+    - result.systemerr ShouldBeEmpty
+
+- name: hash csv with comments
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "person"
+          mask:
+            hashInCSV:
+              uri: "file://../persons_sep_comment.csv"
+              header: true
+              separator: "%"
+              comment: "#"
+      EOF
+  - script: |-
+      echo '{"person": null}' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldEqual {"person":{"first_name":"Gérard","last_name":"Perez","email":"gerard.perez@yopmail.fr"}}
+    - result.systemerr ShouldBeEmpty
+
+- name: hash csv with spaces
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "person"
+          mask:
+            hashInCSV:
+              uri: "file://../persons_sep_comment_trim.csv"
+              header: true
+              separator: "%"
+              comment: "#"
+              trim: true
+      EOF
+  - script: |-
+      echo '{"person": null}' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldEqual {"person":{"first_name":"Gérard","last_name":"Perez","email":"gerard.perez@yopmail.fr"}}
+    - result.systemerr ShouldBeEmpty
+
