@@ -45,7 +45,7 @@ type MaskEngine struct {
 	trimSpaces      bool
 }
 
-// NewMaskSeeded create a MaskRandomList with a seed
+// NewMask create a MaskRandomChoiceInCSV with a seed
 func NewMask(conf model.ChoiceInCSVType, seed int64, seeder model.Seeder) (MaskEngine, error) {
 	template, err := template.New("template-randomInCsv").Parse(conf.URI)
 	sep := ','
