@@ -22,6 +22,7 @@ import (
 	"hash/fnv"
 	"math/rand"
 	"strconv"
+	"strings"
 	"text/template"
 	"unicode/utf8"
 
@@ -55,7 +56,7 @@ func NewMask(conf model.ChoiceInCSVType, seed int64, seeder model.Seeder) (MaskE
 		comment, _ = utf8.DecodeRune([]byte(conf.Comment))
 	}
 	// nolint: gosec
-	return MaskEngine{rand.New(rand.NewSource(seed)), seeder, template, map[string][][]string{}, conf.Header, sep, comment, conf.FieldsPerRecord, conf.TrimLeadingSpace}, err
+	return MaskEngine{rand.New(rand.NewSource(seed)), seeder, template, map[string][][]string{}, conf.Header, sep, comment, conf.FieldsPerRecord, conf.TrimSpace}, err
 }
 
 // Mask choose a mask value randomly
@@ -98,14 +99,22 @@ func (mrl MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.En
 		obj := model.NewDictionary()
 		headers := records[0]
 		for i, header := range headers {
-			obj.Set(header, record[i])
+			if mrl.trimSpaces {
+				obj.Set(strings.TrimSpace(header), strings.TrimSpace(record[i]))
+			} else {
+				obj.Set(header, record[i])
+			}
 		}
 		return obj, nil
 	} else {
 		record := records[mrl.rand.Intn(len(records))]
 		obj := model.NewDictionary()
 		for i, value := range record {
-			obj.Set(strconv.Itoa(i), value)
+			if mrl.trimSpaces {
+				obj.Set(strconv.Itoa(i), strings.TrimSpace(value))
+			} else {
+				obj.Set(strconv.Itoa(i), value)
+			}
 		}
 		return obj, nil
 	}
@@ -128,7 +137,7 @@ func Factory(conf model.MaskFactoryConfiguration) (model.MaskEngine, bool, error
 func Func(seed int64, seedField string, comment string, fieldsPerRecord int, trimSpaces bool) interface{} {
 	var callnumber int64
 	return func(uri string, header bool, sep string) (model.Entry, error) {
-		mask, err := NewMask(model.ChoiceInCSVType{URI: uri, Header: header, Separator: sep, Comment: comment, FieldsPerRecord: fieldsPerRecord, TrimLeadingSpace: trimSpaces}, seed+callnumber, model.NewSeeder(seedField, seed+callnumber))
+		mask, err := NewMask(model.ChoiceInCSVType{URI: uri, Header: header, Separator: sep, Comment: comment, FieldsPerRecord: fieldsPerRecord, TrimSpace: trimSpaces}, seed+callnumber, model.NewSeeder(seedField, seed+callnumber))
 		if err != nil {
 			return "", err
 		}

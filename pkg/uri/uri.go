@@ -38,7 +38,7 @@ func ReadCsv(uri string, sep rune, comment rune, fieldsPerRecord int, trimLeadin
 
 	switch u.Scheme {
 	case "file":
-		f, err := os.Open(uri)
+		f, err := os.Open(u.Host + u.Path)
 		if err != nil {
 			return nil, err
 		}
