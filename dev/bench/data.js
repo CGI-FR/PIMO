@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1686576075834,
+  "lastUpdate": 1686577834399,
   "repoUrl": "https://github.com/CGI-FR/PIMO",
   "entries": {
     "Benchmark": [
@@ -3198,6 +3198,42 @@ window.BENCHMARK_DATA = {
             "value": 2902528,
             "unit": "ns/op\t  681542 B/op\t    5893 allocs/op",
             "extra": "3796 times\n2 procs"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "49699333+dependabot[bot]@users.noreply.github.com",
+            "name": "dependabot[bot]",
+            "username": "dependabot[bot]"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "98ce5018a0c970395fbf3b536d97ecaf8bf880fa",
+          "message": "chore(deps): bump github.com/mattn/go-isatty from 0.0.18 to 0.0.19 (#226)\n\nBumps [github.com/mattn/go-isatty](https://github.com/mattn/go-isatty) from 0.0.18 to 0.0.19.\r\n- [Commits](https://github.com/mattn/go-isatty/compare/v0.0.18...v0.0.19)\r\n\r\n---\r\nupdated-dependencies:\r\n- dependency-name: github.com/mattn/go-isatty\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-patch\r\n...\r\n\r\nSigned-off-by: dependabot[bot] <support@github.com>\r\nCo-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>",
+          "timestamp": "2023-06-12T15:35:31+02:00",
+          "tree_id": "c547a0e0ba1ad42b8b6dcaab061c2622c4779c60",
+          "url": "https://github.com/CGI-FR/PIMO/commit/98ce5018a0c970395fbf3b536d97ecaf8bf880fa"
+        },
+        "date": 1686577833598,
+        "tool": "go",
+        "benches": [
+          {
+            "name": "BenchmarkPimoRun",
+            "value": 45668,
+            "unit": "ns/op\t   16437 B/op\t     168 allocs/op",
+            "extra": "251248 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge",
+            "value": 2865430,
+            "unit": "ns/op\t  681447 B/op\t    5893 allocs/op",
+            "extra": "3867 times\n2 procs"
           }
         ]
       }
