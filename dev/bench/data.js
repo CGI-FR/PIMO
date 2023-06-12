@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1686124079957,
+  "lastUpdate": 1686576075834,
   "repoUrl": "https://github.com/CGI-FR/PIMO",
   "entries": {
     "Benchmark": [
@@ -3162,6 +3162,42 @@ window.BENCHMARK_DATA = {
             "value": 2635324,
             "unit": "ns/op\t  681677 B/op\t    5892 allocs/op",
             "extra": "4344 times\n2 procs"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "44274230+adrienaury@users.noreply.github.com",
+            "name": "Adrien Aury",
+            "username": "adrienaury"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "c39f410d023edabadadd612d0b0df8183654269b",
+          "message": "feat: choiceInCsv (#233)\n\n* feat(choiceInCsv): implement mask\r\n\r\n* feat(choiceInCsv): update json schema\r\n\r\n* feat(choiceInCsv): separator\r\n\r\n* feat(choiceInUri): lint\r\n\r\n* feat(choiceInUri): add parameters\r\n\r\n* feat(choiceInUri): hashInCsv\r\n\r\n* feat(choiceInCsv): update jsonschema\r\n\r\n* feat(choiceInCsv): add hashInCsv\r\n\r\n* feat(choiceInCsv): add venom tests\r\n\r\n* feat(choiceInCsv): add venom tests\r\n\r\n* feat(choiceInCsv): add venom tests\r\n\r\n* feat(choiceInCsv): add venom tests\r\n\r\n* docs(choiceInCsv): complete readme and changelog\r\n\r\n* fix: comment",
+          "timestamp": "2023-06-12T15:06:43+02:00",
+          "tree_id": "b47218aa975f0815c01d31926df41c23ea373765",
+          "url": "https://github.com/CGI-FR/PIMO/commit/c39f410d023edabadadd612d0b0df8183654269b"
+        },
+        "date": 1686576075105,
+        "tool": "go",
+        "benches": [
+          {
+            "name": "BenchmarkPimoRun",
+            "value": 45640,
+            "unit": "ns/op\t   16448 B/op\t     168 allocs/op",
+            "extra": "247682 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge",
+            "value": 2902528,
+            "unit": "ns/op\t  681542 B/op\t    5893 allocs/op",
+            "extra": "3796 times\n2 procs"
           }
         ]
       }
