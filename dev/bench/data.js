@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1686760847830,
+  "lastUpdate": 1686767688519,
   "repoUrl": "https://github.com/CGI-FR/PIMO",
   "entries": {
     "Benchmark": [
@@ -3378,6 +3378,42 @@ window.BENCHMARK_DATA = {
             "value": 2851192,
             "unit": "ns/op\t  681936 B/op\t    5893 allocs/op",
             "extra": "4096 times\n2 procs"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "youen.peron@cgi.com",
+            "name": "Youen Péron",
+            "username": "youen"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "9b88a15706ae4fd0d3289178627e929c735711c1",
+          "message": "fix: handle panics and recover gracefully when panics occure (#237)\n\n* fix: handle panics and recover gracefully when panics occure\r\n\r\n* docs: Update CHANGELOG.md\r\n\r\n---------\r\n\r\nCo-authored-by: Adrien Aury <44274230+adrienaury@users.noreply.github.com>",
+          "timestamp": "2023-06-14T20:20:31+02:00",
+          "tree_id": "8699df1f271c490549a9dbe9c222145355e0d228",
+          "url": "https://github.com/CGI-FR/PIMO/commit/9b88a15706ae4fd0d3289178627e929c735711c1"
+        },
+        "date": 1686767688052,
+        "tool": "go",
+        "benches": [
+          {
+            "name": "BenchmarkPimoRun",
+            "value": 43515,
+            "unit": "ns/op\t   16415 B/op\t     168 allocs/op",
+            "extra": "259021 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge",
+            "value": 2714416,
+            "unit": "ns/op\t  681721 B/op\t    5893 allocs/op",
+            "extra": "4420 times\n2 procs"
           }
         ]
       }
