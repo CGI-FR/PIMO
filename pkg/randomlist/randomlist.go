@@ -57,13 +57,15 @@ func (mrl MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.En
 
 // Factory create a mask from a yaml config
 func Factory(conf model.MaskFactoryConfiguration) (model.MaskEngine, bool, error) {
+	seeder := model.NewSeeder(conf.Masking.Seed.Field, conf.Seed)
+
 	// set differents seeds for differents jsonpath
 	h := fnv.New64a()
 	h.Write([]byte(conf.Masking.Selector.Jsonpath))
 	conf.Seed += int64(h.Sum64())
 
 	if len(conf.Masking.Mask.RandomChoice) != 0 {
-		return NewMask(conf.Masking.Mask.RandomChoice, conf.Seed, model.NewSeeder(conf.Masking.Seed.Field, conf.Seed)), true, nil
+		return NewMask(conf.Masking.Mask.RandomChoice, conf.Seed, seeder), true, nil
 	}
 
 	return nil, false, nil

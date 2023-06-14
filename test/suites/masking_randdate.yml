@@ -97,5 +97,5 @@ testcases:
         echo -e '{"date":1}\n{"date":2}\n{"date":3}\n{"date":2}\n{"date":1}\n{"date":3}' | TZ="" pimo | head -c -1 | tr '\n' ' '
       assertions:
       - result.code ShouldEqual 0
-      - result.systemout ShouldEqual {"date":"1997-10-30T16:13:09Z"} {"date":"1997-09-15T01:31:05Z"} {"date":"1997-05-30T12:42:07Z"} {"date":"1997-09-15T01:31:05Z"} {"date":"1997-10-30T16:13:09Z"} {"date":"1997-05-30T12:42:07Z"}
+      - result.systemout ShouldEqual {"date":"1997-07-31T05:16:11Z"} {"date":"1997-02-07T18:24:46Z"} {"date":"1997-04-21T22:05:41Z"} {"date":"1997-02-07T18:24:46Z"} {"date":"1997-07-31T05:16:11Z"} {"date":"1997-04-21T22:05:41Z"}
       - result.systemerr ShouldBeEmpty

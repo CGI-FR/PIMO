@@ -66,5 +66,5 @@ testcases:
       echo -e '{"id":"1A"}\n{"id":"2B"}\n{"id":"3C"}\n{"id":"2B"}\n{"id":"1A"}\n{"id":"3C"}' | pimo | head -c -1 | tr '\n' ' '
     assertions:
     - result.code ShouldEqual 0
-    - result.systemout ShouldEqual {"id":"0E"} {"id":"3S"} {"id":"3Q"} {"id":"3S"} {"id":"0E"} {"id":"3Q"}
+    - result.systemout ShouldEqual {"id":"3I"} {"id":"7C"} {"id":"3D"} {"id":"7C"} {"id":"3I"} {"id":"3D"}
     - result.systemerr ShouldBeEmpty

@@ -102,5 +102,5 @@ testcases:
       echo -e '{"index": 1, "date": "2020-01-01T00:00:00Z"}\n{"index": 2, "date": "2020-01-01T00:00:00Z"}\n{"index": 1, "date": "2020-01-01T00:00:00Z"}\n{"index": 2, "date": "2020-01-01T00:00:00Z"}' | pimo | head -c -1 | tr '\n' ' '
     assertions:
       - result.code ShouldEqual 0
-      - result.systemout ShouldEqual {"date":"2019-12-29T22:49:04.208101611Z"} {"date":"2019-12-25T10:44:05.019037735Z"} {"date":"2019-12-29T22:49:04.208101611Z"} {"date":"2019-12-25T10:44:05.019037735Z"}
+      - result.systemout ShouldEqual {"date":"2019-12-28T07:57:54.421699429Z"} {"date":"2019-12-10T09:05:42.752967314Z"} {"date":"2019-12-28T07:57:54.421699429Z"} {"date":"2019-12-10T09:05:42.752967314Z"}
       - result.systemerr ShouldBeEmpty
