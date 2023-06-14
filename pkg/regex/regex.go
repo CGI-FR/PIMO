@@ -65,12 +65,14 @@ func (rm MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Ent
 // Factory create a mask from a yaml config
 func Factory(conf model.MaskFactoryConfiguration) (model.MaskEngine, bool, error) {
 	if len(conf.Masking.Mask.Regex) != 0 {
+		seeder := model.NewSeeder(conf.Masking.Seed.Field, conf.Seed)
+
 		// set differents seeds for differents jsonpath
 		h := fnv.New64a()
 		h.Write([]byte(conf.Masking.Selector.Jsonpath))
 		conf.Seed += int64(h.Sum64())
 
-		mask, err := NewMask(conf.Masking.Mask.Regex, conf.Seed, model.NewSeeder(conf.Masking.Seed.Field, conf.Seed))
+		mask, err := NewMask(conf.Masking.Mask.Regex, conf.Seed, seeder)
 		if err != nil {
 			return nil, true, err
 		}

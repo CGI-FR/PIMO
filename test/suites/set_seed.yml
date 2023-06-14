@@ -83,3 +83,47 @@ testcases:
           - result.code ShouldEqual 0
           - result.systemoutjson.name ShouldEqual Rolande
           - result.systemerr ShouldBeEmpty
+
+  - name: test local seed consistency between fields
+    steps:
+      - script: rm -f masking.yml
+      - script: |-
+          cat > masking.yml <<EOF
+          version: "1"
+          seed: 42
+          masking:
+            - selector:
+                jsonpath: "name"
+              mask:
+                template: '{{printf "%.0f" .id_person}}{{.name}}'
+            - selector:
+                jsonpath: "name"
+              mask:
+                randomChoiceInUri: "pimo://surnameFR"
+              seed:
+                field: "name"
+            - selector:
+                jsonpath: "name2"
+              mask:
+                template: '{{printf "%.0f" .id_person}}{{.name2}}'
+            - selector:
+                jsonpath: "name2"
+              mask:
+                randomChoiceInUri: "pimo://surnameFR"
+              seed:
+                field: "name2"
+          EOF
+      - script: |-
+          echo '{"id": 123456789, "name": "", "name2": ""}' | pimo -s -1 -c masking.yml
+        assertions:
+          - result.code ShouldEqual 0
+          - result.systemoutjson.name ShouldEqual Perez
+          - result.systemoutjson.name2 ShouldEqual Perez
+          - result.systemerr ShouldBeEmpty
+      - script: |-
+          echo '{"id": 123456789, "name": "A", "name2": "B"}' | pimo -s -1 -c masking.yml
+        assertions:
+          - result.code ShouldEqual 0
+          - result.systemoutjson.name ShouldEqual Lopez
+          - result.systemoutjson.name2 ShouldEqual Legrand
+          - result.systemerr ShouldBeEmpty
