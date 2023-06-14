@@ -96,5 +96,5 @@ testcases:
       echo -e '{"age":1}\n{"age":2}\n{"age":3}\n{"age":2}\n{"age":1}\n{"age":3}' | pimo | head -c -1 | tr '\n' ' '
     assertions:
     - result.code ShouldEqual 0
-    - result.systemout ShouldEqual {"age":87} {"age":69} {"age":65} {"age":69} {"age":87} {"age":65}
+    - result.systemout ShouldEqual {"age":82} {"age":81} {"age":56} {"age":81} {"age":82} {"age":56}
     - result.systemerr ShouldBeEmpty

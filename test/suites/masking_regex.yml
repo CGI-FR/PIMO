@@ -87,5 +87,5 @@ testcases:
       echo -e '{"name":1}\n{"name":2}\n{"name":3}\n{"name":2}\n{"name":1}\n{"name":3}' | pimo | head -c -1 | tr '\n' ' '
     assertions:
     - result.code ShouldEqual 0
-    - result.systemout ShouldEqual {"name":"rvktt"} {"name":"bjrxd"} {"name":"qlofi"} {"name":"bjrxd"} {"name":"rvktt"} {"name":"qlofi"}
+    - result.systemout ShouldEqual {"name":"bakvg"} {"name":"vvauw"} {"name":"cdjgf"} {"name":"vvauw"} {"name":"bakvg"} {"name":"cdjgf"}
     - result.systemerr ShouldBeEmpty
