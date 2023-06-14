@@ -77,6 +77,15 @@ func main() {
 			reject := args[1]
 
 			go func() {
+				// dont't panic
+				defer func() {
+					if r := recover(); r != nil {
+						log.Error().AnErr("panic", r.(error)).Msg("Recovering from panic in play.")
+						errorObject := errorConstructor.New(r.(error).Error())
+						reject.Invoke(errorObject)
+					}
+				}()
+
 				data, err := play(yaml, data)
 				if err != nil {
 					// err should be an instance of `error`, eg `errors.New("some error")`
@@ -100,6 +109,15 @@ func main() {
 			reject := args[1]
 
 			go func() {
+				// dont't panic
+				defer func() {
+					if r := recover(); r != nil {
+						log.Error().AnErr("panic", r.(error)).Msg("Recovering from panic in flow")
+						errorObject := errorConstructor.New(r.(error).Error())
+						reject.Invoke(errorObject)
+					}
+				}()
+
 				pdef, err := model.LoadPipelineDefinitionFromYAML([]byte(yaml))
 				if err != nil {
 					log.Err(err).Msg("Cannot load pipeline definition")

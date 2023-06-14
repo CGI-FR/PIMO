@@ -17,6 +17,7 @@ Types of changes
 ## [1.18.1]
 
 - `Fixed` local seed parameter should be consistent between different jsonpath
+- `Fixed` PIMO Play web assembly version handle panics and recover gracefully when panics occure
 
 ## [1.18.0]
 
