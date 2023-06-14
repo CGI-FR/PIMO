@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1686639842143,
+  "lastUpdate": 1686760847830,
   "repoUrl": "https://github.com/CGI-FR/PIMO",
   "entries": {
     "Benchmark": [
@@ -3342,6 +3342,42 @@ window.BENCHMARK_DATA = {
             "value": 2235150,
             "unit": "ns/op\t  681449 B/op\t    5892 allocs/op",
             "extra": "4839 times\n2 procs"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "44274230+adrienaury@users.noreply.github.com",
+            "name": "Adrien Aury",
+            "username": "adrienaury"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "5fb95bfd4b1cd141da6d54b94a698a931d8a850e",
+          "message": "fix: local seed consistency between fields (#235)\n\n* fix: local seed consistency between fields\r\n\r\n* test: local seed consistency between fields",
+          "timestamp": "2023-06-14T18:25:30+02:00",
+          "tree_id": "3ea08488f3b050d55080fe2611d4aed25d2da9f0",
+          "url": "https://github.com/CGI-FR/PIMO/commit/5fb95bfd4b1cd141da6d54b94a698a931d8a850e"
+        },
+        "date": 1686760847125,
+        "tool": "go",
+        "benches": [
+          {
+            "name": "BenchmarkPimoRun",
+            "value": 45907,
+            "unit": "ns/op\t   16426 B/op\t     168 allocs/op",
+            "extra": "254991 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge",
+            "value": 2851192,
+            "unit": "ns/op\t  681936 B/op\t    5893 allocs/op",
+            "extra": "4096 times\n2 procs"
           }
         ]
       }
