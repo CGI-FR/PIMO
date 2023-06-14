@@ -99,5 +99,5 @@ testcases:
       echo -e '{"name":1}\n{"name":2}\n{"name":3}\n{"name":2}\n{"name":1}\n{"name":3}' | pimo | head -c -1 | tr '\n' ' '
     assertions:
     - result.code ShouldEqual 0
-    - result.systemout ShouldEqual {"name":"Benjamin"} {"name":"Benjamin"} {"name":"Mickael"} {"name":"Benjamin"} {"name":"Benjamin"} {"name":"Mickael"}
+    - result.systemout ShouldEqual {"name":"Mickael"} {"name":"Benjamin"} {"name":"Marc"} {"name":"Benjamin"} {"name":"Mickael"} {"name":"Marc"}
     - result.systemerr ShouldBeEmpty

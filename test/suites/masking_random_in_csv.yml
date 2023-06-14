@@ -94,7 +94,7 @@ testcases:
       echo -e '{"person":1}\n{"person":2}\n{"person":3}\n{"person":2}\n{"person":1}\n{"person":3}' | pimo | head -c -1 | tr '\n' ' '
     assertions:
     - result.code ShouldEqual 0
-    - result.systemout ShouldEqual {"person":"Luce"} {"person":"Patricia"} {"person":"Luce"} {"person":"Patricia"} {"person":"Luce"} {"person":"Luce"}
+    - result.systemout ShouldEqual {"person":"Anissa"} {"person":"Patricia"} {"person":"Jean-Claude"} {"person":"Patricia"} {"person":"Anissa"} {"person":"Jean-Claude"}
     - result.systemerr ShouldBeEmpty
 
 - name: random csv with different separator

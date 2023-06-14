@@ -103,5 +103,5 @@ testcases:
       echo -e '{"amount":1}\n{"amount":2}\n{"amount":3}\n{"amount":2}\n{"amount":1}\n{"amount":3}' | pimo | head -c -1 | tr '\n' ' '
     assertions:
     - result.code ShouldEqual 0
-    - result.systemout ShouldEqual {"amount":6.926} {"amount":2.042} {"amount":0.512} {"amount":2.042} {"amount":6.926} {"amount":0.512}
+    - result.systemout ShouldEqual {"amount":6.367} {"amount":1.186} {"amount":8.9} {"amount":1.186} {"amount":6.367} {"amount":8.9}
     - result.systemerr ShouldBeEmpty

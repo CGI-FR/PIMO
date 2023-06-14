@@ -105,11 +105,14 @@ func (me MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Ent
 
 // Create a mask from a configuration
 func Factory(conf model.MaskFactoryConfiguration) (model.MaskEngine, bool, error) {
-	if len(conf.Masking.Mask.RandomDuration.Min) != 0 || len(conf.Masking.Mask.RandomDuration.Max) != 0 { // set differents seeds for differents jsonpath
+	if len(conf.Masking.Mask.RandomDuration.Min) != 0 || len(conf.Masking.Mask.RandomDuration.Max) != 0 {
+		seeder := model.NewSeeder(conf.Masking.Seed.Field, conf.Seed)
+
+		// set differents seeds for differents jsonpath
 		h := fnv.New64a()
 		h.Write([]byte(conf.Masking.Selector.Jsonpath))
 		conf.Seed += int64(h.Sum64())
-		mask, err := NewMask(conf.Masking.Mask.RandomDuration.Min, conf.Masking.Mask.RandomDuration.Max, conf.Seed, model.NewSeeder(conf.Masking.Seed.Field, conf.Seed))
+		mask, err := NewMask(conf.Masking.Mask.RandomDuration.Min, conf.Masking.Mask.RandomDuration.Max, conf.Seed, seeder)
 		if err != nil {
 			return nil, false, err
 		}

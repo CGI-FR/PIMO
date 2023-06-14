@@ -14,6 +14,10 @@ Types of changes
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [1.18.1]
+
+- `Fixed` local seed parameter should be consistent between different jsonpath
+
 ## [1.18.0]
 
 - `Added` `randomChoiceInCSV` and `hashInCSV` mask to get values from CSV files
