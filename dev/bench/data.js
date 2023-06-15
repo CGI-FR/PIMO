@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1686767688519,
+  "lastUpdate": 1686814354690,
   "repoUrl": "https://github.com/CGI-FR/PIMO",
   "entries": {
     "Benchmark": [
@@ -3414,6 +3414,42 @@ window.BENCHMARK_DATA = {
             "value": 2714416,
             "unit": "ns/op\t  681721 B/op\t    5893 allocs/op",
             "extra": "4420 times\n2 procs"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "44274230+adrienaury@users.noreply.github.com",
+            "name": "Adrien Aury",
+            "username": "adrienaury"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "8daf79d7b9b389444b730aa8d2332c730cf6bf64",
+          "message": "fix: play panic recover (#238)\n\n* chore: ignore node_modules in go\r\n\r\n* chore: ignore node_modules in go\r\n\r\n* fix: don't panic in pimo play\r\n\r\n* fix: lint\r\n\r\n* docs: fix changelog\r\n\r\n* Update internal/app/pimo/play.go\r\n\r\nCo-authored-by: Youen Péron <youen.peron@cgi.com>\r\n\r\n---------\r\n\r\nCo-authored-by: Youen Péron <youen.peron@cgi.com>",
+          "timestamp": "2023-06-15T09:16:44+02:00",
+          "tree_id": "33fef08eb3e010a56a134e6483ebf942fed8e9cc",
+          "url": "https://github.com/CGI-FR/PIMO/commit/8daf79d7b9b389444b730aa8d2332c730cf6bf64"
+        },
+        "date": 1686814353854,
+        "tool": "go",
+        "benches": [
+          {
+            "name": "BenchmarkPimoRun",
+            "value": 46144,
+            "unit": "ns/op\t   16476 B/op\t     168 allocs/op",
+            "extra": "238645 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge",
+            "value": 3113376,
+            "unit": "ns/op\t  681536 B/op\t    5892 allocs/op",
+            "extra": "3690 times\n2 procs"
           }
         ]
       }
