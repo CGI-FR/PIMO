@@ -53,7 +53,7 @@ func play(ctx echo.Context) error {
 			return ctx.String(http.StatusInternalServerError, r.(error).Error())
 		}
 		return nil
-	}()
+	}() //nolint:errcheck
 
 	config := Config{
 		EmptyInput:       false,
@@ -126,7 +126,7 @@ func flowchart(ctx echo.Context) error {
 			return ctx.String(http.StatusInternalServerError, r.(error).Error())
 		}
 		return nil
-	}()
+	}() //nolint:errcheck
 
 	var dataInput map[string]interface{}
 
