@@ -122,7 +122,7 @@ func flowchart(ctx echo.Context) error {
 	// dont't panic
 	defer func() error {
 		if r := recover(); r != nil {
-			log.Error().AnErr("panic", r.(error)).Msg("Recovering from panic in play.")
+			log.Error().AnErr("panic", r.(error)).Msg("Recovering from panic in flow.")
 			return ctx.String(http.StatusInternalServerError, r.(error).Error())
 		}
 		return nil
