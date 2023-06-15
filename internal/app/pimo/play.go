@@ -46,6 +46,15 @@ func Play(enableSecurity bool) *echo.Echo {
 
 // play binds client interface data entry to be processed and returns the transformed json to client
 func play(ctx echo.Context) error {
+	// dont't panic
+	defer func() error {
+		if r := recover(); r != nil {
+			log.Error().AnErr("panic", r.(error)).Msg("Recovering from panic in play.")
+			return ctx.String(http.StatusInternalServerError, r.(error).Error())
+		}
+		return nil
+	}() //nolint:errcheck
+
 	config := Config{
 		EmptyInput:       false,
 		RepeatUntil:      "",
@@ -110,6 +119,15 @@ func play(ctx echo.Context) error {
 }
 
 func flowchart(ctx echo.Context) error {
+	// dont't panic
+	defer func() error {
+		if r := recover(); r != nil {
+			log.Error().AnErr("panic", r.(error)).Msg("Recovering from panic in flow.")
+			return ctx.String(http.StatusInternalServerError, r.(error).Error())
+		}
+		return nil
+	}() //nolint:errcheck
+
 	var dataInput map[string]interface{}
 
 	err := ctx.Bind(&dataInput)
