@@ -1,7 +1,8 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # dependencies
-/node_modules
+# /node_modules
+!/node_modules/go.mod
 /.pnp
 .pnp.js
 
@@ -23,6 +24,6 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# Elm 
+# Elm
 elm-stuff/
 gen/
