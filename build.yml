@@ -447,8 +447,11 @@ targets:
                 if len(keycomponents) > 1 {
                   suffix = "-" + keycomponents[len(keycomponents)-1]
                 }
-              - $: "sudo docker push ={DOCKERHUB_ORGANIZATION}/={project}={suffix}:v={version_major}"
-              - $: "sudo docker push ={DOCKERHUB_ORGANIZATION}/={project}={suffix}:v={version_major}.={version_minor}"
+                beta = split(version_patch, "-")
+              - if: len(beta) == 1 
+                then:                 
+                  - $: "sudo docker push ={DOCKERHUB_ORGANIZATION}/={project}={suffix}:v={version_major}"
+                  - $: "sudo docker push ={DOCKERHUB_ORGANIZATION}/={project}={suffix}:v={version_major}.={version_minor}"
               - $: "sudo docker push ={DOCKERHUB_ORGANIZATION}/={project}={suffix}:v={version_major}.={version_minor}.={version_patch}"
               - if: "latest"
                 then:
