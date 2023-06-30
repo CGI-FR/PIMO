@@ -21,6 +21,7 @@ import (
 	b64 "encoding/base64"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/capitalone/fpe/ff1"
 	"github.com/cgi-fr/pimo/pkg/model"
@@ -69,22 +70,38 @@ func (ff1m MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.E
 	if err != nil {
 		return nil, err
 	}
+
+	radix := int(ff1m.radix)
+	value := e.(string)
+	if len(ff1m.domain) > 0 {
+		if value, err = toFF1Domain(value, ff1m.domain); err != nil {
+			return nil, err
+		}
+		radix = len(ff1m.domain)
+	}
+
 	// Create cipher based on radix, key and the given tweak
-	FF1, err := ff1.NewCipher(int(ff1m.radix), len(tweak), decodedKey, []byte(tweak))
+	FF1, err := ff1.NewCipher(radix, len(tweak), decodedKey, []byte(tweak))
 	if err != nil {
 		return nil, err
 	}
+
 	var ciphertext string
 	if ff1m.decrypt {
 		// Decrypt targeted string
-		ciphertext, err = FF1.Decrypt(e.(string))
+		ciphertext, err = FF1.Decrypt(value)
 	} else {
 		// Encrypt targeted string
-		ciphertext, err = FF1.Encrypt(e.(string))
+		ciphertext, err = FF1.Encrypt(value)
 	}
 	if err != nil {
 		return nil, err
 	}
+
+	if len(ff1m.domain) > 0 {
+		ciphertext = fromFF1Domain(ciphertext, ff1m.domain)
+	}
+
 	return ciphertext, nil
 }
 
@@ -119,4 +136,32 @@ func Func(seed int64, seedField string) interface{} {
 		mask := NewMask(key, "tweak", radix, decrypt, domain, preserve, "")
 		return mask.Mask(input, context)
 	}
+}
+
+const ff1domain = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+
+func toFF1Domain(value string, domain string) (string, error) {
+	var result strings.Builder
+	for _, char := range value {
+		index := strings.IndexRune(domain, char)
+		if index > -1 {
+			result.WriteByte(ff1domain[index])
+		} else {
+			return value, fmt.Errorf("character %c is outside of the domain %s", char, domain)
+		}
+	}
+	return result.String(), nil
+}
+
+func fromFF1Domain(value string, domain string) string {
+	var result strings.Builder
+	for _, char := range value {
+		index := strings.IndexRune(ff1domain, char)
+		if index > -1 {
+			result.WriteByte(domain[index])
+		} else {
+			panic(fmt.Errorf("character %c is outside of the ff1 domain", char))
+		}
+	}
+	return result.String()
 }
