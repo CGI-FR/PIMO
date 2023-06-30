@@ -155,10 +155,19 @@ func Factory(conf model.MaskFactoryConfiguration) (model.MaskEngine, bool, error
 }
 
 func Func(seed int64, seedField string) interface{} {
-	return func(key string, tweak string, radix uint, decrypt bool, domain string, preserve bool, input model.Entry) (model.Entry, error) {
+	return func(key string, tweak string, radix uint, decrypt bool, input model.Entry) (model.Entry, error) {
 		context := model.NewDictionary()
 		context.Set("tweak", tweak)
-		mask := NewMask(key, "tweak", radix, decrypt, domain, preserve, nil)
+		mask := NewMask(key, "tweak", radix, decrypt, "", false, nil)
+		return mask.Mask(input, context)
+	}
+}
+
+func FuncV2(seed int64, seedField string) interface{} {
+	return func(key string, tweak string, domain string, preserve bool, decrypt bool, input model.Entry) (model.Entry, error) {
+		context := model.NewDictionary()
+		context.Set("tweak", tweak)
+		mask := NewMask(key, "tweak", 0, decrypt, domain, preserve, nil)
 		return mask.Mask(input, context)
 	}
 }

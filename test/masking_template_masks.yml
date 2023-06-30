@@ -67,7 +67,12 @@ masking:
       jsonpath: "ff1"
     masks:
       - add: "123456879"
-      - template: '{{MaskFF1 "FF1_ENCRYPTION_KEY" "" 10 false "" false .ff1}}'
+      - template: '{{MaskFF1 "FF1_ENCRYPTION_KEY" "" 10 false .ff1}}'
+  - selector:
+      jsonpath: "ff1_v2"
+    masks:
+      - add: "1234-5687-9"
+      - template: '{{MaskFF1_v2 "FF1_ENCRYPTION_KEY" "" "1234567890" true false .ff1_v2}}'
   - selector:
       jsonpath: "range"
     masks:
