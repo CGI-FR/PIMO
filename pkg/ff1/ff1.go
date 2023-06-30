@@ -18,6 +18,7 @@
 package ff1
 
 import (
+	"bytes"
 	b64 "encoding/base64"
 	"fmt"
 	"os"
@@ -25,6 +26,7 @@ import (
 
 	"github.com/capitalone/fpe/ff1"
 	"github.com/cgi-fr/pimo/pkg/model"
+	"github.com/cgi-fr/pimo/pkg/template"
 	"github.com/rs/zerolog/log"
 )
 
@@ -36,11 +38,11 @@ type MaskEngine struct {
 	decrypt    bool
 	domain     string
 	preserve   bool
-	onError    string
+	onError    *template.Engine
 }
 
 // NewMask return a MaskEngine from a value
-func NewMask(key string, tweak string, radix uint, decrypt bool, domain string, preserve bool, onError string) MaskEngine {
+func NewMask(key string, tweak string, radix uint, decrypt bool, domain string, preserve bool, onError *template.Engine) MaskEngine {
 	return MaskEngine{key, tweak, radix, decrypt, domain, preserve, onError}
 }
 
@@ -76,6 +78,9 @@ func (ff1m MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.E
 	var preserved map[int]rune
 	if len(ff1m.domain) > 0 {
 		if value, preserved, err = toFF1Domain(value, ff1m.domain, ff1m.preserve); err != nil {
+			if ff1m.onError != nil {
+				return executeTemplate(ff1m.onError, context)
+			}
 			return nil, err
 		}
 		radix = len(ff1m.domain)
@@ -96,6 +101,9 @@ func (ff1m MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.E
 		ciphertext, err = FF1.Encrypt(value)
 	}
 	if err != nil {
+		if ff1m.onError != nil {
+			return executeTemplate(ff1m.onError, context)
+		}
 		return nil, err
 	}
 
@@ -125,7 +133,23 @@ func Factory(conf model.MaskFactoryConfiguration) (model.MaskEngine, bool, error
 		if conf.Masking.Mask.FF1.Radix == 0 && conf.Masking.Mask.FF1.Domain == "" {
 			return nil, true, fmt.Errorf("radix or domain should be given")
 		}
-		return NewMask(conf.Masking.Mask.FF1.KeyFromEnv, conf.Masking.Mask.FF1.TweakField, conf.Masking.Mask.FF1.Radix, conf.Masking.Mask.FF1.Decrypt, conf.Masking.Mask.FF1.Domain, conf.Masking.Mask.FF1.Preserve, conf.Masking.Mask.FF1.OnError), true, nil
+		var onError *template.Engine
+		if len(conf.Masking.Mask.FF1.OnError) > 0 {
+			if temp, err := template.NewEngine(conf.Masking.Mask.FF1.OnError, conf.Functions, conf.Seed, conf.Masking.Seed.Field); err != nil {
+				return nil, true, err
+			} else {
+				onError = temp
+			}
+		}
+		return NewMask(
+			conf.Masking.Mask.FF1.KeyFromEnv,
+			conf.Masking.Mask.FF1.TweakField,
+			conf.Masking.Mask.FF1.Radix,
+			conf.Masking.Mask.FF1.Decrypt,
+			conf.Masking.Mask.FF1.Domain,
+			conf.Masking.Mask.FF1.Preserve,
+			onError,
+		), true, nil
 	}
 	return nil, false, nil
 }
@@ -134,7 +158,7 @@ func Func(seed int64, seedField string) interface{} {
 	return func(key string, tweak string, radix uint, decrypt bool, domain string, preserve bool, input model.Entry) (model.Entry, error) {
 		context := model.NewDictionary()
 		context.Set("tweak", tweak)
-		mask := NewMask(key, "tweak", radix, decrypt, domain, preserve, "")
+		mask := NewMask(key, "tweak", radix, decrypt, domain, preserve, nil)
 		return mask.Mask(input, context)
 	}
 }
@@ -180,4 +204,12 @@ func fromFF1Domain(value string, domain string, preserved map[int]rune) string {
 		pos++
 	}
 	return result.String()
+}
+
+func executeTemplate(engine *template.Engine, contexts []model.Dictionary) (string, error) {
+	var output bytes.Buffer
+	if err := engine.Execute(&output, contexts[0].Unordered()); err != nil {
+		return "", err
+	}
+	return output.String(), nil
 }
