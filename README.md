@@ -701,18 +701,21 @@ A `reverse` option is available in the `caches` section to use the reverse cache
 
 ### FF1
 
-[![Try it](https://img.shields.io/badge/-Try%20it%20in%20PIMO%20Play-brightgreen)](https://cgi-fr.github.io/pimo-play/#c=G4UwTgzglg9gdgLgAQCICMKBQBbAhhAayjgHMFNMkkBaJCEAGxAGMAXGMcq7pAKwngAHXKwAWyFFAAmIOKygAzKOCw88hLjyQKFaTVqRhcUqAA9kaAAyUDSAiACeAMTAxsAUTjAJTp2gD67gByAMIASgCaAAoAKgCSAPJB-gDS7hFYmADESL5oSACu9BBIuNpmIFJIUm64xNUgSnBQ8vBIABQMUBCsSDAKpQwMgwwwAO6VSMyiuEZs4CX1uHB9BayCa0iyzGAOgqyTPWDEJACUAHTZSJZoAEwAzAAsAKwAbADsABwAnLgARswZAoSKIoLwCAxsHAYIIAI6QVgFYBjUwOABeAEEAEIhAAi7icAHEABJxABSKQAMgBZIIJKIARTCAGUYgBVABqAHUABoRABaVxiohAhmMZiQwiM2BABzADTl2GIorGoOmktmvX6SDEopqeHqQOILVgKzGUCGpTYBVwQwcSD+oqKlUuOScHC2plw2EETAANKUxSZTH0BlYkObLYJXFICsxRcBbQUQCVmPBWHVmqQ+nAGPaTCQWiUru1dUhw0oEVMZnM5SVtWWFAVLfrMw0mib4BchSKwI0OCAA2XEwxk6GgxLsEVekwIPX5SBYTbhmJlkhXrdzkgMQwBIGR2PtfkPZYkN0z15bdJLjYcjEYA0dntemUD076I-dvtkKwwMmbLQ9BMGwHD6Nw-BCCI4ioNIsjyEo4D+DIT77JUqjcOoBAQGBVC0MYUgSAA3oR5ywXIijKGAAC+VHoTwtA6HoNi2BO5jltYLFUMhX6sD+f4gMxtj2M4rgeF4Ph+IEoSRLEiTJGkGSYEAA&i=N4KABGBECWAmCmA7ALtAZteAnSAuKAHAEwDMBBAnACykkCsVlFkIAvkA)
+[![Try it](https://img.shields.io/badge/-Try%20it%20in%20PIMO%20Play-brightgreen)](https://cgi-fr.github.io/pimo-play/#c=G4UwTgzglg9gdgLgAQCICMKBQBbAhhAayjgHMFNMkkBaJCEAGxAGMAXGMcq7pAKwngAHXKwAWyFNDAhWWHnkJceSAGYq0S5UgIgAngDEwMbAFE4wCfv1oA+iYByAYQBKATQAKAFQCSAeXs2ANImrnJaSAAmxrjEEgAMaABMAMwALACsAGwA7AAcAJwoSADESLgMDEiCMBDQAEZMSMyiuGC4bOAQSMRldFDSrJTh8CZgRpxIAOTe5uVQEUjA5QCuIEgA3utIAHRSMkgAvgeTJd0qdDIANEhiUF2sINiCDCJrAO5QFUh1ayAAHixlg8FvAkOBxhRSlY0EhlvQurhVFAAQsongehEQCpiFBWLA4EgABQMO6sJAwc7lSpUmBvEALZqtdoPSDdAm4AkwIGCIFguDMMC6QTAuisMDEEgASm2mFKCRSGRyBVwdWYmJUJFEUF4BAY2DgMEEAEdIKxlsA3n9dAAvACCACFHAAREz6ADiAAlvAApQIAGQAsvZfO4AIrOADKngAqgA1ADqAA1XAAtWVITyiNZtCLIqpM7AycCRItgbDEd5a5r5sBkik3LORaIYrE4vGgj5fZnLKm6b5rOH0mVQjhgv64J5Ma6InN5+toOJITuVQRGCLLZhrJYMVZdZjwVgxOAS8lwBh93MkXFddOEsRrBdI01NFptDqs+v31TLL5oo8l7Fj3bOBpXTTNwCxDgQGuL9t1WclzlnP4kGwOEySYWpyTAMEjR7SoxA5JBMkSbYkFtBgBF6OC1nnLCkEXO42W3eYZSGUpPBgEsBSFMlEWo2F6C4wVhWQMVViGWh6CYNgOE0bh+CEERxFQeYQDgPFsXAGxMW44V6TCKgFAICA5KoWhcAiCIJE2bZVPUqBNLAI4DO4Wg1A0IZwiQJDkAXTzwh04TWFEsBxK8qgdAMIxTHMSxrDsJw3C8PwAmCUJMCAA&i=N4KABGBECWAmCmA7ALtAZteAnSAuKAHAEwDMBBAnACykkCsVlFkIAvkA)
 
 ```yaml
   - selector:
       jsonpath: "siret"
     mask:
       ff1:
-        radix: 10
         keyFromEnv: "FF1_ENCRYPTION_KEY"
+        domain: "0123456789" # all possible characters in a siret
+        onError: "Invalid value = {{ .siret }}" # if set, this template will be executed on error
 ```
 
 This example will encrypt the `siret` column with the private key base64-encoded in the FF1_ENCRYPTION_KEY environment variable. Use the same mask with the option `decrypt: true` to re-identify the unmasked value.
+
+Characters outside of the domain can be preserved with `preserve: true` option.
 
 Be sure to check [the full FPE demo](demo/demo7) to get more details about this mask.
 

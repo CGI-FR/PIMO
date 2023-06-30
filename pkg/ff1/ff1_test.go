@@ -98,5 +98,5 @@ func TestFactoryShouldReturnErrorOnWrongConfig(t *testing.T) {
 	mask, present, err := Factory(factoryConfig)
 	assert.Nil(t, mask, "should be nil")
 	assert.True(t, present, "should be true")
-	assert.EqualErrorf(t, err, "radix attribut is not optional", "should be nil")
+	assert.EqualErrorf(t, err, "one of the radix or domain attributes should be set", "should be nil")
 }

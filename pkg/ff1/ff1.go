@@ -131,7 +131,7 @@ func Factory(conf model.MaskFactoryConfiguration) (model.MaskEngine, bool, error
 			return nil, true, fmt.Errorf("keyFromEnv attribut is not optional")
 		}
 		if conf.Masking.Mask.FF1.Radix == 0 && conf.Masking.Mask.FF1.Domain == "" {
-			return nil, true, fmt.Errorf("radix or domain should be given")
+			return nil, true, fmt.Errorf("one of the radix or domain attributes should be set")
 		}
 		var onError *template.Engine
 		if conf.Masking.Mask.FF1.OnError != nil {
