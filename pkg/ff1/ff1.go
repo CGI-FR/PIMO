@@ -33,11 +33,14 @@ type MaskEngine struct {
 	tweakField string
 	radix      uint
 	decrypt    bool
+	domain     string
+	preserve   bool
+	onError    string
 }
 
 // NewMask return a MaskEngine from a value
-func NewMask(key string, tweak string, radix uint, decrypt bool) MaskEngine {
-	return MaskEngine{key, tweak, radix, decrypt}
+func NewMask(key string, tweak string, radix uint, decrypt bool, domain string, preserve bool, onError string) MaskEngine {
+	return MaskEngine{key, tweak, radix, decrypt, domain, preserve, onError}
 }
 
 // Mask return a Constant from a MaskEngine
@@ -97,23 +100,23 @@ func decodingKey(key string) ([]byte, error) {
 
 // Factory create a mask from a configuration
 func Factory(conf model.MaskFactoryConfiguration) (model.MaskEngine, bool, error) {
-	if conf.Masking.Mask.FF1.KeyFromEnv != "" || conf.Masking.Mask.FF1.Radix > 0 {
+	if conf.Masking.Mask.FF1.KeyFromEnv != "" || conf.Masking.Mask.FF1.Radix > 0 || conf.Masking.Mask.FF1.Domain != "" {
 		if conf.Masking.Mask.FF1.KeyFromEnv == "" {
 			return nil, true, fmt.Errorf("keyFromEnv attribut is not optional")
 		}
-		if conf.Masking.Mask.FF1.Radix == 0 {
-			return nil, true, fmt.Errorf("radix attribut is not optional")
+		if conf.Masking.Mask.FF1.Radix == 0 && conf.Masking.Mask.FF1.Domain == "" {
+			return nil, true, fmt.Errorf("radix or domain should be given")
 		}
-		return NewMask(conf.Masking.Mask.FF1.KeyFromEnv, conf.Masking.Mask.FF1.TweakField, conf.Masking.Mask.FF1.Radix, conf.Masking.Mask.FF1.Decrypt), true, nil
+		return NewMask(conf.Masking.Mask.FF1.KeyFromEnv, conf.Masking.Mask.FF1.TweakField, conf.Masking.Mask.FF1.Radix, conf.Masking.Mask.FF1.Decrypt, conf.Masking.Mask.FF1.Domain, conf.Masking.Mask.FF1.Preserve, conf.Masking.Mask.FF1.OnError), true, nil
 	}
 	return nil, false, nil
 }
 
 func Func(seed int64, seedField string) interface{} {
-	return func(key string, tweak string, radix uint, decrypt bool, input model.Entry) (model.Entry, error) {
+	return func(key string, tweak string, radix uint, decrypt bool, domain string, preserve bool, input model.Entry) (model.Entry, error) {
 		context := model.NewDictionary()
 		context.Set("tweak", tweak)
-		mask := NewMask(key, "tweak", radix, decrypt)
+		mask := NewMask(key, "tweak", radix, decrypt, domain, preserve, "")
 		return mask.Mask(input, context)
 	}
 }
