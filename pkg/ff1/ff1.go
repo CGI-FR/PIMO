@@ -73,8 +73,9 @@ func (ff1m MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.E
 
 	radix := int(ff1m.radix)
 	value := e.(string)
+	var preserved map[int]rune
 	if len(ff1m.domain) > 0 {
-		if value, err = toFF1Domain(value, ff1m.domain); err != nil {
+		if value, preserved, err = toFF1Domain(value, ff1m.domain, ff1m.preserve); err != nil {
 			return nil, err
 		}
 		radix = len(ff1m.domain)
@@ -99,7 +100,7 @@ func (ff1m MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.E
 	}
 
 	if len(ff1m.domain) > 0 {
-		ciphertext = fromFF1Domain(ciphertext, ff1m.domain)
+		ciphertext = fromFF1Domain(ciphertext, ff1m.domain, preserved)
 	}
 
 	return ciphertext, nil
@@ -140,28 +141,43 @@ func Func(seed int64, seedField string) interface{} {
 
 const ff1domain = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
-func toFF1Domain(value string, domain string) (string, error) {
+func toFF1Domain(value string, domain string, preserve bool) (string, map[int]rune, error) {
+	preserved := map[int]rune{}
 	var result strings.Builder
-	for _, char := range value {
+	for pos, char := range value {
 		index := strings.IndexRune(domain, char)
-		if index > -1 {
+		switch {
+		case index > -1:
 			result.WriteByte(ff1domain[index])
-		} else {
-			return value, fmt.Errorf("character %c is outside of the domain %s", char, domain)
+		case preserve:
+			preserved[pos] = char
+		default:
+			return value, nil, fmt.Errorf("character %c is outside of the domain %s", char, domain)
 		}
 	}
-	return result.String(), nil
+	fmt.Println(preserved)
+	return result.String(), preserved, nil
 }
 
-func fromFF1Domain(value string, domain string) string {
+func fromFF1Domain(value string, domain string, preserved map[int]rune) string {
 	var result strings.Builder
+	pos := 0
 	for _, char := range value {
+		for char, ok := preserved[pos]; ok; char, ok = preserved[pos] {
+			result.WriteRune(char)
+			pos++
+		}
 		index := strings.IndexRune(ff1domain, char)
 		if index > -1 {
 			result.WriteByte(domain[index])
 		} else {
 			panic(fmt.Errorf("character %c is outside of the ff1 domain", char))
 		}
+		pos++
+	}
+	for char, ok := preserved[pos]; ok; char, ok = preserved[pos] {
+		result.WriteRune(char)
+		pos++
 	}
 	return result.String()
 }
