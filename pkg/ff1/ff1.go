@@ -134,8 +134,8 @@ func Factory(conf model.MaskFactoryConfiguration) (model.MaskEngine, bool, error
 			return nil, true, fmt.Errorf("radix or domain should be given")
 		}
 		var onError *template.Engine
-		if len(conf.Masking.Mask.FF1.OnError) > 0 {
-			if temp, err := template.NewEngine(conf.Masking.Mask.FF1.OnError, conf.Functions, conf.Seed, conf.Masking.Seed.Field); err != nil {
+		if conf.Masking.Mask.FF1.OnError != nil {
+			if temp, err := template.NewEngine(*conf.Masking.Mask.FF1.OnError, conf.Functions, conf.Seed, conf.Masking.Seed.Field); err != nil {
 				return nil, true, err
 			} else {
 				onError = temp
