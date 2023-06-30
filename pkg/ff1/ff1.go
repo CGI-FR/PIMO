@@ -179,7 +179,6 @@ func toFF1Domain(value string, domain string, preserve bool) (string, map[int]ru
 			return value, nil, fmt.Errorf("character %c is outside of the domain %s", char, domain)
 		}
 	}
-	fmt.Println(preserved)
 	return result.String(), preserved, nil
 }
 

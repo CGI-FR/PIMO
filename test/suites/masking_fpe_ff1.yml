@@ -200,14 +200,14 @@ testcases:
       echo '{"name": "1A2B3C4D"}' | FF1_ENCRYPTION_KEY="70NZ2NWAqk9/A21vBPxqlA==" pimo
     assertions:
     - result.code ShouldEqual 0
-    - result.systemoutjson.name ShouldEqual adefinir
+    - result.systemoutjson.name ShouldEqual B234BBA1
     - result.systemerr ShouldBeEmpty
   - script: |-
       echo '{"name": "12345678"}' | FF1_ENCRYPTION_KEY="70NZ2NWAqk9/A21vBPxqlA==" pimo
     assertions:
     - result.code ShouldEqual 4
     - |-
-      result.systemerr ShouldContainSubstring "à définir"
+      result.systemerr ShouldContainSubstring "character 5 is outside of the domain ABCD1234"
 
 - name: custom domain and preserve
   steps:
@@ -228,14 +228,14 @@ testcases:
       echo '{"name": "1A2B-3C4D"}' | FF1_ENCRYPTION_KEY="70NZ2NWAqk9/A21vBPxqlA==" pimo
     assertions:
     - result.code ShouldEqual 0
-    - result.systemoutjson.name ShouldEqual adef-inir
+    - result.systemoutjson.name ShouldEqual B234-BBA1
     - result.systemerr ShouldBeEmpty
   - script: |-
       echo '{"name": "1234-5678"}' | FF1_ENCRYPTION_KEY="70NZ2NWAqk9/A21vBPxqlA==" pimo
     assertions:
-    - result.code ShouldEqual 4
-    - |-
-      result.systemerr ShouldContainSubstring "à définir-5678"
+    - result.code ShouldEqual 0
+    - result.systemoutjson.name ShouldEqual 3DC3-5678
+    - result.systemerr ShouldBeEmpty
 
 - name: on error
   steps:
