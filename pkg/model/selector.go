@@ -66,9 +66,16 @@ type selector struct {
 }
 
 func NewPathSelector(path string) Selector {
+	if path == "." {
+		return selector{"", nil}
+	}
+	return selector{"", newInternalPathSelector(strings.TrimPrefix(path, "."))}
+}
+
+func newInternalPathSelector(path string) selectorInternal {
 	paths := strings.SplitN(path, ".", 2)
 	if len(paths) == 2 {
-		return selector{paths[0], NewPathSelector(paths[1]).(selectorInternal)}
+		return selector{paths[0], newInternalPathSelector(paths[1])}
 	}
 	return selector{paths[0], nil}
 }
