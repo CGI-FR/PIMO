@@ -78,7 +78,7 @@ func TestFromCacheProcessShouldWaitForValueProvide(t *testing.T) {
 		NewDictionary().With("id", "2").With("name", "John").With("supervisor", "4"),
 		NewDictionary().With("id", "3").With("name", "Tom").With("supervisor", "2"),
 	}
-	var result []Dictionary
+	var result []Entry
 
 	pipeline := NewPipelineFromSlice(mySlice).
 		Process(NewMaskEngineProcess(NewPathSelector("id"), NewMaskCacheEngine(cache, idMasking), "")).

@@ -16,6 +16,17 @@ func NewDictionary() Dictionary {
 	return Dictionary{ordered.NewOrderedMap()}
 }
 
+func Copy(other Entry) Entry {
+	switch d := other.(type) {
+	case Dictionary:
+		return d.Copy()
+	case Entry:
+		return NewDictionary().With("entry", d).Copy().Get("entry")
+	default:
+		panic("")
+	}
+}
+
 // CopyDictionary clone deeply dictionary
 func CopyDictionary(other Dictionary) Dictionary {
 	if other.OrderedMap == nil {

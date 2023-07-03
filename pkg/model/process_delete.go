@@ -35,11 +35,11 @@ func (dp *DeleteMaskEngineProcess) Open() (err error) {
 	return err
 }
 
-func (dp *DeleteMaskEngineProcess) ProcessDictionary(dictionary Dictionary, out Collector) error {
+func (dp *DeleteMaskEngineProcess) ProcessDictionary(dictionary Entry, out Collector) error {
 	over.AddGlobalFields("path")
 	over.MDC().Set("path", dp.selector)
 	defer func() { over.MDC().Remove("path") }()
-	result := dictionary
+	result := dictionary.(Dictionary)
 	applied := dp.selector.Apply(result, func(rootContext, parentContext Dictionary, key string, value Entry) (Action, Entry) {
 		return DELETE, nil
 	})

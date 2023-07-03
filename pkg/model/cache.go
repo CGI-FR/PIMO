@@ -245,7 +245,7 @@ func (p *FromCacheProcess) Open() error {
 	return nil
 }
 
-func (p *FromCacheProcess) ProcessDictionary(dictionary Dictionary, out Collector) error {
+func (p *FromCacheProcess) ProcessDictionary(dictionary Entry, out Collector) error {
 	for p.readiness.Next() {
 		p.processDictionary(p.readiness.Value(), out)
 	}
@@ -254,8 +254,8 @@ func (p *FromCacheProcess) ProcessDictionary(dictionary Dictionary, out Collecto
 	return nil
 }
 
-func (p *FromCacheProcess) processDictionary(dictionary Dictionary, out Collector) {
-	key, ok := p.selector.Read(dictionary)
+func (p *FromCacheProcess) processDictionary(dictionary Entry, out Collector) {
+	key, ok := p.selector.Read(dictionary.(Dictionary))
 	if !ok {
 		out.Collect(dictionary)
 		return
@@ -264,7 +264,7 @@ func (p *FromCacheProcess) processDictionary(dictionary Dictionary, out Collecto
 	value, inCache := p.cache.Get(key)
 	switch {
 	case inCache:
-		out.Collect(p.selector.Write(dictionary, value))
+		out.Collect(p.selector.Write(dictionary.(Dictionary), value))
 	case p.preserve == "notInCache":
 		out.Collect(dictionary)
 	default:
@@ -296,8 +296,8 @@ func (lvs *LookupValueSetter) Open() error {
 	return nil
 }
 
-func (lvs *LookupValueSetter) ProcessDictionary(e Dictionary, c Collector) error {
-	if entry, ok := lvs.selector.Read(e); ok {
+func (lvs *LookupValueSetter) ProcessDictionary(e Entry, c Collector) error {
+	if entry, ok := lvs.selector.Read(e.(Dictionary)); ok {
 		lvs.cache.SetLookupValue(entry)
 	}
 	c.Collect(e)
@@ -312,7 +312,7 @@ func (lvd *LookupValueDiscarder) Open() error {
 	return nil
 }
 
-func (lvd *LookupValueDiscarder) ProcessDictionary(e Dictionary, c Collector) error {
+func (lvd *LookupValueDiscarder) ProcessDictionary(e Entry, c Collector) error {
 	lvd.cache.SetLookupValue(nil)
 	c.Collect(e)
 	return nil

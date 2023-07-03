@@ -68,7 +68,7 @@ func (s *Source) Next() bool {
 	return s.err == nil
 }
 
-func (s *Source) Value() model.Dictionary {
+func (s *Source) Value() model.Entry {
 	return s.value
 }
 
@@ -96,7 +96,7 @@ func (s Sink) Open() error {
 	return nil
 }
 
-func (s Sink) ProcessDictionary(dictionary model.Dictionary) error {
+func (s Sink) ProcessDictionary(dictionary model.Entry) error {
 	jsonline, err := json.Marshal(dictionary)
 	if err != nil {
 		return err

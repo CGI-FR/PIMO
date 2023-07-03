@@ -37,12 +37,12 @@ func (mep *MaskEngineProcess) Open() error {
 	return nil
 }
 
-func (mep *MaskEngineProcess) ProcessDictionary(dictionary Dictionary, out Collector) (ret error) {
+func (mep *MaskEngineProcess) ProcessDictionary(dictionary Entry, out Collector) (ret error) {
 	over.AddGlobalFields("path")
 	over.MDC().Set("path", mep.selector)
 	defer func() { over.MDC().Remove("path") }()
 	result := dictionary
-	applied := mep.selector.Apply(result, func(rootContext, parentContext Dictionary, key string, value Entry) (Action, Entry) {
+	applied := mep.selector.Apply(result.(Dictionary), func(rootContext, parentContext Dictionary, key string, value Entry) (Action, Entry) {
 		switch {
 		case value == nil && (mep.preserve == "null" || mep.preserve == "blank"):
 			log.Trace().Msgf("Preserve %s value, skip masking", mep.preserve)
@@ -79,7 +79,7 @@ func (mep *MaskEngineProcess) ProcessDictionary(dictionary Dictionary, out Colle
 	if ret != nil && skipFieldOnError {
 		log.Warn().AnErr("error", ret).Msg("Field skipped")
 		statistics.IncIgnoredFieldsCount()
-		mep.selector.Apply(result, func(rootContext, parentContext Dictionary, key string, value Entry) (Action, Entry) {
+		mep.selector.Apply(result.(Dictionary), func(rootContext, parentContext Dictionary, key string, value Entry) (Action, Entry) {
 			return DELETE, nil
 		})
 		out.Collect(result)
