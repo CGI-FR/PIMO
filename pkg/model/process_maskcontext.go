@@ -42,7 +42,7 @@ func (mcep *MaskContextEngineProcess) ProcessDictionary(dictionary Dictionary, o
 	defer func() { over.MDC().Remove("path") }()
 	result := dictionary
 	applied := mcep.selector.ApplyContext(result, func(rootContext, parentContext Dictionary, key string, _ Entry) (Action, Entry) {
-		masked, err := mcep.mask.MaskContext(parentContext, key, rootContext, parentContext)
+		masked, err := mcep.mask.MaskContext(parentContext, key, rootContext.Get("").(Dictionary), parentContext)
 		if err != nil {
 			ret = err
 			return NOTHING, nil

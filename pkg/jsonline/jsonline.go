@@ -50,10 +50,7 @@ func JSONToDictionary(jsonline []byte) (model.Dictionary, error) {
 		return model.NewDictionary(), err
 	}
 
-	root := model.NewDictionary()
-	root.Set("", dict)
-
-	return model.CleanDictionary(root), nil
+	return model.CleanDictionary(dict), nil
 }
 
 func (s *Source) Open() error {
@@ -100,7 +97,7 @@ func (s Sink) Open() error {
 }
 
 func (s Sink) ProcessDictionary(dictionary model.Dictionary) error {
-	jsonline, err := json.Marshal(dictionary.Get(""))
+	jsonline, err := json.Marshal(dictionary)
 	if err != nil {
 		return err
 	}

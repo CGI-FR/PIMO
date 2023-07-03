@@ -94,6 +94,9 @@ func BuildPipeline(pipeline Pipeline, conf Definition, caches map[string]Cache, 
 	}
 	cleaners := []Processor{}
 
+	// pack data inside a root container
+	pipeline = pipeline.Process(NewPackProcess())
+
 	for _, masking := range conf.Masking {
 		allSelectors := masking.Selectors
 		if sel := masking.Selector; sel.Jsonpath != "" {
@@ -104,7 +107,7 @@ func BuildPipeline(pipeline Pipeline, conf Definition, caches map[string]Cache, 
 			nbArg := 0
 
 			if cache, ok := caches[masking.Cache]; ok {
-				pipeline = pipeline.Process(&LookupValueSetter{cache, NewPathSelector(sel.Jsonpath)})
+				pipeline = pipeline.Process(&LookupValueSetter{cache, NewPackedPathSelector(sel.Jsonpath)})
 			}
 
 			allMasksDefinition := append([]MaskType{masking.Mask}, masking.Masks...)
@@ -125,7 +128,7 @@ func BuildPipeline(pipeline Pipeline, conf Definition, caches map[string]Cache, 
 					if !ok {
 						return nil, nil, errors.New("Cache '" + virtualMask.Cache + "' not found for '" + virtualMask.Selector.Jsonpath + "'")
 					}
-					pipeline = pipeline.Process(NewFromCacheProcess(NewPathSelector(virtualMask.Selector.Jsonpath), cache, virtualMask.Preserve))
+					pipeline = pipeline.Process(NewFromCacheProcess(NewPackedPathSelector(virtualMask.Selector.Jsonpath), cache, virtualMask.Preserve))
 					nbArg++
 				}
 
@@ -149,7 +152,7 @@ func BuildPipeline(pipeline Pipeline, conf Definition, caches map[string]Cache, 
 								mask = NewMaskCacheEngine(typedCache, mask)
 							}
 						}
-						pipeline = pipeline.Process(NewMaskEngineProcess(NewPathSelector(virtualMask.Selector.Jsonpath), mask, virtualMask.Preserve))
+						pipeline = pipeline.Process(NewMaskEngineProcess(NewPackedPathSelector(virtualMask.Selector.Jsonpath), mask, virtualMask.Preserve))
 						nbArg++
 					}
 				}
@@ -172,10 +175,10 @@ func BuildPipeline(pipeline Pipeline, conf Definition, caches map[string]Cache, 
 								mask = NewMaskContextCacheEngine(typedCache, mask)
 							}
 						}
-						pipeline = pipeline.Process(NewMaskContextEngineProcess(NewPathSelector(virtualMask.Selector.Jsonpath), mask))
+						pipeline = pipeline.Process(NewMaskContextEngineProcess(NewPackedPathSelector(virtualMask.Selector.Jsonpath), mask))
 						nbArg++
 						if i, hasCleaner := mask.(HasCleaner); hasCleaner {
-							cleaners = append(cleaners, NewMaskContextEngineProcess(NewPathSelector(virtualMask.Selector.Jsonpath), i.GetCleaner()))
+							cleaners = append(cleaners, NewMaskContextEngineProcess(NewPackedPathSelector(virtualMask.Selector.Jsonpath), i.GetCleaner()))
 						}
 					}
 				}
@@ -193,6 +196,9 @@ func BuildPipeline(pipeline Pipeline, conf Definition, caches map[string]Cache, 
 	for _, cleaner := range cleaners {
 		pipeline = pipeline.Process(cleaner)
 	}
+
+	// unpack data from the container
+	pipeline = pipeline.Process(NewUnpackProcess())
 
 	return pipeline, caches, nil
 }
