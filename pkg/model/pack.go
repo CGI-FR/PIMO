@@ -12,8 +12,12 @@ func (pp *PackProcess) Open() error {
 }
 
 func (pp *PackProcess) ProcessDictionary(dictionary Dictionary, out Collector) error {
-	packed := NewDictionary().With("", dictionary)
-	out.Collect(packed)
+	if _, ok := dictionary.GetValue("."); ok {
+		out.Collect(dictionary)
+	} else {
+		packed := NewDictionary().With(".", dictionary)
+		out.Collect(packed)
+	}
 	return nil
 }
 
@@ -29,7 +33,7 @@ func (up *UnpackProcess) Open() error {
 }
 
 func (up *UnpackProcess) ProcessDictionary(dictionary Dictionary, out Collector) error {
-	unpacked := dictionary.Get("").(Dictionary)
+	unpacked := dictionary.Get(".").(Dictionary)
 	out.Collect(unpacked)
 	return nil
 }

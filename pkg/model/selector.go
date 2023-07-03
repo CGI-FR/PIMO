@@ -67,9 +67,9 @@ type selector struct {
 
 func NewPackedPathSelector(path string) Selector {
 	if path == "." {
-		return selector{"", nil}
+		return selector{".", nil}
 	}
-	return selector{"", NewPathSelector(strings.TrimPrefix(path, "."))}
+	return selector{".", NewPathSelector(strings.TrimPrefix(path, "."))}
 }
 
 func NewPathSelector(path string) selectorInternal {

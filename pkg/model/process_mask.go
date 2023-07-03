@@ -51,7 +51,7 @@ func (mep *MaskEngineProcess) ProcessDictionary(dictionary Dictionary, out Colle
 			log.Trace().Msgf("Preserve %s value, skip masking", mep.preserve)
 			return NOTHING, nil
 		default:
-			masked, err := mep.mask.Mask(value, rootContext.Get("").(Dictionary), parentContext)
+			masked, err := mep.mask.Mask(value, rootContext.Get(".").(Dictionary), parentContext)
 			if err != nil {
 				ret = err
 				return NOTHING, nil
