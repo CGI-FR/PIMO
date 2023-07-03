@@ -181,3 +181,81 @@ testcases:
     - result.code ShouldEqual 4
     - |-
       result.systemerr ShouldContainSubstring "key length must be 128, 192, or 256 bits"
+
+- name: custom domain
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "name"
+          mask:
+            ff1:
+              domain: "ABCD1234"
+              keyFromEnv: "FF1_ENCRYPTION_KEY"
+      EOF
+  - script: |-
+      echo '{"name": "1A2B3C4D"}' | FF1_ENCRYPTION_KEY="70NZ2NWAqk9/A21vBPxqlA==" pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemoutjson.name ShouldEqual B234BBA1
+    - result.systemerr ShouldBeEmpty
+  - script: |-
+      echo '{"name": "12345678"}' | FF1_ENCRYPTION_KEY="70NZ2NWAqk9/A21vBPxqlA==" pimo
+    assertions:
+    - result.code ShouldEqual 4
+    - |-
+      result.systemerr ShouldContainSubstring "character 5 is outside of the domain ABCD1234"
+
+- name: custom domain and preserve
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "name"
+          mask:
+            ff1:
+              domain: "ABCD1234"
+              preserve: true
+              keyFromEnv: "FF1_ENCRYPTION_KEY"
+      EOF
+  - script: |-
+      echo '{"name": "1A2B-3C4D"}' | FF1_ENCRYPTION_KEY="70NZ2NWAqk9/A21vBPxqlA==" pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemoutjson.name ShouldEqual B234-BBA1
+    - result.systemerr ShouldBeEmpty
+  - script: |-
+      echo '{"name": "1234-5678"}' | FF1_ENCRYPTION_KEY="70NZ2NWAqk9/A21vBPxqlA==" pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemoutjson.name ShouldEqual 3DC3-5678
+    - result.systemerr ShouldBeEmpty
+
+- name: on error
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "name"
+          mask:
+            ff1:
+              radix: 10
+              onError: "Invalid value : {{.name}}"
+              keyFromEnv: "FF1_ENCRYPTION_KEY"
+      EOF
+  - script: |-
+      echo '{"name": "ABCD"}' | FF1_ENCRYPTION_KEY="70NZ2NWAqk9/A21vBPxqlA==" pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - |
+      result.systemoutjson.name ShouldEqual "Invalid value : ABCD"
+    - result.systemerr ShouldBeEmpty
