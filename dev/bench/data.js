@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1687849876361,
+  "lastUpdate": 1688398962241,
   "repoUrl": "https://github.com/CGI-FR/PIMO",
   "entries": {
     "Benchmark": [
@@ -3486,6 +3486,42 @@ window.BENCHMARK_DATA = {
             "value": 2878267,
             "unit": "ns/op\t  681606 B/op\t    5893 allocs/op",
             "extra": "3651 times\n2 procs"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "44274230+adrienaury@users.noreply.github.com",
+            "name": "Adrien Aury",
+            "username": "adrienaury"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "6be731ce916c0cc5d9370d41dcddec87f1c5b2d6",
+          "message": "feat(ff1): venom tests for improvements (#243)\n\n* feat(ff1): venom tests for improvements\r\n\r\n* feat(ff1): update ff1 model\r\n\r\n* feat(ff1): update ff1 mask model\r\n\r\n* feat(ff1): added custom domain\r\n\r\n* feat(ff1): added preserve chars outside of domain\r\n\r\n* feat(ff1): added onError template\r\n\r\n* feat(ff1): update jsonschema\r\n\r\n* feat(ff1): possibility to use empty value onError\r\n\r\n* feat(ff1): documentation\r\n\r\n* feat(ff1): fix venom tests\r\n\r\n* feat(ff1): use MaskFF1_v2 in template",
+          "timestamp": "2023-07-03T17:31:28+02:00",
+          "tree_id": "edfa6419798061392dd501dc465465fe2fc98f22",
+          "url": "https://github.com/CGI-FR/PIMO/commit/6be731ce916c0cc5d9370d41dcddec87f1c5b2d6"
+        },
+        "date": 1688398961869,
+        "tool": "go",
+        "benches": [
+          {
+            "name": "BenchmarkPimoRun",
+            "value": 29880,
+            "unit": "ns/op\t   16467 B/op\t     168 allocs/op",
+            "extra": "377989 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge",
+            "value": 2146163,
+            "unit": "ns/op\t  681891 B/op\t    5893 allocs/op",
+            "extra": "5232 times\n2 procs"
           }
         ]
       }
