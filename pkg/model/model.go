@@ -246,7 +246,7 @@ type Definition struct {
 // Processor process Dictionary and none, one or many element
 type Processor interface {
 	Open() error
-	ProcessDictionary(Dictionary, Collector) error
+	ProcessDictionary(Dictionary, Collector, SinkProcess) error
 }
 
 // Collector collect Dictionary generate by Process
@@ -261,7 +261,7 @@ type SinkProcess interface {
 }
 
 type Pipeline interface {
-	Process(Processor) Pipeline
+	Process(Processor, SinkProcess) Pipeline
 	WithSource(Source) Pipeline
 	AddSink(SinkProcess) SinkedPipeline
 }
@@ -332,7 +332,7 @@ func (p RepeaterUntilProcess) Open() error {
 	return nil
 }
 
-func (p RepeaterUntilProcess) ProcessDictionary(dictionary Dictionary, out Collector) error {
+func (p RepeaterUntilProcess) ProcessDictionary(dictionary Dictionary, out Collector, errors SinkProcess) error {
 	var output bytes.Buffer
 	var err error
 	defer func() {
@@ -345,6 +345,9 @@ func (p RepeaterUntilProcess) ProcessDictionary(dictionary Dictionary, out Colle
 	if err != nil && skipLineOnError {
 		log.Warn().AnErr("error", err).Msg("Line skipped")
 		statistics.IncIgnoredLinesCount()
+		if errors != nil {
+			errors.ProcessDictionary(dictionary)
+		}
 		return nil
 	}
 
@@ -409,7 +412,7 @@ func (p RepeaterProcess) Open() error {
 	return nil
 }
 
-func (p RepeaterProcess) ProcessDictionary(dictionary Dictionary, out Collector) error {
+func (p RepeaterProcess) ProcessDictionary(dictionary Dictionary, out Collector, _ SinkProcess) error {
 	for i := 0; i < p.times; i++ {
 		out.Collect(dictionary.Copy())
 	}
@@ -426,7 +429,7 @@ func NewMapProcess(mapper Mapper) Processor {
 
 func (mp MapProcess) Open() error { return nil }
 
-func (mp MapProcess) ProcessDictionary(dictionary Dictionary, out Collector) error {
+func (mp MapProcess) ProcessDictionary(dictionary Dictionary, out Collector, _ SinkProcess) error {
 	mappedValue, err := mp.mapper(dictionary)
 	if err != nil {
 		return err
@@ -487,8 +490,8 @@ func (pipeline SimplePipeline) WithSource(source Source) Pipeline {
 	return SimplePipeline{source: source}
 }
 
-func (pipeline SimplePipeline) Process(process Processor) Pipeline {
-	return NewProcessPipeline(pipeline.source, process)
+func (pipeline SimplePipeline) Process(process Processor, errors SinkProcess) Pipeline {
+	return NewProcessPipeline(pipeline.source, process, errors)
 }
 
 func (pipeline SimplePipeline) AddSink(sink SinkProcess) SinkedPipeline {
@@ -545,12 +548,13 @@ func (c *QueueCollector) Value() Dictionary {
 	return c.value
 }
 
-func NewProcessPipeline(source Source, process Processor) Pipeline {
-	return &ProcessPipeline{NewCollector(), source, process, nil}
+func NewProcessPipeline(source Source, process Processor, errors SinkProcess) Pipeline {
+	return &ProcessPipeline{NewCollector(), errors, source, process, nil}
 }
 
 type ProcessPipeline struct {
 	collector *QueueCollector
+	errors    SinkProcess
 	source    Source
 	Processor
 	err error
@@ -561,7 +565,7 @@ func (p *ProcessPipeline) Next() bool {
 		return true
 	}
 	for p.source.Next() {
-		p.err = p.ProcessDictionary(p.source.Value(), p.collector)
+		p.err = p.ProcessDictionary(p.source.Value(), p.collector, p.errors)
 		if p.err != nil {
 			return false
 		}
@@ -585,15 +589,15 @@ func (p *ProcessPipeline) AddSink(sink SinkProcess) SinkedPipeline {
 	return SimpleSinkedPipeline{p, sink}
 }
 
-func (p *ProcessPipeline) Process(process Processor) Pipeline {
-	return NewProcessPipeline(p, process)
+func (p *ProcessPipeline) Process(process Processor, errors SinkProcess) Pipeline {
+	return NewProcessPipeline(p, process, errors)
 }
 
 func (p *ProcessPipeline) WithSource(source Source) Pipeline {
 	if s, ok := p.source.(*ProcessPipeline); ok {
-		return &ProcessPipeline{NewCollector(), s.WithSource(source).(Source), p.Processor, nil}
+		return &ProcessPipeline{NewCollector(), nil, s.WithSource(source).(Source), p.Processor, nil}
 	}
-	return &ProcessPipeline{NewCollector(), source, p.Processor, nil}
+	return &ProcessPipeline{NewCollector(), nil, source, p.Processor, nil}
 }
 
 func (pipeline SimpleSinkedPipeline) Run() (err error) {

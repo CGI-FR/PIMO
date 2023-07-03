@@ -24,14 +24,14 @@ func (p CounterProcess) Open() error {
 	return nil
 }
 
-func (p CounterProcess) ProcessDictionary(dictionary Dictionary, out Collector) error {
+func (p CounterProcess) ProcessDictionary(dictionary Dictionary, out Collector, ercoll SinkProcess) error {
 	value, exists := over.MDC().Get(p.contextName)
 	if !exists {
 		err := p.Open()
 		if err != nil {
 			return err
 		}
-		return p.ProcessDictionary(dictionary, out)
+		return p.ProcessDictionary(dictionary, out, ercoll)
 	}
 
 	if counter, ok := value.(int); ok {

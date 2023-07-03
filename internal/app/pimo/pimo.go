@@ -67,15 +67,16 @@ import (
 type CachedMaskEngineFactories func(model.MaskEngine) model.MaskEngine
 
 type Config struct {
-	SingleInput      *model.Dictionary
-	EmptyInput       bool
-	RepeatUntil      string
-	RepeatWhile      string
-	Iteration        int
-	SkipLineOnError  bool
-	SkipFieldOnError bool
-	CachesToDump     map[string]string
-	CachesToLoad     map[string]string
+	SingleInput         *model.Dictionary
+	EmptyInput          bool
+	RepeatUntil         string
+	RepeatWhile         string
+	Iteration           int
+	SkipLineOnError     bool
+	SkipFieldOnError    bool
+	SkippedLinesLogFile string
+	CachesToDump        map[string]string
+	CachesToLoad        map[string]string
 }
 
 type Context struct {
@@ -133,14 +134,14 @@ func (ctx *Context) Configure(cfg Config) error {
 	}
 
 	ctx.pipeline = model.NewPipeline(ctx.source).
-		Process(model.NewCounterProcessWithCallback("input-line", 0, updateContext)).
-		Process(model.NewRepeaterProcess(cfg.Iteration))
+		Process(model.NewCounterProcessWithCallback("input-line", 0, updateContext), nil).
+		Process(model.NewRepeaterProcess(cfg.Iteration), nil)
 	over.AddGlobalFields("input-line")
 
 	injectTemplateFuncs()
 	model.InjectMaskContextFactories(injectMaskContextFactories())
 	model.InjectMaskFactories(injectMaskFactories())
-	model.InjectConfig(cfg.SkipLineOnError, cfg.SkipFieldOnError)
+	model.InjectConfig(cfg.SkipLineOnError, cfg.SkipFieldOnError, cfg.SkippedLinesLogFile)
 
 	var err error
 	ctx.pipeline, ctx.caches, err = model.BuildPipeline(ctx.pipeline, ctx.pdef, nil, nil)
@@ -153,7 +154,7 @@ func (ctx *Context) Configure(cfg Config) error {
 		if err != nil {
 			return fmt.Errorf("Cannot build pipeline: %w", err)
 		}
-		ctx.pipeline = ctx.pipeline.Process(processor)
+		ctx.pipeline = ctx.pipeline.Process(processor, nil)
 	}
 
 	return nil
@@ -219,7 +220,7 @@ func dumpCache(name string, cache model.Cache, path string, reverse bool) error 
 			return reverse, nil
 		}
 
-		pipe = pipe.Process(model.NewMapProcess(reverseFunc))
+		pipe = pipe.Process(model.NewMapProcess(reverseFunc), nil)
 	}
 
 	err = pipe.AddSink(jsonline.NewSink(file)).Run()
@@ -248,7 +249,7 @@ func loadCache(name string, cache model.Cache, path string, reverse bool) error 
 			return reverse, nil
 		}
 
-		pipe = pipe.Process(model.NewMapProcess(reverseFunc))
+		pipe = pipe.Process(model.NewMapProcess(reverseFunc), nil)
 	}
 
 	err = pipe.AddSink(model.NewSinkToCache(cache)).Run()

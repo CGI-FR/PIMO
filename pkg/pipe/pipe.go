@@ -92,7 +92,7 @@ func (me MaskEngine) MaskContext(e model.Dictionary, key string, context ...mode
 	//			Run()
 	err := me.pipeline.
 		WithSource(model.NewSourceFromSlice(input)).
-		Process(model.NewCounterProcessWithCallback("internal", 1, updateContext)).
+		Process(model.NewCounterProcessWithCallback("internal", 1, updateContext), nil).
 		AddSink(model.NewSinkToSlice(&result)).
 		Run()
 	over.MDC().Set("config", saveConfig)

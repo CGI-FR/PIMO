@@ -245,7 +245,7 @@ func (p *FromCacheProcess) Open() error {
 	return nil
 }
 
-func (p *FromCacheProcess) ProcessDictionary(dictionary Dictionary, out Collector) error {
+func (p *FromCacheProcess) ProcessDictionary(dictionary Dictionary, out Collector, _ SinkProcess) error {
 	for p.readiness.Next() {
 		p.processDictionary(p.readiness.Value(), out)
 	}
@@ -296,7 +296,7 @@ func (lvs *LookupValueSetter) Open() error {
 	return nil
 }
 
-func (lvs *LookupValueSetter) ProcessDictionary(e Dictionary, c Collector) error {
+func (lvs *LookupValueSetter) ProcessDictionary(e Dictionary, c Collector, _ SinkProcess) error {
 	if entry, ok := lvs.selector.Read(e); ok {
 		lvs.cache.SetLookupValue(entry)
 	}
@@ -312,7 +312,7 @@ func (lvd *LookupValueDiscarder) Open() error {
 	return nil
 }
 
-func (lvd *LookupValueDiscarder) ProcessDictionary(e Dictionary, c Collector) error {
+func (lvd *LookupValueDiscarder) ProcessDictionary(e Dictionary, c Collector, _ SinkProcess) error {
 	lvd.cache.SetLookupValue(nil)
 	c.Collect(e)
 	return nil

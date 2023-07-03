@@ -35,7 +35,7 @@ func (dp *DeleteMaskEngineProcess) Open() (err error) {
 	return err
 }
 
-func (dp *DeleteMaskEngineProcess) ProcessDictionary(dictionary Dictionary, out Collector) error {
+func (dp *DeleteMaskEngineProcess) ProcessDictionary(dictionary Dictionary, out Collector, _ SinkProcess) error {
 	over.AddGlobalFields("path")
 	over.MDC().Set("path", dp.selector)
 	defer func() { over.MDC().Remove("path") }()

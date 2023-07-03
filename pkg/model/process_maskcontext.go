@@ -36,7 +36,7 @@ func (mcep *MaskContextEngineProcess) Open() error {
 	return nil
 }
 
-func (mcep *MaskContextEngineProcess) ProcessDictionary(dictionary Dictionary, out Collector) (ret error) {
+func (mcep *MaskContextEngineProcess) ProcessDictionary(dictionary Dictionary, out Collector, ercoll SinkProcess) (ret error) {
 	over.AddGlobalFields("path")
 	over.MDC().Set("path", mcep.selector)
 	defer func() { over.MDC().Remove("path") }()
@@ -66,6 +66,9 @@ func (mcep *MaskContextEngineProcess) ProcessDictionary(dictionary Dictionary, o
 	if ret != nil && skipLineOnError {
 		log.Warn().AnErr("error", ret).Msg("Line skipped")
 		statistics.IncIgnoredLinesCount()
+		if ercoll != nil {
+			ercoll.ProcessDictionary(dictionary)
+		}
 		ret = nil
 	}
 
