@@ -57,7 +57,7 @@ func NewMask(seed int64, injectParent string, injectRoot string, caches map[stri
 
 func (me MaskEngine) MaskContext(e model.Dictionary, key string, context ...model.Dictionary) (model.Dictionary, error) {
 	log.Info().Msg("Mask pipe")
-	var result []model.Dictionary
+	var result []model.Entry
 	input := []model.Dictionary{}
 
 	copy := model.CopyDictionary(e)
@@ -103,10 +103,10 @@ func (me MaskEngine) MaskContext(e model.Dictionary, key string, context ...mode
 	}
 	for _, dict := range result {
 		if len(me.injectParent) > 0 {
-			dict.Delete(me.injectParent)
+			dict.(model.Dictionary).Delete(me.injectParent)
 		}
 		if len(me.injectRoot) > 0 {
-			dict.Delete(me.injectRoot)
+			dict.(model.Dictionary).Delete(me.injectRoot)
 		}
 	}
 	copy.Set(key, result)

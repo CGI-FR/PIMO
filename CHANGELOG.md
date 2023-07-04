@@ -14,6 +14,11 @@ Types of changes
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [1.19.0]
+
+- `Added` new features for ff1 mask : `domain`, `preserve` and `onError`.
+- `Added` possibility to use `.` in the jsonpath field of selectors.
+
 ## [1.18.1]
 
 - `Fixed` local seed parameter should be consistent between different jsonpath

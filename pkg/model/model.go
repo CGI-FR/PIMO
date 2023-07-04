@@ -116,10 +116,13 @@ type DateParserType struct {
 }
 
 type FF1Type struct {
-	KeyFromEnv string `yaml:"keyFromEnv" json:"keyFromEnv" jsonschema_description:"Name of the system environment variable that contains the private key"`
-	TweakField string `yaml:"tweakField,omitempty" json:"tweakField,omitempty" jsonschema_description:"Name of the field to use as 'tweak' value : reduce the attack surface by using a varying value on each record, it can be considered as an extension of the secret key that change on each record"`
-	Radix      uint   `yaml:"radix,omitempty" json:"radix,omitempty" jsonschema_description:"determine which part of the fixed FF1 domain definition will actually be used, for example 10 will use the first 10 characters of 0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"`
-	Decrypt    bool   `yaml:"decrypt,omitempty" json:"decrypt,omitempty" jsonschema_description:"Decrypt the value instead of encrypt"`
+	KeyFromEnv string  `yaml:"keyFromEnv" json:"keyFromEnv" jsonschema_description:"Name of the system environment variable that contains the private key"`
+	TweakField string  `yaml:"tweakField,omitempty" json:"tweakField,omitempty" jsonschema_description:"Name of the field to use as 'tweak' value : reduce the attack surface by using a varying value on each record, it can be considered as an extension of the secret key that change on each record"`
+	Radix      uint    `yaml:"radix,omitempty" json:"radix,omitempty" jsonschema_description:"determine which part of the fixed FF1 domain definition will actually be used, for example 10 will use the first 10 characters of 0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"`
+	Domain     string  `yaml:"domain,omitempty" json:"domain,omitempty" jsonschema_description:"allowed characters domain that will be encrypted, do not use radix and domain at the same time"`
+	Preserve   bool    `yaml:"preserve,omitempty" json:"preserve,omitempty" jsonschema_description:"preserve characters that are not part of the allowed domain"`
+	OnError    *string `yaml:"onError,omitempty" json:"onError,omitempty" jsonschema_description:"template to execute if there is an error while encrypting value"`
+	Decrypt    bool    `yaml:"decrypt,omitempty" json:"decrypt,omitempty" jsonschema_description:"Decrypt the value instead of encrypt"`
 }
 
 type PipeType struct {
@@ -251,13 +254,13 @@ type Processor interface {
 
 // Collector collect Dictionary generate by Process
 type Collector interface {
-	Collect(Dictionary)
+	Collect(Entry)
 }
 
 // SinkProcess send Dictionary process by Pipeline to an output
 type SinkProcess interface {
 	Open() error
-	ProcessDictionary(Dictionary) error
+	ProcessDictionary(Entry) error
 }
 
 type Pipeline interface {
@@ -274,7 +277,7 @@ type SinkedPipeline interface {
 type Source interface {
 	Open() error
 	Next() bool
-	Value() Dictionary
+	Value() Entry
 	Err() error
 }
 
@@ -303,7 +306,7 @@ func (source *SourceFromSlice) Next() bool {
 	return result
 }
 
-func (source *SourceFromSlice) Value() Dictionary {
+func (source *SourceFromSlice) Value() Entry {
 	return source.dictionaries[source.offset-1]
 }
 
@@ -340,7 +343,7 @@ func (p RepeaterUntilProcess) ProcessDictionary(dictionary Dictionary, out Colle
 			err = fmt.Errorf("Cannot execute template, error: %v", r)
 		}
 	}()
-	err = p.tmpl.Execute(&output, dictionary.Untyped())
+	err = p.tmpl.Execute(&output, Untyped(dictionary))
 
 	if err != nil && skipLineOnError {
 		log.Warn().AnErr("error", err).Msg("Line skipped")
@@ -377,7 +380,7 @@ func NewTempSource(sourceValue Source) Source {
 
 type TempSource struct {
 	repeat bool
-	value  Dictionary
+	value  Entry
 	source Source
 }
 
@@ -396,7 +399,7 @@ func (s *TempSource) Next() bool {
 
 func (s *TempSource) Err() error { return s.source.Err() }
 
-func (s *TempSource) Value() Dictionary {
+func (s *TempSource) Value() Entry {
 	return s.value
 }
 
@@ -438,20 +441,20 @@ func (mp MapProcess) ProcessDictionary(dictionary Dictionary, out Collector, _ S
 	return nil
 }
 
-func NewSinkToSlice(dictionaries *[]Dictionary) SinkProcess {
+func NewSinkToSlice(dictionaries *[]Entry) SinkProcess {
 	return &SinkToSlice{dictionaries}
 }
 
 type SinkToSlice struct {
-	dictionaries *[]Dictionary
+	dictionaries *[]Entry
 }
 
 func (sink *SinkToSlice) Open() error {
-	*sink.dictionaries = []Dictionary{}
+	*sink.dictionaries = []Entry{}
 	return nil
 }
 
-func (sink *SinkToSlice) ProcessDictionary(dictionary Dictionary) error {
+func (sink *SinkToSlice) ProcessDictionary(dictionary Entry) error {
 	*sink.dictionaries = append(*sink.dictionaries, dictionary)
 	return nil
 }
@@ -468,7 +471,8 @@ func (sink *SinkToCache) Open() error {
 	return nil
 }
 
-func (sink *SinkToCache) ProcessDictionary(dictionary Dictionary) error {
+func (sink *SinkToCache) ProcessDictionary(entry Entry) error {
+	dictionary := entry.(Dictionary)
 	sink.cache.Put(CleanTypes(dictionary.Get("key")), CleanTypes(dictionary.Get("value")))
 	return nil
 }
@@ -502,7 +506,7 @@ func (pipeline SimplePipeline) Next() bool {
 	return pipeline.source.Next()
 }
 
-func (pipeline SimplePipeline) Value() Dictionary {
+func (pipeline SimplePipeline) Value() Entry {
 	return pipeline.source.Value()
 }
 
@@ -515,12 +519,12 @@ func (pipeline SimplePipeline) Open() error {
 }
 
 func NewCollector() *QueueCollector {
-	return &QueueCollector{[]Dictionary{}, NewDictionary()}
+	return &QueueCollector{[]Entry{}, NewDictionary()}
 }
 
 type QueueCollector struct {
-	queue []Dictionary
-	value Dictionary
+	queue []Entry
+	value Entry
 }
 
 func (c *QueueCollector) Err() error {
@@ -531,7 +535,7 @@ func (c *QueueCollector) Open() error {
 	return nil
 }
 
-func (c *QueueCollector) Collect(dictionary Dictionary) {
+func (c *QueueCollector) Collect(dictionary Entry) {
 	c.queue = append(c.queue, dictionary)
 }
 
@@ -544,7 +548,7 @@ func (c *QueueCollector) Next() bool {
 	return false
 }
 
-func (c *QueueCollector) Value() Dictionary {
+func (c *QueueCollector) Value() Entry {
 	return c.value
 }
 
@@ -565,7 +569,7 @@ func (p *ProcessPipeline) Next() bool {
 		return true
 	}
 	for p.source.Next() {
-		p.err = p.ProcessDictionary(p.source.Value(), p.collector, p.errors)
+		p.err = p.ProcessDictionary(p.source.Value().(Dictionary), p.collector, p.errors)
 		if p.err != nil {
 			return false
 		}
@@ -577,7 +581,7 @@ func (p *ProcessPipeline) Next() bool {
 	return false
 }
 
-func (p *ProcessPipeline) Value() Dictionary {
+func (p *ProcessPipeline) Value() Entry {
 	return p.collector.Value()
 }
 
@@ -628,7 +632,7 @@ func NewSeeder(sourceField string, seed int64) Seeder {
 	var seeder Seeder
 
 	if jpath := sourceField; jpath != "" {
-		sel := NewPathSelector(jpath)
+		sel := NewPackedPathSelector(jpath)
 		hash := fnv.New64a()
 		seeder = func(context Dictionary) (int64, bool, error) {
 			e, ok := sel.Read(context)

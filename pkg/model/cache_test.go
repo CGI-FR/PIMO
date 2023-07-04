@@ -78,7 +78,7 @@ func TestFromCacheProcessShouldWaitForValueProvide(t *testing.T) {
 		NewDictionary().With("id", "2").With("name", "John").With("supervisor", "4"),
 		NewDictionary().With("id", "3").With("name", "Tom").With("supervisor", "2"),
 	}
-	var result []Dictionary
+	var result []Entry
 
 	pipeline := NewPipelineFromSlice(mySlice).
 		Process(NewMaskEngineProcess(NewPathSelector("id"), NewMaskCacheEngine(cache, idMasking), "")).
@@ -92,7 +92,7 @@ func TestFromCacheProcessShouldWaitForValueProvide(t *testing.T) {
 		NewDictionary().With("id", "bob").With("name", "Bob").With("supervisor", "john"),
 		NewDictionary().With("id", "tom").With("name", "Tom").With("supervisor", "john"),
 	}
-	assert.Equal(t, wanted, result)
+	assert.Equal(t, DictionariesToJSONLine(wanted), EntriesToJSONLine(result))
 }
 
 func TestFromCacheProcessShouldWaitForLoopProvid(t *testing.T) {
@@ -107,7 +107,7 @@ func TestFromCacheProcessShouldWaitForLoopProvid(t *testing.T) {
 		NewDictionary().With("id", "2").With("name", "John").With("supervisor", "3"),
 		NewDictionary().With("id", "3").With("name", "Tom").With("supervisor", "1"),
 	}
-	var result []Dictionary
+	var result []Entry
 
 	pipeline := NewPipelineFromSlice(mySlice).
 		Process(NewMaskEngineProcess(NewPathSelector("id"), NewMaskCacheEngine(cache, idMasking), "")).
@@ -122,7 +122,7 @@ func TestFromCacheProcessShouldWaitForLoopProvid(t *testing.T) {
 		NewDictionary().With("id", "john").With("name", "John").With("supervisor", "tom"),
 		NewDictionary().With("id", "tom").With("name", "Tom").With("supervisor", "bob"),
 	}
-	assert.Equal(t, wanted, result)
+	assert.Equal(t, DictionariesToJSONLine(wanted), EntriesToJSONLine(result))
 }
 
 func TestFromCacheProcessShouldUsedPreviouslyCachedValue(t *testing.T) {
@@ -139,7 +139,7 @@ func TestFromCacheProcessShouldUsedPreviouslyCachedValue(t *testing.T) {
 		NewDictionary().With("id", "2").With("name", "John").With("supervisor", "3"),
 		NewDictionary().With("id", "3").With("name", "Tom").With("supervisor", "1"),
 	}
-	var result []Dictionary
+	var result []Entry
 
 	pipeline := NewPipelineFromSlice(mySlice).
 		Process(NewMaskEngineProcess(NewPathSelector("id"), NewMaskCacheEngine(cache, idMasking), "")).
@@ -154,7 +154,7 @@ func TestFromCacheProcessShouldUsedPreviouslyCachedValue(t *testing.T) {
 		NewDictionary().With("id", "john").With("name", "John").With("supervisor", "tom"),
 		NewDictionary().With("id", "tom").With("name", "Tom").With("supervisor", "boby"),
 	}
-	assert.Equal(t, wanted, result)
+	assert.Equal(t, DictionariesToJSONLine(wanted), EntriesToJSONLine(result))
 }
 
 func TestFromCacheProcessShouldReorderList(t *testing.T) {
@@ -171,7 +171,7 @@ func TestFromCacheProcessShouldReorderList(t *testing.T) {
 		NewDictionary().With("id", "2").With("name", "John").With("supervisor", "3"),
 		NewDictionary().With("id", "3").With("name", "Tom").With("supervisor", "1"),
 	}
-	var result []Dictionary
+	var result []Entry
 
 	pipeline := NewPipelineFromSlice(mySlice).
 		Process(NewMaskEngineProcess(NewPathSelector("id"), NewMaskCacheEngine(cache, idMasking), "")).
@@ -188,7 +188,7 @@ func TestFromCacheProcessShouldReorderList(t *testing.T) {
 		NewDictionary().With("id", "john").With("name", "John").With("supervisor", "tom"),
 		NewDictionary().With("id", "tom").With("name", "Tom").With("supervisor", "bob"),
 	}
-	assert.Equal(t, wanted, result)
+	assert.Equal(t, DictionariesToJSONLine(wanted), EntriesToJSONLine(result))
 }
 
 func TestFromCacheProcessShouldWaitWithUnique(t *testing.T) {
@@ -203,7 +203,7 @@ func TestFromCacheProcessShouldWaitWithUnique(t *testing.T) {
 		NewDictionary().With("id", "2").With("name", "John").With("supervisor", "3"),
 		NewDictionary().With("id", "3").With("name", "Tom").With("supervisor", "1"),
 	}
-	var result []Dictionary
+	var result []Entry
 
 	pipeline := NewPipelineFromSlice(mySlice).
 		Process(NewMaskEngineProcess(NewPathSelector("id"), NewUniqueMaskCacheEngine(cache, idMasking), "")).
@@ -218,5 +218,5 @@ func TestFromCacheProcessShouldWaitWithUnique(t *testing.T) {
 		NewDictionary().With("id", "john").With("name", "John").With("supervisor", "tom"),
 		NewDictionary().With("id", "tom").With("name", "Tom").With("supervisor", "bob"),
 	}
-	assert.Equal(t, wanted, result)
+	assert.Equal(t, DictionariesToJSONLine(wanted), EntriesToJSONLine(result))
 }

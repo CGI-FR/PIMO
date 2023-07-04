@@ -31,7 +31,7 @@ type MaskEngine struct {
 
 // NewMask return a MaskEngine from a value
 func NewMask(source string) MaskEngine {
-	return MaskEngine{model.NewPathSelector(source)}
+	return MaskEngine{model.NewPackedPathSelector(source)}
 }
 
 // MaskContext

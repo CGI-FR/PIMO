@@ -29,8 +29,8 @@ func TestMaskingShouldEncryptStringWithTweak(t *testing.T) {
 	os.Setenv("FF1_ENCRYPTION_KEY", "70NZ2NWAqk9/A21vBPxqlA==")
 	context := model.NewDictionary().
 		With("name", "Toto").
-		With("tweak", "mytweak")
-	ff1Mask := NewMask("FF1_ENCRYPTION_KEY", "tweak", 62, false)
+		With("tweak", "mytweak").Pack()
+	ff1Mask := NewMask("FF1_ENCRYPTION_KEY", "tweak", 62, false, "", false, nil)
 	line := "Toto"
 	result, err := ff1Mask.Mask(line, context)
 	assert.Nil(t, err)
@@ -40,8 +40,8 @@ func TestMaskingShouldEncryptStringWithTweak(t *testing.T) {
 func TestMaskingShouldEncryptStringWithoutTweak(t *testing.T) {
 	os.Setenv("FF1_ENCRYPTION_KEY", "70NZ2NWAqk9/A21vBPxqlA==")
 	context := model.NewDictionary().
-		With("name", "Toto")
-	ff1Mask := NewMask("FF1_ENCRYPTION_KEY", "tweak", 62, false)
+		With("name", "Toto").Pack()
+	ff1Mask := NewMask("FF1_ENCRYPTION_KEY", "tweak", 62, false, "", false, nil)
 	line := "Toto"
 	result, err := ff1Mask.Mask(line, context)
 	assert.Nil(t, err)
@@ -52,8 +52,8 @@ func TestMaskingShouldDecryptStringWithTweak(t *testing.T) {
 	os.Setenv("FF1_ENCRYPTION_KEY", "70NZ2NWAqk9/A21vBPxqlA==")
 	context := model.NewDictionary().
 		With("name", "nhIy").
-		With("tweak", "mytweak")
-	ff1Mask := NewMask("FF1_ENCRYPTION_KEY", "tweak", 62, true)
+		With("tweak", "mytweak").Pack()
+	ff1Mask := NewMask("FF1_ENCRYPTION_KEY", "tweak", 62, true, "", false, nil)
 	line := "nhIy"
 	result, err := ff1Mask.Mask(line, context)
 	assert.Nil(t, err)
@@ -63,8 +63,8 @@ func TestMaskingShouldDecryptStringWithTweak(t *testing.T) {
 func TestMaskingShouldDecryptStringWithoutTweak(t *testing.T) {
 	os.Setenv("FF1_ENCRYPTION_KEY", "70NZ2NWAqk9/A21vBPxqlA==")
 	context := model.NewDictionary().
-		With("name", "Uaow")
-	ff1Mask := NewMask("FF1_ENCRYPTION_KEY", "tweak", 62, true)
+		With("name", "Uaow").Pack()
+	ff1Mask := NewMask("FF1_ENCRYPTION_KEY", "tweak", 62, true, "", false, nil)
 	line := "Uaow"
 	result, err := ff1Mask.Mask(line, context)
 	assert.Nil(t, err)
@@ -98,5 +98,5 @@ func TestFactoryShouldReturnErrorOnWrongConfig(t *testing.T) {
 	mask, present, err := Factory(factoryConfig)
 	assert.Nil(t, mask, "should be nil")
 	assert.True(t, present, "should be true")
-	assert.EqualErrorf(t, err, "radix attribut is not optional", "should be nil")
+	assert.EqualErrorf(t, err, "one of the radix or domain attributes should be set", "should be nil")
 }

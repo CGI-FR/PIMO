@@ -64,7 +64,7 @@ func (tmpl MaskEngine) MaskContext(context model.Dictionary, key string, context
 	log.Trace().Interface("input", context).Str("key", key).Interface("contexts", contexts).Msg("Enter MaskContext")
 
 	copy := model.CopyDictionary(context)
-	tmplctx := contexts[0].Unordered()
+	tmplctx := contexts[0].UnpackAsDict().Unordered()
 
 	value, ok := copy.GetValue(key)
 	if ok {

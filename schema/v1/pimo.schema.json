@@ -139,6 +139,18 @@
           "type": "integer",
           "description": "determine which part of the fixed FF1 domain definition will actually be used, for example 10 will use the first 10 characters of 0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
         },
+        "domain": {
+          "type": "string",
+          "description": "allowed characters domain that will be encrypted, do not use radix and domain at the same time"
+        },
+        "preserve": {
+          "type": "boolean",
+          "description": "preserve characters that are not part of the allowed domain"
+        },
+        "onError": {
+          "type": "string",
+          "description": "template to execute if there is an error while encrypting value"
+        },
         "decrypt": {
           "type": "boolean",
           "description": "Decrypt the value instead of encrypt"
