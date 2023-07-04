@@ -625,7 +625,7 @@ func NewSeeder(sourceField string, seed int64) Seeder {
 	var seeder Seeder
 
 	if jpath := sourceField; jpath != "" {
-		sel := NewPathSelector(jpath)
+		sel := NewPackedPathSelector(jpath)
 		hash := fnv.New64a()
 		seeder = func(context Dictionary) (int64, bool, error) {
 			e, ok := sel.Read(context)
