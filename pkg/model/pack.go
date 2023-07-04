@@ -11,8 +11,7 @@ func (pp *PackProcess) Open() error {
 	return nil
 }
 
-func (pp *PackProcess) ProcessDictionary(entry Entry, out Collector) error {
-	dictionary := entry.(Dictionary)
+func (pp *PackProcess) ProcessDictionary(dictionary Dictionary, out Collector) error {
 	if dictionary.IsPacked() {
 		out.Collect(dictionary)
 	} else {
@@ -32,7 +31,7 @@ func (up *UnpackProcess) Open() error {
 	return nil
 }
 
-func (up *UnpackProcess) ProcessDictionary(dictionary Entry, out Collector) error {
-	out.Collect(dictionary.(Dictionary).Unpack())
+func (up *UnpackProcess) ProcessDictionary(dictionary Dictionary, out Collector) error {
+	out.Collect(dictionary.Unpack())
 	return nil
 }

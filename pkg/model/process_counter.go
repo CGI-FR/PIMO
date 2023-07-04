@@ -24,7 +24,7 @@ func (p CounterProcess) Open() error {
 	return nil
 }
 
-func (p CounterProcess) ProcessDictionary(dictionary Entry, out Collector) error {
+func (p CounterProcess) ProcessDictionary(dictionary Dictionary, out Collector) error {
 	value, exists := over.MDC().Get(p.contextName)
 	if !exists {
 		err := p.Open()

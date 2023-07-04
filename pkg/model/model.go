@@ -249,7 +249,7 @@ type Definition struct {
 // Processor process Dictionary and none, one or many element
 type Processor interface {
 	Open() error
-	ProcessDictionary(Entry, Collector) error
+	ProcessDictionary(Dictionary, Collector) error
 }
 
 // Collector collect Dictionary generate by Process
@@ -335,7 +335,7 @@ func (p RepeaterUntilProcess) Open() error {
 	return nil
 }
 
-func (p RepeaterUntilProcess) ProcessDictionary(dictionary Entry, out Collector) error {
+func (p RepeaterUntilProcess) ProcessDictionary(dictionary Dictionary, out Collector) error {
 	var output bytes.Buffer
 	var err error
 	defer func() {
@@ -412,9 +412,9 @@ func (p RepeaterProcess) Open() error {
 	return nil
 }
 
-func (p RepeaterProcess) ProcessDictionary(dictionary Entry, out Collector) error {
+func (p RepeaterProcess) ProcessDictionary(dictionary Dictionary, out Collector) error {
 	for i := 0; i < p.times; i++ {
-		out.Collect(Copy(dictionary))
+		out.Collect(dictionary.Copy())
 	}
 	return nil
 }
@@ -429,8 +429,8 @@ func NewMapProcess(mapper Mapper) Processor {
 
 func (mp MapProcess) Open() error { return nil }
 
-func (mp MapProcess) ProcessDictionary(dictionary Entry, out Collector) error {
-	mappedValue, err := mp.mapper(dictionary.(Dictionary))
+func (mp MapProcess) ProcessDictionary(dictionary Dictionary, out Collector) error {
+	mappedValue, err := mp.mapper(dictionary)
 	if err != nil {
 		return err
 	}
@@ -565,7 +565,7 @@ func (p *ProcessPipeline) Next() bool {
 		return true
 	}
 	for p.source.Next() {
-		p.err = p.ProcessDictionary(p.source.Value(), p.collector)
+		p.err = p.ProcessDictionary(p.source.Value().(Dictionary), p.collector)
 		if p.err != nil {
 			return false
 		}
