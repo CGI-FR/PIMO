@@ -107,7 +107,7 @@ func TestFromCacheProcessShouldWaitForLoopProvid(t *testing.T) {
 		NewDictionary().With("id", "2").With("name", "John").With("supervisor", "3"),
 		NewDictionary().With("id", "3").With("name", "Tom").With("supervisor", "1"),
 	}
-	var result []Dictionary
+	var result []Entry
 
 	pipeline := NewPipelineFromSlice(mySlice).
 		Process(NewMaskEngineProcess(NewPathSelector("id"), NewMaskCacheEngine(cache, idMasking), "")).
@@ -139,7 +139,7 @@ func TestFromCacheProcessShouldUsedPreviouslyCachedValue(t *testing.T) {
 		NewDictionary().With("id", "2").With("name", "John").With("supervisor", "3"),
 		NewDictionary().With("id", "3").With("name", "Tom").With("supervisor", "1"),
 	}
-	var result []Dictionary
+	var result []Entry
 
 	pipeline := NewPipelineFromSlice(mySlice).
 		Process(NewMaskEngineProcess(NewPathSelector("id"), NewMaskCacheEngine(cache, idMasking), "")).
@@ -171,7 +171,7 @@ func TestFromCacheProcessShouldReorderList(t *testing.T) {
 		NewDictionary().With("id", "2").With("name", "John").With("supervisor", "3"),
 		NewDictionary().With("id", "3").With("name", "Tom").With("supervisor", "1"),
 	}
-	var result []Dictionary
+	var result []Entry
 
 	pipeline := NewPipelineFromSlice(mySlice).
 		Process(NewMaskEngineProcess(NewPathSelector("id"), NewMaskCacheEngine(cache, idMasking), "")).
@@ -203,7 +203,7 @@ func TestFromCacheProcessShouldWaitWithUnique(t *testing.T) {
 		NewDictionary().With("id", "2").With("name", "John").With("supervisor", "3"),
 		NewDictionary().With("id", "3").With("name", "Tom").With("supervisor", "1"),
 	}
-	var result []Dictionary
+	var result []Entry
 
 	pipeline := NewPipelineFromSlice(mySlice).
 		Process(NewMaskEngineProcess(NewPathSelector("id"), NewUniqueMaskCacheEngine(cache, idMasking), "")).

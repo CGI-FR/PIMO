@@ -37,7 +37,7 @@ func TestMaskEngineShouldMaskNestedArray(t *testing.T) {
 		})),
 	}
 
-	var result []model.Dictionary
+	var result []model.Entry
 
 	model.InjectMaskFactories([]model.MaskFactory{templatemask.Factory})
 	pipe, err := pipe.NewMask(42, "parent", "root", map[string]model.Cache{}, nil, "",
@@ -66,10 +66,20 @@ func TestMaskEngineShouldMaskNestedArray(t *testing.T) {
 			model.NewDictionary().With("name", "Nantes+"),
 		})),
 	}
-	assert.Equal(t, DictionariesToJSONLine(wanted), DictionariesToJSONLine(result))
+	assert.Equal(t, DictionariesToJSONLine(wanted), EntriesToJSONLine(result))
 }
 
 func DictionariesToJSONLine(dictionaries []model.Dictionary) string {
+	var jsonline []byte
+	for _, dictionary := range dictionaries {
+		result, _ := json.Marshal(dictionary)
+		jsonline = append(jsonline, result...)
+		jsonline = append(jsonline, "\n"...)
+	}
+	return strings.TrimSuffix(string(jsonline), "\n")
+}
+
+func EntriesToJSONLine(dictionaries []model.Entry) string {
 	var jsonline []byte
 	for _, dictionary := range dictionaries {
 		result, _ := json.Marshal(dictionary)

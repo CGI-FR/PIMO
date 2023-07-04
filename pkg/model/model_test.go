@@ -33,7 +33,7 @@ func TestPipelineSource(t *testing.T) {
 		NewDictionary().With("v", 3),
 		NewDictionary().With("v", 4),
 	}
-	var result []Dictionary
+	var result []Entry
 
 	pipeline := NewPipelineFromSlice(mySlice).
 		AddSink(NewSinkToSlice(&result))
@@ -50,7 +50,7 @@ func TestPipelineWithProcessorSource(t *testing.T) {
 		NewDictionary().With("v", 3),
 		NewDictionary().With("v", 4),
 	}
-	var result []Dictionary
+	var result []Entry
 
 	pipeline := NewPipelineFromSlice(mySlice).
 		Process(NewMapProcess(func(d Dictionary) (Dictionary, error) {
@@ -78,7 +78,7 @@ func TestPipelineWithChainedProcessorSource(t *testing.T) {
 		NewDictionary().With("v", 3),
 		NewDictionary().With("v", 4),
 	}
-	var result []Dictionary
+	var result []Entry
 
 	pipeline := NewPipelineFromSlice(mySlice).
 		Process(NewMapProcess(func(d Dictionary) (Dictionary, error) {
@@ -110,7 +110,7 @@ func TestPipelineWithRepeaterProcessor(t *testing.T) {
 		NewDictionary().With("v", 3),
 		NewDictionary().With("v", 4),
 	}
-	var result []Dictionary
+	var result []Entry
 
 	pipeline := NewPipelineFromSlice(mySlice).
 		Process(NewRepeaterProcess(2)).
@@ -139,7 +139,7 @@ func TestPipelineWithRepeaterAndMapChainedProcessor(t *testing.T) {
 		NewDictionary().With("v", 3),
 		NewDictionary().With("v", 4),
 	}
-	var result []Dictionary
+	var result []Entry
 
 	pipeline := NewPipelineFromSlice(mySlice).
 		Process(NewRepeaterProcess(2)).
@@ -169,7 +169,7 @@ func TestPipelineWithMaskEngine(t *testing.T) {
 	nameMasking := FunctionMaskEngine{Function: func(name Entry, contexts ...Dictionary) (Entry, error) { return "Toto", nil }}
 
 	mySlice := []Dictionary{NewDictionary().With("name", "Bob")}
-	var result []Dictionary
+	var result []Entry
 
 	pipeline := NewPipelineFromSlice(mySlice).
 		Process(NewMaskEngineProcess(NewPathSelector("name"), nameMasking, "")).
@@ -186,7 +186,7 @@ func TestPipelineWithDeleteMaskEngine(t *testing.T) {
 	mySlice := []Dictionary{
 		NewDictionary().With("name", "Bob").With("city", "Nantes"),
 	}
-	var result []Dictionary
+	var result []Entry
 
 	pipeline := NewPipelineFromSlice(mySlice).
 		Process(NewDeleteMaskEngineProcess(NewPathSelector("name"))).
@@ -205,7 +205,7 @@ func TestMaskEngineShouldNotCreateField(t *testing.T) {
 	nameMasking := FunctionMaskEngine{Function: func(name Entry, contexts ...Dictionary) (Entry, error) { return "Toto", nil }}
 
 	mySlice := []Dictionary{NewDictionary().With("city", "Nantes")}
-	var result []Dictionary
+	var result []Entry
 
 	pipeline := NewPipelineFromSlice(mySlice).
 		Process(NewMaskEngineProcess(NewPathSelector("name"), nameMasking, "")).
@@ -235,7 +235,7 @@ func (am TestAddMaskEngine) MaskContext(context Dictionary, key string, contexts
 
 func TestMaskEngineWithContext(t *testing.T) {
 	mySlice := []Dictionary{NewDictionary().With("city", "Nantes")}
-	var result []Dictionary
+	var result []Entry
 
 	pipeline := NewPipelineFromSlice(mySlice).
 		Process(NewMaskContextEngineProcess(NewPathSelector("name"), TestAddMaskEngine{"Toto"})).
@@ -252,7 +252,7 @@ func TestMaskEngineShouldMaskAllEntriesInArray(t *testing.T) {
 	nameMasking := FunctionMaskEngine{Function: func(name Entry, contexts ...Dictionary) (Entry, error) { return "Paris", nil }}
 
 	mySlice := []Dictionary{NewDictionary().With("city", []Entry{"Nantes", "Rennes", "Grenoble"})}
-	var result []Dictionary
+	var result []Entry
 
 	pipeline := NewPipelineFromSlice(mySlice).
 		Process(NewMaskEngineProcess(NewPathSelector("city"), nameMasking, "")).
@@ -269,7 +269,7 @@ func TestMaskEngineShouldMaskNestedEntry(t *testing.T) {
 	nameMasking := FunctionMaskEngine{Function: func(name Entry, contexts ...Dictionary) (Entry, error) { return "Paris", nil }}
 
 	mySlice := []Dictionary{NewDictionary().With("address", NewDictionary().With("city", "Nantes"))}
-	var result []Dictionary
+	var result []Entry
 
 	pipeline := NewPipelineFromSlice(mySlice).
 		Process(NewMaskEngineProcess(NewPathSelector("address.city"), nameMasking, "")).
@@ -293,7 +293,7 @@ func TestMaskEngineShouldMaskNestedDictionariesArray(t *testing.T) {
 		}),
 	}
 
-	var result []Dictionary
+	var result []Entry
 
 	pipeline := NewPipelineFromSlice(mySlice).
 		Process(NewMaskEngineProcess(NewPathSelector("address.city"), nameMasking, "")).
@@ -323,7 +323,7 @@ func TestMaskEngineShouldMaskNestedArray(t *testing.T) {
 		})),
 	}
 
-	var result []Dictionary
+	var result []Entry
 
 	pipeline := NewPipelineFromSlice(mySlice).
 		Process(NewMaskEngineProcess(NewPathSelector("address.city"), nameMasking, "")).
@@ -368,6 +368,16 @@ func DictionariesToJSONLine(dictionaries []Dictionary) string {
 	return strings.TrimSuffix(string(jsonline), "\n")
 }
 
+func EntriesToJSONLine(dictionaries []Entry) string {
+	var jsonline []byte
+	for _, dictionary := range dictionaries {
+		result, _ := json.Marshal(dictionary)
+		jsonline = append(jsonline, result...)
+		jsonline = append(jsonline, "\n"...)
+	}
+	return strings.TrimSuffix(string(jsonline), "\n")
+}
+
 func TestMaskEngineShouldMaskNestedArrays(t *testing.T) {
 	i := 0
 	nameMasking := FunctionMaskEngine{
@@ -386,7 +396,7 @@ func TestMaskEngineShouldMaskNestedArrays(t *testing.T) {
 
 	mySlice := jsonlineToDictionaries(iput)
 
-	var result []Dictionary
+	var result []Entry
 
 	pipeline := NewPipelineFromSlice(mySlice).
 		Process(NewMaskEngineProcess(NewPathSelector("persons.phonenumber"), nameMasking, "")).
@@ -396,7 +406,7 @@ func TestMaskEngineShouldMaskNestedArrays(t *testing.T) {
 	assert.Nil(t, err)
 
 	expected := DictionariesToJSONLine(jsonlineToDictionaries(oput))
-	actual := DictionariesToJSONLine(result)
+	actual := EntriesToJSONLine(result)
 	assert.Equal(t, expected, actual)
 }
 
@@ -409,7 +419,7 @@ func TestMaskEngineShouldMaskNestedNestedArrays(t *testing.T) {
 
 	mySlice := jsonlineToDictionaries(iput)
 
-	var result []Dictionary
+	var result []Entry
 
 	pipeline := NewPipelineFromSlice(mySlice).
 		Process(NewMaskEngineProcess(NewPathSelector("elements.persons.phonenumber"), nameMasking, "")).
@@ -419,13 +429,13 @@ func TestMaskEngineShouldMaskNestedNestedArrays(t *testing.T) {
 	assert.Nil(t, err)
 
 	expected := DictionariesToJSONLine(jsonlineToDictionaries(oput))
-	actual := DictionariesToJSONLine(result)
+	actual := EntriesToJSONLine(result)
 	assert.Equal(t, expected, actual)
 }
 
 func TestInOutFormat1(t *testing.T) {
 	masking := FunctionMaskEngine{Function: func(name Entry, contexts ...Dictionary) (Entry, error) { return "mask", nil }}
-	var odict []Dictionary
+	var odict []Entry
 	iput := `{"key": ["mask"]}`
 	idict := jsonlineToDictionaries(iput)
 	pipeline := NewPipelineFromSlice(idict).
@@ -439,7 +449,7 @@ func TestInOutFormat1(t *testing.T) {
 
 func TestInOutFormat2(t *testing.T) {
 	masking := FunctionMaskEngine{Function: func(name Entry, contexts ...Dictionary) (Entry, error) { return "mask", nil }}
-	var odict []Dictionary
+	var odict []Entry
 	iput := `{"key1": [{"key2": "mask"}]}`
 	idict := jsonlineToDictionaries(iput)
 	pipeline := NewPipelineFromSlice(idict).
@@ -465,7 +475,7 @@ func TestMaskEngineShouldMaskMultipleNestedNestedArrays(t *testing.T) {
 
 	mySlice := jsonlineToDictionaries(iput)
 
-	var result []Dictionary
+	var result []Entry
 
 	pipeline := NewPipelineFromSlice(mySlice).
 		Process(NewMaskEngineProcess(NewPathSelector("elements.persons.email"), emailMasking, "")).
@@ -476,7 +486,7 @@ func TestMaskEngineShouldMaskMultipleNestedNestedArrays(t *testing.T) {
 	assert.Nil(t, err)
 
 	expected := DictionariesToJSONLine(jsonlineToDictionaries(oput))
-	actual := DictionariesToJSONLine(result)
+	actual := EntriesToJSONLine(result)
 	assert.Equal(t, expected, actual)
 }
 
@@ -484,7 +494,7 @@ func TestMaskEngineShouldReturnError(t *testing.T) {
 	errorMasking := FunctionMaskEngine{Function: func(name Entry, contexts ...Dictionary) (Entry, error) { return "", fmt.Errorf("Test error") }}
 
 	mySlice := []Dictionary{NewDictionary().With("city", "Nantes")}
-	var result []Dictionary
+	var result []Entry
 
 	pipeline := NewPipelineFromSlice(mySlice).
 		Process(NewMaskEngineProcess(NewPathSelector("city"), errorMasking, "")).
@@ -500,7 +510,7 @@ func TestPipelineShouldReturnError(t *testing.T) {
 	}
 
 	mySlice := []Dictionary{NewDictionary().With("city", "Nantes")}
-	var result []Dictionary
+	var result []Entry
 
 	pipeline := NewPipelineFromSlice(mySlice).
 		Process(NewMapProcess(errorMap)).
@@ -520,7 +530,7 @@ func (s ErrorSource) Next() bool {
 	return false
 }
 
-func (s ErrorSource) Value() Dictionary {
+func (s ErrorSource) Value() Entry {
 	return NewDictionary()
 }
 
@@ -529,7 +539,7 @@ func (s ErrorSource) Open() error {
 }
 
 func TestPipelineShouldReturnErrorFromSource(t *testing.T) {
-	var result []Dictionary
+	var result []Entry
 
 	pipeline := NewPipeline(ErrorSource{}).
 		AddSink(NewSinkToSlice(&result))
@@ -553,7 +563,7 @@ func TestCacheShouldProvide(t *testing.T) {
 		NewDictionary().With("city", "Grenoble"),
 		NewDictionary().With("city", "Nantes"),
 	}
-	var result []Dictionary
+	var result []Entry
 
 	pipeline := NewPipelineFromSlice(mySlice).
 		Process(NewMaskEngineProcess(NewPathSelector("city"), NewMaskCacheEngine(cache, errorMasking), "")).
