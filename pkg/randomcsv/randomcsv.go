@@ -75,7 +75,7 @@ func (mrl MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.En
 
 	var output bytes.Buffer
 	if len(context) == 0 {
-		context = []model.Dictionary{model.NewPackedDictionary(model.NewDictionary())}
+		context = []model.Dictionary{model.NewPackedDictionary()}
 	}
 	if err := mrl.template.Execute(&output, context[0].UnpackAsDict().Unordered()); err != nil {
 		return nil, err

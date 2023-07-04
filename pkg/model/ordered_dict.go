@@ -12,8 +12,8 @@ type Dictionary struct {
 	*ordered.OrderedMap
 }
 
-func NewPackedDictionary(dict Dictionary) Dictionary {
-	return dict.Pack()
+func NewPackedDictionary() Dictionary {
+	return NewDictionary().Pack()
 }
 
 func NewDictionary() Dictionary {
