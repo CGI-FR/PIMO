@@ -101,7 +101,7 @@ func TestMaskingTemplateShouldFormat(t *testing.T) {
 		assert.Fail(t, err.Error())
 	}
 
-	data := model.NewDictionary().With("field", "anything")
+	data := model.NewDictionary().With("field", "anything").Pack()
 	result, err := tempMask.Mask("anything", data)
 	assert.Equal(t, nil, err, "error should be nil")
 	waited := "HELLO!HELLO!"
