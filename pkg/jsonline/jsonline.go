@@ -31,7 +31,15 @@ func NewSource(file io.Reader) model.Source {
 	scanner := bufio.NewScanner(file)
 	buf := make([]byte, 0, 64*1024)
 	scanner.Buffer(buf, 1024*1024*100) // increase buffer up to 100 MB
-	return &Source{scanner, model.NewDictionary(), nil}
+	return &Source{scanner, model.NewDictionary(), nil, false}
+}
+
+// NewPackedSource creates a new packed Source.
+func NewPackedSource(file io.Reader) model.Source {
+	scanner := bufio.NewScanner(file)
+	buf := make([]byte, 0, 64*1024)
+	scanner.Buffer(buf, 1024*1024*100) // increase buffer up to 100 MB
+	return &Source{scanner, model.NewDictionary(), nil, true}
 }
 
 // Source export line to JSON format.
@@ -39,18 +47,7 @@ type Source struct {
 	fscanner *bufio.Scanner
 	value    model.Dictionary
 	err      error
-}
-
-// JSONToDictionary return a model.Dictionary from a jsonline
-func JSONToDictionary(jsonline []byte) (model.Dictionary, error) {
-	dict := model.NewDictionary()
-
-	err := json.Unmarshal(jsonline, &dict)
-	if err != nil {
-		return model.NewDictionary(), err
-	}
-
-	return model.CleanDictionary(dict), nil
+	packed   bool
 }
 
 func (s *Source) Open() error {
@@ -64,7 +61,11 @@ func (s *Source) Next() bool {
 		return false
 	}
 	line := s.fscanner.Bytes()
-	s.value, s.err = JSONToDictionary(line)
+	if s.packed {
+		s.value, s.err = JSONToPackedDictionary(line)
+	} else {
+		s.value, s.err = JSONToDictionary(line)
+	}
 	return s.err == nil
 }
 
@@ -122,22 +123,19 @@ func (s Sink) ProcessDictionary(dictionary model.Entry) error {
 	return nil
 }
 
-// NewPackedSource creates a new Source.
-func NewPackedSource(file io.Reader) model.Source {
-	scanner := bufio.NewScanner(file)
-	buf := make([]byte, 0, 64*1024)
-	scanner.Buffer(buf, 1024*1024*100) // increase buffer up to 100 MB
-	return &Source{scanner, model.NewDictionary(), nil}
-}
-
-// Source export line to JSON format.
-type PackedSource struct {
-	fscanner *bufio.Scanner
-	value    model.Dictionary
-	err      error
-}
-
 // JSONToDictionary return a model.Dictionary from a jsonline
+func JSONToDictionary(jsonline []byte) (model.Dictionary, error) {
+	dict := model.NewDictionary()
+
+	err := json.Unmarshal(jsonline, &dict)
+	if err != nil {
+		return model.NewDictionary(), err
+	}
+
+	return model.CleanDictionary(dict), nil
+}
+
+// JSONToPackedDictionary return a packed model.Dictionary from a jsonline
 func JSONToPackedDictionary(jsonline []byte) (model.Dictionary, error) {
 	dict := model.NewDictionary()
 
@@ -150,27 +148,4 @@ func JSONToPackedDictionary(jsonline []byte) (model.Dictionary, error) {
 	root := dict.Pack().With("original", jsonline)
 
 	return model.CleanDictionary(root), nil
-}
-
-func (s *PackedSource) Open() error {
-	return nil
-}
-
-// Next convert next line to model.Dictionary
-func (s *PackedSource) Next() bool {
-	if !s.fscanner.Scan() {
-		s.err = s.fscanner.Err()
-		return false
-	}
-	line := s.fscanner.Bytes()
-	s.value, s.err = JSONToPackedDictionary(line)
-	return s.err == nil
-}
-
-func (s *PackedSource) Value() model.Dictionary {
-	return s.value
-}
-
-func (s *PackedSource) Err() error {
-	return s.err
 }
