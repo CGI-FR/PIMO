@@ -325,6 +325,8 @@ func injectTemplateFuncs() {
 	template.InjectSeededFuncGenerator("MaskRandomDuration", randdura.Func)
 	template.InjectSeededFuncGenerator("MaskFF1", ff1.Func)
 	template.InjectSeededFuncGenerator("MaskFf1", ff1.Func)
+	template.InjectSeededFuncGenerator("MaskFF1_v2", ff1.FuncV2)
+	template.InjectSeededFuncGenerator("MaskFf1_v2", ff1.FuncV2)
 	template.InjectSeededFuncGenerator("MaskRange", rangemask.Func)
 	template.InjectSeededFuncGenerator("MaskLuhn", luhn.Func)
 	template.InjectSeededFuncGenerator("MaskTranscode", transcode.Func)
