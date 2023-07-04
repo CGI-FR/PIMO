@@ -41,7 +41,7 @@ func TestFactoryShouldCreateAMaskFromAListWithTemplate(t *testing.T) {
 	mask, present, err := Factory(factoryConfig)
 	assert.Nil(t, err, "error should be nil")
 	assert.True(t, present, "should be true")
-	masked, err := mask.Mask("", model.NewDictionary().With("gender", "M"))
+	masked, err := mask.Mask("", model.NewDictionary().With("gender", "M").Pack())
 	assert.Equal(t, masked, "Mickael", "should be equal")
 	assert.Nil(t, err, "error should be nil")
 }

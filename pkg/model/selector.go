@@ -65,10 +65,17 @@ type selector struct {
 	sub  selectorInternal
 }
 
-func NewPathSelector(path string) Selector {
+func NewPackedPathSelector(path string) Selector {
+	if path == "." {
+		return selector{".", nil}
+	}
+	return selector{".", NewPathSelector(strings.TrimPrefix(path, "."))}
+}
+
+func NewPathSelector(path string) selectorInternal {
 	paths := strings.SplitN(path, ".", 2)
 	if len(paths) == 2 {
-		return selector{paths[0], NewPathSelector(paths[1]).(selectorInternal)}
+		return selector{paths[0], NewPathSelector(paths[1])}
 	}
 	return selector{paths[0], nil}
 }

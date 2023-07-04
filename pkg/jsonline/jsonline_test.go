@@ -29,7 +29,7 @@ import (
 func TestSourceReturnDictionary(t *testing.T) {
 	jsonline := []byte(`{"personne": [{"name": "Benjamin", "age" : 35}, {"name": "Nicolas", "age" : 38}]}`)
 	pipeline := model.NewPipeline(NewSource(bytes.NewReader(jsonline)))
-	var result []model.Dictionary
+	var result []model.Entry
 	err := pipeline.AddSink(model.NewSinkToSlice(&result)).Run()
 	assert.Nil(t, err)
 	assert.Equal(t, 1, len(result))
@@ -44,7 +44,7 @@ func TestSourceReturnDictionary(t *testing.T) {
 func TestSourceReturnError(t *testing.T) {
 	jsonline := []byte(`{"personne" [{"name": "Benjamin", "age" : 35}, {"name": "Nicolas", "age" : 38}]}`)
 	pipeline := model.NewPipeline(NewSource(bytes.NewReader(jsonline)))
-	var result []model.Dictionary
+	var result []model.Entry
 	err := pipeline.AddSink(model.NewSinkToSlice(&result)).Run()
 	assert.NotNil(t, err)
 	assert.EqualError(t, err, "invalid character '[' after object key")

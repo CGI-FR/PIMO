@@ -114,7 +114,7 @@ func (ctx *Context) Configure(cfg Config) error {
 		ctx.source = model.NewSourceFromSlice([]model.Dictionary{*cfg.SingleInput})
 	default:
 		over.MDC().Set("context", "stdin")
-		ctx.source = jsonline.NewSource(os.Stdin)
+		ctx.source = jsonline.NewPackedSource(os.Stdin)
 	}
 
 	if cfg.RepeatUntil != "" && cfg.RepeatWhile != "" {

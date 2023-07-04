@@ -12,8 +12,23 @@ type Dictionary struct {
 	*ordered.OrderedMap
 }
 
+func NewPackedDictionary() Dictionary {
+	return NewDictionary().Pack()
+}
+
 func NewDictionary() Dictionary {
 	return Dictionary{ordered.NewOrderedMap()}
+}
+
+func Copy(other Entry) Entry {
+	switch d := other.(type) {
+	case Dictionary:
+		return d.Copy()
+	case Entry:
+		return NewDictionary().With("entry", d).Copy().Get("entry")
+	default:
+		panic("")
+	}
 }
 
 // CopyDictionary clone deeply dictionary
@@ -276,6 +291,23 @@ func UnorderedTypes(inter interface{}) interface{} {
 	default:
 		return inter
 	}
+}
+
+func (d Dictionary) IsPacked() bool {
+	_, packed := d.GetValue(".")
+	return packed
+}
+
+func (d Dictionary) Pack() Dictionary {
+	return NewDictionary().With(".", d)
+}
+
+func (d Dictionary) Unpack() Entry {
+	return d.Get(".")
+}
+
+func (d Dictionary) UnpackAsDict() Dictionary {
+	return d.Get(".").(Dictionary)
 }
 
 func (d Dictionary) Copy() Dictionary {

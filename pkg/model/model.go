@@ -254,13 +254,13 @@ type Processor interface {
 
 // Collector collect Dictionary generate by Process
 type Collector interface {
-	Collect(Dictionary)
+	Collect(Entry)
 }
 
 // SinkProcess send Dictionary process by Pipeline to an output
 type SinkProcess interface {
 	Open() error
-	ProcessDictionary(Dictionary) error
+	ProcessDictionary(Entry) error
 }
 
 type Pipeline interface {
@@ -277,7 +277,7 @@ type SinkedPipeline interface {
 type Source interface {
 	Open() error
 	Next() bool
-	Value() Dictionary
+	Value() Entry
 	Err() error
 }
 
@@ -306,7 +306,7 @@ func (source *SourceFromSlice) Next() bool {
 	return result
 }
 
-func (source *SourceFromSlice) Value() Dictionary {
+func (source *SourceFromSlice) Value() Entry {
 	return source.dictionaries[source.offset-1]
 }
 
@@ -343,7 +343,7 @@ func (p RepeaterUntilProcess) ProcessDictionary(dictionary Dictionary, out Colle
 			err = fmt.Errorf("Cannot execute template, error: %v", r)
 		}
 	}()
-	err = p.tmpl.Execute(&output, dictionary.Untyped())
+	err = p.tmpl.Execute(&output, Untyped(dictionary))
 
 	if err != nil && skipLineOnError {
 		log.Warn().AnErr("error", err).Msg("Line skipped")
@@ -377,7 +377,7 @@ func NewTempSource(sourceValue Source) Source {
 
 type TempSource struct {
 	repeat bool
-	value  Dictionary
+	value  Entry
 	source Source
 }
 
@@ -396,7 +396,7 @@ func (s *TempSource) Next() bool {
 
 func (s *TempSource) Err() error { return s.source.Err() }
 
-func (s *TempSource) Value() Dictionary {
+func (s *TempSource) Value() Entry {
 	return s.value
 }
 
@@ -438,20 +438,20 @@ func (mp MapProcess) ProcessDictionary(dictionary Dictionary, out Collector) err
 	return nil
 }
 
-func NewSinkToSlice(dictionaries *[]Dictionary) SinkProcess {
+func NewSinkToSlice(dictionaries *[]Entry) SinkProcess {
 	return &SinkToSlice{dictionaries}
 }
 
 type SinkToSlice struct {
-	dictionaries *[]Dictionary
+	dictionaries *[]Entry
 }
 
 func (sink *SinkToSlice) Open() error {
-	*sink.dictionaries = []Dictionary{}
+	*sink.dictionaries = []Entry{}
 	return nil
 }
 
-func (sink *SinkToSlice) ProcessDictionary(dictionary Dictionary) error {
+func (sink *SinkToSlice) ProcessDictionary(dictionary Entry) error {
 	*sink.dictionaries = append(*sink.dictionaries, dictionary)
 	return nil
 }
@@ -468,7 +468,8 @@ func (sink *SinkToCache) Open() error {
 	return nil
 }
 
-func (sink *SinkToCache) ProcessDictionary(dictionary Dictionary) error {
+func (sink *SinkToCache) ProcessDictionary(entry Entry) error {
+	dictionary := entry.(Dictionary)
 	sink.cache.Put(CleanTypes(dictionary.Get("key")), CleanTypes(dictionary.Get("value")))
 	return nil
 }
@@ -502,7 +503,7 @@ func (pipeline SimplePipeline) Next() bool {
 	return pipeline.source.Next()
 }
 
-func (pipeline SimplePipeline) Value() Dictionary {
+func (pipeline SimplePipeline) Value() Entry {
 	return pipeline.source.Value()
 }
 
@@ -515,12 +516,12 @@ func (pipeline SimplePipeline) Open() error {
 }
 
 func NewCollector() *QueueCollector {
-	return &QueueCollector{[]Dictionary{}, NewDictionary()}
+	return &QueueCollector{[]Entry{}, NewDictionary()}
 }
 
 type QueueCollector struct {
-	queue []Dictionary
-	value Dictionary
+	queue []Entry
+	value Entry
 }
 
 func (c *QueueCollector) Err() error {
@@ -531,7 +532,7 @@ func (c *QueueCollector) Open() error {
 	return nil
 }
 
-func (c *QueueCollector) Collect(dictionary Dictionary) {
+func (c *QueueCollector) Collect(dictionary Entry) {
 	c.queue = append(c.queue, dictionary)
 }
 
@@ -544,7 +545,7 @@ func (c *QueueCollector) Next() bool {
 	return false
 }
 
-func (c *QueueCollector) Value() Dictionary {
+func (c *QueueCollector) Value() Entry {
 	return c.value
 }
 
@@ -564,7 +565,7 @@ func (p *ProcessPipeline) Next() bool {
 		return true
 	}
 	for p.source.Next() {
-		p.err = p.ProcessDictionary(p.source.Value(), p.collector)
+		p.err = p.ProcessDictionary(p.source.Value().(Dictionary), p.collector)
 		if p.err != nil {
 			return false
 		}
@@ -576,7 +577,7 @@ func (p *ProcessPipeline) Next() bool {
 	return false
 }
 
-func (p *ProcessPipeline) Value() Dictionary {
+func (p *ProcessPipeline) Value() Entry {
 	return p.collector.Value()
 }
 
@@ -627,7 +628,7 @@ func NewSeeder(sourceField string, seed int64) Seeder {
 	var seeder Seeder
 
 	if jpath := sourceField; jpath != "" {
-		sel := NewPathSelector(jpath)
+		sel := NewPackedPathSelector(jpath)
 		hash := fnv.New64a()
 		seeder = func(context Dictionary) (int64, bool, error) {
 			e, ok := sel.Read(context)

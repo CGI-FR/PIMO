@@ -29,7 +29,7 @@ type MaskEngine struct {
 
 // NewMask return a mask containing another field of the dictionary
 func NewMask(field string) MaskEngine {
-	return MaskEngine{model.NewPathSelector(field)}
+	return MaskEngine{model.NewPackedPathSelector(field)}
 }
 
 // Mask masks a value with another field of the json
