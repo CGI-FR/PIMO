@@ -40,7 +40,7 @@ func TestPipelineSource(t *testing.T) {
 	err := pipeline.Run()
 
 	assert.Nil(t, err)
-	assert.Equal(t, mySlice, result)
+	assert.Equal(t, DictionariesToJSONLine(mySlice), EntriesToJSONLine(result))
 }
 
 func TestPipelineWithProcessorSource(t *testing.T) {
@@ -68,7 +68,7 @@ func TestPipelineWithProcessorSource(t *testing.T) {
 		NewDictionary().With("v", 4),
 		NewDictionary().With("v", 5),
 	}
-	assert.Equal(t, wanted, result)
+	assert.Equal(t, DictionariesToJSONLine(wanted), EntriesToJSONLine(result))
 }
 
 func TestPipelineWithChainedProcessorSource(t *testing.T) {
@@ -100,7 +100,7 @@ func TestPipelineWithChainedProcessorSource(t *testing.T) {
 		NewDictionary().With("v", 16),
 		NewDictionary().With("v", 25),
 	}
-	assert.Equal(t, wanted, result)
+	assert.Equal(t, DictionariesToJSONLine(wanted), EntriesToJSONLine(result))
 }
 
 func TestPipelineWithRepeaterProcessor(t *testing.T) {
@@ -129,7 +129,7 @@ func TestPipelineWithRepeaterProcessor(t *testing.T) {
 		NewDictionary().With("v", 4),
 		NewDictionary().With("v", 4),
 	}
-	assert.Equal(t, wanted, result)
+	assert.Equal(t, DictionariesToJSONLine(wanted), EntriesToJSONLine(result))
 }
 
 func TestPipelineWithRepeaterAndMapChainedProcessor(t *testing.T) {
@@ -162,7 +162,7 @@ func TestPipelineWithRepeaterAndMapChainedProcessor(t *testing.T) {
 		NewDictionary().With("v", 16),
 		NewDictionary().With("v", 16),
 	}
-	assert.Equal(t, wanted, result)
+	assert.Equal(t, DictionariesToJSONLine(wanted), EntriesToJSONLine(result))
 }
 
 func TestPipelineWithMaskEngine(t *testing.T) {
@@ -179,7 +179,7 @@ func TestPipelineWithMaskEngine(t *testing.T) {
 	assert.Nil(t, err)
 
 	wanted := []Dictionary{NewDictionary().With("name", "Toto")}
-	assert.Equal(t, wanted, result)
+	assert.Equal(t, DictionariesToJSONLine(wanted), EntriesToJSONLine(result))
 }
 
 func TestPipelineWithDeleteMaskEngine(t *testing.T) {
@@ -198,7 +198,7 @@ func TestPipelineWithDeleteMaskEngine(t *testing.T) {
 	wanted := []Dictionary{
 		NewDictionary().With("city", "Nantes"),
 	}
-	assert.Equal(t, wanted, result)
+	assert.Equal(t, DictionariesToJSONLine(wanted), EntriesToJSONLine(result))
 }
 
 func TestMaskEngineShouldNotCreateField(t *testing.T) {
@@ -215,7 +215,7 @@ func TestMaskEngineShouldNotCreateField(t *testing.T) {
 	assert.Nil(t, err)
 
 	wanted := []Dictionary{NewDictionary().With("city", "Nantes")}
-	assert.Equal(t, wanted, result)
+	assert.Equal(t, DictionariesToJSONLine(wanted), EntriesToJSONLine(result))
 }
 
 // MaskEngine is a value that will be the initialisation of the field when it's created
@@ -245,7 +245,7 @@ func TestMaskEngineWithContext(t *testing.T) {
 	assert.Nil(t, err)
 
 	wanted := []Dictionary{NewDictionary().With("city", "Nantes").With("name", "Toto")}
-	assert.Equal(t, wanted, result)
+	assert.Equal(t, DictionariesToJSONLine(wanted), EntriesToJSONLine(result))
 }
 
 func TestMaskEngineShouldMaskAllEntriesInArray(t *testing.T) {
@@ -262,7 +262,7 @@ func TestMaskEngineShouldMaskAllEntriesInArray(t *testing.T) {
 	assert.Nil(t, err)
 
 	wanted := []Dictionary{NewDictionary().With("city", []Entry{"Paris", "Paris", "Paris"})}
-	assert.Equal(t, wanted, result)
+	assert.Equal(t, DictionariesToJSONLine(wanted), EntriesToJSONLine(result))
 }
 
 func TestMaskEngineShouldMaskNestedEntry(t *testing.T) {
@@ -279,7 +279,7 @@ func TestMaskEngineShouldMaskNestedEntry(t *testing.T) {
 	assert.Nil(t, err)
 
 	wanted := []Dictionary{NewDictionary().With("address", NewDictionary().With("city", "Paris"))}
-	assert.Equal(t, wanted, result)
+	assert.Equal(t, DictionariesToJSONLine(wanted), EntriesToJSONLine(result))
 }
 
 func TestMaskEngineShouldMaskNestedDictionariesArray(t *testing.T) {
@@ -309,7 +309,7 @@ func TestMaskEngineShouldMaskNestedDictionariesArray(t *testing.T) {
 			NewDictionary().With("city", "Paris"),
 		}),
 	}
-	assert.Equal(t, wanted, result)
+	assert.Equal(t, DictionariesToJSONLine(wanted), EntriesToJSONLine(result))
 }
 
 func TestMaskEngineShouldMaskNestedArray(t *testing.T) {
@@ -341,7 +341,7 @@ func TestMaskEngineShouldMaskNestedArray(t *testing.T) {
 			}),
 		),
 	}
-	assert.Equal(t, wanted, result)
+	assert.Equal(t, DictionariesToJSONLine(wanted), EntriesToJSONLine(result))
 }
 
 func jsonlineToDictionaries(jsl string) []Dictionary {
@@ -444,7 +444,7 @@ func TestInOutFormat1(t *testing.T) {
 	err := pipeline.Run()
 
 	assert.Nil(t, err)
-	assert.Equal(t, idict, odict)
+	assert.Equal(t, DictionariesToJSONLine(idict), EntriesToJSONLine(odict))
 }
 
 func TestInOutFormat2(t *testing.T) {
@@ -458,7 +458,7 @@ func TestInOutFormat2(t *testing.T) {
 	err := pipeline.Run()
 
 	assert.Nil(t, err)
-	assert.Equal(t, idict, odict)
+	assert.Equal(t, DictionariesToJSONLine(idict), EntriesToJSONLine(odict))
 }
 
 func TestMaskEngineShouldMaskMultipleNestedNestedArrays(t *testing.T) {
@@ -572,7 +572,7 @@ func TestCacheShouldProvide(t *testing.T) {
 
 	assert.Nil(t, err)
 
-	wanted := []Dictionary{
+	wanted := []Entry{
 		NewDictionary().With("city", "Nantes - 1"),
 		NewDictionary().With("city", "Grenoble - 2"),
 		NewDictionary().With("city", "Nantes - 1"),

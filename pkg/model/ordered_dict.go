@@ -12,6 +12,10 @@ type Dictionary struct {
 	*ordered.OrderedMap
 }
 
+func NewPackedDictionary(dict Dictionary) Dictionary {
+	return NewDictionary().With(".", dict)
+}
+
 func NewDictionary() Dictionary {
 	return Dictionary{ordered.NewOrderedMap()}
 }
@@ -287,6 +291,10 @@ func UnorderedTypes(inter interface{}) interface{} {
 	default:
 		return inter
 	}
+}
+
+func (d Dictionary) Pack() Dictionary {
+	return NewDictionary().With(".", d)
 }
 
 func (d Dictionary) Copy() Dictionary {

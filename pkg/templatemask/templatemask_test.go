@@ -32,7 +32,7 @@ func TestMaskingShouldReplaceSensitiveValueByTemplate(t *testing.T) {
 		assert.Fail(t, err.Error())
 	}
 
-	data := model.NewDictionary().With("name", "Jean").With("surname", "Bonbeur").With("mail", "jean44@outlook.com")
+	data := model.NewDictionary().With("name", "Jean").With("surname", "Bonbeur").With("mail", "jean44@outlook.com").Pack()
 	result, err := tempMask.Mask("jean44@outlook.com", data)
 	assert.Equal(t, nil, err, "error should be nil")
 	waited := "Jean.Bonbeur@gmail.com"
@@ -53,7 +53,7 @@ func TestMaskingShouldReplaceSensitiveValueByTemplateInNested(t *testing.T) {
 				With("surname", "Bonbeur"),
 			).
 			With("mail", "jean44@outlook.com"),
-		)
+		).Pack()
 	result, err := tempMask.Mask("jean44@outlook.com", data)
 	assert.Equal(t, nil, err, "error should be nil")
 	waited := "Jean.Bonbeur@gmail.com"
@@ -69,7 +69,7 @@ func TestFactoryShouldCreateAMask(t *testing.T) {
 	assert.IsType(t, maskingEngine, config, "should be equal")
 	assert.True(t, present, "should be true")
 	assert.Nil(t, err, "error should be nil")
-	data := model.NewDictionary().With("name", "Toto").With("surname", "Tata").With("mail", "")
+	data := model.NewDictionary().With("name", "Toto").With("surname", "Tata").With("mail", "").Pack()
 	result, err := maskingEngine.Mask(data, data)
 	assert.Nil(t, err, "error should be nil")
 	waitedResult := "Toto.Tata@gmail.com"
@@ -116,7 +116,7 @@ func TestRFactoryShouldCreateANestedContextMask(t *testing.T) {
 	assert.True(t, present, "should be true")
 	data := model.NewDictionary().
 		With("baz", "BAZ").
-		With("foo", model.NewDictionary().With("bar", "BAR"))
+		With("foo", model.NewDictionary().With("bar", "BAR")).Pack()
 
 	masked, _ := maskEngine.Mask("bar", data)
 
@@ -132,6 +132,7 @@ func TestMaskingTemplateShouldIterOverContextArray(t *testing.T) {
 	}
 
 	data := model.NewDictionary().With("REL_PERMIS", []model.Dictionary{model.NewDictionary().With("ID_PERMIS", 1)})
+	data = data.Pack()
 
 	result, err := tempMask.Mask("anything", data)
 	if err != nil {

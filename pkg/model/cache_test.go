@@ -92,7 +92,7 @@ func TestFromCacheProcessShouldWaitForValueProvide(t *testing.T) {
 		NewDictionary().With("id", "bob").With("name", "Bob").With("supervisor", "john"),
 		NewDictionary().With("id", "tom").With("name", "Tom").With("supervisor", "john"),
 	}
-	assert.Equal(t, wanted, result)
+	assert.Equal(t, DictionariesToJSONLine(wanted), EntriesToJSONLine(result))
 }
 
 func TestFromCacheProcessShouldWaitForLoopProvid(t *testing.T) {
@@ -122,7 +122,7 @@ func TestFromCacheProcessShouldWaitForLoopProvid(t *testing.T) {
 		NewDictionary().With("id", "john").With("name", "John").With("supervisor", "tom"),
 		NewDictionary().With("id", "tom").With("name", "Tom").With("supervisor", "bob"),
 	}
-	assert.Equal(t, wanted, result)
+	assert.Equal(t, DictionariesToJSONLine(wanted), EntriesToJSONLine(result))
 }
 
 func TestFromCacheProcessShouldUsedPreviouslyCachedValue(t *testing.T) {
@@ -154,7 +154,7 @@ func TestFromCacheProcessShouldUsedPreviouslyCachedValue(t *testing.T) {
 		NewDictionary().With("id", "john").With("name", "John").With("supervisor", "tom"),
 		NewDictionary().With("id", "tom").With("name", "Tom").With("supervisor", "boby"),
 	}
-	assert.Equal(t, wanted, result)
+	assert.Equal(t, DictionariesToJSONLine(wanted), EntriesToJSONLine(result))
 }
 
 func TestFromCacheProcessShouldReorderList(t *testing.T) {
@@ -188,7 +188,7 @@ func TestFromCacheProcessShouldReorderList(t *testing.T) {
 		NewDictionary().With("id", "john").With("name", "John").With("supervisor", "tom"),
 		NewDictionary().With("id", "tom").With("name", "Tom").With("supervisor", "bob"),
 	}
-	assert.Equal(t, wanted, result)
+	assert.Equal(t, DictionariesToJSONLine(wanted), EntriesToJSONLine(result))
 }
 
 func TestFromCacheProcessShouldWaitWithUnique(t *testing.T) {
@@ -218,5 +218,5 @@ func TestFromCacheProcessShouldWaitWithUnique(t *testing.T) {
 		NewDictionary().With("id", "john").With("name", "John").With("supervisor", "tom"),
 		NewDictionary().With("id", "tom").With("name", "Tom").With("supervisor", "bob"),
 	}
-	assert.Equal(t, wanted, result)
+	assert.Equal(t, DictionariesToJSONLine(wanted), EntriesToJSONLine(result))
 }
