@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1688398962241,
+  "lastUpdate": 1688485967041,
   "repoUrl": "https://github.com/CGI-FR/PIMO",
   "entries": {
     "Benchmark": [
@@ -3522,6 +3522,42 @@ window.BENCHMARK_DATA = {
             "value": 2146163,
             "unit": "ns/op\t  681891 B/op\t    5893 allocs/op",
             "extra": "5232 times\n2 procs"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "44274230+adrienaury@users.noreply.github.com",
+            "name": "Adrien Aury",
+            "username": "adrienaury"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "146da8435bd7f2fd09b182cb36b5491a764e7e04",
+          "message": "feat: dot selector (#244)\n\n* feat: dot selector\r\n\r\n* feat: pack and unpack jsonline\r\n\r\n* feat: packed source\r\n\r\n* refactor: allow Entry in Process\r\n\r\n* fix: allow chain masks on \".\" selector\r\n\r\n* test: wip! fix unit tests\r\n\r\n* test: fix unit tests\r\n\r\n* refactor: improvements\r\n\r\n* test: fix ff1 onError\r\n\r\n* test: fix unit tests\r\n\r\n* test: fix venom tests\r\n\r\n* refactor: NewPackedDictionary\r\n\r\n* refactor: PackedSource\r\n\r\n* refactor: revert useless refactoring of Process\r\n\r\n* docs: update changelog",
+          "timestamp": "2023-07-04T17:37:51+02:00",
+          "tree_id": "5940715a0baec4fb274c95a674943cb20f5d034e",
+          "url": "https://github.com/CGI-FR/PIMO/commit/146da8435bd7f2fd09b182cb36b5491a764e7e04"
+        },
+        "date": 1688485966377,
+        "tool": "go",
+        "benches": [
+          {
+            "name": "BenchmarkPimoRun",
+            "value": 50680,
+            "unit": "ns/op\t   18549 B/op\t     201 allocs/op",
+            "extra": "228692 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge",
+            "value": 3194226,
+            "unit": "ns/op\t  786617 B/op\t    7087 allocs/op",
+            "extra": "3424 times\n2 procs"
           }
         ]
       }
