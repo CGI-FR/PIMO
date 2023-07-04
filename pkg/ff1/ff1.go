@@ -58,10 +58,10 @@ func (ff1m MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.E
 
 	// Extract tweak from the Dictionary (context)
 	var tweak string
-	if context[0].Get(".").(model.Dictionary).Get(ff1m.tweakField) == nil {
+	if context[0].UnpackAsDict().Get(ff1m.tweakField) == nil {
 		tweak = ""
 	} else {
-		tweak = context[0].Get(".").(model.Dictionary).Get(ff1m.tweakField).(string)
+		tweak = context[0].UnpackAsDict().Get(ff1m.tweakField).(string)
 	}
 	// Get encryption key as byte array
 	envKey := os.Getenv(ff1m.keyFromEnv)
@@ -156,7 +156,7 @@ func Factory(conf model.MaskFactoryConfiguration) (model.MaskEngine, bool, error
 
 func Func(seed int64, seedField string) interface{} {
 	return func(key string, tweak string, radix uint, decrypt bool, input model.Entry) (model.Entry, error) {
-		context := model.NewDictionary().With(".", model.NewDictionary().With("tweak", tweak))
+		context := model.NewDictionary().With("tweak", tweak).Pack()
 		mask := NewMask(key, "tweak", radix, decrypt, "", false, nil)
 		return mask.Mask(input, context)
 	}
@@ -164,7 +164,7 @@ func Func(seed int64, seedField string) interface{} {
 
 func FuncV2(seed int64, seedField string) interface{} {
 	return func(key string, tweak string, domain string, preserve bool, decrypt bool, input model.Entry) (model.Entry, error) {
-		context := model.NewDictionary().With(".", model.NewDictionary().With("tweak", tweak))
+		context := model.NewDictionary().With("tweak", tweak).Pack()
 		mask := NewMask(key, "tweak", 0, decrypt, domain, preserve, nil)
 		return mask.Mask(input, context)
 	}

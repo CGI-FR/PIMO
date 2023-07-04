@@ -13,7 +13,7 @@ type Dictionary struct {
 }
 
 func NewPackedDictionary(dict Dictionary) Dictionary {
-	return NewDictionary().With(".", dict)
+	return dict.Pack()
 }
 
 func NewDictionary() Dictionary {
@@ -293,8 +293,21 @@ func UnorderedTypes(inter interface{}) interface{} {
 	}
 }
 
+func (d Dictionary) IsPacked() bool {
+	_, packed := d.GetValue(".")
+	return packed
+}
+
 func (d Dictionary) Pack() Dictionary {
 	return NewDictionary().With(".", d)
+}
+
+func (d Dictionary) Unpack() Entry {
+	return d.Get(".")
+}
+
+func (d Dictionary) UnpackAsDict() Dictionary {
+	return d.Get(".").(Dictionary)
 }
 
 func (d Dictionary) Copy() Dictionary {
