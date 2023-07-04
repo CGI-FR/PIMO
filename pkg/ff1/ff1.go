@@ -214,7 +214,7 @@ func fromFF1Domain(value string, domain string, preserved map[int]rune) string {
 
 func executeTemplate(engine *template.Engine, contexts []model.Dictionary) (string, error) {
 	var output bytes.Buffer
-	if err := engine.Execute(&output, contexts[0].Unordered()); err != nil {
+	if err := engine.Execute(&output, contexts[0].UnpackAsDict().Unordered()); err != nil {
 		return "", err
 	}
 	return output.String(), nil
