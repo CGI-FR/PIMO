@@ -666,3 +666,31 @@ testcases:
     assertions:
     - result.code ShouldEqual 0
     - result.systemout ShouldEqual '"hello"'
+
+- name: mask pipe
+  steps:
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "."
+          masks:
+            - constant: [{"name": "paul"}]
+            - pipe:
+                masking:
+                  - selector:
+                      jsonpath: "name"
+                    mask:
+                      template: "{{.name | upper}}"
+      EOF
+  - script: |-
+      echo '{ "existing": "value" }' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldEqual '[{"name":"PAUL"}]'
+  - script: |-
+      pimo --empty-input
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldEqual '[{"name":"PAUL"}]'
