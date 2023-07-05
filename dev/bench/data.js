@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1688485967041,
+  "lastUpdate": 1688543978079,
   "repoUrl": "https://github.com/CGI-FR/PIMO",
   "entries": {
     "Benchmark": [
@@ -3558,6 +3558,42 @@ window.BENCHMARK_DATA = {
             "value": 3194226,
             "unit": "ns/op\t  786617 B/op\t    7087 allocs/op",
             "extra": "3424 times\n2 procs"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "44274230+adrienaury@users.noreply.github.com",
+            "name": "Adrien Aury",
+            "username": "adrienaury"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "6107c5432f2e89e1b0dcede81304c42dcbc602d1",
+          "message": "test: dot selector (#247)\n\n* test: add missing venom tests\r\n\r\n* test: add missing venom test for pipe",
+          "timestamp": "2023-07-05T09:47:10+02:00",
+          "tree_id": "217e7f10526b058444580fca6aa378fc70efcd70",
+          "url": "https://github.com/CGI-FR/PIMO/commit/6107c5432f2e89e1b0dcede81304c42dcbc602d1"
+        },
+        "date": 1688543977281,
+        "tool": "go",
+        "benches": [
+          {
+            "name": "BenchmarkPimoRun",
+            "value": 35182,
+            "unit": "ns/op\t   18463 B/op\t     201 allocs/op",
+            "extra": "327136 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge",
+            "value": 2488422,
+            "unit": "ns/op\t  786608 B/op\t    7087 allocs/op",
+            "extra": "4418 times\n2 procs"
           }
         ]
       }
