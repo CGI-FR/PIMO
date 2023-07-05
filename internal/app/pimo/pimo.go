@@ -141,7 +141,7 @@ func (ctx *Context) Configure(cfg Config) error {
 	injectTemplateFuncs()
 	model.InjectMaskContextFactories(injectMaskContextFactories())
 	model.InjectMaskFactories(injectMaskFactories())
-	model.InjectConfig(cfg.SkipLineOnError, cfg.SkipFieldOnError)
+	model.InjectConfig(cfg.SkipLineOnError, cfg.SkipFieldOnError, cfg.SkipLogFile)
 
 	var err error
 	ctx.pipeline, ctx.caches, err = model.BuildPipeline(ctx.pipeline, ctx.pdef, nil, nil)

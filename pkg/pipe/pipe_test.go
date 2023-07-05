@@ -51,7 +51,7 @@ func TestMaskEngineShouldMaskNestedArray(t *testing.T) {
 
 	pipeline := model.NewPipelineFromSlice(mySlice).
 		Process(model.NewRepeaterProcess(2)).
-		Process(model.NewMaskContextEngineProcess(model.NewPathSelector("address.city"), pipe)).
+		Process(model.NewMaskContextEngineProcess(model.NewPathSelector("address.city"), pipe, "")).
 		AddSink(model.NewSinkToSlice(&result))
 
 	err = pipeline.Run()

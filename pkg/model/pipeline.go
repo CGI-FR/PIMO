@@ -35,6 +35,7 @@ var (
 	maskFactories        []MaskFactory
 	skipLineOnError      bool
 	skipFieldOnError     bool
+	skipLogFile          string
 )
 
 func InjectMaskContextFactories(factories []MaskContextFactory) {
@@ -45,9 +46,10 @@ func InjectMaskFactories(factories []MaskFactory) {
 	maskFactories = factories
 }
 
-func InjectConfig(skipLineOnErrorValue bool, skipFieldOnErrorValue bool) {
+func InjectConfig(skipLineOnErrorValue bool, skipFieldOnErrorValue bool, skipLogFileValue string) {
 	skipLineOnError = skipLineOnErrorValue
 	skipFieldOnError = skipFieldOnErrorValue
+	skipLogFile = skipLogFileValue
 }
 
 func BuildCaches(caches map[string]CacheDefinition, existing map[string]Cache) map[string]Cache {
@@ -152,7 +154,7 @@ func BuildPipeline(pipeline Pipeline, conf Definition, caches map[string]Cache, 
 								mask = NewMaskCacheEngine(typedCache, mask)
 							}
 						}
-						pipeline = pipeline.Process(NewMaskEngineProcess(NewPackedPathSelector(virtualMask.Selector.Jsonpath), mask, virtualMask.Preserve))
+						pipeline = pipeline.Process(NewMaskEngineProcess(NewPackedPathSelector(virtualMask.Selector.Jsonpath), mask, virtualMask.Preserve, skipLogFile))
 						nbArg++
 					}
 				}
@@ -175,10 +177,10 @@ func BuildPipeline(pipeline Pipeline, conf Definition, caches map[string]Cache, 
 								mask = NewMaskContextCacheEngine(typedCache, mask)
 							}
 						}
-						pipeline = pipeline.Process(NewMaskContextEngineProcess(NewPackedPathSelector(virtualMask.Selector.Jsonpath), mask))
+						pipeline = pipeline.Process(NewMaskContextEngineProcess(NewPackedPathSelector(virtualMask.Selector.Jsonpath), mask, skipLogFile))
 						nbArg++
 						if i, hasCleaner := mask.(HasCleaner); hasCleaner {
-							cleaners = append(cleaners, NewMaskContextEngineProcess(NewPackedPathSelector(virtualMask.Selector.Jsonpath), i.GetCleaner()))
+							cleaners = append(cleaners, NewMaskContextEngineProcess(NewPackedPathSelector(virtualMask.Selector.Jsonpath), i.GetCleaner(), skipLogFile))
 						}
 					}
 				}
