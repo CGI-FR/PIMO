@@ -61,3 +61,26 @@ testcases:
         assertions:
           - |
             result.systemout ShouldEqual '{"date": "Toto"}'
+
+  - name: catch errors
+    steps:
+      - script: rm -f masking.yml
+      - script: |-
+          cat > masking.yml <<EOF
+          version: "1"
+          masking:
+            - selector:
+                jsonpath: "date"
+              mask:
+                duration: "-P2D"
+          EOF
+      - script: |-
+          echo -e '{"date": "Toto"}\n{"date": "2020-01-01T00:00:00Z"}' | TZ="" pimo -e errors.jsonl
+        assertions:
+          - result.code ShouldEqual 0
+          - |
+            result.systemout ShouldEqual '{"date":"2019-12-30T00:00:00Z"}'
+      - script: cat errors.jsonl
+        assertions:
+          - |
+            result.systemout ShouldEqual '{"date": "Toto"}'
