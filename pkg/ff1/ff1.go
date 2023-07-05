@@ -57,11 +57,11 @@ func (ff1m MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.E
 	log.Info().Msg("Mask ff1")
 
 	// Extract tweak from the Dictionary (context)
-	var tweak string
-	if context[0].UnpackAsDict().Get(ff1m.tweakField) == nil {
-		tweak = ""
-	} else {
-		tweak = context[0].UnpackAsDict().Get(ff1m.tweakField).(string)
+	tweak := ""
+	if rootCtx, ctxExist := context[0].TryUnpackAsDict(); ctxExist {
+		if rootCtx.Get(ff1m.tweakField) != nil {
+			tweak = rootCtx.Get(ff1m.tweakField).(string)
+		}
 	}
 	// Get encryption key as byte array
 	envKey := os.Getenv(ff1m.keyFromEnv)
