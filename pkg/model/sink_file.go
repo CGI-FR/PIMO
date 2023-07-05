@@ -1,8 +1,7 @@
 package model
 
 import (
-	"encoding/json"
-	"fmt"
+	"encoding/base64"
 	"io"
 	"os"
 )
@@ -20,15 +19,13 @@ func (sink *SinkToFile) Open() error {
 	return nil
 }
 
-func (sink *SinkToFile) ProcessDictionary(dictionary Dictionary) error {
-	fmt.Println(dictionary)
-	jsonline, err := json.Marshal(dictionary)
+func (sink *SinkToFile) ProcessDictionary(dictionary Entry) error {
+	value, err := base64.StdEncoding.DecodeString(string(dictionary.([]byte)))
 	if err != nil {
 		return err
 	}
-	jsonline = append(jsonline, "\n"...)
 
-	_, err = sink.file.Write(jsonline)
+	_, err = sink.file.Write(append(value, '\n'))
 	if err != nil {
 		return err
 	}

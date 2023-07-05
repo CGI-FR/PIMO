@@ -67,7 +67,7 @@ func (mcep *MaskContextEngineProcess) ProcessDictionary(dictionary Dictionary, o
 		log.Warn().AnErr("error", ret).Msg("Line skipped")
 		statistics.IncIgnoredLinesCount()
 		if ercoll != nil {
-			ercoll.ProcessDictionary(dictionary)
+			ercoll.ProcessDictionary(dictionary.Get("original"))
 		}
 		ret = nil
 	}

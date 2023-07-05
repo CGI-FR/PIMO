@@ -100,9 +100,9 @@ func BuildPipeline(pipeline Pipeline, conf Definition, caches map[string]Cache, 
 	if skipLineOnError && len(skipLineLogFile) > 0 {
 		errCollector = NewSinkToFile(skipLineLogFile)
 	}
-  
+
 	// pack data inside a root container
-	pipeline = pipeline.Process(NewPackProcess())
+	pipeline = pipeline.Process(NewPackProcess(), nil)
 
 	for _, masking := range conf.Masking {
 		allSelectors := masking.Selectors
@@ -205,7 +205,7 @@ func BuildPipeline(pipeline Pipeline, conf Definition, caches map[string]Cache, 
 	}
 
 	// unpack data from the container
-	pipeline = pipeline.Process(NewUnpackProcess())
+	pipeline = pipeline.Process(NewUnpackProcess(), nil)
 
 	return pipeline, caches, nil
 }
