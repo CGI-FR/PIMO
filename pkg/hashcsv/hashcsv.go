@@ -75,10 +75,14 @@ func (mrl MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.En
 	}
 
 	var output bytes.Buffer
-	if len(context) == 0 {
-		context = []model.Dictionary{model.NewPackedDictionary()}
+	var tmplContext any
+	if len(context) == 0 || !context[0].CanUnpackAsDict() {
+		tmplContext = nil
+	} else {
+		tmplContext = context[0].UnpackAsDict().Unordered()
 	}
-	if err := mrl.template.Execute(&output, context[0].UnpackAsDict().Unordered()); err != nil {
+
+	if err := mrl.template.Execute(&output, tmplContext); err != nil {
 		return nil, err
 	}
 	filename := output.String()
@@ -96,6 +100,10 @@ func (mrl MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.En
 	}
 
 	if mrl.header {
+		if len(records) < 2 {
+			log.Warn().Msg("empty CSV ressource")
+			return nil, fmt.Errorf("cannot mask with hashInCSV from empty CSV")
+		}
 		h := fnv.New32a()
 		if _, err := h.Write([]byte(fmt.Sprintf("%v", e))); err != nil {
 			return nil, err
@@ -112,6 +120,10 @@ func (mrl MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.En
 		}
 		return obj, nil
 	} else {
+		if len(records) < 1 {
+			log.Warn().Msg("empty CSV ressource")
+			return nil, fmt.Errorf("cannot mask with hashInCSV from empty CSV")
+		}
 		h := fnv.New32a()
 		if _, err := h.Write([]byte(fmt.Sprintf("%v", e))); err != nil {
 			return nil, err
