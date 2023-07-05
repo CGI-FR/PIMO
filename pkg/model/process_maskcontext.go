@@ -72,11 +72,15 @@ func (mcep *MaskContextEngineProcess) ProcessDictionary(dictionary Dictionary, o
 		log.Warn().AnErr("error", ret).Msg("Line skipped")
 		statistics.IncIgnoredLinesCount()
 		if mcep.errlogger != nil {
-			if err := mcep.errlogger.Log(dictionary.Get("original").(string)); err != nil {
+			if msg, ok := dictionary.GetValue("original"); !ok {
+				return nil
+			} else if msgstr, ok := msg.(string); !ok {
+				return nil
+			} else if err := mcep.errlogger.Log(msgstr); err != nil {
 				log.Err(err)
 			}
 		}
-		ret = nil
+		return nil
 	}
 
 	if ret != nil && skipFieldOnError {
