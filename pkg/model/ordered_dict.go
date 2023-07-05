@@ -310,6 +310,16 @@ func (d Dictionary) UnpackAsDict() Dictionary {
 	return d.Get(".").(Dictionary)
 }
 
+func (d Dictionary) TryUnpackAsDict() (Dictionary, bool) {
+	dict, ok := d.Get(".").(Dictionary)
+	return dict, ok
+}
+
+func (d Dictionary) CanUnpackAsDict() bool {
+	_, ok := d.Get(".").(Dictionary)
+	return ok
+}
+
 func (d Dictionary) Copy() Dictionary {
 	return CopyDictionary(d)
 }

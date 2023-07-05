@@ -1,0 +1,668 @@
+name: dot selector feature
+testcases:
+
+- name: mask command
+  steps:
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "."
+          mask:
+            command: "echo hello"
+      EOF
+  - script: |-
+      echo '{ "existing": "value" }' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldEqual '"hello"'
+  - script: |-
+      pimo --empty-input
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldEqual '"hello"'
+
+- name: mask constant
+  steps:
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "."
+          mask:
+            constant: 1
+      EOF
+  - script: |-
+      echo '{ "existing": "value" }' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldEqual 1
+  - script: |-
+      pimo --empty-input
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldEqual 1
+
+- name: mask dateParser
+  steps:
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "."
+          masks:
+            - constant: "2023-06-05"
+            - dateParser:
+                inputFormat: "2006-01-02"
+                outputFormat: "01/02/06"
+      EOF
+  - script: |-
+      echo '{ "existing": "value" }' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldEqual '"06/05/23"'
+  - script: |-
+      pimo --empty-input
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldEqual '"06/05/23"'
+
+- name: mask duration
+  steps:
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "."
+          masks:
+            - constant: "2020-01-01T00:00:00Z"
+            - duration: "-P2D"
+      EOF
+  - script: |-
+      echo '{ "existing": "value" }' | TZ="" pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldEqual '"2019-12-30T00:00:00Z"'
+  - script: |-
+      TZ="" pimo --empty-input
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldEqual '"2019-12-30T00:00:00Z"'
+
+- name: mask ff1
+  steps:
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "."
+          masks:
+            - constant: "1234"
+            - ff1:
+                keyFromEnv: "FF1_ENCRYPTION_KEY"
+                domain: "0123456789"
+      EOF
+  - script: |-
+      echo '{ "existing": "value" }' | FF1_ENCRYPTION_KEY="70NZ2NWAqk9/A21vBPxqlA==" TZ="" pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldEqual '"8239"'
+  - script: |-
+      FF1_ENCRYPTION_KEY="70NZ2NWAqk9/A21vBPxqlA==" TZ="" pimo --empty-input
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldEqual '"8239"'
+
+- name: mask fluxUri
+  steps:
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "."
+          mask:
+            fluxUri: "pimo://nameFR"
+      EOF
+  - script: |-
+      echo '{ "existing": "value" }' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldEqual '"Aaron"'
+  - script: |-
+      pimo --empty-input
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldEqual '"Aaron"'
+
+- name: mask fromcache
+  steps:
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      caches:
+        test: {}
+      masking:
+        - selector:
+            jsonpath: "test"
+          mask:
+            constant: "2"
+          cache: "test"
+        - selector:
+            jsonpath: "."
+          masks:
+            - constant: "1"
+            - fromCache: "test"
+      EOF
+  - script: |-
+      echo '{ "test": "1" }' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldEqual '"2"'
+  - script: |-
+      pimo --empty-input
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldEqual '' # value is not in cache so the line is lost
+
+- name: mask fromjson
+  steps:
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "."
+          mask:
+            fromjson: "value"
+      EOF
+  - script: |-
+      echo '{ "value": "1" }' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldEqual '1'
+  - script: |-
+      echo '{ "value": "true" }' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldEqual 'true'
+
+- name: mask hash
+  steps:
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "."
+          masks:
+            - constant: "orig"
+            - hash:
+                - "hello"
+      EOF
+  - script: |-
+      echo '{ "existing": "value" }' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldEqual '"hello"'
+  - script: |-
+      pimo --empty-input
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldEqual '"hello"'
+
+- name: mask hashInUri
+  steps:
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "."
+          masks:
+            - constant: "orig"
+            - hashInUri: "pimo://nameFR"
+      EOF
+  - script: |-
+      echo '{ "existing": "value" }' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldEqual '"Maria"'
+  - script: |-
+      pimo --empty-input
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldEqual '"Maria"'
+
+- name: mask hashInCSV
+  steps:
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "."
+          masks:
+            - constant: "orig"
+            - hashInCSV:
+                uri: "file://../persons.csv"
+      EOF
+  - script: |-
+      echo '{ "existing": "value" }' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldEqual '{"0":"Patricia","1":"Garnier","2":"patricia.garnier@yopmail.fr"}'
+  - script: |-
+      pimo --empty-input
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldEqual '{"0":"Patricia","1":"Garnier","2":"patricia.garnier@yopmail.fr"}'
+
+- name: mask incremental
+  steps:
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "."
+          mask:
+            incremental:
+              start: 1
+              increment: 1
+      EOF
+  - script: |-
+      echo '{ "existing": "value" }' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldEqual '1'
+  - script: |-
+      pimo --empty-input
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldEqual '1'
+  - script: |-
+      pimo --empty-input --repeat 4 | head -c -1 | tr '\n' ' '
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldEqual "1 2 3 4"
+
+- name: mask luhn
+  steps:
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "."
+          masks:
+            - constant: "123456789"
+            - luhn: {}
+      EOF
+  - script: |-
+      echo '{ "existing": "value" }' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldEqual '"1234567897"'
+  - script: |-
+      pimo --empty-input
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldEqual '"1234567897"'
+
+- name: mask markov
+  steps:
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      seed: 1
+      masking:
+        - selector:
+            jsonpath: "."
+          mask:
+            markov:
+              sample: "pimo://nameFR"
+              max-size: 5
+      EOF
+  - script: |-
+      echo '{ "existing": "value" }' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldBeIn '"Ang"' '"And"'
+  - script: |-
+      pimo --empty-input
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldBeIn '"Ang"' '"And"'
+
+- name: mask randDate
+  steps:
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      seed: 1
+      masking:
+        - selector:
+            jsonpath: "."
+          mask:
+            randDate:
+              dateMin: "1970-01-01T00:00:00Z"
+              dateMax: "2020-01-01T00:00:00Z"
+      EOF
+  - script: |-
+      echo '{ "existing": "value" }' | TZ="" pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldEqual '"1984-11-11T20:29:23Z"'
+  - script: |-
+      TZ="" pimo --empty-input
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldEqual '"1984-11-11T20:29:23Z"'
+
+- name: mask randomChoice
+  steps:
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      seed: 1
+      masking:
+        - selector:
+            jsonpath: "."
+          mask:
+            randomChoice:
+              - "hello"
+      EOF
+  - script: |-
+      echo '{ "existing": "value" }' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldEqual '"hello"'
+  - script: |-
+      pimo --empty-input
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldEqual '"hello"'
+
+- name: mask randomChoiceInCSV
+  steps:
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      seed: 1
+      masking:
+        - selector:
+            jsonpath: "."
+          mask:
+            randomChoiceInCSV:
+              uri: "file://../persons.csv"
+      EOF
+  - script: |-
+      echo '{ "existing": "value" }' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldEqual '{"0":"Gérard","1":"Perez","2":"gerard.perez@yopmail.fr"}'
+  - script: |-
+      pimo --empty-input
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldEqual '{"0":"Gérard","1":"Perez","2":"gerard.perez@yopmail.fr"}'
+
+- name: mask randomChoiceInUri
+  steps:
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      seed: 1
+      masking:
+        - selector:
+            jsonpath: "."
+          mask:
+            randomChoiceInUri: "pimo://nameFR"
+      EOF
+  - script: |-
+      echo '{ "existing": "value" }' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldEqual '"Noémie"'
+  - script: |-
+      pimo --empty-input
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldEqual '"Noémie"'
+
+- name: mask randomDecimal
+  steps:
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      seed: 1
+      masking:
+        - selector:
+            jsonpath: "."
+          mask:
+            randomDecimal:
+              min: 1
+              max: 2
+              precision: 2
+      EOF
+  - script: |-
+      echo '{ "existing": "value" }' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldEqual '1.4'
+  - script: |-
+      pimo --empty-input
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldEqual '1.4'
+
+- name: mask randomDuration
+  steps:
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      seed: 1
+      masking:
+        - selector:
+            jsonpath: "."
+          masks:
+            - constant: "2020-01-01T00:00:00Z"
+            - randomDuration:
+                min: "-P2D"
+                max: "-P27D"
+      EOF
+  - script: |-
+      echo '{ "existing": "value" }' | TZ="" pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldEqual '"2019-12-15T01:30:03.485129437Z"'
+  - script: |-
+      TZ="" pimo --empty-input
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldEqual '"2019-12-15T01:30:03.485129437Z"'
+
+- name: mask randomInt
+  steps:
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      seed: 1
+      masking:
+        - selector:
+            jsonpath: "."
+          mask:
+            randomInt:
+              min: 0
+              max: 10
+      EOF
+  - script: |-
+      echo '{ "existing": "value" }' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldEqual '5'
+  - script: |-
+      pimo --empty-input
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldEqual '5'
+
+- name: mask range
+  steps:
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "."
+          masks:
+            - constant: 2
+            - range: 5
+      EOF
+  - script: |-
+      echo '{ "existing": "value" }' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldEqual '"[0;4]"'
+  - script: |-
+      pimo --empty-input
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldEqual '"[0;4]"'
+
+- name: mask regex
+  steps:
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      seed: 1
+      masking:
+        - selector:
+            jsonpath: "."
+          mask:
+            regex: "0[1-7]( ([0-9]){2}){4}"
+      EOF
+  - script: |-
+      echo '{ "existing": "value" }' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldEqual '"01 63 11 23 05"'
+  - script: |-
+      pimo --empty-input
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldEqual '"01 63 11 23 05"'
+
+- name: mask replacement
+  steps:
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "."
+          mask:
+            replacement: "value"
+      EOF
+  - script: |-
+      echo '{ "value": "1" }' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldEqual '"1"'
+
+- name: mask template
+  steps:
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "."
+          mask:
+            template: "{{.surname | NoAccent | lower}}.{{.name | NoAccent | lower}}@gmail.com"
+      EOF
+  - script: |-
+      echo '{ "surname": "André", "name": "Jonathan" }' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldEqual '"andre.jonathan@gmail.com"'
+
+- name: mask template-each
+  steps:
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "."
+          masks:
+            - constant: ["value1", "value2"]
+            - template-each:
+                template: "{{title .value}}"
+                item: "value"
+      EOF
+  - script: |-
+      echo '{ "existing": "value" }' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldEqual '["Value1","Value2"]'
+  - script: |-
+      pimo --empty-input
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldEqual '["Value1","Value2"]'
+
+- name: mask transcode
+  steps:
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      seed: 1
+      masking:
+        - selector:
+            jsonpath: "."
+          masks:
+            - constant: "AB-123-CD"
+            - transcode: {}
+      EOF
+  - script: |-
+      echo '{ "existing": "value" }' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldEqual '"TT-361-WH"'
+  - script: |-
+      pimo --empty-input
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldEqual '"TT-361-WH"'
+
+- name: mask weightedChoice
+  steps:
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      seed: 1
+      masking:
+        - selector:
+            jsonpath: "."
+          mask:
+            weightedChoice:
+              - weight: 1
+                choice: "hello"
+      EOF
+  - script: |-
+      echo '{ "existing": "value" }' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldEqual '"hello"'
+  - script: |-
+      pimo --empty-input
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldEqual '"hello"'
