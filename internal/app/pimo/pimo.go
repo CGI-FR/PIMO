@@ -74,6 +74,7 @@ type Config struct {
 	Iteration        int
 	SkipLineOnError  bool
 	SkipFieldOnError bool
+	SkipLogFile      string
 	CachesToDump     map[string]string
 	CachesToLoad     map[string]string
 }

@@ -57,6 +57,7 @@ var (
 	cachesToLoad          map[string]string
 	skipLineOnError       bool
 	skipFieldOnError      bool
+	skipLogFile           string
 	seedValue             int64
 	maskingOneLiner       []string
 	repeatUntil           string
@@ -98,6 +99,7 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 	rootCmd.PersistentFlags().StringToStringVar(&cachesToLoad, "load-cache", map[string]string{}, "path for loading cache from file")
 	rootCmd.PersistentFlags().BoolVar(&skipLineOnError, "skip-line-on-error", false, "skip a line if an error occurs while masking a field")
 	rootCmd.PersistentFlags().BoolVar(&skipFieldOnError, "skip-field-on-error", false, "remove a field if an error occurs while masking this field")
+	rootCmd.PersistentFlags().StringVar(&skipLogFile, "skip-log-file", "", "skipped lines will be written to this log file")
 	rootCmd.Flags().Int64VarP(&seedValue, "seed", "s", 0, "set seed")
 	rootCmd.PersistentFlags().StringArrayVarP(&maskingOneLiner, "mask", "m", []string{}, "one liner masking")
 	rootCmd.PersistentFlags().StringVar(&repeatUntil, "repeat-until", "", "mask each input repeatedly until the given condition is met")
@@ -168,6 +170,7 @@ func run(cmd *cobra.Command) {
 		Iteration:        iteration,
 		SkipLineOnError:  skipLineOnError,
 		SkipFieldOnError: skipFieldOnError,
+		SkipLogFile:      skipLogFile,
 		CachesToDump:     cachesToDump,
 		CachesToLoad:     cachesToLoad,
 	}

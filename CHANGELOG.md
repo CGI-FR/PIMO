@@ -18,6 +18,7 @@ Types of changes
 
 - `Added` new features for ff1 mask : `domain`, `preserve` and `onError`.
 - `Added` possibility to use `.` in the jsonpath field of selectors.
+- `Added` option `--skip-log-file <filename>` to log skipped lines on error when using `--skip-line-on-error`.
 
 ## [1.18.1]
 
