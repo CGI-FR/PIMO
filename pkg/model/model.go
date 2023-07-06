@@ -308,7 +308,7 @@ func (source *SourceFromSlice) Next() bool {
 }
 
 func (source *SourceFromSlice) Value() Entry {
-	return source.dictionaries[source.offset-1].Copy()
+	return source.dictionaries[source.offset-1]
 }
 
 func (source *SourceFromSlice) Err() error {
@@ -398,10 +398,7 @@ func (s *TempSource) Next() bool {
 func (s *TempSource) Err() error { return s.source.Err() }
 
 func (s *TempSource) Value() Entry {
-	if s.value == nil {
-		return nil
-	}
-	return s.value.(Dictionary).Copy()
+	return s.value
 }
 
 func NewRepeaterProcess(times int) Processor {
