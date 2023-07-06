@@ -35,6 +35,7 @@ var (
 	maskFactories        []MaskFactory
 	skipLineOnError      bool
 	skipFieldOnError     bool
+	skipLogFile          string
 )
 
 func InjectMaskContextFactories(factories []MaskContextFactory) {
@@ -45,9 +46,10 @@ func InjectMaskFactories(factories []MaskFactory) {
 	maskFactories = factories
 }
 
-func InjectConfig(skipLineOnErrorValue bool, skipFieldOnErrorValue bool) {
+func InjectConfig(skipLineOnErrorValue bool, skipFieldOnErrorValue bool, skipLogFileValue string) {
 	skipLineOnError = skipLineOnErrorValue
 	skipFieldOnError = skipFieldOnErrorValue
+	skipLogFile = skipLogFileValue
 }
 
 func BuildCaches(caches map[string]CacheDefinition, existing map[string]Cache) map[string]Cache {
@@ -86,7 +88,7 @@ func BuildFuncMap(funcs map[string]Function, fns tmpl.FuncMap) (tmpl.FuncMap, er
 	return b.Build(fns)
 }
 
-func BuildPipeline(pipeline Pipeline, conf Definition, caches map[string]Cache, functions tmpl.FuncMap) (Pipeline, map[string]Cache, error) {
+func BuildPipeline(pipeline Pipeline, conf Definition, caches map[string]Cache, functions tmpl.FuncMap, repeatCondition string, repeatConditionMode string) (Pipeline, map[string]Cache, error) {
 	caches = BuildCaches(conf.Caches, caches)
 	functions, err := BuildFuncMap(conf.Functions, functions)
 	if err != nil {
@@ -152,7 +154,7 @@ func BuildPipeline(pipeline Pipeline, conf Definition, caches map[string]Cache, 
 								mask = NewMaskCacheEngine(typedCache, mask)
 							}
 						}
-						pipeline = pipeline.Process(NewMaskEngineProcess(NewPackedPathSelector(virtualMask.Selector.Jsonpath), mask, virtualMask.Preserve))
+						pipeline = pipeline.Process(NewMaskEngineProcess(NewPackedPathSelector(virtualMask.Selector.Jsonpath), mask, virtualMask.Preserve, skipLogFile))
 						nbArg++
 					}
 				}
@@ -175,10 +177,10 @@ func BuildPipeline(pipeline Pipeline, conf Definition, caches map[string]Cache, 
 								mask = NewMaskContextCacheEngine(typedCache, mask)
 							}
 						}
-						pipeline = pipeline.Process(NewMaskContextEngineProcess(NewPackedPathSelector(virtualMask.Selector.Jsonpath), mask))
+						pipeline = pipeline.Process(NewMaskContextEngineProcess(NewPackedPathSelector(virtualMask.Selector.Jsonpath), mask, skipLogFile))
 						nbArg++
 						if i, hasCleaner := mask.(HasCleaner); hasCleaner {
-							cleaners = append(cleaners, NewMaskContextEngineProcess(NewPackedPathSelector(virtualMask.Selector.Jsonpath), i.GetCleaner()))
+							cleaners = append(cleaners, NewMaskContextEngineProcess(NewPackedPathSelector(virtualMask.Selector.Jsonpath), i.GetCleaner(), skipLogFile))
 						}
 					}
 				}
@@ -195,6 +197,15 @@ func BuildPipeline(pipeline Pipeline, conf Definition, caches map[string]Cache, 
 	}
 	for _, cleaner := range cleaners {
 		pipeline = pipeline.Process(cleaner)
+	}
+
+	if repeatCondition != "" {
+		repeatSource := NewTempSource(pipeline.Source())
+		processor, err := NewRepeaterUntilProcess(repeatSource, repeatCondition, repeatConditionMode, skipLogFile)
+		if err != nil {
+			return pipeline, caches, fmt.Errorf("Cannot build pipeline: %w", err)
+		}
+		pipeline = pipeline.Process(processor).WithSource(repeatSource)
 	}
 
 	// unpack data from the container

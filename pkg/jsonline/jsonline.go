@@ -145,7 +145,7 @@ func JSONToPackedDictionary(jsonline []byte) (model.Dictionary, error) {
 	}
 
 	// packer
-	root := dict.Pack().With("original", jsonline)
+	root := dict.Pack().With("original", string(jsonline))
 
 	return model.CleanDictionary(root), nil
 }

@@ -448,8 +448,8 @@ targets:
                   suffix = "-" + keycomponents[len(keycomponents)-1]
                 }
                 beta = split(version_patch, "-")
-              - if: len(beta) == 1 
-                then:                 
+              - if: len(beta) == 1
+                then:
                   - $: "sudo docker push ={DOCKERHUB_ORGANIZATION}/={project}={suffix}:v={version_major}"
                   - $: "sudo docker push ={DOCKERHUB_ORGANIZATION}/={project}={suffix}:v={version_major}.={version_minor}"
               - $: "sudo docker push ={DOCKERHUB_ORGANIZATION}/={project}={suffix}:v={version_major}.={version_minor}.={version_patch}"

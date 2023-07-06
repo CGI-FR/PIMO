@@ -23,14 +23,19 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func NewMaskEngineProcess(selector Selector, mask MaskEngine, preserve string) Processor {
-	return &MaskEngineProcess{selector, mask, preserve}
+func NewMaskEngineProcess(selector Selector, mask MaskEngine, preserve string, skipLogFile string) Processor {
+	var errlogger *MsgLogger
+	if len(skipLogFile) > 0 {
+		errlogger = NewMsgLogger(skipLogFile)
+	}
+	return &MaskEngineProcess{selector, mask, preserve, errlogger}
 }
 
 type MaskEngineProcess struct {
-	selector Selector
-	mask     MaskEngine
-	preserve string
+	selector  Selector
+	mask      MaskEngine
+	preserve  string
+	errlogger *MsgLogger
 }
 
 func (mep *MaskEngineProcess) Open() error {
@@ -73,6 +78,15 @@ func (mep *MaskEngineProcess) ProcessDictionary(dictionary Dictionary, out Colle
 	if ret != nil && skipLineOnError {
 		log.Warn().AnErr("error", ret).Msg("Line skipped")
 		statistics.IncIgnoredLinesCount()
+		if mep.errlogger != nil {
+			if msg, ok := dictionary.GetValue("original"); !ok {
+				return nil
+			} else if msgstr, ok := msg.(string); !ok {
+				return nil
+			} else if err := mep.errlogger.Log(msgstr); err != nil {
+				log.Err(err)
+			}
+		}
 		return nil
 	}
 

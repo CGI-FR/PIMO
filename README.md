@@ -162,6 +162,8 @@ This takes the `data.json` file, masks the data contained inside it and put the 
 * `--repeat=N` This flag will make pimo mask every input N-times (useful for dataset generation).
 * `--skip-line-on-error` This flag will totally skip a line if an error occurs masking a field.
 * `--skip-field-on-error` This flag will return output without a field if an error occurs masking this field.
+* `--skip-log-file <filename>` Skipped lines will be written to `<filename>`.
+* `--catch-errors <filename>` or `-e <filename>` Equivalent to `--skip-line-on-error --skip-log-file <filename>`.
 * `--empty-input` This flag will give PIMO a `{}` input, usable with `--repeat` flag.
 * `--config=filename.yml` This flag allow to use another file for config than the default `masking.yml`.
 * `--load-cache cacheName=filename.json` This flag load an initial cache content from a file (json line format `{"key":"a", "value":"b"}`).

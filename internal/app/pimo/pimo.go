@@ -74,6 +74,7 @@ type Config struct {
 	Iteration        int
 	SkipLineOnError  bool
 	SkipFieldOnError bool
+	SkipLogFile      string
 	CachesToDump     map[string]string
 	CachesToLoad     map[string]string
 }
@@ -108,10 +109,10 @@ func (ctx *Context) Configure(cfg Config) error {
 	switch {
 	case cfg.EmptyInput:
 		over.MDC().Set("context", "empty-input")
-		ctx.source = model.NewSourceFromSlice([]model.Dictionary{{}})
+		ctx.source = model.NewSourceFromSlice([]model.Dictionary{model.NewPackedDictionary()})
 	case cfg.SingleInput != nil:
 		over.MDC().Set("context", "single-input")
-		ctx.source = model.NewSourceFromSlice([]model.Dictionary{*cfg.SingleInput})
+		ctx.source = model.NewSourceFromSlice([]model.Dictionary{cfg.SingleInput.Pack()})
 	default:
 		over.MDC().Set("context", "stdin")
 		ctx.source = jsonline.NewPackedSource(os.Stdin)
@@ -128,10 +129,6 @@ func (ctx *Context) Configure(cfg Config) error {
 		ctx.repeatConditionMode = "until"
 	}
 
-	if ctx.repeatCondition != "" {
-		ctx.source = model.NewTempSource(ctx.source)
-	}
-
 	ctx.pipeline = model.NewPipeline(ctx.source).
 		Process(model.NewCounterProcessWithCallback("input-line", 0, updateContext)).
 		Process(model.NewRepeaterProcess(cfg.Iteration))
@@ -140,20 +137,12 @@ func (ctx *Context) Configure(cfg Config) error {
 	injectTemplateFuncs()
 	model.InjectMaskContextFactories(injectMaskContextFactories())
 	model.InjectMaskFactories(injectMaskFactories())
-	model.InjectConfig(cfg.SkipLineOnError, cfg.SkipFieldOnError)
+	model.InjectConfig(cfg.SkipLineOnError, cfg.SkipFieldOnError, cfg.SkipLogFile)
 
 	var err error
-	ctx.pipeline, ctx.caches, err = model.BuildPipeline(ctx.pipeline, ctx.pdef, nil, nil)
+	ctx.pipeline, ctx.caches, err = model.BuildPipeline(ctx.pipeline, ctx.pdef, nil, nil, ctx.repeatCondition, ctx.repeatConditionMode)
 	if err != nil {
 		return fmt.Errorf("Cannot build pipeline: %w", err)
-	}
-
-	if ctx.repeatCondition != "" {
-		processor, err := model.NewRepeaterUntilProcess(ctx.source.(*model.TempSource), ctx.repeatCondition, ctx.repeatConditionMode)
-		if err != nil {
-			return fmt.Errorf("Cannot build pipeline: %w", err)
-		}
-		ctx.pipeline = ctx.pipeline.Process(processor)
 	}
 
 	return nil

@@ -264,6 +264,7 @@ type SinkProcess interface {
 }
 
 type Pipeline interface {
+	Source() Source
 	Process(Processor) Pipeline
 	WithSource(Source) Pipeline
 	AddSink(SinkProcess) SinkedPipeline
@@ -319,16 +320,20 @@ func (source *SourceFromSlice) Open() error {
 	return nil
 }
 
-func NewRepeaterUntilProcess(source *TempSource, text, mode string) (Processor, error) {
+func NewRepeaterUntilProcess(source *TempSource, text, mode string, skipLogFile string) (Processor, error) {
 	eng, err := template.NewEngine(text, tmpl.FuncMap{}, 0, "")
-
-	return RepeaterUntilProcess{eng, source, mode}, err
+	var errlogger *MsgLogger
+	if len(skipLogFile) > 0 {
+		errlogger = NewMsgLogger(skipLogFile)
+	}
+	return RepeaterUntilProcess{eng, source, mode, errlogger}, err
 }
 
 type RepeaterUntilProcess struct {
-	tmpl *template.Engine
-	tmp  *TempSource
-	mode string
+	tmpl      *template.Engine
+	tmp       *TempSource
+	mode      string
+	errlogger *MsgLogger
 }
 
 func (p RepeaterUntilProcess) Open() error {
@@ -343,11 +348,20 @@ func (p RepeaterUntilProcess) ProcessDictionary(dictionary Dictionary, out Colle
 			err = fmt.Errorf("Cannot execute template, error: %v", r)
 		}
 	}()
-	err = p.tmpl.Execute(&output, Untyped(dictionary))
+	err = p.tmpl.Execute(&output, dictionary.UnpackAsDict().Untyped())
 
 	if err != nil && skipLineOnError {
 		log.Warn().AnErr("error", err).Msg("Line skipped")
 		statistics.IncIgnoredLinesCount()
+		if p.errlogger != nil {
+			if msg, ok := dictionary.GetValue("original"); !ok {
+				return nil
+			} else if msgstr, ok := msg.(string); !ok {
+				return nil
+			} else if err := p.errlogger.Log(msgstr); err != nil {
+				log.Err(err)
+			}
+		}
 		return nil
 	}
 
@@ -371,8 +385,8 @@ func (p RepeaterUntilProcess) ProcessDictionary(dictionary Dictionary, out Colle
 	return err
 }
 
-func NewTempSource(sourceValue Source) Source {
-	return &TempSource{repeat: false, source: sourceValue, value: NewDictionary()}
+func NewTempSource(sourceValue Source) *TempSource {
+	return &TempSource{repeat: false, source: sourceValue, value: NewPackedDictionary()}
 }
 
 type TempSource struct {
@@ -487,6 +501,10 @@ func NewPipeline(source Source) Pipeline {
 	return SimplePipeline{source: source}
 }
 
+func (pipeline SimplePipeline) Source() Source {
+	return pipeline.source
+}
+
 func (pipeline SimplePipeline) WithSource(source Source) Pipeline {
 	return SimplePipeline{source: source}
 }
@@ -591,6 +609,10 @@ func (p *ProcessPipeline) AddSink(sink SinkProcess) SinkedPipeline {
 
 func (p *ProcessPipeline) Process(process Processor) Pipeline {
 	return NewProcessPipeline(p, process)
+}
+
+func (p *ProcessPipeline) Source() Source {
+	return p.source
 }
 
 func (p *ProcessPipeline) WithSource(source Source) Pipeline {
