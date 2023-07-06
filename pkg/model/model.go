@@ -264,6 +264,7 @@ type SinkProcess interface {
 }
 
 type Pipeline interface {
+	Source() Source
 	Process(Processor) Pipeline
 	WithSource(Source) Pipeline
 	AddSink(SinkProcess) SinkedPipeline
@@ -307,7 +308,7 @@ func (source *SourceFromSlice) Next() bool {
 }
 
 func (source *SourceFromSlice) Value() Entry {
-	return source.dictionaries[source.offset-1]
+	return source.dictionaries[source.offset-1].Copy()
 }
 
 func (source *SourceFromSlice) Err() error {
@@ -343,7 +344,7 @@ func (p RepeaterUntilProcess) ProcessDictionary(dictionary Dictionary, out Colle
 			err = fmt.Errorf("Cannot execute template, error: %v", r)
 		}
 	}()
-	err = p.tmpl.Execute(&output, Untyped(dictionary))
+	err = p.tmpl.Execute(&output, dictionary.UnpackAsDict().Untyped())
 
 	if err != nil && skipLineOnError {
 		log.Warn().AnErr("error", err).Msg("Line skipped")
@@ -371,8 +372,8 @@ func (p RepeaterUntilProcess) ProcessDictionary(dictionary Dictionary, out Colle
 	return err
 }
 
-func NewTempSource(sourceValue Source) Source {
-	return &TempSource{repeat: false, source: sourceValue, value: NewDictionary()}
+func NewTempSource(sourceValue Source) *TempSource {
+	return &TempSource{repeat: false, source: sourceValue, value: NewPackedDictionary()}
 }
 
 type TempSource struct {
@@ -397,7 +398,10 @@ func (s *TempSource) Next() bool {
 func (s *TempSource) Err() error { return s.source.Err() }
 
 func (s *TempSource) Value() Entry {
-	return s.value
+	if s.value == nil {
+		return nil
+	}
+	return s.value.(Dictionary).Copy()
 }
 
 func NewRepeaterProcess(times int) Processor {
@@ -485,6 +489,10 @@ type SimplePipeline struct {
 
 func NewPipeline(source Source) Pipeline {
 	return SimplePipeline{source: source}
+}
+
+func (pipeline SimplePipeline) Source() Source {
+	return pipeline.source
 }
 
 func (pipeline SimplePipeline) WithSource(source Source) Pipeline {
@@ -591,6 +599,10 @@ func (p *ProcessPipeline) AddSink(sink SinkProcess) SinkedPipeline {
 
 func (p *ProcessPipeline) Process(process Processor) Pipeline {
 	return NewProcessPipeline(p, process)
+}
+
+func (p *ProcessPipeline) Source() Source {
+	return p.source
 }
 
 func (p *ProcessPipeline) WithSource(source Source) Pipeline {

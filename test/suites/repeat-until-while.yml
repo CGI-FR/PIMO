@@ -85,3 +85,17 @@ testcases:
       pimo --empty-input --repeat-while "not_empty" --repeat-until  "not_empty"
     assertions:
     - result.code ShouldEqual 1
+
+- name: use repeat-while to extract content of referential
+  steps:
+  - script: |-
+      cat > script.sh <<EOF
+      pimo --empty-input --repeat-while '[[ hasKey . "name" ]]' --mask 'name={fluxUri: "pimo://nameFR"}'
+      EOF
+  - script: sed -i  "s/\[\[/\{\{/g"  script.sh
+  - script: sed -i  "s/\]\]/\}\}/g"  script.sh
+  - script: chmod +x script.sh
+  - script: ./script.sh
+    assertions:
+      - result.systemout ShouldStartWith '{"name":"Aaron"}'
+      - result.systemout ShouldEndWith '{"name":"Zazie"}'
