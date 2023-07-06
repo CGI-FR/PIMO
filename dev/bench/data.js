@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1688639186068,
+  "lastUpdate": 1688645769795,
   "repoUrl": "https://github.com/CGI-FR/PIMO",
   "entries": {
     "Benchmark": [
@@ -3666,6 +3666,42 @@ window.BENCHMARK_DATA = {
             "value": 2811640,
             "unit": "ns/op\t  682528 B/op\t    5905 allocs/op",
             "extra": "3828 times\n2 procs"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "44274230+adrienaury@users.noreply.github.com",
+            "name": "Adrien Aury",
+            "username": "adrienaury"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "58fcbab0f1ff993a7498eeeb3a925d0a38186633",
+          "message": "doc: fix pimo play link in README",
+          "timestamp": "2023-07-06T14:03:55+02:00",
+          "tree_id": "d0862f62f75d33df94459b7e6655e19a763df15e",
+          "url": "https://github.com/CGI-FR/PIMO/commit/58fcbab0f1ff993a7498eeeb3a925d0a38186633"
+        },
+        "date": 1688645769201,
+        "tool": "go",
+        "benches": [
+          {
+            "name": "BenchmarkPimoRun",
+            "value": 33796,
+            "unit": "ns/op\t   17336 B/op\t     180 allocs/op",
+            "extra": "330397 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge",
+            "value": 2229290,
+            "unit": "ns/op\t  683040 B/op\t    5906 allocs/op",
+            "extra": "5162 times\n2 procs"
           }
         ]
       }
