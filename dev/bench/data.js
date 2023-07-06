@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1688543978079,
+  "lastUpdate": 1688636990905,
   "repoUrl": "https://github.com/CGI-FR/PIMO",
   "entries": {
     "Benchmark": [
@@ -3594,6 +3594,42 @@ window.BENCHMARK_DATA = {
             "value": 2488422,
             "unit": "ns/op\t  786608 B/op\t    7087 allocs/op",
             "extra": "4418 times\n2 procs"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "44274230+adrienaury@users.noreply.github.com",
+            "name": "Adrien Aury",
+            "username": "adrienaury"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "7cbda6a00caaca202f6f9e1182f3a3c1be1fd4bf",
+          "message": "feat: log on error (#248)\n\n* feat: wip! skip log file\r\n\r\n* feat: skip log file\r\n\r\n* fix: panic with empty-input\r\n\r\n* feat: catch-errors flag\r\n\r\n* fix: regression with repeat-until/while\r\n\r\n* fix: revert useless fix\r\n\r\n* feat: skip log file on repeaterprocess",
+          "timestamp": "2023-07-06T11:38:43+02:00",
+          "tree_id": "ae7f83678aac4434c3bf7fcdf28b7673ec0ea6de",
+          "url": "https://github.com/CGI-FR/PIMO/commit/7cbda6a00caaca202f6f9e1182f3a3c1be1fd4bf"
+        },
+        "date": 1688636990426,
+        "tool": "go",
+        "benches": [
+          {
+            "name": "BenchmarkPimoRun",
+            "value": 32302,
+            "unit": "ns/op\t   17441 B/op\t     180 allocs/op",
+            "extra": "353178 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge",
+            "value": 2125193,
+            "unit": "ns/op\t  683010 B/op\t    5905 allocs/op",
+            "extra": "5221 times\n2 procs"
           }
         ]
       }
