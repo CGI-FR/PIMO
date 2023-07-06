@@ -320,16 +320,20 @@ func (source *SourceFromSlice) Open() error {
 	return nil
 }
 
-func NewRepeaterUntilProcess(source *TempSource, text, mode string) (Processor, error) {
+func NewRepeaterUntilProcess(source *TempSource, text, mode string, skipLogFile string) (Processor, error) {
 	eng, err := template.NewEngine(text, tmpl.FuncMap{}, 0, "")
-
-	return RepeaterUntilProcess{eng, source, mode}, err
+	var errlogger *MsgLogger
+	if len(skipLogFile) > 0 {
+		errlogger = NewMsgLogger(skipLogFile)
+	}
+	return RepeaterUntilProcess{eng, source, mode, errlogger}, err
 }
 
 type RepeaterUntilProcess struct {
-	tmpl *template.Engine
-	tmp  *TempSource
-	mode string
+	tmpl      *template.Engine
+	tmp       *TempSource
+	mode      string
+	errlogger *MsgLogger
 }
 
 func (p RepeaterUntilProcess) Open() error {
@@ -349,6 +353,15 @@ func (p RepeaterUntilProcess) ProcessDictionary(dictionary Dictionary, out Colle
 	if err != nil && skipLineOnError {
 		log.Warn().AnErr("error", err).Msg("Line skipped")
 		statistics.IncIgnoredLinesCount()
+		if p.errlogger != nil {
+			if msg, ok := dictionary.GetValue("original"); !ok {
+				return nil
+			} else if msgstr, ok := msg.(string); !ok {
+				return nil
+			} else if err := p.errlogger.Log(msgstr); err != nil {
+				log.Err(err)
+			}
+		}
 		return nil
 	}
 

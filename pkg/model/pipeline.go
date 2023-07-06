@@ -201,7 +201,7 @@ func BuildPipeline(pipeline Pipeline, conf Definition, caches map[string]Cache, 
 
 	if repeatCondition != "" {
 		repeatSource := NewTempSource(pipeline.Source())
-		processor, err := NewRepeaterUntilProcess(repeatSource, repeatCondition, repeatConditionMode)
+		processor, err := NewRepeaterUntilProcess(repeatSource, repeatCondition, repeatConditionMode, skipLogFile)
 		if err != nil {
 			return pipeline, caches, fmt.Errorf("Cannot build pipeline: %w", err)
 		}
