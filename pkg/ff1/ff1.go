@@ -58,11 +58,11 @@ func (ff1m MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.E
 
 	// Extract tweak from the Dictionary (context)
 	tweak := ""
-	if rootCtx, ctxExist := context[0].TryUnpackAsDict(); ctxExist {
-		if rootCtx.Get(ff1m.tweakField) != nil {
-			tweak = rootCtx.Get(ff1m.tweakField).(string)
-		}
+	tweakSelector := model.NewPackedPathSelector(ff1m.tweakField)
+	if value, found := tweakSelector.Read(context[0]); found {
+		tweak = value.(string)
 	}
+
 	// Get encryption key as byte array
 	envKey := os.Getenv(ff1m.keyFromEnv)
 	if envKey == "" {
@@ -214,7 +214,7 @@ func fromFF1Domain(value string, domain string, preserved map[int]rune) string {
 
 func executeTemplate(engine *template.Engine, contexts []model.Dictionary) (string, error) {
 	var output bytes.Buffer
-	if err := engine.Execute(&output, contexts[0].UnpackAsDict().Unordered()); err != nil {
+	if err := engine.Execute(&output, contexts[0].UnpackUnordered()); err != nil {
 		return "", err
 	}
 	return output.String(), nil

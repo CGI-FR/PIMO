@@ -76,10 +76,10 @@ func (mrl MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.En
 
 	var output bytes.Buffer
 	var tmplContext any
-	if len(context) == 0 || !context[0].CanUnpackAsDict() {
+	if len(context) == 0 {
 		tmplContext = nil
 	} else {
-		tmplContext = context[0].UnpackAsDict().Unordered()
+		tmplContext = context[0].UnpackUnordered()
 	}
 
 	if err := mrl.template.Execute(&output, tmplContext); err != nil {
