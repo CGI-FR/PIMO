@@ -41,7 +41,11 @@ func NewMask(text string, funcs tmpl.FuncMap, seed int64, seedField string) (Mas
 func (tmpl MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Entry, error) {
 	log.Info().Msg("Mask template")
 	var output bytes.Buffer
-	err := tmpl.template.Execute(&output, context[0].UnpackAsDict().Unordered())
+	if context[0].CanUnpackAsDict() {
+		err := tmpl.template.Execute(&output, context[0].UnpackAsDict().Unordered())
+		return output.String(), err
+	}
+	err := tmpl.template.Execute(&output, context[0].Unordered()["."])
 	return output.String(), err
 }
 
