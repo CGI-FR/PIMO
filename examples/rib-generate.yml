@@ -1,0 +1,6 @@
+version: "1"
+masking:
+  - selector:
+      jsonpath: "."
+    mask:
+      regex: "[0-9]{23}"

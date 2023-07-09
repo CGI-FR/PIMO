@@ -29,17 +29,25 @@ import (
 // MaskEngine is a value that always mask the same way
 type MaskEngine struct {
 	pipeline model.Pipeline
+	lib      string
 }
 
 // NewMask return a MaskEngine from a value
 func NewMask(seed int64, caches map[string]model.Cache, fns template.FuncMap, uri string) (MaskEngine, error) {
+	libname := "default"
+	libmasking := uri
+
 	libparts := strings.SplitN(uri, ":", 2)
-	libname := libparts[0]
-	libmasking := libparts[1]
+	if len(libparts) == 2 {
+		libname = libparts[0]
+		libmasking = libparts[1]
+		olddefault := model.SetDefault(libname)
+		defer model.SetDefault(olddefault)
+	}
 
 	pipeline, err := model.Load(libname, libmasking, seed, caches, fns)
 
-	return MaskEngine{pipeline}, err
+	return MaskEngine{pipeline, libname}, err
 }
 
 // func (me MaskEngine) MaskContext(e model.Dictionary, key string, context ...model.Dictionary) (model.Dictionary, error) {

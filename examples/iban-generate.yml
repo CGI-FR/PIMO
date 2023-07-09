@@ -1,0 +1,7 @@
+version: "1"
+masking:
+  - selector:
+      jsonpath: "."
+    masks:
+      - apply: {uri: "rib-generate.yml"}
+      - template: 'FR76{{ . }}'

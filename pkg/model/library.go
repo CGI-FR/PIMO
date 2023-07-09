@@ -9,7 +9,10 @@ import (
 	"strings"
 )
 
-var libraries = map[string]Loader{}
+var (
+	libdefault = "default"
+	libraries  = map[string]Loader{}
+)
 
 type Loader interface {
 	Load(name string) ([]byte, error)
@@ -26,7 +29,21 @@ func Declare(libname string, uri string) error {
 	return nil
 }
 
+func SetDefault(libname string) string {
+	olddefault := libdefault
+	libdefault = libname
+	return olddefault
+}
+
+func LoadDefault(masking string, globalSeed int64, globalCaches map[string]Cache, globalFunctions template.FuncMap) (Pipeline, error) {
+	return Load(libdefault, masking, globalSeed, globalCaches, globalFunctions)
+}
+
 func Load(libname string, masking string, globalSeed int64, globalCaches map[string]Cache, globalFunctions template.FuncMap) (Pipeline, error) {
+	if libname == "default" {
+		libname = libdefault
+	}
+
 	loader, ok := libraries[libname]
 	if !ok {
 		return nil, fmt.Errorf("library not found : %s", libname)
