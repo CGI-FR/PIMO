@@ -34,15 +34,21 @@ masking:
 
   - selector:
       jsonpath: "rib"
-    mask:
-      apply: {uri: "rib-generate.yml"}
+    masks:
+      - add: {}
+      - apply: {uri: "rib-generate.yml"}
 
-  # construction de l'IBAN avec sa clé
+  # construction de la clé IBAN
+  - selector:
+      jsonpath: "cle"
+    masks:
+      - add: '{{ .rib }}FR00'
+      - template: '{{ .cle | upper | cleaniban }}'
+      - template: '{{ mod (.cle | substr 0 18 | removeLeadingZeroes | int64) 97 }}{{ .cle | substr 18 100 }}'
+      - template: '{{ mod (.cle | removeLeadingZeroes | int64) 97 | sub 98 }}'
+
+  # construction de l'IBAN
   - selector:
       jsonpath: "."
-    masks:
-      - template: '{{ .rib }}FR00'
-      - template: '{{ .iban | upper | cleaniban }}'
-      - template: '{{ mod (.iban | substr 0 18 | removeLeadingZeroes | int64) 97 }}{{ .iban | substr 18 100 }}'
-      - template: '{{ mod (.iban | removeLeadingZeroes | int64) 97 | sub 98 }}'
-      - template: 'FR{{ .iban }}{{ .rib }}'
+    mask:
+      template: 'FR{{ .cle }}{{ .rib }}'

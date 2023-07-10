@@ -67,4 +67,4 @@ masking:
   - selector:
       jsonpath: "."
     mask:
-      add: '{{ .code_banque }}{{ .code_guichet }}{{ .numero_compte }}{{ mod (add (.code_banque | removeLeadingZeroes | int64 | mul 89) (.code_guichet | removeLeadingZeroes | int64 | mul 15) (.numero_compte | upper | cleanrib | removeLeadingZeroes | int64 | mul 3)) 97 | sub 97 | printf "%02d" }}'
+      template: '{{ .code_banque }}{{ .code_guichet }}{{ .numero_compte }}{{ mod (add (.code_banque | removeLeadingZeroes | int64 | mul 89) (.code_guichet | removeLeadingZeroes | int64 | mul 15) (.numero_compte | upper | cleanrib | removeLeadingZeroes | int64 | mul 3)) 97 | sub 97 | printf "%02d" }}'
