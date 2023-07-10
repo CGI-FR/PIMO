@@ -97,7 +97,7 @@ func BuildPipeline(pipeline Pipeline, conf Definition, caches map[string]Cache, 
 	cleaners := []Processor{}
 
 	for libname, liburi := range conf.Libraries {
-		_ = Declare(libname, liburi)
+		_ = DeclareLibrary(libname, liburi)
 	}
 
 	// pack data inside a root container

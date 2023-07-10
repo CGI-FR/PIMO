@@ -11,17 +11,17 @@ import (
 
 var (
 	libdefault = "default"
-	libraries  = map[string]Loader{}
+	libraries  = map[string]LibraryLoader{}
 )
 
-type Loader interface {
+type LibraryLoader interface {
 	Load(name string) ([]byte, error)
 }
 
-func Declare(libname string, uri string) error {
+func DeclareLibrary(libname string, uri string) error {
 	switch {
 	case strings.HasPrefix(uri, "file://"):
-		libraries[libname] = localDirLoader{uri}
+		libraries[libname] = localDirLibraryLoader{uri}
 	default:
 		return fmt.Errorf("invalid uri scheme for library : %s", uri)
 	}
@@ -29,17 +29,17 @@ func Declare(libname string, uri string) error {
 	return nil
 }
 
-func SetDefault(libname string) string {
+func SetDefaultLibrary(libname string) string {
 	olddefault := libdefault
 	libdefault = libname
 	return olddefault
 }
 
-func LoadDefault(masking string, globalSeed int64, globalCaches map[string]Cache, globalFunctions template.FuncMap) (Pipeline, error) {
-	return Load(libdefault, masking, globalSeed, globalCaches, globalFunctions)
+func LoadDefaultLibrary(masking string, globalSeed int64, globalCaches map[string]Cache, globalFunctions template.FuncMap) (Pipeline, error) {
+	return LoadLibrary(libdefault, masking, globalSeed, globalCaches, globalFunctions)
 }
 
-func Load(libname string, masking string, globalSeed int64, globalCaches map[string]Cache, globalFunctions template.FuncMap) (Pipeline, error) {
+func LoadLibrary(libname string, masking string, globalSeed int64, globalCaches map[string]Cache, globalFunctions template.FuncMap) (Pipeline, error) {
 	if libname == "default" {
 		libname = libdefault
 	}
@@ -70,11 +70,11 @@ func Load(libname string, masking string, globalSeed int64, globalCaches map[str
 	return pipeline, nil
 }
 
-type localDirLoader struct {
+type localDirLibraryLoader struct {
 	uri string
 }
 
-func (l localDirLoader) Load(name string) ([]byte, error) {
+func (l localDirLibraryLoader) Load(name string) ([]byte, error) {
 	u, err := url.Parse(l.uri)
 	if err != nil {
 		return nil, err

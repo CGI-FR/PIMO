@@ -41,11 +41,11 @@ func NewMask(seed int64, caches map[string]model.Cache, fns template.FuncMap, ur
 	if len(libparts) == 2 {
 		libname = libparts[0]
 		libmasking = libparts[1]
-		olddefault := model.SetDefault(libname)
-		defer model.SetDefault(olddefault)
+		olddefault := model.SetDefaultLibrary(libname)
+		defer model.SetDefaultLibrary(olddefault)
 	}
 
-	pipeline, err := model.Load(libname, libmasking, seed, caches, fns)
+	pipeline, err := model.LoadLibrary(libname, libmasking, seed, caches, fns)
 
 	return MaskEngine{pipeline, libname}, err
 }
