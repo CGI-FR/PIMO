@@ -1,6 +1,70 @@
 version: "1"
+functions:
+  cleanrib:
+    params:
+      - name: rib
+    body: |
+      result = ""
+      for i = 0; i < len(rib); i++ {
+        r = toRune(rib[i])
+        if r >= toRune('A') && r <= toRune('I') {
+          result += toString(r - 64)
+        } else if r >= toRune('J') && r <= toRune('R') {
+          result += toString(r - 73)
+        } else if r >= toRune('S') && r <= toRune('Z') {
+          result += toString(r - 81)
+        } else if r >= toRune('0') && r <= toRune('9') {
+          result += toChar(r)
+        }
+      }
+      return result
+  removeLeadingZeroes:
+    params:
+      - name: val
+    body: |
+      result = ""
+      add = false
+      for i = 0; i < len(val); i++ {
+        if toRune(val[i]) != toRune('0') {
+          add = true
+        }
+        if add {
+          result += val[i]
+        }
+      }
+      return result
+
 masking:
+
+  # code banque = choix parmi une liste
+  - selector:
+      jsonpath: "code_banque"
+    masks:
+      - add: ""
+      - randomChoice:
+          - "20041" # La Banque Postale
+          - "30002" # Crédit lyonnais
+          - "30003" # Société générale
+          - "30004" # BNP Paribas
+          - "30006" # Crédit Agricole S.A.
+          - "30007" # Natixis
+          - "30056" # HSBC France
+
+  # code guichet = 5 chiffres aléatoires
+  - selector:
+      jsonpath: "code_guichet"
+    masks:
+      - add: ""
+      - regex: "[0-9]{5}"
+
+  # numéro de compte = 11 chiffres aléatoires (contient une lettre pour 2 banques spécifiques)
+  - selector:
+      jsonpath: "numero_compte"
+    mask:
+      add: '{{ if mustHas .code_banque (list "20041" "30002") }}{{ MaskRegex "[0-9]{10}[A-Z]" }}{{ else }}{{ MaskRegex "[0-9]{11}" }}{{ end }}'
+
+  # RIB avec sa clé (2 derniers caractères)
   - selector:
       jsonpath: "."
     mask:
-      regex: "[0-9]{23}"
+      add: '{{ .code_banque }}{{ .code_guichet }}{{ .numero_compte }}{{ mod (add (.code_banque | removeLeadingZeroes | int64 | mul 89) (.code_guichet | removeLeadingZeroes | int64 | mul 15) (.numero_compte | upper | cleanrib | removeLeadingZeroes | int64 | mul 3)) 97 | sub 97 | printf "%02d" }}'
