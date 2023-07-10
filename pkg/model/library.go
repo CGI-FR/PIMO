@@ -3,6 +3,8 @@ package model
 import (
 	"fmt"
 	"html/template"
+	"io"
+	"net/http"
 	"net/url"
 	"os"
 	"path"
@@ -22,6 +24,8 @@ func DeclareLibrary(libname string, uri string) error {
 	switch {
 	case strings.HasPrefix(uri, "file://"):
 		libraries[libname] = localDirLibraryLoader{uri}
+	case strings.HasPrefix(uri, "http://"), strings.HasPrefix(uri, "https://"):
+		libraries[libname] = httpLibraryLoader{uri}
 	default:
 		return fmt.Errorf("invalid uri scheme for library : %s", uri)
 	}
@@ -81,4 +85,23 @@ func (l localDirLibraryLoader) Load(name string) ([]byte, error) {
 	}
 
 	return os.ReadFile(path.Join(u.Host, u.Path, name))
+}
+
+type httpLibraryLoader struct {
+	uri string
+}
+
+func (l httpLibraryLoader) Load(name string) ([]byte, error) {
+	resp, err := http.Get(l.uri + "/" + name)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	b, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	return b, nil
 }
