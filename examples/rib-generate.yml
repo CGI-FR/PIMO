@@ -49,6 +49,7 @@ masking:
           - "30006" # Crédit Agricole S.A.
           - "30007" # Natixis
           - "30056" # HSBC France
+    preserve: "notblank"
 
   # code guichet = 5 chiffres aléatoires
   - selector:
@@ -56,6 +57,7 @@ masking:
     masks:
       - add: ""
       - regex: "[0-9]{5}"
+    preserve: "notblank"
 
   # numéro de compte = 11 chiffres aléatoires (contient une lettre pour 2 banques spécifiques)
   - selector:
