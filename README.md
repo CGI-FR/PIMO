@@ -154,7 +154,7 @@ In case two types of mask are entered with the same selector, the program can't 
 To use PIMO to mask a `data.json`, use in the following way :
 
 ```bash
-./pimo <data.json >maskedData.json
+./pimo <data.json> maskedData.json
 ```
 
 This takes the `data.json` file, masks the data contained inside it and put the result in a `maskedData.json` file. If data are in a table (for example multiple names), then each field of this table will be masked using the given mask. The following flags can be used:
