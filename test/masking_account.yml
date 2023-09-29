@@ -1,0 +1,15 @@
+version: "1"
+seed: 42
+
+masking:
+  - selector:
+      jsonpath: "name"
+    mask:
+      randomChoice:
+       - "Mickael"
+       - "Mathieu "
+       - "Marcelle"
+  - selector:
+      jsonpath: "account_number"
+    mask:
+      regex: "d{5}$"

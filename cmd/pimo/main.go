@@ -67,6 +67,7 @@ var (
 	statsTemplate         string
 	statsDestinationEnv   = os.Getenv("PIMO_STATS_URL")
 	statsTemplateEnv      = os.Getenv("PIMO_STATS_TEMPLATE")
+	subscribers           map[string]string
 )
 
 func main() {
@@ -119,6 +120,14 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 			fmt.Println(jsonschema)
 		},
 	})
+
+	xmlCmd := &cobra.Command{
+		Use: "xml",
+		Run: func(cmd *cobra.Command, args []string) {
+			pimo.ParseXML(cmd.InOrStdin(), cmd.OutOrStdout())
+		},
+	}
+	xmlCmd.Flags().StringToStringVar(&subscribers, "subscribers", map[string]string{}, "element where apply mask")
 
 	rootCmd.AddCommand(&cobra.Command{
 		Use: "flow",

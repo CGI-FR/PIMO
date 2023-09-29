@@ -1,0 +1,8 @@
+version: "1"
+seed: 42
+
+masking:
+  - selector:
+      jsonpath: "agency_number"
+    mask:
+      regex: "d{4}$"

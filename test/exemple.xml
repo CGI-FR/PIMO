@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<taxes>
+    <agency>
+        <name>Nantes Agency</name>
+        <agency_number>0032</agency_number>
+    </agency>
+    <account>
+        <name>Doe John</name>
+        <account_number>12345</account_number>
+        <annual_income>50000</annual_income>
+        <total_taxes_paid>10000</total_taxes_paid>
+    </account>
+    <account>
+        <name>Smith Jane</name>
+        <account_number>67890</account_number>
+        <annual_income>60000</annual_income>
+        <total_taxes_paid>12000</total_taxes_paid>
+    </account>
+</taxes>
