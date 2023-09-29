@@ -99,3 +99,17 @@ testcases:
     assertions:
       - result.systemout ShouldStartWith '{"name":"Aaron"}'
       - result.systemout ShouldEndWith '{"name":"Zazie"}'
+
+- name: use repeat-while to extract content of referential
+  steps:
+  - script: |-
+      cat > script.sh <<EOF
+      pimo --empty-input --repeat-while '[[ eq "string" (printf "%T" .) ]]' --mask '.={fluxUri: "pimo://nameFR"}'
+      EOF
+  - script: sed -i  "s/\[\[/\{\{/g"  script.sh
+  - script: sed -i  "s/\]\]/\}\}/g"  script.sh
+  - script: chmod +x script.sh
+  - script: ./script.sh
+    assertions:
+      - result.systemout ShouldStartWith '"Aaron"'
+      - result.systemout ShouldEndWith '"Zazie"'

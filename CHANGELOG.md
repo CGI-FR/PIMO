@@ -14,11 +14,15 @@ Types of changes
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [1.20.0]
+
+- `Added` external mask libraries
+
 ## [1.19.0]
 
-- `Added` new features for ff1 mask : `domain`, `preserve` and `onError`.
-- `Added` possibility to use `.` in the jsonpath field of selectors.
-- `Added` option `--skip-log-file <filename>` to log skipped lines on error when using `--skip-line-on-error`.
+- `Added` new features for ff1 mask : `domain`, `preserve` and `onError`
+- `Added` possibility to use `.` in the jsonpath field of selectors
+- `Added` option `--skip-log-file <filename>` to log skipped lines on error when using `--skip-line-on-error`
 
 ## [1.18.1]
 

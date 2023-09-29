@@ -1,0 +1,60 @@
+version: "1"
+functions:
+  cleaniban:
+    params:
+      - name: iban
+    body: |
+      result = ""
+      for i = 0; i < len(iban); i++ {
+        r = toRune(iban[i])
+        if r >= toRune('A') && r <= toRune('Z') {
+          result += toString(r - 55)
+        } else if r >= toRune('0') && r <= toRune('9') {
+          result += toChar(r)
+        }
+      }
+      return result
+  removeLeadingZeroes:
+    params:
+      - name: val
+    body: |
+      result = ""
+      add = false
+      for i = 0; i < len(val); i++ {
+        if toRune(val[i]) != toRune('0') {
+          add = true
+        }
+        if add {
+          result += val[i]
+        }
+      }
+      return result
+
+masking:
+
+  - selector:
+      jsonpath: "."
+    mask:
+      apply: {uri: "rib-generate.yml"}
+
+  # reconstruction de l'objet iban
+  - selector:
+      jsonpath: "."
+    masks:
+      - template: '{"rib": "{{.}}"}'
+      - fromjson: "."
+
+  # construction de la clé IBAN
+  - selector:
+      jsonpath: "cle"
+    masks:
+      - add: '{{ .rib }}FR00'
+      - template: '{{ .cle | upper | cleaniban }}'
+      - template: '{{ mod (.cle | substr 0 18 | removeLeadingZeroes | int64) 97 }}{{ .cle | substr 18 100 }}'
+      - template: '{{ mod (.cle | removeLeadingZeroes | int64) 97 | sub 98 }}'
+
+  # construction de l'IBAN
+  - selector:
+      jsonpath: "."
+    mask:
+      template: 'FR{{ .cle }}{{ .rib }}'

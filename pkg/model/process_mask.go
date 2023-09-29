@@ -50,10 +50,13 @@ func (mep *MaskEngineProcess) ProcessDictionary(dictionary Dictionary, out Colle
 	applied := mep.selector.Apply(result, func(rootContext, parentContext Dictionary, key string, value Entry) (Action, Entry) {
 		switch {
 		case value == nil && (mep.preserve == "null" || mep.preserve == "blank"):
-			log.Trace().Msgf("Preserve %s value, skip masking", mep.preserve)
+			log.Warn().Msgf("Preserve %s value, skip masking", mep.preserve)
 			return NOTHING, nil
 		case value == "" && (mep.preserve == "empty" || mep.preserve == "blank"):
-			log.Trace().Msgf("Preserve %s value, skip masking", mep.preserve)
+			log.Warn().Msgf("Preserve %s value, skip masking", mep.preserve)
+			return NOTHING, nil
+		case (value != nil && value != "") && mep.preserve == "notblank":
+			log.Warn().Msgf("Preserve %s value, skip masking", mep.preserve)
 			return NOTHING, nil
 		default:
 			masked, err := mep.mask.Mask(value, rootContext, parentContext)

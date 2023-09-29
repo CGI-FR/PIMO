@@ -3,6 +3,19 @@
   "$id": "https://github.com/cgi-fr/pimo/pkg/model/definition",
   "$ref": "#/$defs/Definition",
   "$defs": {
+    "ApplyType": {
+      "properties": {
+        "uri": {
+          "type": "string",
+          "description": "URI of the mask resource"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "uri"
+      ]
+    },
     "CacheDefinition": {
       "properties": {
         "unique": {
@@ -116,6 +129,15 @@
           },
           "type": "object",
           "description": "Declare in-memory caches"
+        },
+        "libraries": {
+          "patternProperties": {
+            ".*": {
+              "type": "string"
+            }
+          },
+          "type": "object",
+          "description": "Declare external mask libraries"
         }
       },
       "additionalProperties": false,
@@ -590,6 +612,9 @@
           "$ref": "#/$defs/TranscodeType",
           "title": "Transcode Mask",
           "description": "Produce a random string by preserving character classes from the original value"
+        },
+        "apply": {
+          "$ref": "#/$defs/ApplyType"
         }
       },
       "additionalProperties": false,
@@ -659,9 +684,10 @@
             "null",
             "empty",
             "blank",
-            "notInCache"
+            "notInCache",
+            "notblank"
           ],
-          "description": "Preserve (do not mask) some values : null = preserve null value, empty = preserve empty strings, blank = preserve both null and empty values, notInCache = preserve value even if not present in cache (fromCache mask)"
+          "description": "Preserve (do not mask) some values : null = preserve null value, empty = preserve empty strings, blank = preserve both null and empty values, notblank = preserve non-null/non-empty values, notInCache = preserve value even if not present in cache (fromCache mask)"
         },
         "seed": {
           "$ref": "#/$defs/SeedType",

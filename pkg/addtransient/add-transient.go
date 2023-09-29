@@ -48,7 +48,7 @@ func (am MaskEngine) MaskContext(context model.Dictionary, key string, contexts 
 	if !present {
 		if am.template != nil {
 			var output bytes.Buffer
-			if err := am.template.Execute(&output, contexts[0].UnpackAsDict().Unordered()); err != nil {
+			if err := am.template.Execute(&output, contexts[0].UnpackUnordered()); err != nil {
 				return context, err
 			}
 			context.Set(key, output.String())

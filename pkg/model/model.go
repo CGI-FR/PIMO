@@ -167,6 +167,10 @@ type ChoiceInCSVType struct {
 	TrimSpace       bool   `yaml:"trim,omitempty" json:"trim,omitempty" jsonschema_description:"If true leading white space in a field is ignored"`
 }
 
+type ApplyType struct {
+	URI string `yaml:"uri" json:"uri" jsonschema_description:"URI of the mask resource"`
+}
+
 type MaskType struct {
 	Add               Entry                `yaml:"add,omitempty" json:"add,omitempty" jsonschema:"oneof_required=Add,title=Add Mask,description=Add a new field in the JSON stream"`
 	AddTransient      Entry                `yaml:"add-transient,omitempty" json:"add-transient,omitempty" jsonschema:"oneof_required=AddTransient,title=Add Transient Mask" jsonschema_description:"Add a new temporary field, that will not show in the JSON output"`
@@ -200,6 +204,7 @@ type MaskType struct {
 	Luhn              *LuhnType            `yaml:"luhn,omitempty" json:"luhn,omitempty" jsonschema:"oneof_required=Luhn,title=Luhn Mask" jsonschema_description:"Concatenate a checksum key to the input value computed with the luhn algorithm"`
 	Markov            MarkovType           `yaml:"markov,omitempty" json:"markov,omitempty" jsonschema:"oneof_required=Markov,title=Markov Mask" jsonschema_description:"Produces pseudo text based on sample text"`
 	Transcode         *TranscodeType       `yaml:"transcode,omitempty" json:"transcode,omitempty" jsonschema:"oneof_required=Transcode,title=Transcode Mask" jsonschema_description:"Produce a random string by preserving character classes from the original value"`
+	Apply             ApplyType            `yaml:"apply,omitempty" json:"apply,omitempty" jsonschema:""`
 }
 
 type Masking struct {
@@ -213,7 +218,7 @@ type Masking struct {
 	Mask      MaskType       `yaml:"mask,omitempty" json:"mask,omitempty" jsonschema:"oneof_required=case1,oneof_required=case3" jsonschema_description:"Defines how the selected value(s) will be masked"`
 	Masks     []MaskType     `yaml:"masks,omitempty" json:"masks,omitempty" jsonschema:"oneof_required=case2,oneof_required=case4" jsonschema_description:"Defines how the selected value(s) will be masked"`
 	Cache     string         `yaml:"cache,omitempty" json:"cache,omitempty" jsonschema_description:"Use an in-memory cache to preserve coherence between original/masked values"`
-	Preserve  string         `yaml:"preserve,omitempty" json:"preserve,omitempty" jsonschema:"enum=null,enum=empty,enum=blank,enum=notInCache" jsonschema_description:"Preserve (do not mask) some values : null = preserve null value, empty = preserve empty strings, blank = preserve both null and empty values, notInCache = preserve value even if not present in cache (fromCache mask)"`
+	Preserve  string         `yaml:"preserve,omitempty" json:"preserve,omitempty" jsonschema:"enum=null,enum=empty,enum=blank,enum=notInCache,enum=notblank" jsonschema_description:"Preserve (do not mask) some values : null = preserve null value, empty = preserve empty strings, blank = preserve both null and empty values, notblank = preserve non-null/non-empty values, notInCache = preserve value even if not present in cache (fromCache mask)"`
 	Seed      SeedType       `yaml:"seed,omitempty" json:"seed,omitempty" jsonschema_description:"Initialize the Pseaudo-Random-Generator with the value given field"`
 }
 
@@ -240,6 +245,7 @@ type Definition struct {
 	Functions map[string]Function        `yaml:"functions,omitempty" json:"functions,omitempty" jsonschema_description:"Declare functions to be used in the masking"`
 	Masking   []Masking                  `yaml:"masking" json:"masking" jsonschema_description:"Masking pipeline definition"`
 	Caches    map[string]CacheDefinition `yaml:"caches,omitempty" json:"caches,omitempty" jsonschema_description:"Declare in-memory caches"`
+	Libraries map[string]string          `yaml:"libraries,omitempty" json:"libraries,omitempty" jsonschema_description:"Declare external mask libraries"`
 }
 
 /***************
@@ -348,7 +354,7 @@ func (p RepeaterUntilProcess) ProcessDictionary(dictionary Dictionary, out Colle
 			err = fmt.Errorf("Cannot execute template, error: %v", r)
 		}
 	}()
-	err = p.tmpl.Execute(&output, dictionary.UnpackAsDict().Untyped())
+	err = p.tmpl.Execute(&output, dictionary.UnpackUntyped())
 
 	if err != nil && skipLineOnError {
 		log.Warn().AnErr("error", err).Msg("Line skipped")

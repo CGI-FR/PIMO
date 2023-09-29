@@ -306,6 +306,14 @@ func (d Dictionary) Unpack() Entry {
 	return d.Get(".")
 }
 
+func (d Dictionary) UnpackUnordered() Entry {
+	return d.Unordered()["."]
+}
+
+func (d Dictionary) UnpackUntyped() interface{} {
+	return d.Untyped()["."]
+}
+
 func (d Dictionary) UnpackAsDict() Dictionary {
 	return d.Get(".").(Dictionary)
 }
