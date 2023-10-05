@@ -10,6 +10,11 @@
 
 PIMO is a tool for data masking. It can mask data from a JSONline stream and return another JSONline stream thanks to a masking configuration contained in a yaml file.
 
+![pimo](doc/img/pimo.png)
+
+You can use [LINO](https://github.com/CGI-FR/LINO) to extract sample data from a database, which you can then use as input data for PIMO's data masking.
+You can also generate data with a simple yaml configuration file.
+
 ## Configuration file needed
 
 PIMO requires a yaml configuration file to works. By default, the file is named `masking.yml` and is placed in the working directory. The file must respect the following format :
