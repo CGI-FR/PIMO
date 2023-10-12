@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1692284427049,
+  "lastUpdate": 1697140333287,
   "repoUrl": "https://github.com/CGI-FR/PIMO",
   "entries": {
     "Benchmark": [
@@ -3882,6 +3882,66 @@ window.BENCHMARK_DATA = {
             "value": 5905,
             "unit": "allocs/op",
             "extra": "4834 times\n2 procs"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "89643755+giraud10@users.noreply.github.com",
+            "name": "giraud10",
+            "username": "giraud10"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "c3c16858c495e20161d27f7fab385d8ab45e3617",
+          "message": "docs: add pimo schema (#265)",
+          "timestamp": "2023-10-12T21:40:19+02:00",
+          "tree_id": "29c28f2045f9ca9fe7958d039825c540da2de333",
+          "url": "https://github.com/CGI-FR/PIMO/commit/c3c16858c495e20161d27f7fab385d8ab45e3617"
+        },
+        "date": 1697140332614,
+        "tool": "go",
+        "benches": [
+          {
+            "name": "BenchmarkPimoRun - ns/op",
+            "value": 35003,
+            "unit": "ns/op",
+            "extra": "310863 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkPimoRun - B/op",
+            "value": 17382,
+            "unit": "B/op",
+            "extra": "310863 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkPimoRun - allocs/op",
+            "value": 180,
+            "unit": "allocs/op",
+            "extra": "310863 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge - ns/op",
+            "value": 2264027,
+            "unit": "ns/op",
+            "extra": "5052 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge - B/op",
+            "value": 683047,
+            "unit": "B/op",
+            "extra": "5052 times\n2 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge - allocs/op",
+            "value": 5905,
+            "unit": "allocs/op",
+            "extra": "5052 times\n2 procs"
           }
         ]
       }
