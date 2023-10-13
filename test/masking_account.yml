@@ -7,9 +7,9 @@ masking:
     mask:
       randomChoice:
        - "Mickael"
-       - "Mathieu "
+       - "Mathieu"
        - "Marcelle"
   - selector:
       jsonpath: "account_number"
     mask:
-      regex: "d{5}$"
+      regex: "[0-9]{5}$"

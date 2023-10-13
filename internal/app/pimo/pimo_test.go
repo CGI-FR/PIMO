@@ -318,3 +318,26 @@ func LoadJsonLineFromDocument(filename string) (model.Dictionary, error) {
 
 	// return jsonline.JSONToDictionary(compactLine.Bytes())
 }
+
+func TestExecuteMap(t *testing.T) {
+	definition := model.Definition{
+		Version: "1",
+		Masking: []model.Masking{
+			{
+				Selector: model.SelectorType{Jsonpath: "name"},
+				Mask: model.MaskType{
+					HashInURI: "pimo://nameFR",
+				},
+			},
+		},
+	}
+
+	ctx := pimo.NewContext(definition)
+
+	data := map[string]string{"name": "John"}
+
+	newData, err := ctx.ExecuteMap(data)
+
+	assert.Nil(t, err)
+	assert.NotEqual(t, "John", newData["name"])
+}

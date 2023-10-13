@@ -5,4 +5,4 @@ masking:
   - selector:
       jsonpath: "agency_number"
     mask:
-      regex: "d{4}$"
+      template: '{{MaskRegex "[0-9]{4}$"}}'

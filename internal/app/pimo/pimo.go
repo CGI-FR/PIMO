@@ -331,3 +331,46 @@ func updateContext(counter int) {
 	context := over.MDC().GetString("context")
 	over.MDC().Set("context", re.ReplaceAllString(context, fmt.Sprintf("[%d]", counter)))
 }
+
+func (ctx *Context) ExecuteMap(data map[string]string) (map[string]string, error) {
+	input := model.NewDictionary()
+
+	for k, v := range data {
+		input = input.With(k, v)
+	}
+
+	cfg := Config{
+		EmptyInput:  false,
+		Iteration:   1,
+		SingleInput: &input,
+	}
+
+	err := ctx.Configure(cfg)
+	if err != nil {
+		return nil, err
+	}
+	result := []model.Entry{}
+	err = ctx.pipeline.AddSink(model.NewSinkToSlice(&result)).Run()
+	if err != nil {
+		return nil, err
+	}
+
+	newData := make(map[string]string)
+
+	if len(result) > 0 {
+		new_map, ok := result[0].(model.Dictionary)
+		if !ok {
+			return nil, fmt.Errorf("result is not Dictionary")
+		}
+		unordered := new_map.Unordered()
+		for k, v := range unordered {
+			stringValue, ok := v.(string)
+			if !ok {
+				return nil, fmt.Errorf("Result is not a string")
+			}
+			newData[k] = stringValue
+		}
+		return newData, nil
+	}
+	return nil, fmt.Errorf("Result is not a map[string]string")
+}

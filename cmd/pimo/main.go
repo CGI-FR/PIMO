@@ -67,7 +67,7 @@ var (
 	statsTemplate         string
 	statsDestinationEnv   = os.Getenv("PIMO_STATS_URL")
 	statsTemplateEnv      = os.Getenv("PIMO_STATS_TEMPLATE")
-	subscribers           map[string]string
+	subscriberName        map[string]string
 )
 
 func main() {
@@ -120,14 +120,60 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 			fmt.Println(jsonschema)
 		},
 	})
-
+	// Add command for XML transformer
 	xmlCmd := &cobra.Command{
-		Use: "xml",
+		Use:   "xml",
+		Short: "Transform fichier XML with substitution",
 		Run: func(cmd *cobra.Command, args []string) {
-			pimo.ParseXML(cmd.InOrStdin(), cmd.OutOrStdout())
+			initLog()
+			if len(catchErrors) > 0 {
+				skipLineOnError = true
+				skipLogFile = catchErrors
+			}
+			config := pimo.Config{
+				EmptyInput:       emptyInput,
+				RepeatUntil:      repeatUntil,
+				RepeatWhile:      repeatWhile,
+				Iteration:        iteration,
+				SkipLineOnError:  skipLineOnError,
+				SkipFieldOnError: skipFieldOnError,
+				SkipLogFile:      skipLogFile,
+				CachesToDump:     cachesToDump,
+				CachesToLoad:     cachesToLoad,
+			}
+			// ces étapes doivent retrouver dans xixo.go pour ne pas alourdre le main.gopi
+			parser := pimo.ParseXML(cmd.InOrStdin(), cmd.OutOrStdout())
+			// Map the command line balise name to fit the masking configuration
+			for elementName, mask := range subscriberName {
+				pdef, err := model.LoadPipelineDefinitionFromFile(mask)
+				if err != nil {
+					fmt.Printf("Error when charging pipeline for %s : %v\n", elementName, err)
+					return
+				}
+				ctx := pimo.NewContext(pdef)
+				if err := ctx.Configure(config); err != nil {
+					log.Err(err).Msg("Cannot configure pipeline")
+					log.Warn().Int("return", 1).Msg("End PIMO")
+					os.Exit(1)
+				}
+
+				parser.RegisterMapCallback(elementName, func(m map[string]string) (map[string]string, error) {
+					transformedData, err := ctx.ExecuteMap(m)
+					if err != nil {
+						return nil, err
+					}
+					// Update m with masked data
+					for key, value := range transformedData {
+						m[key] = value
+					}
+					return m, nil
+				})
+			}
+			parser.Stream()
 		},
 	}
-	xmlCmd.Flags().StringToStringVar(&subscribers, "subscribers", map[string]string{}, "element where apply mask")
+	xmlCmd.Flags().StringToStringVar(&subscriberName, "subscriber", map[string]string{}, "name of element to mask")
+	rootCmd.AddCommand(xmlCmd)
 
 	rootCmd.AddCommand(&cobra.Command{
 		Use: "flow",
