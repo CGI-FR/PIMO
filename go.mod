@@ -4,9 +4,12 @@ go 1.20
 
 require (
 	github.com/Masterminds/sprig/v3 v3.2.3
+	github.com/adrienaury/flexjson v0.0.0-20231012183712-b4abbdff5e4a
 	github.com/adrienaury/zeromdc v0.0.0-20221116212822-6a366c26ee61
 	github.com/capitalone/fpe v1.2.1
+	github.com/goccy/go-json v0.10.2
 	github.com/goccy/go-yaml v1.11.0
+	github.com/iancoleman/orderedmap v0.3.0
 	github.com/invopop/jsonschema v0.7.0
 	github.com/labstack/echo/v4 v4.11.1
 	github.com/mattn/anko v0.1.9
@@ -16,7 +19,6 @@ require (
 	github.com/spf13/cobra v1.7.0
 	github.com/stretchr/testify v1.8.4
 	github.com/zach-klippenstein/goregen v0.0.0-20160303162051-795b5e3961ea
-	gitlab.com/c0b/go-ordered-json v0.0.0-20201030195603-febf46534d5a
 	golang.org/x/text v0.12.0
 )
 
@@ -29,7 +31,6 @@ require (
 	github.com/google/gxui v0.0.0-20151028112939-f85e0a97b3a4 // indirect
 	github.com/google/uuid v1.1.2 // indirect
 	github.com/huandu/xstrings v1.3.3 // indirect
-	github.com/iancoleman/orderedmap v0.0.0-20190318233801-ac98e3ecb4b0 // indirect
 	github.com/imdario/mergo v0.3.11 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/labstack/gommon v0.4.0 // indirect

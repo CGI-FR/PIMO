@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 
+	ordered "github.com/iancoleman/orderedmap"
 	"github.com/rs/zerolog/log"
-	"gitlab.com/c0b/go-ordered-json"
 )
 
 type Dictionary struct {
@@ -17,7 +17,7 @@ func NewPackedDictionary() Dictionary {
 }
 
 func NewDictionary() Dictionary {
-	return Dictionary{ordered.NewOrderedMap()}
+	return Dictionary{ordered.New()}
 }
 
 func Copy(other Entry) Entry {
@@ -37,19 +37,15 @@ func CopyDictionary(other Dictionary) Dictionary {
 		return NewDictionary()
 	}
 
-	om := ordered.NewOrderedMap()
-	iter := other.EntriesIter()
+	om := ordered.New()
 
-	for {
-		pair, ok := iter()
-		if !ok {
-			break
-		}
-		switch typedVal := pair.Value.(type) {
+	for _, key := range other.Keys() {
+		value := other.Get(key)
+		switch typedVal := value.(type) {
 		case Dictionary:
-			om.Set(pair.Key, CopyDictionary(typedVal))
+			om.Set(key, CopyDictionary(typedVal))
 		default:
-			om.Set(pair.Key, pair.Value)
+			om.Set(key, value)
 		}
 	}
 	return Dictionary{om}
@@ -72,31 +68,29 @@ func CleanTypes(inter interface{}) interface{} {
 		}
 		return dict
 	case *Dictionary:
-		iter := typedInter.EntriesIter()
 		dict := NewDictionary()
-		for pair, ok := iter(); ok; pair, ok = iter() {
-			dict.Set(pair.Key, CleanTypes(pair.Value))
+		for _, key := range typedInter.Keys() {
+			dict.Set(key, CleanTypes(typedInter.Get(key)))
 		}
 		return dict
 	case Dictionary:
-		iter := typedInter.EntriesIter()
 		dict := NewDictionary()
-		for pair, ok := iter(); ok; pair, ok = iter() {
-			dict.Set(pair.Key, CleanTypes(pair.Value))
+		for _, key := range typedInter.Keys() {
+			dict.Set(key, CleanTypes(typedInter.Get(key)))
 		}
 		return dict
 	case *ordered.OrderedMap:
-		iter := typedInter.EntriesIter()
 		dict := NewDictionary()
-		for pair, ok := iter(); ok; pair, ok = iter() {
-			dict.Set(pair.Key, CleanTypes(pair.Value))
+		for _, key := range typedInter.Keys() {
+			value, _ := typedInter.Get(key)
+			dict.Set(key, CleanTypes(value))
 		}
 		return dict
 	case ordered.OrderedMap:
-		iter := typedInter.EntriesIter()
 		dict := NewDictionary()
-		for pair, ok := iter(); ok; pair, ok = iter() {
-			dict.Set(pair.Key, CleanTypes(pair.Value))
+		for _, key := range typedInter.Keys() {
+			value, _ := typedInter.Get(key)
+			dict.Set(key, CleanTypes(value))
 		}
 		return dict
 	case []interface{}:
@@ -165,31 +159,29 @@ func Untyped(inter interface{}) interface{} {
 		}
 		return cleanmap
 	case *Dictionary:
-		iter := typedInter.EntriesIter()
 		cleanmap := map[string]interface{}{}
-		for pair, ok := iter(); ok; pair, ok = iter() {
-			cleanmap[pair.Key] = Untyped(pair.Value)
+		for _, key := range typedInter.Keys() {
+			cleanmap[key] = Untyped(typedInter.Get(key))
 		}
 		return cleanmap
 	case Dictionary:
-		iter := typedInter.EntriesIter()
 		cleanmap := map[string]interface{}{}
-		for pair, ok := iter(); ok; pair, ok = iter() {
-			cleanmap[pair.Key] = Untyped(pair.Value)
+		for _, key := range typedInter.Keys() {
+			cleanmap[key] = Untyped(typedInter.Get(key))
 		}
 		return cleanmap
 	case *ordered.OrderedMap:
-		iter := typedInter.EntriesIter()
 		cleanmap := map[string]interface{}{}
-		for pair, ok := iter(); ok; pair, ok = iter() {
-			cleanmap[pair.Key] = Untyped(pair.Value)
+		for _, key := range typedInter.Keys() {
+			value, _ := typedInter.Get(key)
+			cleanmap[key] = Untyped(value)
 		}
 		return cleanmap
 	case ordered.OrderedMap:
-		iter := typedInter.EntriesIter()
 		cleanmap := map[string]interface{}{}
-		for pair, ok := iter(); ok; pair, ok = iter() {
-			cleanmap[pair.Key] = Untyped(pair.Value)
+		for _, key := range typedInter.Keys() {
+			value, _ := typedInter.Get(key)
+			cleanmap[key] = Untyped(value)
 		}
 		return cleanmap
 	case []interface{}:
@@ -234,31 +226,29 @@ func UnorderedTypes(inter interface{}) interface{} {
 		}
 		return cleanmap
 	case *Dictionary:
-		iter := typedInter.EntriesIter()
 		cleanmap := map[string]Entry{}
-		for pair, ok := iter(); ok; pair, ok = iter() {
-			cleanmap[pair.Key] = UnorderedTypes(pair.Value)
+		for _, key := range typedInter.Keys() {
+			cleanmap[key] = UnorderedTypes(typedInter.Get(key))
 		}
 		return cleanmap
 	case Dictionary:
-		iter := typedInter.EntriesIter()
 		cleanmap := map[string]Entry{}
-		for pair, ok := iter(); ok; pair, ok = iter() {
-			cleanmap[pair.Key] = UnorderedTypes(pair.Value)
+		for _, key := range typedInter.Keys() {
+			cleanmap[key] = UnorderedTypes(typedInter.Get(key))
 		}
 		return cleanmap
 	case *ordered.OrderedMap:
-		iter := typedInter.EntriesIter()
 		cleanmap := map[string]Entry{}
-		for pair, ok := iter(); ok; pair, ok = iter() {
-			cleanmap[pair.Key] = UnorderedTypes(pair.Value)
+		for _, key := range typedInter.Keys() {
+			value, _ := typedInter.Get(key)
+			cleanmap[key] = UnorderedTypes(value)
 		}
 		return cleanmap
 	case ordered.OrderedMap:
-		iter := typedInter.EntriesIter()
 		cleanmap := map[string]Entry{}
-		for pair, ok := iter(); ok; pair, ok = iter() {
-			cleanmap[pair.Key] = UnorderedTypes(pair.Value)
+		for _, key := range typedInter.Keys() {
+			value, _ := typedInter.Get(key)
+			cleanmap[key] = UnorderedTypes(value)
 		}
 		return cleanmap
 	case []interface{}:
@@ -294,7 +284,7 @@ func UnorderedTypes(inter interface{}) interface{} {
 }
 
 func (d Dictionary) IsPacked() bool {
-	_, packed := d.GetValue(".")
+	_, packed := d.OrderedMap.Get(".")
 	return packed
 }
 
@@ -344,4 +334,9 @@ func (d Dictionary) With(key string, value interface{}) Dictionary {
 	result := CleanDictionary(d)
 	result.Set(key, CleanTypes(value))
 	return result
+}
+
+func (d Dictionary) Get(key string) Entry {
+	entry, _ := d.OrderedMap.Get(key)
+	return entry
 }

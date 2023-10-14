@@ -79,7 +79,7 @@ func (mep *MaskEngineProcess) ProcessDictionary(dictionary Dictionary, out Colle
 		log.Warn().AnErr("error", ret).Msg("Line skipped")
 		statistics.IncIgnoredLinesCount()
 		if mep.errlogger != nil {
-			if msg, ok := dictionary.GetValue("original"); !ok {
+			if msg, ok := dictionary.OrderedMap.Get("original"); !ok {
 				return nil
 			} else if msgstr, ok := msg.(string); !ok {
 				return nil

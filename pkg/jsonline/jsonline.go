@@ -19,9 +19,12 @@ package jsonline
 
 import (
 	"bufio"
-	"encoding/json"
+	"bytes"
 	"io"
 
+	json "github.com/goccy/go-json"
+
+	"github.com/adrienaury/flexjson"
 	over "github.com/adrienaury/zeromdc"
 	"github.com/cgi-fr/pimo/pkg/model"
 )
@@ -125,9 +128,19 @@ func (s Sink) ProcessDictionary(dictionary model.Entry) error {
 
 // JSONToDictionary return a model.Dictionary from a jsonline
 func JSONToDictionary(jsonline []byte) (model.Dictionary, error) {
-	dict := model.NewDictionary()
+	decoder := json.NewDecoder(bytes.NewReader(jsonline))
+	flex := flexjson.NewFlexDecoder(
+		decoder,
+		func() (model.Dictionary, error) { return model.NewDictionary(), nil },
+		func(obj model.Dictionary, key string, value any) (model.Dictionary, error) {
+			obj.Set(key, value)
+			return obj, nil
+		},
+		flexjson.StandardArrayMaker(),
+		flexjson.StandardArrayAdder(),
+	)
 
-	err := json.Unmarshal(jsonline, &dict)
+	dict, err := flex.DecodeObject()
 	if err != nil {
 		return model.NewDictionary(), err
 	}
@@ -137,9 +150,19 @@ func JSONToDictionary(jsonline []byte) (model.Dictionary, error) {
 
 // JSONToPackedDictionary return a packed model.Dictionary from a jsonline
 func JSONToPackedDictionary(jsonline []byte) (model.Dictionary, error) {
-	dict := model.NewDictionary()
+	decoder := json.NewDecoder(bytes.NewReader(jsonline))
+	flex := flexjson.NewFlexDecoder(
+		decoder,
+		func() (model.Dictionary, error) { return model.NewDictionary(), nil },
+		func(obj model.Dictionary, key string, value any) (model.Dictionary, error) {
+			obj.Set(key, value)
+			return obj, nil
+		},
+		flexjson.StandardArrayMaker(),
+		flexjson.StandardArrayAdder(),
+	)
 
-	err := json.Unmarshal(jsonline, &dict)
+	dict, err := flex.DecodeObject()
 	if err != nil {
 		return model.NewDictionary(), err
 	}

@@ -52,7 +52,7 @@ func (mcep *MaskContextEngineProcess) ProcessDictionary(dictionary Dictionary, o
 			ret = err
 			return NOTHING, nil
 		}
-		value, ok := masked.GetValue(key)
+		value, ok := masked.OrderedMap.Get(key)
 		if !ok {
 			return NOTHING, nil
 		}
@@ -72,7 +72,7 @@ func (mcep *MaskContextEngineProcess) ProcessDictionary(dictionary Dictionary, o
 		log.Warn().AnErr("error", ret).Msg("Line skipped")
 		statistics.IncIgnoredLinesCount()
 		if mcep.errlogger != nil {
-			if msg, ok := dictionary.GetValue("original"); !ok {
+			if msg, ok := dictionary.OrderedMap.Get("original"); !ok {
 				return nil
 			} else if msgstr, ok := msg.(string); !ok {
 				return nil

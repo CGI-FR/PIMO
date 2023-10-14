@@ -62,7 +62,7 @@ func (me MaskEngine) MaskContext(e model.Dictionary, key string, context ...mode
 
 	copy := model.CopyDictionary(e)
 
-	value, ok := e.GetValue(key)
+	value, ok := e.OrderedMap.Get(key)
 	if !ok || value == nil {
 		return copy, nil
 	}
