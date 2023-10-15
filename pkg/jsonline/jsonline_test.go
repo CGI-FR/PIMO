@@ -42,12 +42,12 @@ func TestSourceReturnDictionary(t *testing.T) {
 }
 
 func TestSourceReturnError(t *testing.T) {
-	jsonline := []byte(`{"personne" [{"name": "Benjamin", "age" : 35}, {"name": "Nicolas", "age" : 38}]}`)
+	jsonline := []byte(`{"personne: [{"name": "Benjamin", "age" : 35}, {"name": "Nicolas", "age" : 38}]}`)
 	pipeline := model.NewPipeline(NewSource(bytes.NewReader(jsonline)))
 	var result []model.Entry
 	err := pipeline.AddSink(model.NewSinkToSlice(&result)).Run()
 	assert.NotNil(t, err)
-	assert.EqualError(t, err, "invalid character '[' after object key")
+	assert.EqualError(t, err, "json: invalid character a as null")
 }
 
 func TestSinkWriteDictionary(t *testing.T) {

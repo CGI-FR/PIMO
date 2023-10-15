@@ -15,4 +15,4 @@ testcases:
         assertions:
           - result.code  ShouldEqual 4
           - result.systemout ShouldEqual {}
-          - result.systemerr ShouldContainSubstring unexpected end of JSON input
+          - result.systemerr ShouldContainSubstring EOF
