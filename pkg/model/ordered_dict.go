@@ -1,9 +1,11 @@
 package model
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 
+	goccy "github.com/goccy/go-json"
 	ordered "github.com/iancoleman/orderedmap"
 	"github.com/rs/zerolog/log"
 )
@@ -339,4 +341,28 @@ func (d Dictionary) With(key string, value interface{}) Dictionary {
 func (d Dictionary) Get(key string) Entry {
 	entry, _ := d.OrderedMap.Get(key)
 	return entry
+}
+
+func (d Dictionary) MarshalJSON() ([]byte, error) {
+	var buf bytes.Buffer
+	buf.WriteByte('{')
+	encoder := goccy.NewEncoder(&buf)
+	for i, k := range d.Keys() {
+		if i > 0 {
+			buf.WriteByte(',')
+		}
+		// add key
+		if err := encoder.Encode(k); err != nil {
+			return nil, err
+		}
+		buf.Truncate(buf.Len() - 1) // remove last new line
+		buf.WriteByte(':')
+		// add value
+		if err := encoder.Encode(d.Get(k)); err != nil {
+			return nil, err
+		}
+		buf.Truncate(buf.Len() - 1) // remove last new line
+	}
+	buf.WriteByte('}')
+	return buf.Bytes(), nil
 }
