@@ -580,3 +580,8 @@ func TestCacheShouldProvide(t *testing.T) {
 
 	assert.Equal(t, wanted, result)
 }
+
+func TestCallableMapSource(t *testing.T) {
+	source := NewCallableMapSource()
+	assert.NotNil(t, source)
+}

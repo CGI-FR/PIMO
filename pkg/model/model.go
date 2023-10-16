@@ -668,3 +668,31 @@ func NewSeeder(sourceField string, seed int64) Seeder {
 	}
 	return seeder
 }
+
+func NewCallableMapSource() Source {
+	return &CallableMapSource{}
+}
+
+type CallableMapSource struct {
+	dictionaries []Dictionary
+	offset       int
+}
+
+func (source *CallableMapSource) Open() error {
+	source.offset = 0
+	return nil
+}
+
+func (source *CallableMapSource) Next() bool {
+	result := source.offset < len(source.dictionaries)
+	source.offset++
+	return result
+}
+
+func (source *CallableMapSource) Value() Entry {
+	return source.dictionaries[source.offset-1]
+}
+
+func (source *CallableMapSource) Err() error {
+	return nil
+}

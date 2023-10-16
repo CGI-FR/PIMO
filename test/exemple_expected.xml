@@ -1,0 +1,39 @@
+contextSourceBefor <nil>
+contextSourceafter &{[{0xc000128870}] 0}
+data:  {"name":"Doe John","account_number":"12345","annual_income":"50000","total_taxes_paid":"10000"}
+singleInput:  {"name":"Doe John","account_number":"12345","annual_income":"50000","total_taxes_paid":"10000"}
+contextSourceBefor <nil>
+contextSourceafter &{[{0xc000128bb8}] 0}
+data:  {"total_taxes_paid":"12000","name":"Smith Jane","account_number":"67890","annual_income":"60000"}
+singleInput:  {"total_taxes_paid":"12000","name":"Smith Jane","account_number":"67890","annual_income":"60000"}
+contextSourceBefor <nil>
+contextSourceafter &{[{0xc000129008}] 0}
+data:  {"account_number":"00000","annual_income":"60000","total_taxes_paid":"12000","name":"Hello world"}
+singleInput:  {"account_number":"00000","annual_income":"60000","total_taxes_paid":"12000","name":"Hello world"}
+contextSourceBefor <nil>
+contextSourceafter &{[{0xc000129458}] 0}
+<?xml version="1.0" encoding="UTF-8"?>
+<taxes>
+    <agency>
+        <name>Nantes Agency</name>
+        <agency_number>0032</agency_number>
+    </agency>
+    <account>
+  <name>Mathieu</name>
+  <account_number>18291</account_number>
+  <annual_income>50000</annual_income>
+  <total_taxes_paid>10000</total_taxes_paid>
+</account>
+    <account>
+  <name>Mathieu</name>
+  <account_number>18291</account_number>
+  <annual_income>60000</annual_income>
+  <total_taxes_paid>12000</total_taxes_paid>
+</account>
+    <account>
+  <name>Mathieu</name>
+  <account_number>18291</account_number>
+  <annual_income>60000</annual_income>
+  <total_taxes_paid>12000</total_taxes_paid>
+</account>
+</taxes>

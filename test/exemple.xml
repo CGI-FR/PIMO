@@ -16,4 +16,10 @@
         <annual_income>60000</annual_income>
         <total_taxes_paid>12000</total_taxes_paid>
     </account>
+    <account>
+        <name>Hello world</name>
+        <account_number>00000</account_number>
+        <annual_income>60000</annual_income>
+        <total_taxes_paid>12000</total_taxes_paid>
+    </account>
 </taxes>
