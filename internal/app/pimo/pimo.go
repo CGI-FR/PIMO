@@ -77,6 +77,7 @@ type Config struct {
 	SkipLogFile      string
 	CachesToDump     map[string]string
 	CachesToLoad     map[string]string
+	Callback         bool
 }
 
 type Context struct {
@@ -107,6 +108,9 @@ func (ctx *Context) Configure(cfg Config) error {
 
 	over.AddGlobalFields("context")
 	switch {
+	case cfg.Callback:
+		over.MDC().Set("context", "callback-input")
+		ctx.source = model.NewCallableMapSource()
 	case cfg.EmptyInput:
 		over.MDC().Set("context", "empty-input")
 		ctx.source = model.NewSourceFromSlice([]model.Dictionary{model.NewPackedDictionary()})
@@ -338,19 +342,13 @@ func (ctx *Context) ExecuteMap(data map[string]string) (map[string]string, error
 	for k, v := range data {
 		input = input.With(k, v)
 	}
-
-	cfg := Config{
-		EmptyInput:  false,
-		Iteration:   1,
-		SingleInput: &input,
+	source, ok := ctx.source.(*model.CallableMapSource)
+	if !ok {
+		return nil, fmt.Errorf("Source is not CallableMapSource")
 	}
-
-	err := ctx.Configure(cfg)
-	if err != nil {
-		return nil, err
-	}
+	source.SetValue(input)
 	result := []model.Entry{}
-	err = ctx.pipeline.AddSink(model.NewSinkToSlice(&result)).Run()
+	err := ctx.pipeline.AddSink(model.NewSinkToSlice(&result)).Run()
 	if err != nil {
 		return nil, err
 	}

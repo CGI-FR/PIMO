@@ -674,7 +674,8 @@ func NewCallableMapSource() *CallableMapSource {
 }
 
 type CallableMapSource struct {
-	value Entry
+	value     Entry
+	nextValue Entry
 }
 
 func (source *CallableMapSource) Open() error {
@@ -682,11 +683,13 @@ func (source *CallableMapSource) Open() error {
 }
 
 func (source *CallableMapSource) Next() bool {
+	source.value = source.nextValue
+	source.nextValue = nil
 	return source.value != nil
 }
 
 func (source *CallableMapSource) SetValue(value Entry) {
-	source.value = value
+	source.nextValue = value
 }
 
 func (source *CallableMapSource) Value() Entry {

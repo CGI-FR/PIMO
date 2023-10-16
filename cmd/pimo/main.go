@@ -140,6 +140,7 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 				SkipLogFile:      skipLogFile,
 				CachesToDump:     cachesToDump,
 				CachesToLoad:     cachesToLoad,
+				Callback:         true,
 			}
 			// ces étapes doivent retrouver dans xixo.go pour ne pas alourdre le main.gopi
 			parser := pimo.ParseXML(cmd.InOrStdin(), cmd.OutOrStdout())
@@ -169,7 +170,10 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 					return m, nil
 				})
 			}
-			parser.Stream()
+			err := parser.Stream()
+			if err != nil {
+				log.Err(err).Msg("Error during parsing XML document")
+			}
 		},
 	}
 	xmlCmd.Flags().StringToStringVar(&subscriberName, "subscriber", map[string]string{}, "name of element to mask")

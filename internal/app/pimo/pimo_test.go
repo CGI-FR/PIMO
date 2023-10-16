@@ -331,8 +331,14 @@ func TestExecuteMap(t *testing.T) {
 			},
 		},
 	}
-
 	ctx := pimo.NewContext(definition)
+	cfg := pimo.Config{
+		Iteration: 1,
+		Callback:  true,
+	}
+
+	err := ctx.Configure(cfg)
+	assert.Nil(t, err)
 
 	data := map[string]string{"name": "John"}
 
@@ -340,4 +346,33 @@ func TestExecuteMap(t *testing.T) {
 
 	assert.Nil(t, err)
 	assert.NotEqual(t, "John", newData["name"])
+}
+
+func Test2BaliseIdentity(t *testing.T) {
+	definition := model.Definition{
+		Version: "1",
+		Seed:    42,
+		Masking: []model.Masking{
+			{
+				Selector: model.SelectorType{Jsonpath: "name"},
+				Mask: model.MaskType{
+					RandomChoiceInURI: "pimo://nameFR",
+				},
+			},
+		},
+	}
+	ctx := pimo.NewContext(definition)
+	cfg := pimo.Config{
+		Iteration: 1,
+		Callback:  true,
+	}
+
+	err := ctx.Configure(cfg)
+	assert.Nil(t, err)
+
+	data := map[string]string{"name": "John"}
+	newData1, err := ctx.ExecuteMap(data)
+	newData2, err := ctx.ExecuteMap(data)
+	assert.Nil(t, err)
+	assert.NotEqual(t, newData2["name"], newData1["name"])
 }

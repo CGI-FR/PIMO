@@ -5,11 +5,11 @@ masking:
   - selector:
       jsonpath: "name"
     mask:
-      randomChoice:
-       - "Mickael"
-       - "Mathieu"
-       - "Marcelle"
+      randomChoiceInUri: "pimo://nameFR"
   - selector:
       jsonpath: "account_number"
-    mask:
-      regex: "[0-9]{5}$"
+    masks:
+      - incremental:
+          start: 1
+          increment: 1
+      - template: "{{.account_number}}"

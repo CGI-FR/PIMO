@@ -596,3 +596,10 @@ func TestCallableMapSourceNextShouldReturnTrueAfterValueIsSetted(t *testing.T) {
 	source.SetValue(NewDictionary())
 	assert.True(t, source.Next())
 }
+
+func TestCallableMapSourceNextShouldReturnFalseAfterNextCalledTwice(t *testing.T) {
+	source := NewCallableMapSource()
+	source.SetValue(NewDictionary())
+	assert.True(t, source.Next())
+	assert.False(t, source.Next())
+}
