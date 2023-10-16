@@ -669,28 +669,28 @@ func NewSeeder(sourceField string, seed int64) Seeder {
 	return seeder
 }
 
-func NewCallableMapSource() Source {
+func NewCallableMapSource() *CallableMapSource {
 	return &CallableMapSource{}
 }
 
 type CallableMapSource struct {
-	dictionaries []Dictionary
-	offset       int
+	value Entry
 }
 
 func (source *CallableMapSource) Open() error {
-	source.offset = 0
 	return nil
 }
 
 func (source *CallableMapSource) Next() bool {
-	result := source.offset < len(source.dictionaries)
-	source.offset++
-	return result
+	return source.value != nil
+}
+
+func (source *CallableMapSource) SetValue(value Entry) {
+	source.value = value
 }
 
 func (source *CallableMapSource) Value() Entry {
-	return source.dictionaries[source.offset-1]
+	return source.value
 }
 
 func (source *CallableMapSource) Err() error {
