@@ -67,7 +67,7 @@ var (
 	statsTemplate         string
 	statsDestinationEnv   = os.Getenv("PIMO_STATS_URL")
 	statsTemplateEnv      = os.Getenv("PIMO_STATS_TEMPLATE")
-	subscriberName        map[string]string
+	xmlSubscriberName     map[string]string
 )
 
 func main() {
@@ -123,7 +123,7 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 	// Add command for XML transformer
 	xmlCmd := &cobra.Command{
 		Use:   "xml",
-		Short: "Transform fichier XML with substitution",
+		Short: "Parsing and masking XML file",
 		Run: func(cmd *cobra.Command, args []string) {
 			initLog()
 			if len(catchErrors) > 0 {
@@ -140,12 +140,12 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 				SkipLogFile:      skipLogFile,
 				CachesToDump:     cachesToDump,
 				CachesToLoad:     cachesToLoad,
-				Callback:         true,
+				XMLCallback:      true,
 			}
 			// ces étapes doivent retrouver dans xixo.go pour ne pas alourdre le main.gopi
 			parser := pimo.ParseXML(cmd.InOrStdin(), cmd.OutOrStdout())
 			// Map the command line balise name to fit the masking configuration
-			for elementName, mask := range subscriberName {
+			for elementName, mask := range xmlSubscriberName {
 				pdef, err := model.LoadPipelineDefinitionFromFile(mask)
 				if err != nil {
 					fmt.Printf("Error when charging pipeline for %s : %v\n", elementName, err)
@@ -163,11 +163,7 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 					if err != nil {
 						return nil, err
 					}
-					// Update m with masked data
-					for key, value := range transformedData {
-						m[key] = value
-					}
-					return m, nil
+					return transformedData, nil
 				})
 			}
 			err := parser.Stream()
@@ -176,7 +172,7 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 			}
 		},
 	}
-	xmlCmd.Flags().StringToStringVar(&subscriberName, "subscriber", map[string]string{}, "name of element to mask")
+	xmlCmd.Flags().StringToStringVar(&xmlSubscriberName, "subscriber", map[string]string{}, "name of element to mask")
 	rootCmd.AddCommand(xmlCmd)
 
 	rootCmd.AddCommand(&cobra.Command{

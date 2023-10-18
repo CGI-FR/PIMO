@@ -333,8 +333,8 @@ func TestExecuteMap(t *testing.T) {
 	}
 	ctx := pimo.NewContext(definition)
 	cfg := pimo.Config{
-		Iteration: 1,
-		Callback:  true,
+		Iteration:   1,
+		XMLCallback: true,
 	}
 
 	err := ctx.Configure(cfg)
@@ -363,8 +363,8 @@ func Test2BaliseIdentity(t *testing.T) {
 	}
 	ctx := pimo.NewContext(definition)
 	cfg := pimo.Config{
-		Iteration: 1,
-		Callback:  true,
+		Iteration:   1,
+		XMLCallback: true,
 	}
 
 	err := ctx.Configure(cfg)
@@ -372,6 +372,7 @@ func Test2BaliseIdentity(t *testing.T) {
 
 	data := map[string]string{"name": "John"}
 	newData1, err := ctx.ExecuteMap(data)
+	assert.Nil(t, err)
 	newData2, err := ctx.ExecuteMap(data)
 	assert.Nil(t, err)
 	assert.NotEqual(t, newData2["name"], newData1["name"])

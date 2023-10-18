@@ -77,7 +77,7 @@ type Config struct {
 	SkipLogFile      string
 	CachesToDump     map[string]string
 	CachesToLoad     map[string]string
-	Callback         bool
+	XMLCallback      bool
 }
 
 type Context struct {
@@ -108,7 +108,7 @@ func (ctx *Context) Configure(cfg Config) error {
 
 	over.AddGlobalFields("context")
 	switch {
-	case cfg.Callback:
+	case cfg.XMLCallback:
 		over.MDC().Set("context", "callback-input")
 		ctx.source = model.NewCallableMapSource()
 	case cfg.EmptyInput:
