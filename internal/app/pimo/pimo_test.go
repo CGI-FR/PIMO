@@ -377,3 +377,38 @@ func Test2BaliseIdentity(t *testing.T) {
 	assert.Nil(t, err)
 	assert.NotEqual(t, newData2["name"], newData1["name"])
 }
+
+func TestExecuteMapWithAttributes(t *testing.T) {
+	definition := model.Definition{
+		Version: "1",
+		Masking: []model.Masking{
+			{
+				Selector: model.SelectorType{Jsonpath: "name"},
+				Mask: model.MaskType{
+					HashInURI: "pimo://nameFR",
+				},
+			},
+			{
+				Selector: model.SelectorType{Jsonpath: "name"},
+				Mask: model.MaskType{
+					HashInURI: "pimo://nameFR",
+				},
+			},
+		},
+	}
+	ctx := pimo.NewContext(definition)
+	cfg := pimo.Config{
+		Iteration:   1,
+		XMLCallback: true,
+	}
+
+	err := ctx.Configure(cfg)
+	assert.Nil(t, err)
+
+	data := map[string]string{"name": "John"}
+
+	newData, err := ctx.ExecuteMap(data)
+
+	assert.Nil(t, err)
+	assert.NotEqual(t, "John", newData["name"])
+}
