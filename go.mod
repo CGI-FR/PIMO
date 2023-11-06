@@ -3,6 +3,7 @@ module github.com/cgi-fr/pimo
 go 1.20
 
 require (
+	github.com/CGI-FR/xixo v0.1.1
 	github.com/Masterminds/sprig/v3 v3.2.3
 	github.com/adrienaury/zeromdc v0.0.0-20221116212822-6a366c26ee61
 	github.com/capitalone/fpe v1.2.1
@@ -15,7 +16,6 @@ require (
 	github.com/spf13/cast v1.5.1
 	github.com/spf13/cobra v1.7.0
 	github.com/stretchr/testify v1.8.4
-	github.com/youen/xixo v0.0.0-20230922162717-6d8c927577cb
 	github.com/zach-klippenstein/goregen v0.0.0-20160303162051-795b5e3961ea
 	gitlab.com/c0b/go-ordered-json v0.0.0-20201030195603-febf46534d5a
 	golang.org/x/text v0.12.0

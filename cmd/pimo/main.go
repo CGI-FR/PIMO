@@ -142,7 +142,7 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 				CachesToLoad:     cachesToLoad,
 				XMLCallback:      true,
 			}
-			// ces étapes doivent retrouver dans xixo.go pour ne pas alourdre le main.gopi
+
 			parser := pimo.ParseXML(cmd.InOrStdin(), cmd.OutOrStdout())
 			// Map the command line balise name to fit the masking configuration
 			for elementName, mask := range xmlSubscriberName {
