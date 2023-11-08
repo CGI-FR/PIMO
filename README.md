@@ -966,6 +966,11 @@ To use PIMO to masking data in an XML file, use in the following way :
 
 Pimo selects specific tags within a predefined parent tag to replace the text and store the entire data in a new XML file. These specific tags should not contain any other nested tags.
 
+To mask values of attributes, follow the rules to define your choice in jsonpath in masking.yml.
+
+* For attributes of parent tag, we use: `@attributeName` in jsonpath.
+* For attributes of child tag, we use: `childTagName@attributeName` in jsonpath.
+
 For example, consider an XML file named data.xml:
 
 **`data.xml`**
@@ -977,13 +982,13 @@ For example, consider an XML file named data.xml:
         <name>NewYork Agency</name>
         <agency_number>0032</agency_number>
     </agency>
-    <account>
-        <name>Doe</name>
+    <account type="classic">
+        <name age="25">Doe</name>
         <account_number>12345</account_number>
         <annual_income>50000</annual_income>
     </account>
-    <account>
-        <name>Smith</name>
+    <account type="saving">
+        <name age="50">Smith</name>
         <account_number>67890</account_number>
         <annual_income>60000</annual_income>
     </account>
@@ -1021,6 +1026,13 @@ masking:
     mask:
       randomChoiceInUri: "pimo://nameFR"
   - selector:
+      jsonpath: "@type" # this is the name of parent tag's attribute that will be masked
+    mask:
+        randomChoice:
+         - "classic"
+         - "saving"
+         - "securitie"
+  - selector:
       jsonpath: "account_number" # this is the name of tag that will be masked
     masks:
       - incremental:
@@ -1028,6 +1040,14 @@ masking:
           increment: 1
         # incremental will change string to int, need to use template to restore string value in xml file
       - template: "{{.account_number}}"
+  - selector:
+      jsonpath: "name@age" # this is the name of child tag's attribute that will be masked
+    masks:
+      - randomInt:
+         min: 18
+         max: 95
+         # @ is not accepted by GO, so there we need use index in template to change int into string
+      - template: "{{index . \"name@age\"}}"
 ```
 
 After executing the command with the correct configuration, here is the expected result in the file maskedData.xml:
@@ -1041,13 +1061,13 @@ After executing the command with the correct configuration, here is the expected
         <name>NewYork Agency</name>
         <agency_number>2308</agency_number>
     </agency>
-    <account>
-        <name>Rolande</name>
+    <account type="saving">
+        <name age="33">Rolande</name>
         <account_number>1</account_number>
         <annual_income>50000</annual_income>
     </account>
-    <account>
-        <name>Matéo</name>
+    <account type="saving">
+        <name age="47">Matéo</name>
         <account_number>2</account_number>
         <annual_income>60000</annual_income>
     </account>

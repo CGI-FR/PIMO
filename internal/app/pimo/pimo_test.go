@@ -319,35 +319,6 @@ func LoadJsonLineFromDocument(filename string) (model.Dictionary, error) {
 	// return jsonline.JSONToDictionary(compactLine.Bytes())
 }
 
-func TestExecuteMap(t *testing.T) {
-	definition := model.Definition{
-		Version: "1",
-		Masking: []model.Masking{
-			{
-				Selector: model.SelectorType{Jsonpath: "name"},
-				Mask: model.MaskType{
-					HashInURI: "pimo://nameFR",
-				},
-			},
-		},
-	}
-	ctx := pimo.NewContext(definition)
-	cfg := pimo.Config{
-		Iteration:   1,
-		XMLCallback: true,
-	}
-
-	err := ctx.Configure(cfg)
-	assert.Nil(t, err)
-
-	data := map[string]string{"name": "John"}
-
-	newData, err := ctx.ExecuteMap(data)
-
-	assert.Nil(t, err)
-	assert.NotEqual(t, "John", newData["name"])
-}
-
 func Test2BaliseIdentity(t *testing.T) {
 	definition := model.Definition{
 		Version: "1",
@@ -389,9 +360,9 @@ func TestExecuteMapWithAttributes(t *testing.T) {
 				},
 			},
 			{
-				Selector: model.SelectorType{Jsonpath: "name"},
+				Selector: model.SelectorType{Jsonpath: "name@age"},
 				Mask: model.MaskType{
-					HashInURI: "pimo://nameFR",
+					Regex: "([0-9]){2}",
 				},
 			},
 		},
@@ -405,10 +376,11 @@ func TestExecuteMapWithAttributes(t *testing.T) {
 	err := ctx.Configure(cfg)
 	assert.Nil(t, err)
 
-	data := map[string]string{"name": "John"}
+	data := map[string]string{"name": "John", "name@age": "25"}
 
 	newData, err := ctx.ExecuteMap(data)
 
 	assert.Nil(t, err)
 	assert.NotEqual(t, "John", newData["name"])
+	assert.NotEqual(t, "25", newData["name@age"])
 }

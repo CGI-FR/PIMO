@@ -1,0 +1,28 @@
+name: parsing/masking XML features
+testcases:
+  - name: masking XML one parent tag
+    steps:
+      - script: |-
+          cat > origin.xml <<EOF
+          <?xml version="1.0" encoding="UTF-8"?>
+          <User name="John" sex="male">
+            <name age="25">Bar</name>
+          </User>
+          EOF
+      - script: |-
+          cat > expected.xml <<EOF
+          <?xml version="1.0" encoding="UTF-8"?>
+          <User name="Typhaine" sex="male">
+            <name age="46">Rolande</name>
+          </User>
+          EOF
+      - script: |-
+          cat origin.xml | pimo xml --subscriber User=../masking_attr.yml > result.xml
+        assertions:
+          - result.code ShouldEqual 0
+      - script: diff expected.xml result.xml
+        assertions:
+          - result.systemout ShouldBeEmpty
+      - script: rm -f origin.xml
+      - script: rm -f expected.xml
+      - script: rm -f result.xml
