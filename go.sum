@@ -1,5 +1,5 @@
-github.com/CGI-FR/xixo v0.1.5 h1:q+5pdCeAYKKF9E/Ac+9rXnoul1TzbiAXDwg5XEfm2uM=
-github.com/CGI-FR/xixo v0.1.5/go.mod h1:8arh0a5wsw67GuWoL1t4ea8jjN+movVMZty17ahGlWA=
+github.com/CGI-FR/xixo v0.1.6 h1:C3BPzLmUebjXsQqaP8A6IBwtlqpRX6Pq9xd3PQp6DCg=
+github.com/CGI-FR/xixo v0.1.6/go.mod h1:Q7Xf6CHqoU6hyRwPtvrUu4wCspfFYxIWZoYXTYXvtI8=
 github.com/Masterminds/goutils v1.1.1 h1:5nUrii3FMTL5diU80unEVvNevw1nH4+ZV4DSLVJLSYI=
 github.com/Masterminds/goutils v1.1.1/go.mod h1:8cTjp+g8YejhMuvIA5y2vz3BpJxksy863GQaJW2MFNU=
 github.com/Masterminds/semver/v3 v3.2.0 h1:3MEsd0SM6jqZojhjLWWeBY+Kcjy9i6MQAeY7YgDP83g=
@@ -8,7 +8,6 @@ github.com/Masterminds/sprig/v3 v3.2.3 h1:eL2fZNezLomi0uOLqjQoN6BfsDD+fyLtgbJMAj
 github.com/Masterminds/sprig/v3 v3.2.3/go.mod h1:rXcFaZ2zZbLRJv/xSysmlgIM1u11eBaRMhvYXJNkGuM=
 github.com/adrienaury/zeromdc v0.0.0-20221116212822-6a366c26ee61 h1:GXmgCyG0oDr3BFL+NYcwKEP2H3L9DuBo66ZR++zNasA=
 github.com/adrienaury/zeromdc v0.0.0-20221116212822-6a366c26ee61/go.mod h1:5UlMlw0MRjEAms20gDadR5GrN2wEp9XEXTBiMp/XI4E=
-github.com/antchfx/xpath v1.2.4 h1:dW1HB/JxKvGtJ9WyVGJ0sIoEcqftV3SqIstujI+B9XY=
 github.com/capitalone/fpe v1.2.1 h1:/r81KhhTkfmxjjr2HKr+WYTLrMjPnn0gtK/L8gKNfts=
 github.com/capitalone/fpe v1.2.1/go.mod h1:hI6YzL2v2WkosaevH24sYHyyDAzacfqkpaOYc/0Qn7g=
 github.com/coreos/go-systemd/v22 v22.5.0/go.mod h1:Y58oyj3AT4RCenI/lSvhwexgC+NSVTIJ3seZv2GcEnc=
@@ -98,8 +97,6 @@ github.com/stretchr/testify v1.5.1/go.mod h1:5W2xD1RspED5o8YsWQXVCued0rvSQ+mT+I5
 github.com/stretchr/testify v1.7.0/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/h/Wwjteg=
 github.com/stretchr/testify v1.8.4 h1:CcVxjf3Q8PM0mHUKJCdn+eZZtm5yQwehR5yeSVQQcUk=
 github.com/stretchr/testify v1.8.4/go.mod h1:sz/lmYIOXD/1dqDmKjjqLyZ2RngseejIcXlSw2iwfAo=
-github.com/tamerh/xpath v1.0.0 h1:NccMES/Ej8slPCFDff73Kf6V1xu9hdbuKf2RyDsxf5Q=
-github.com/tamerh/xpath v1.0.0/go.mod h1:t0wnh72FQlOVEO20f2Dl3EoVxso9GnLREh1WTpvNmJQ=
 github.com/valyala/bytebufferpool v1.0.0 h1:GqA5TC/0021Y/b9FG4Oi9Mr3q7XYx6KllzawFIhcdPw=
 github.com/valyala/bytebufferpool v1.0.0/go.mod h1:6bBcMArwyJ5K/AmCkWv1jt77kVWyCJ6HpOuEn7z0Csc=
 github.com/valyala/fasttemplate v1.2.1/go.mod h1:KHLXt3tVN2HBp8eijSv/kGJopbvo7S+qRAEEKiv+SiQ=
