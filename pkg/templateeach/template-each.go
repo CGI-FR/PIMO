@@ -72,7 +72,7 @@ func (tmpl MaskEngine) MaskContext(context model.Dictionary, key string, context
 		tmplctx = contexts[0].Unordered()
 	}
 
-	value, ok := copy.GetValue(key)
+	value, ok := copy.OrderedMap.Get(key)
 	if ok {
 		switch typedVal := model.CleanTypes(value).(type) {
 		case []model.Entry:

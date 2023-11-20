@@ -225,7 +225,7 @@ type TestAddMaskEngine struct {
 
 // MaskContext add the field
 func (am TestAddMaskEngine) MaskContext(context Dictionary, key string, contexts ...Dictionary) (Dictionary, error) {
-	_, present := context.GetValue(key)
+	_, present := context.OrderedMap.Get(key)
 	if !present {
 		context.Set(key, am.value)
 	}

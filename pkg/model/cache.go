@@ -152,13 +152,13 @@ func (mcce MaskContextCacheEngine) MaskContext(context Dictionary,
 	key string,
 	contexts ...Dictionary,
 ) (Dictionary, error) {
-	e, _ := context.GetValue(key)
+	e, _ := context.OrderedMap.Get(key)
 	if _, isInCache := mcce.Cache.Get(e); isInCache {
 		return context, nil
 	}
 	dict, err := mcce.OriginalEngine.MaskContext(context, key, contexts...)
 	if err == nil {
-		value, _ := dict.GetValue(key)
+		value, _ := dict.OrderedMap.Get(key)
 		mcce.Cache.Put(e, value)
 	}
 
@@ -210,7 +210,7 @@ func (umcce UniqueMaskContextCacheEngine) MaskContext(context Dictionary,
 	key string,
 	contexts ...Dictionary,
 ) (Dictionary, error) {
-	e, _ := context.GetValue(key)
+	e, _ := context.OrderedMap.Get(key)
 	if _, isInCache := umcce.cache.Get(e); isInCache {
 		return context, nil
 	}

@@ -92,7 +92,7 @@ func (s selector) Apply(root Dictionary, appliers ...Applier) bool {
 }
 
 func (s selector) applySub(root Dictionary, current Dictionary, appliers ...Applier) bool {
-	entry, ok := current.GetValue(s.path)
+	entry, ok := current.OrderedMap.Get(s.path)
 	if !ok {
 		return false
 	}
@@ -178,7 +178,7 @@ func (s selector) ApplyContext(root Dictionary, appliers ...Applier) bool {
 }
 
 func (s selector) applySubContext(root Dictionary, current Dictionary, appliers ...Applier) bool {
-	entry, ok := current.GetValue(s.path)
+	entry, ok := current.OrderedMap.Get(s.path)
 	if !ok {
 		if s.sub == nil {
 			// apply with nil value

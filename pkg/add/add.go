@@ -44,7 +44,7 @@ func NewMask(value model.Entry, tmpl tmpl.FuncMap, seed int64, seedField string)
 // MaskContext add the field
 func (am MaskEngine) MaskContext(context model.Dictionary, key string, contexts ...model.Dictionary) (model.Dictionary, error) {
 	log.Info().Msg("Mask add")
-	_, present := context.GetValue(key)
+	_, present := context.OrderedMap.Get(key)
 	if !present {
 		if am.template != nil {
 			var output bytes.Buffer

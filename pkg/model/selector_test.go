@@ -135,7 +135,7 @@ func TestDeleteSingle(t *testing.T) {
 		return model.DELETE, nil
 	})
 	assert.True(t, found)
-	_, exist := dictionary.GetValue("id")
+	_, exist := dictionary.OrderedMap.Get("id")
 	assert.False(t, exist)
 }
 

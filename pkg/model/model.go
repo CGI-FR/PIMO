@@ -354,7 +354,7 @@ func (p RepeaterUntilProcess) ProcessDictionary(dictionary Dictionary, out Colle
 		log.Warn().AnErr("error", err).Msg("Line skipped")
 		statistics.IncIgnoredLinesCount()
 		if p.errlogger != nil {
-			if msg, ok := dictionary.GetValue("original"); !ok {
+			if msg, ok := dictionary.OrderedMap.Get("original"); !ok {
 				return nil
 			} else if msgstr, ok := msg.(string); !ok {
 				return nil
