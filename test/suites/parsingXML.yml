@@ -26,3 +26,30 @@ testcases:
       - script: rm -f origin.xml
       - script: rm -f expected.xml
       - script: rm -f result.xml
+
+  - name: masking XML one parent tag with a given seed from cli
+    steps:
+      - script: |-
+          cat > origin.xml <<EOF
+          <?xml version="1.0" encoding="UTF-8"?>
+          <User name="John" sex="male">
+            <name age="25">Bar</name>
+          </User>
+          EOF
+      - script: |-
+          cat > expected.xml <<EOF
+          <?xml version="1.0" encoding="UTF-8"?>
+          <User name="Naomi" sex="male">
+            <name age="65">Zacharie</name>
+          </User>
+          EOF
+      - script: |-
+          cat origin.xml | pimo xml --seed 41 --subscriber User=../masking_attr.yml > result.xml
+        assertions:
+          - result.code ShouldEqual 0
+      - script: diff expected.xml result.xml
+        assertions:
+          - result.systemout ShouldBeEmpty
+      - script: rm -f origin.xml
+      - script: rm -f expected.xml
+      - script: rm -f result.xml
