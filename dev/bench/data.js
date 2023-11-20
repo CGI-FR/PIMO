@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1700493232249,
+  "lastUpdate": 1700512512286,
   "repoUrl": "https://github.com/CGI-FR/PIMO",
   "entries": {
     "Benchmark": [
@@ -4002,6 +4002,66 @@ window.BENCHMARK_DATA = {
             "value": 5905,
             "unit": "allocs/op",
             "extra": "6531 times\n4 procs"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "49699333+dependabot[bot]@users.noreply.github.com",
+            "name": "dependabot[bot]",
+            "username": "dependabot[bot]"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "ee96c9b5ebe67b1d23dff8f852f3639551a1e3a8",
+          "message": "chore(deps): bump golang.org/x/net from 0.12.0 to 0.17.0 (#273)\n\nBumps [golang.org/x/net](https://github.com/golang/net) from 0.12.0 to 0.17.0.\r\n- [Commits](https://github.com/golang/net/compare/v0.12.0...v0.17.0)\r\n\r\n---\r\nupdated-dependencies:\r\n- dependency-name: golang.org/x/net\r\n  dependency-type: indirect\r\n...\r\n\r\nSigned-off-by: dependabot[bot] <support@github.com>\r\nCo-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>",
+          "timestamp": "2023-11-20T21:26:49+01:00",
+          "tree_id": "ff10cac61f768e00df8cac00087cdd167ac23c80",
+          "url": "https://github.com/CGI-FR/PIMO/commit/ee96c9b5ebe67b1d23dff8f852f3639551a1e3a8"
+        },
+        "date": 1700512511523,
+        "tool": "go",
+        "benches": [
+          {
+            "name": "BenchmarkPimoRun - ns/op",
+            "value": 26803,
+            "unit": "ns/op",
+            "extra": "380359 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkPimoRun - B/op",
+            "value": 17400,
+            "unit": "B/op",
+            "extra": "380359 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkPimoRun - allocs/op",
+            "value": 181,
+            "unit": "allocs/op",
+            "extra": "380359 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge - ns/op",
+            "value": 1698695,
+            "unit": "ns/op",
+            "extra": "6769 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge - B/op",
+            "value": 682976,
+            "unit": "B/op",
+            "extra": "6769 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge - allocs/op",
+            "value": 5906,
+            "unit": "allocs/op",
+            "extra": "6769 times\n4 procs"
           }
         ]
       }
