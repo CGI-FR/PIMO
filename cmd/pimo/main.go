@@ -151,6 +151,11 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 					fmt.Printf("Error when charging pipeline for %s : %v\n", elementName, err)
 					return
 				}
+
+				if cmd.Flags().Changed("seed") {
+					(&pdef).SetSeed(seedValue)
+				}
+
 				ctx := pimo.NewContext(pdef)
 				if err := ctx.Configure(config); err != nil {
 					log.Err(err).Msg("Cannot configure pipeline")
@@ -173,6 +178,7 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 		},
 	}
 	xmlCmd.Flags().StringToStringVar(&xmlSubscriberName, "subscriber", map[string]string{}, "name of element to mask")
+	xmlCmd.Flags().Int64VarP(&seedValue, "seed", "s", 0, "set seed")
 	rootCmd.AddCommand(xmlCmd)
 
 	rootCmd.AddCommand(&cobra.Command{

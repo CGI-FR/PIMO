@@ -3,7 +3,7 @@ module github.com/cgi-fr/pimo
 go 1.20
 
 require (
-	github.com/CGI-FR/xixo v0.1.6
+	github.com/CGI-FR/xixo v0.1.7
 	github.com/Masterminds/sprig/v3 v3.2.3
 	github.com/adrienaury/zeromdc v0.0.0-20221116212822-6a366c26ee61
 	github.com/capitalone/fpe v1.2.1
