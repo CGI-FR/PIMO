@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1697140333287,
+  "lastUpdate": 1700493232249,
   "repoUrl": "https://github.com/CGI-FR/PIMO",
   "entries": {
     "Benchmark": [
@@ -3942,6 +3942,66 @@ window.BENCHMARK_DATA = {
             "value": 5905,
             "unit": "allocs/op",
             "extra": "5052 times\n2 procs"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "youen.peron@cgi.com",
+            "name": "Youen Péron",
+            "username": "youen"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "73b17b56956425c929d370cc40a56b7d2d70dd6b",
+          "message": "Feat xml support (#270)\n\n* feat: préparation des fichiers pour intégration de xixo\r\n\r\n* feat:traitement xml v1 avec un problème de mask identique à régler\r\n\r\n* feat: TestCallableMapSource\r\n\r\n* feat: add setValue to callableMapSource\r\n\r\n* feat: XML version 1 done\r\n\r\n* feat: ajouter les documentations et test yaml\r\n\r\n* feat: mise à jour de xixo\r\n\r\n* feat: ajouter test avec attributs\r\n\r\n* feat: add venom test and update README\r\n\r\n* fix: seed for xml\r\n\r\n* feat: upgrade xixo to v0.1.5\r\n\r\n* fix: upgrade xixo\r\n\r\n* fix: conflict with --seed shortcut and --secure shortcut in pimo play\r\n\r\n* feat: support seed from cli for xml parsing\r\n\r\n* chore: restore go.mod in node_modules\r\n\r\n* feat: update xixo version 1.7\r\n\r\n---------\r\n\r\nCo-authored-by: Jianchao Ma <jianchao.ma@cgi.com>\r\nCo-authored-by: Adrien Aury <adrien.aury@cgi.com>",
+          "timestamp": "2023-11-20T16:05:13+01:00",
+          "tree_id": "3c5f6dce1fde975103bfa7fa4fb48f9d75508d69",
+          "url": "https://github.com/CGI-FR/PIMO/commit/73b17b56956425c929d370cc40a56b7d2d70dd6b"
+        },
+        "date": 1700493231484,
+        "tool": "go",
+        "benches": [
+          {
+            "name": "BenchmarkPimoRun - ns/op",
+            "value": 26295,
+            "unit": "ns/op",
+            "extra": "424832 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkPimoRun - B/op",
+            "value": 17475,
+            "unit": "B/op",
+            "extra": "424832 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkPimoRun - allocs/op",
+            "value": 181,
+            "unit": "allocs/op",
+            "extra": "424832 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge - ns/op",
+            "value": 1770397,
+            "unit": "ns/op",
+            "extra": "6531 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge - B/op",
+            "value": 683056,
+            "unit": "B/op",
+            "extra": "6531 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge - allocs/op",
+            "value": 5905,
+            "unit": "allocs/op",
+            "extra": "6531 times\n4 procs"
           }
         ]
       }
