@@ -10,7 +10,7 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func play(yaml string, data string) (string, error) {
+func Play(yaml string, data string) (string, error) {
 	config := pimo.Config{
 		EmptyInput:       false,
 		RepeatUntil:      "",
