@@ -93,10 +93,8 @@
           "description": "Initialize the Pseaudo-Random-Generator with the given value"
         },
         "functions": {
-          "patternProperties": {
-            ".*": {
-              "$ref": "#/$defs/Function"
-            }
+          "additionalProperties": {
+            "$ref": "#/$defs/Function"
           },
           "type": "object",
           "description": "Declare functions to be used in the masking"
@@ -109,10 +107,8 @@
           "description": "Masking pipeline definition"
         },
         "caches": {
-          "patternProperties": {
-            ".*": {
-              "$ref": "#/$defs/CacheDefinition"
-            }
+          "additionalProperties": {
+            "$ref": "#/$defs/CacheDefinition"
           },
           "type": "object",
           "description": "Declare in-memory caches"
