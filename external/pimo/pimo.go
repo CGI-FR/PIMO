@@ -1,4 +1,4 @@
-package main
+package pimo
 
 import (
 	"errors"
@@ -51,7 +51,4 @@ func Play(yaml string, data string) (string, error) {
 
 	log.Info().Interface("stats", stats).Msg("Input masked")
 	return output.String(), err
-}
-
-func main() {
 }
