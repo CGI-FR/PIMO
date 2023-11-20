@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1700513120070,
+  "lastUpdate": 1700513784529,
   "repoUrl": "https://github.com/CGI-FR/PIMO",
   "entries": {
     "Benchmark": [
@@ -4122,6 +4122,66 @@ window.BENCHMARK_DATA = {
             "value": 5905,
             "unit": "allocs/op",
             "extra": "6613 times\n4 procs"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "49699333+dependabot[bot]@users.noreply.github.com",
+            "name": "dependabot[bot]",
+            "username": "dependabot[bot]"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "f7290549449d48fa0d1f0af82342a92e265bb35b",
+          "message": "chore(deps): bump github.com/labstack/echo/v4 from 4.11.1 to 4.11.3 (#269)\n\nBumps [github.com/labstack/echo/v4](https://github.com/labstack/echo) from 4.11.1 to 4.11.3.\r\n- [Release notes](https://github.com/labstack/echo/releases)\r\n- [Changelog](https://github.com/labstack/echo/blob/master/CHANGELOG.md)\r\n- [Commits](https://github.com/labstack/echo/compare/v4.11.1...v4.11.3)\r\n\r\n---\r\nupdated-dependencies:\r\n- dependency-name: github.com/labstack/echo/v4\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-patch\r\n...\r\n\r\nSigned-off-by: dependabot[bot] <support@github.com>\r\nCo-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>",
+          "timestamp": "2023-11-20T21:48:00+01:00",
+          "tree_id": "1bce47da6004a9ba769944e7569e371ea6aec1f2",
+          "url": "https://github.com/CGI-FR/PIMO/commit/f7290549449d48fa0d1f0af82342a92e265bb35b"
+        },
+        "date": 1700513784167,
+        "tool": "go",
+        "benches": [
+          {
+            "name": "BenchmarkPimoRun - ns/op",
+            "value": 28261,
+            "unit": "ns/op",
+            "extra": "368366 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkPimoRun - B/op",
+            "value": 17426,
+            "unit": "B/op",
+            "extra": "368366 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkPimoRun - allocs/op",
+            "value": 181,
+            "unit": "allocs/op",
+            "extra": "368366 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge - ns/op",
+            "value": 1760834,
+            "unit": "ns/op",
+            "extra": "6430 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge - B/op",
+            "value": 683108,
+            "unit": "B/op",
+            "extra": "6430 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge - allocs/op",
+            "value": 5906,
+            "unit": "allocs/op",
+            "extra": "6430 times\n4 procs"
           }
         ]
       }
