@@ -580,3 +580,26 @@ func TestCacheShouldProvide(t *testing.T) {
 
 	assert.Equal(t, wanted, result)
 }
+
+func TestCallableMapSource(t *testing.T) {
+	source := NewCallableMapSource()
+	assert.NotNil(t, source)
+}
+
+func TestCallableMapSourceNextShouldReturnFalseBeforeValueIsSetted(t *testing.T) {
+	source := NewCallableMapSource()
+	assert.False(t, source.Next())
+}
+
+func TestCallableMapSourceNextShouldReturnTrueAfterValueIsSetted(t *testing.T) {
+	source := NewCallableMapSource()
+	source.SetValue(NewDictionary())
+	assert.True(t, source.Next())
+}
+
+func TestCallableMapSourceNextShouldReturnFalseAfterNextCalledTwice(t *testing.T) {
+	source := NewCallableMapSource()
+	source.SetValue(NewDictionary())
+	assert.True(t, source.Next())
+	assert.False(t, source.Next())
+}

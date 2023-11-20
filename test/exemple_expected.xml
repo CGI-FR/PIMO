@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<taxes>
+    <agency>
+  <name>Nantes Agency</name>
+  <agency_number>2308</agency_number>
+</agency>
+    <account>
+  <name>Rolande</name>
+  <account_number>1</account_number>
+  <annual_income>50000</annual_income>
+  <total_taxes_paid>10000</total_taxes_paid>
+</account>
+    <account>
+  <name>Matéo</name>
+  <account_number>2</account_number>
+  <annual_income>60000</annual_income>
+  <total_taxes_paid>12000</total_taxes_paid>
+</account>
+    <account>
+  <name>Rosalie</name>
+  <account_number>3</account_number>
+  <annual_income>60000</annual_income>
+  <total_taxes_paid>12000</total_taxes_paid>
+</account>
+</taxes>

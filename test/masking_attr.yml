@@ -1,0 +1,18 @@
+version: "1"
+seed: 42
+masking:
+  - selector:
+      jsonpath: "name"
+    mask:
+      randomChoiceInUri: "pimo://nameFR"
+  - selector:
+      jsonpath: "@name"
+    mask:
+      randomChoiceInUri: "pimo://nameFR"
+  - selector:
+      jsonpath: "name@age"
+    masks:
+      - randomInt:
+          min: 18
+          max: 95
+      - template: "{{index . \"name@age\"}}"

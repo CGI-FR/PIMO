@@ -77,6 +77,7 @@ type Config struct {
 	SkipLogFile      string
 	CachesToDump     map[string]string
 	CachesToLoad     map[string]string
+	XMLCallback      bool
 }
 
 type Context struct {
@@ -107,6 +108,9 @@ func (ctx *Context) Configure(cfg Config) error {
 
 	over.AddGlobalFields("context")
 	switch {
+	case cfg.XMLCallback:
+		over.MDC().Set("context", "callback-input")
+		ctx.source = model.NewCallableMapSource()
 	case cfg.EmptyInput:
 		over.MDC().Set("context", "empty-input")
 		ctx.source = model.NewSourceFromSlice([]model.Dictionary{model.NewPackedDictionary()})
@@ -330,4 +334,41 @@ var re = regexp.MustCompile(`(\[\d*\])?$`)
 func updateContext(counter int) {
 	context := over.MDC().GetString("context")
 	over.MDC().Set("context", re.ReplaceAllString(context, fmt.Sprintf("[%d]", counter)))
+}
+
+func (ctx *Context) ExecuteMap(data map[string]string) (map[string]string, error) {
+	input := model.NewDictionary()
+
+	for k, v := range data {
+		input = input.With(k, v)
+	}
+	source, ok := ctx.source.(*model.CallableMapSource)
+	if !ok {
+		return nil, fmt.Errorf("Source is not CallableMapSource")
+	}
+	source.SetValue(input)
+	result := []model.Entry{}
+	err := ctx.pipeline.AddSink(model.NewSinkToSlice(&result)).Run()
+	if err != nil {
+		return nil, err
+	}
+
+	newData := make(map[string]string)
+
+	if len(result) > 0 {
+		new_map, ok := result[0].(model.Dictionary)
+		if !ok {
+			return nil, fmt.Errorf("result is not Dictionary")
+		}
+		unordered := new_map.Unordered()
+		for k, v := range unordered {
+			stringValue, ok := v.(string)
+			if !ok {
+				return nil, fmt.Errorf("Result is not a string")
+			}
+			newData[k] = stringValue
+		}
+		return newData, nil
+	}
+	return nil, fmt.Errorf("Result is not a map[string]string")
 }

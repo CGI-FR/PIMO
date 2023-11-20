@@ -668,3 +668,34 @@ func NewSeeder(sourceField string, seed int64) Seeder {
 	}
 	return seeder
 }
+
+func NewCallableMapSource() *CallableMapSource {
+	return &CallableMapSource{}
+}
+
+type CallableMapSource struct {
+	value     Entry
+	nextValue Entry
+}
+
+func (source *CallableMapSource) Open() error {
+	return nil
+}
+
+func (source *CallableMapSource) Next() bool {
+	source.value = source.nextValue
+	source.nextValue = nil
+	return source.value != nil
+}
+
+func (source *CallableMapSource) SetValue(value Entry) {
+	source.nextValue = value
+}
+
+func (source *CallableMapSource) Value() Entry {
+	return source.value
+}
+
+func (source *CallableMapSource) Err() error {
+	return nil
+}

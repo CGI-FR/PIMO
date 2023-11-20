@@ -960,6 +960,128 @@ By default, if not specified otherwise, these classes will be used (input -> out
 
 [Return to list of masks](#possible-masks)
 
+
+### Parsing XML files
+
+To use PIMO to masking data in an XML file, use in the following way :
+
+```bash
+  `cat data.xml | pimo xml --subscriber parentTagName=MaskName.yml > maskedData.xml`
+```
+
+Pimo selects specific tags within a predefined parent tag to replace the text and store the entire data in a new XML file. These specific tags should not contain any other nested tags.
+
+To mask values of attributes, follow the rules to define your choice in jsonpath in masking.yml.
+
+* For attributes of parent tag, we use: `@attributeName` in jsonpath.
+* For attributes of child tag, we use: `childTagName@attributeName` in jsonpath.
+
+For example, consider an XML file named data.xml:
+
+**`data.xml`**
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<taxes>
+    <agency>
+        <name>NewYork Agency</name>
+        <agency_number>0032</agency_number>
+    </agency>
+    <account type="classic">
+        <name age="25">Doe</name>
+        <account_number>12345</account_number>
+        <annual_income>50000</annual_income>
+    </account>
+    <account type="saving">
+        <name age="50">Smith</name>
+        <account_number>67890</account_number>
+        <annual_income>60000</annual_income>
+    </account>
+</taxes>
+```
+
+In this example, you can mask the values of `agency_number` in the `agency` tag and the values of `name` and `account_number` in the `account` tag using the following command:
+
+```bash
+  `cat data.xml | pimo xml --subscriber agency=masking_agency.yml --subscriber account=masking_account.yml > maskedData.xml`
+```
+
+**`masking_agency.yml`**
+
+```yaml
+version: "1"
+seed: 42
+
+masking:
+  - selector:
+      jsonpath: "agency_number"  # this is the name of tag that will be masked
+    mask:
+      template: '{{MaskRegex "[0-9]{4}$"}}'
+```
+
+**`masking_account.yml`**
+
+```yaml
+version: "1"
+seed: 42
+
+masking:
+  - selector:
+      jsonpath: "name" # this is the name of tag that will be masked
+    mask:
+      randomChoiceInUri: "pimo://nameFR"
+  - selector:
+      jsonpath: "@type" # this is the name of parent tag's attribute that will be masked
+    mask:
+        randomChoice:
+         - "classic"
+         - "saving"
+         - "securitie"
+  - selector:
+      jsonpath: "account_number" # this is the name of tag that will be masked
+    masks:
+      - incremental:
+          start: 1
+          increment: 1
+        # incremental will change string to int, need to use template to restore string value in xml file
+      - template: "{{.account_number}}"
+  - selector:
+      jsonpath: "name@age" # this is the name of child tag's attribute that will be masked
+    masks:
+      - randomInt:
+         min: 18
+         max: 95
+         # @ is not accepted by GO, so there we need use index in template to change int into string
+      - template: "{{index . \"name@age\"}}"
+```
+
+After executing the command with the correct configuration, here is the expected result in the file maskedData.xml:
+
+**`maskedData.xml`**
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<taxes>
+    <agency>
+        <name>NewYork Agency</name>
+        <agency_number>2308</agency_number>
+    </agency>
+    <account type="saving">
+        <name age="33">Rolande</name>
+        <account_number>1</account_number>
+        <annual_income>50000</annual_income>
+    </account>
+    <account type="saving">
+        <name age="47">Matéo</name>
+        <account_number>2</account_number>
+        <annual_income>60000</annual_income>
+    </account>
+</taxes>
+```
+
+[Return to list of masks](#possible-masks)
+
+
 ## `pimo://` scheme
 
 Pimo embed a usefule list of fake data. URIs that begin with a pimo:// sheme point to the pseudo files bellow.

@@ -1,0 +1,15 @@
+version: "1"
+seed: 42
+
+masking:
+  - selector:
+      jsonpath: "name"
+    mask:
+      randomChoiceInUri: "pimo://nameFR"
+  - selector:
+      jsonpath: "account_number"
+    masks:
+      - incremental:
+          start: 1
+          increment: 1
+      - template: "{{.account_number}}"
