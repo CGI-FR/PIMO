@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1700514702431,
+  "lastUpdate": 1700515302505,
   "repoUrl": "https://github.com/CGI-FR/PIMO",
   "entries": {
     "Benchmark": [
@@ -4242,6 +4242,66 @@ window.BENCHMARK_DATA = {
             "value": 5905,
             "unit": "allocs/op",
             "extra": "6620 times\n4 procs"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "49699333+dependabot[bot]@users.noreply.github.com",
+            "name": "dependabot[bot]",
+            "username": "dependabot[bot]"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "56e47e07b3710ff542a163885bf60ec7feac1199",
+          "message": "chore(deps): bump github.com/goccy/go-yaml from 1.11.0 to 1.11.2 (#259)\n\nBumps [github.com/goccy/go-yaml](https://github.com/goccy/go-yaml) from 1.11.0 to 1.11.2.\r\n- [Release notes](https://github.com/goccy/go-yaml/releases)\r\n- [Changelog](https://github.com/goccy/go-yaml/blob/master/CHANGELOG.md)\r\n- [Commits](https://github.com/goccy/go-yaml/compare/v1.11.0...v1.11.2)\r\n\r\n---\r\nupdated-dependencies:\r\n- dependency-name: github.com/goccy/go-yaml\r\n  dependency-type: direct:production\r\n  update-type: version-update:semver-patch\r\n...\r\n\r\nSigned-off-by: dependabot[bot] <support@github.com>\r\nCo-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>",
+          "timestamp": "2023-11-20T22:13:20+01:00",
+          "tree_id": "2b047c4c994ed47e30d16c7d9ff3075e8c884f26",
+          "url": "https://github.com/CGI-FR/PIMO/commit/56e47e07b3710ff542a163885bf60ec7feac1199"
+        },
+        "date": 1700515302181,
+        "tool": "go",
+        "benches": [
+          {
+            "name": "BenchmarkPimoRun - ns/op",
+            "value": 26771,
+            "unit": "ns/op",
+            "extra": "437335 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkPimoRun - B/op",
+            "value": 17450,
+            "unit": "B/op",
+            "extra": "437335 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkPimoRun - allocs/op",
+            "value": 181,
+            "unit": "allocs/op",
+            "extra": "437335 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge - ns/op",
+            "value": 1731136,
+            "unit": "ns/op",
+            "extra": "6631 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge - B/op",
+            "value": 683015,
+            "unit": "B/op",
+            "extra": "6631 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge - allocs/op",
+            "value": 5906,
+            "unit": "allocs/op",
+            "extra": "6631 times\n4 procs"
           }
         ]
       }
