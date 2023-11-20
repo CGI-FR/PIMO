@@ -9,7 +9,7 @@ require (
 	github.com/capitalone/fpe v1.2.1
 	github.com/goccy/go-yaml v1.11.0
 	github.com/invopop/jsonschema v0.7.0
-	github.com/labstack/echo/v4 v4.11.1
+	github.com/labstack/echo/v4 v4.11.3
 	github.com/mattn/anko v0.1.9
 	github.com/mattn/go-isatty v0.0.19
 	github.com/rs/zerolog v1.30.0
