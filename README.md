@@ -966,7 +966,7 @@ By default, if not specified otherwise, these classes will be used (input -> out
 To use PIMO to masking data in an XML file, use in the following way :
 
 ```bash
-  `cat data.xml | pimo xml --subscriber parentTagName=MaskName.yml > maskedData.xml`
+  cat data.xml | pimo xml --subscriber parentTagName=MaskName.yml > maskedData.xml
 ```
 
 Pimo selects specific tags within a predefined parent tag to replace the text and store the entire data in a new XML file. These specific tags should not contain any other nested tags.
@@ -1003,7 +1003,7 @@ For example, consider an XML file named data.xml:
 In this example, you can mask the values of `agency_number` in the `agency` tag and the values of `name` and `account_number` in the `account` tag using the following command:
 
 ```bash
-  `cat data.xml | pimo xml --subscriber agency=masking_agency.yml --subscriber account=masking_account.yml > maskedData.xml`
+  cat data.xml | pimo xml --subscriber agency=masking_agency.yml --subscriber account=masking_account.yml > maskedData.xml
 ```
 
 **`masking_agency.yml`**
