@@ -335,8 +335,8 @@ func Test2BaliseIdentity(t *testing.T) {
 	}
 	ctx := configuration.NewContext(definition)
 	cfg := configuration.Config{
-		Iteration:   1,
-		XMLCallback: true,
+		Iteration: 1,
+		Callback:  true,
 	}
 
 	err := ctx.Configure(cfg, pimo.UpdateContext, pimo.InjectTemplateFuncs, pimo.InjectMaskFactories, pimo.InjectMaskContextFactories)
@@ -370,8 +370,8 @@ func TestExecuteMapWithAttributes(t *testing.T) {
 	}
 	ctx := configuration.NewContext(definition)
 	cfg := configuration.Config{
-		Iteration:   1,
-		XMLCallback: true,
+		Iteration: 1,
+		Callback:  true,
 	}
 
 	err := ctx.Configure(cfg, pimo.UpdateContext, pimo.InjectTemplateFuncs, pimo.InjectMaskFactories, pimo.InjectMaskContextFactories)

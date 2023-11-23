@@ -1,6 +1,7 @@
 package pimo
 
 import (
+	"encoding/json"
 	"errors"
 	"strings"
 
@@ -10,6 +11,56 @@ import (
 	"github.com/cgi-fr/pimo/pkg/model"
 	"github.com/rs/zerolog/log"
 )
+
+func NewContext(yaml string) (configuration.Context, error) {
+	config := configuration.Config{
+		EmptyInput:       false,
+		RepeatUntil:      "",
+		RepeatWhile:      "",
+		Iteration:        1,
+		SkipLineOnError:  false,
+		SkipFieldOnError: false,
+		CachesToDump:     map[string]string{},
+		CachesToLoad:     map[string]string{},
+		Callback:         true,
+	}
+
+	pdef, pipe_err := model.LoadPipelineDefinitionFromYAML([]byte(yaml))
+	if pipe_err != nil {
+		log.Err(pipe_err).Msg("Cannot load pipeline definition")
+		return configuration.Context{}, errors.New("Cannot load pipeline definition")
+	}
+
+	context := configuration.NewContext(pdef)
+	if ctx_err := context.Configure(config, internal.UpdateContext, internal.InjectTemplateFuncs, internal.InjectMaskFactories, internal.InjectMaskContextFactories); ctx_err != nil {
+		log.Err(ctx_err).Msg("Cannot configure pipeline")
+		return configuration.Context{}, ctx_err
+	}
+
+	return context, nil
+}
+
+func ExecuteJSON(ctx configuration.Context, input *[]byte, output *[]byte) (int, error) {
+	inputEntry, err := jsonline.JSONToDictionary(*input)
+	if err != nil {
+		return 0, err
+	}
+
+	resultEntry, err := ctx.ExecuteEntry(inputEntry)
+	if err != nil {
+		return 0, err
+	}
+
+	jsonline, err := json.Marshal(resultEntry)
+	if err != nil {
+		return 0, err
+	}
+
+	copy(*output, jsonline)
+
+	(*output)[len(jsonline)] = 0
+	return len(jsonline), nil
+}
 
 func Play(yaml string, data string) (string, error) {
 	config := configuration.Config{

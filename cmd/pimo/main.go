@@ -141,7 +141,7 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 				SkipLogFile:      skipLogFile,
 				CachesToDump:     cachesToDump,
 				CachesToLoad:     cachesToLoad,
-				XMLCallback:      true,
+				Callback:         true,
 			}
 
 			parser := pimo.ParseXML(cmd.InOrStdin(), cmd.OutOrStdout())

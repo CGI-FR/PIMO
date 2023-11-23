@@ -28,7 +28,7 @@ type Config struct {
 	SkipLogFile      string
 	CachesToDump     map[string]string
 	CachesToLoad     map[string]string
-	XMLCallback      bool
+	Callback         bool
 }
 
 type Context struct {
@@ -67,7 +67,7 @@ func (ctx *Context) Configure(cfg Config, updateContext UpdateContextHandler, in
 
 	over.AddGlobalFields("context")
 	switch {
-	case cfg.XMLCallback:
+	case cfg.Callback:
 		over.MDC().Set("context", "callback-input")
 		ctx.source = model.NewCallableMapSource()
 	case cfg.EmptyInput:
@@ -146,6 +146,25 @@ func (ctx *Context) ExecuteMap(data map[string]string) (map[string]string, error
 		return newData, nil
 	}
 	return nil, fmt.Errorf("Result is not a map[string]string")
+}
+
+func (ctx *Context) ExecuteEntry(data model.Entry) (model.Entry, error) {
+	source, ok := ctx.source.(*model.CallableMapSource)
+	if !ok {
+		return nil, fmt.Errorf("Source is not CallableMapSource")
+	}
+	source.SetValue(data)
+	result := []model.Entry{}
+	err := ctx.pipeline.AddSink(model.NewSinkToSlice(&result)).Run()
+	if err != nil {
+		return nil, err
+	}
+
+	if len(result) > 0 {
+		return result[0], nil
+	}
+
+	return nil, fmt.Errorf("Pipeline didn't return result")
 }
 
 func (ctx *Context) Execute(out io.Writer, loadCache LoadCacheType, dumpCache DumpCacheType) (statistics.ExecutionStats, error) {
