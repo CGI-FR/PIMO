@@ -29,6 +29,7 @@ import (
 
 	over "github.com/adrienaury/zeromdc"
 	"github.com/cgi-fr/pimo/internal/app/pimo"
+	"github.com/cgi-fr/pimo/pkg/configuration"
 	"github.com/cgi-fr/pimo/pkg/flow"
 	"github.com/cgi-fr/pimo/pkg/model"
 	"github.com/cgi-fr/pimo/pkg/statistics"
@@ -130,7 +131,7 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 				skipLineOnError = true
 				skipLogFile = catchErrors
 			}
-			config := pimo.Config{
+			config := configuration.Config{
 				EmptyInput:       emptyInput,
 				RepeatUntil:      repeatUntil,
 				RepeatWhile:      repeatWhile,
@@ -156,8 +157,8 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 					(&pdef).SetSeed(seedValue)
 				}
 
-				ctx := pimo.NewContext(pdef)
-				if err := ctx.Configure(config); err != nil {
+				ctx := configuration.NewContext(pdef)
+				if err := ctx.Configure(config, pimo.UpdateContext, pimo.InjectTemplateFuncs, pimo.InjectMaskFactories, pimo.InjectMaskContextFactories); err != nil {
 					log.Err(err).Msg("Cannot configure pipeline")
 					log.Warn().Int("return", 1).Msg("End PIMO")
 					os.Exit(1)
@@ -231,7 +232,7 @@ func run(cmd *cobra.Command) {
 		skipLogFile = catchErrors
 	}
 
-	config := pimo.Config{
+	config := configuration.Config{
 		EmptyInput:       emptyInput,
 		RepeatUntil:      repeatUntil,
 		RepeatWhile:      repeatWhile,
@@ -261,9 +262,9 @@ func run(cmd *cobra.Command) {
 		os.Exit(1)
 	}
 
-	ctx := pimo.NewContext(pdef)
+	ctx := configuration.NewContext(pdef)
 
-	if err := ctx.Configure(config); err != nil {
+	if err := ctx.Configure(config, pimo.UpdateContext, pimo.InjectTemplateFuncs, pimo.InjectMaskFactories, pimo.InjectMaskContextFactories); err != nil {
 		log.Err(err).Msg("Cannot configure pipeline")
 		log.Warn().Int("return", 1).Msg("End PIMO")
 		os.Exit(1)
@@ -271,7 +272,7 @@ func run(cmd *cobra.Command) {
 
 	startTime := time.Now()
 
-	stats, err := ctx.Execute(os.Stdout)
+	stats, err := ctx.Execute(os.Stdout, pimo.LoadCache, pimo.DumpCache)
 	if err != nil {
 		log.Err(err).Msg("Cannot execute pipeline")
 		log.Warn().Int("return", stats.GetErrorCode()).Msg("End PIMO")

@@ -4,14 +4,15 @@ import (
 	"errors"
 	"strings"
 
-	"github.com/cgi-fr/pimo/internal/app/pimo"
+	internal "github.com/cgi-fr/pimo/internal/app/pimo"
+	"github.com/cgi-fr/pimo/pkg/configuration"
 	"github.com/cgi-fr/pimo/pkg/jsonline"
 	"github.com/cgi-fr/pimo/pkg/model"
 	"github.com/rs/zerolog/log"
 )
 
 func Play(yaml string, data string) (string, error) {
-	config := pimo.Config{
+	config := configuration.Config{
 		EmptyInput:       false,
 		RepeatUntil:      "",
 		RepeatWhile:      "",
@@ -35,16 +36,16 @@ func Play(yaml string, data string) (string, error) {
 	}
 
 	config.SingleInput = &input
-	context := pimo.NewContext(pdef)
+	context := configuration.NewContext(pdef)
 
-	if ctx_err := context.Configure(config); ctx_err != nil {
+	if ctx_err := context.Configure(config, internal.UpdateContext, internal.InjectTemplateFuncs, internal.InjectMaskFactories, internal.InjectMaskContextFactories); ctx_err != nil {
 		log.Err(ctx_err).Msg("Cannot configure pipeline")
 		return "", ctx_err
 	}
 
 	output := &strings.Builder{}
 
-	stats, err := context.Execute(output)
+	stats, err := context.Execute(output, internal.LoadCache, internal.DumpCache)
 	if err != nil {
 		log.Err(err).Msg("Cannot execute pipeline")
 	}

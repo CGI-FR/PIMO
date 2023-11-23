@@ -25,6 +25,7 @@ import (
 	"time"
 
 	"github.com/cgi-fr/pimo/internal/app/pimo"
+	"github.com/cgi-fr/pimo/pkg/configuration"
 	"github.com/cgi-fr/pimo/pkg/jsonline"
 	"github.com/cgi-fr/pimo/pkg/model"
 	"github.com/rs/zerolog"
@@ -84,22 +85,22 @@ func BenchmarkPimoRun(b *testing.B) {
 
 	zerolog.SetGlobalLevel(zerolog.WarnLevel)
 
-	ctx := pimo.NewContext(definition)
+	ctx := configuration.NewContext(definition)
 
 	data := model.NewDictionary().With("name", "John").With("familyName", "Doe").With("email", "john.doe@gmail.com")
 
-	cfg := pimo.Config{
+	cfg := configuration.Config{
 		EmptyInput:  false,
 		Iteration:   b.N,
 		SingleInput: &data,
 	}
-	err := ctx.Configure(cfg)
+	err := ctx.Configure(cfg, pimo.UpdateContext, pimo.InjectTemplateFuncs, pimo.InjectMaskFactories, pimo.InjectMaskContextFactories)
 	if err != nil {
 		b.FailNow()
 	}
 
 	b.ResetTimer()
-	_, err = ctx.Execute(io.Discard)
+	_, err = ctx.Execute(io.Discard, pimo.LoadCache, pimo.DumpCache)
 	if err != nil {
 		b.FailNow()
 	}
@@ -286,18 +287,18 @@ func BenchmarkPimoRunLarge(b *testing.B) {
 
 	zerolog.SetGlobalLevel(zerolog.WarnLevel)
 
-	ctx := pimo.NewContext(definition)
-	cfg := pimo.Config{
+	ctx := configuration.NewContext(definition)
+	cfg := configuration.Config{
 		Iteration:   b.N,
 		SingleInput: &dict,
 	}
 
-	if err := ctx.Configure(cfg); err != nil {
+	if err := ctx.Configure(cfg, pimo.UpdateContext, pimo.InjectTemplateFuncs, pimo.InjectMaskFactories, pimo.InjectMaskContextFactories); err != nil {
 		b.FailNow()
 	}
 
 	b.ResetTimer()
-	if _, err := ctx.Execute(io.Discard); err != nil {
+	if _, err := ctx.Execute(io.Discard, pimo.LoadCache, pimo.DumpCache); err != nil {
 		b.FailNow()
 	}
 }
@@ -332,13 +333,13 @@ func Test2BaliseIdentity(t *testing.T) {
 			},
 		},
 	}
-	ctx := pimo.NewContext(definition)
-	cfg := pimo.Config{
+	ctx := configuration.NewContext(definition)
+	cfg := configuration.Config{
 		Iteration:   1,
 		XMLCallback: true,
 	}
 
-	err := ctx.Configure(cfg)
+	err := ctx.Configure(cfg, pimo.UpdateContext, pimo.InjectTemplateFuncs, pimo.InjectMaskFactories, pimo.InjectMaskContextFactories)
 	assert.Nil(t, err)
 
 	data := map[string]string{"name": "John"}
@@ -367,13 +368,13 @@ func TestExecuteMapWithAttributes(t *testing.T) {
 			},
 		},
 	}
-	ctx := pimo.NewContext(definition)
-	cfg := pimo.Config{
+	ctx := configuration.NewContext(definition)
+	cfg := configuration.Config{
 		Iteration:   1,
 		XMLCallback: true,
 	}
 
-	err := ctx.Configure(cfg)
+	err := ctx.Configure(cfg, pimo.UpdateContext, pimo.InjectTemplateFuncs, pimo.InjectMaskFactories, pimo.InjectMaskContextFactories)
 	assert.Nil(t, err)
 
 	data := map[string]string{"name": "John", "name@age": "25"}

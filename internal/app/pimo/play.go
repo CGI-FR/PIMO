@@ -8,6 +8,7 @@ import (
 	"net/url"
 	"strings"
 
+	"github.com/cgi-fr/pimo/pkg/configuration"
 	"github.com/cgi-fr/pimo/pkg/flow"
 	"github.com/cgi-fr/pimo/pkg/jsonline"
 	"github.com/cgi-fr/pimo/pkg/model"
@@ -55,7 +56,7 @@ func play(ctx echo.Context) error {
 		return nil
 	}() //nolint:errcheck
 
-	config := Config{
+	config := configuration.Config{
 		EmptyInput:       false,
 		RepeatUntil:      "",
 		RepeatWhile:      "",
@@ -99,16 +100,16 @@ func play(ctx echo.Context) error {
 	}
 
 	config.SingleInput = &input
-	context := NewContext(pdef)
+	context := configuration.NewContext(pdef)
 
-	if err := context.Configure(config); err != nil {
+	if err := context.Configure(config, UpdateContext, InjectTemplateFuncs, InjectMaskFactories, InjectMaskContextFactories); err != nil {
 		log.Err(err).Msg("Cannot configure pipeline")
 		return ctx.String(http.StatusInternalServerError, err.Error())
 	}
 
 	result := &strings.Builder{}
 
-	stats, err := context.Execute(result)
+	stats, err := context.Execute(result, LoadCache, DumpCache)
 	if err != nil {
 		log.Err(err).Msg("Cannot execute pipeline")
 		return ctx.String(http.StatusInternalServerError, err.Error())
