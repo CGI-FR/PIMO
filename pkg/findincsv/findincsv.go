@@ -105,7 +105,6 @@ func (me *MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.En
 		if err != nil {
 			return nil, err
 		}
-
 	}
 
 	// Get template Entry value
@@ -150,11 +149,9 @@ func (me *MaskEngine) readCSV(filename string) error {
 		if records, ok := me.csvEntryByKey[key]; ok {
 			records = append(records, record)
 			me.csvEntryByKey[key] = records
-
 		} else {
 			me.csvEntryByKey[key] = []model.Entry{record}
 		}
-
 	}
 
 	return nil
@@ -218,8 +215,12 @@ func Factory(conf model.MaskFactoryConfiguration) (model.MaskEngine, bool, error
 
 func Func(seed int64, seedField string) interface{} {
 	var callnumber int64
-	return func(uri string, header bool, sep string, comment string, fieldsPerRecord int, trimSpaces bool) (model.Entry, error) {
-		mask, err := NewMask(model.FindInCSVType{URI: uri, Header: header, Separator: sep, Comment: comment, FieldsPerRecord: fieldsPerRecord, TrimSpace: trimSpaces}, seed+callnumber, model.NewSeeder(seedField, seed+callnumber))
+	return func(uri string, exactMatchEntry string, exactMatchCsv string, expected string, header bool, sep string, comment string, fieldsPerRecord int, trimSpaces bool) (model.Entry, error) {
+		exactMatch := model.ExactMatchType{
+			CSV:   exactMatchCsv,
+			Entry: exactMatchEntry,
+		}
+		mask, err := NewMask(model.FindInCSVType{URI: uri, Header: header, ExactMatch: exactMatch, Expected: expected, Separator: sep, Comment: comment, FieldsPerRecord: fieldsPerRecord, TrimSpace: trimSpaces}, seed+callnumber, model.NewSeeder(seedField, seed+callnumber))
 		if err != nil {
 			return "", err
 		}
