@@ -33,6 +33,7 @@ import (
 	"github.com/cgi-fr/pimo/pkg/dateparser"
 	"github.com/cgi-fr/pimo/pkg/duration"
 	"github.com/cgi-fr/pimo/pkg/ff1"
+	"github.com/cgi-fr/pimo/pkg/findincsv"
 	"github.com/cgi-fr/pimo/pkg/fluxuri"
 	"github.com/cgi-fr/pimo/pkg/fromjson"
 	"github.com/cgi-fr/pimo/pkg/hash"
@@ -297,6 +298,7 @@ func injectMaskFactories() []model.MaskFactory {
 		transcode.Factory,
 		randomcsv.Factory,
 		hashcsv.Factory,
+		findincsv.Factory,
 	}
 }
 
@@ -327,6 +329,8 @@ func injectTemplateFuncs() {
 	template.InjectSeededFuncGenerator("MaskRandomChoiceInCSV", randomcsv.Func)
 	template.InjectSeededFuncGenerator("MaskHashInCsv", hashcsv.Func)
 	template.InjectSeededFuncGenerator("MaskHashInCSV", hashcsv.Func)
+	template.InjectSeededFuncGenerator("MaskFindInCSV", findincsv.Func)
+	template.InjectSeededFuncGenerator("MaskFindInCsv", findincsv.Func)
 }
 
 var re = regexp.MustCompile(`(\[\d*\])?$`)
