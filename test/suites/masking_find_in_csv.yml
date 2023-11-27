@@ -28,3 +28,29 @@ testcases:
     - result.systemout ShouldEqual {"nom":"Vidal","info_personne":{"first_name":"Luce","last_name":"Vidal","email":"luce.vidal@yopmail.fr"}}
     - result.systemerr ShouldBeEmpty
 
+- name: find in csv mask exactMatch with templated uri
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      seed: 1
+      masking:
+        - selector:
+            jsonpath: "info_personne"
+          mask:
+            findInCSV:
+              uri: "file://../{{.filename}}.csv"
+              exactMatch:
+                csv: "{{.last_name}}+123"
+                entry: "{{.nom}}+123"
+              expected: "only-one"
+              header: true
+              trim: true
+      EOF
+  - script: |-
+      echo '{"filename":"persons","nom":"Vidal","info_personne":""}' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldEqual {"filename":"persons","nom":"Vidal","info_personne":{"first_name":"Luce","last_name":"Vidal","email":"luce.vidal@yopmail.fr"}}
+    - result.systemerr ShouldBeEmpty

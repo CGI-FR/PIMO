@@ -107,3 +107,36 @@ func TestFactoryShouldCreateAMaskAndDontFindMatch(t *testing.T) {
 
 	assert.Equal(t, []model.Entry{}, masked)
 }
+
+func TestFactoryShouldCreateAMaskWithTemplatedUri(t *testing.T) {
+	exactMatch := model.ExactMatchType{
+		CSV:   "{{.last_name}}+123",
+		Entry: "{{.nom}}+123",
+	}
+	config := model.FindInCSVType{
+		URI:        "file://../../test/{{.filename}}.csv",
+		ExactMatch: exactMatch,
+		Expected:   "only-one",
+		Header:     true,
+		TrimSpace:  true,
+	}
+	maskingConfig := model.Masking{Mask: model.MaskType{FindInCSV: config}}
+	factoryConfig := model.MaskFactoryConfiguration{Masking: maskingConfig, Seed: 0}
+	mask, present, err := Factory(factoryConfig)
+	assert.Nil(t, err, "error should be nil")
+	assert.True(t, present, "should be true")
+	data := model.NewDictionary().
+		With("filename", "persons").
+		With("nom", "Vidal").
+		With("info_personne", "").Pack()
+	masked, err := mask.Mask("info_personne", data)
+
+	assert.Equal(t,
+		model.NewDictionary().
+			With("last_name", "Vidal").
+			With("email", "luce.vidal@yopmail.fr").
+			With("first_name", "Luce").Unordered(),
+		masked.(model.Dictionary).Unordered(),
+	)
+	assert.Nil(t, err, "error should be nil")
+}
