@@ -76,6 +76,13 @@ func TestFactoryShouldCreateAMaskAndFindMatchSimple(t *testing.T) {
 	assert.True(t, present, "should be true")
 	data := model.NewDictionary().With("nom", "Vidal").With("info_personne", "").Pack()
 	masked, err := mask.Mask("info_personne", data)
-	assert.Equal(t, masked, "{\"first_name\":\"Luce\",\"last_name\":\"Vidal\",\"email\":\"luce.vidal@yopmail.fr\"}", "should be equal")
+
+	assert.Equal(t,
+		model.NewDictionary().
+			With("last_name", "Vidal").
+			With("email", "luce.vidal@yopmail.fr").
+			With("first_name", "Luce").Unordered(),
+		masked.(model.Dictionary).Unordered(),
+	)
 	assert.Nil(t, err, "error should be nil")
 }

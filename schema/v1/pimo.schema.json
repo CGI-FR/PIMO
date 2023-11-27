@@ -121,6 +121,24 @@
         "masking"
       ]
     },
+    "ExactMatchType": {
+      "properties": {
+        "csv": {
+          "type": "string",
+          "description": "Characters to match in the csv file"
+        },
+        "entry": {
+          "type": "string",
+          "description": "Characters to find in the entry file"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "csv",
+        "entry"
+      ]
+    },
     "FF1Type": {
       "properties": {
         "keyFromEnv": {
@@ -156,6 +174,48 @@
       "type": "object",
       "required": [
         "keyFromEnv"
+      ]
+    },
+    "FindInCSVType": {
+      "properties": {
+        "uri": {
+          "type": "string",
+          "description": "URI of the CSV resource"
+        },
+        "exactMatch": {
+          "$ref": "#/$defs/ExactMatchType",
+          "description": "Compare csv data and entry data, find the exected matched csv line "
+        },
+        "expected": {
+          "type": "string",
+          "description": "How much result return, 3 modes availables: only-one, at-least-one, many"
+        },
+        "header": {
+          "type": "boolean",
+          "description": "Does the CSV resource contains a header line"
+        },
+        "separator": {
+          "type": "string",
+          "description": "Separator character"
+        },
+        "comment": {
+          "type": "string",
+          "description": "Lines beginning with the comment character without preceding whitespace are ignored"
+        },
+        "fieldsPerRecord": {
+          "type": "integer",
+          "description": "FieldsPerRecord is the number of expected fields per record, 0 means the number of fields in the first record"
+        },
+        "trim": {
+          "type": "boolean",
+          "description": "If true leading white space in a field is ignored"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "uri",
+        "expected"
       ]
     },
     "Function": {
@@ -422,6 +482,12 @@
             "transcode"
           ],
           "title": "Transcode"
+        },
+        {
+          "required": [
+            "findInCSV"
+          ],
+          "title": "FindInCSV"
         }
       ],
       "properties": {
@@ -586,6 +652,11 @@
           "$ref": "#/$defs/TranscodeType",
           "title": "Transcode Mask",
           "description": "Produce a random string by preserving character classes from the original value"
+        },
+        "findInCSV": {
+          "$ref": "#/$defs/FindInCSVType",
+          "title": "Find in CSV Mask",
+          "description": "find matched values in a CSV file based on input json file and save the matched csv line as type objet"
         }
       },
       "additionalProperties": false,

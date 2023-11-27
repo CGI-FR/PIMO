@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"hash/fnv"
 	"html/template"
-	"math/rand"
 	"strconv"
 	"strings"
 	"unicode/utf8"
@@ -17,15 +16,19 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
+type CSVKey struct {
+	filename string
+	lineKey  string
+}
+
 type MaskEngine struct {
-	rand               *rand.Rand
 	seeder             model.Seeder
-	template           *template.Template
-	temExactMatchCSV   *tmlmask.Engine
-	temExactMatchEntry *tmlmask.Engine
+	templateURI        *template.Template
+	temExactMatchCSV   *tmlmask.Engine // template to compute key for a csv entry
+	temExactMatchEntry *tmlmask.Engine // template to compute key for json entry
 	expected           string
-	cache              map[string][][]string
-	findCache          map[string][]string
+	csvAllreadyRead    map[string]struct{}
+	csvEntryByKey      map[CSVKey][]model.Entry
 	header             bool
 	sep                rune
 	comment            rune
@@ -43,13 +46,25 @@ func NewMask(conf model.FindInCSVType, seed int64, seeder model.Seeder) (MaskEng
 	if len(conf.Comment) > 0 {
 		comment, _ = utf8.DecodeRune([]byte(conf.Comment))
 	}
-	var tempExactMatchEntry, tempExactMatchCSV *tmlmask.Engine
+	var tempExactMatchEntry *tmlmask.Engine
+	var tempExactMatchCSV *tmlmask.Engine
 	if len(conf.ExactMatch.CSV) > 0 && len(conf.ExactMatch.Entry) > 0 {
-		tempExactMatchEntry, err = tmlmask.NewEngine(conf.ExactMatch.Entry, tmpl.FuncMap{}, seed, "")
+		tempExactMatchEntry, err = tmlmask.NewEngine(
+			conf.ExactMatch.Entry,
+			tmpl.FuncMap{},
+			seed,
+			"", // use for seed functions ?
+		)
 		if err != nil {
 			return MaskEngine{}, err
 		}
-		tempExactMatchCSV, err = tmlmask.NewEngine(conf.ExactMatch.CSV, tmpl.FuncMap{}, seed, "")
+
+		tempExactMatchCSV, err = tmlmask.NewEngine(
+			conf.ExactMatch.CSV,
+			tmpl.FuncMap{},
+			seed,
+			"")
+
 		if err != nil {
 			return MaskEngine{}, err
 		}
@@ -59,119 +74,131 @@ func NewMask(conf model.FindInCSVType, seed int64, seeder model.Seeder) (MaskEng
 	if len(conf.Expected) > 0 {
 		expected = conf.Expected
 	}
-	// nolint: gosec
-	return MaskEngine{rand.New(rand.NewSource(seed)), seeder, template, tempExactMatchCSV, tempExactMatchEntry, expected, map[string][][]string{}, map[string][]string{}, conf.Header, sep, comment, conf.FieldsPerRecord, conf.TrimSpace}, err
+
+	return MaskEngine{
+		seeder,
+		template,
+		tempExactMatchCSV,
+		tempExactMatchEntry,
+		expected,
+		map[string]struct{}{},
+		map[CSVKey][]model.Entry{},
+		conf.Header,
+		sep, comment, conf.FieldsPerRecord, conf.TrimSpace,
+	}, err
 }
 
 // Mask choose one or many line's value in csv which matched with given value from json entry.
-func (mrl MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Entry, error) {
+func (me *MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Entry, error) {
 	log.Info().Msg("Mask findInCSV")
 
-	if len(context) > 0 {
-		seed, ok, err := mrl.seeder(context[0])
-		if err != nil {
-			return nil, err
-		}
-		if ok {
-			mrl.rand.Seed(seed)
-		}
-	}
-
-	var output bytes.Buffer
+	var filename bytes.Buffer
 	if len(context) == 0 {
 		context = []model.Dictionary{model.NewPackedDictionary()}
 	}
-	if err := mrl.template.Execute(&output, context[0].UnpackAsDict().Unordered()); err != nil {
+	if err := me.templateURI.Execute(&filename, context[0].UnpackAsDict().Unordered()); err != nil {
 		return nil, err
 	}
-	filename := output.String()
 
-	var records [][]string
-	if recordsFromCache, ok := mrl.cache[filename]; ok {
-		records = recordsFromCache
-	} else {
-		recordsFromFile, err := uri.ReadCsv(filename, mrl.sep, mrl.comment, mrl.fieldsPerRecord, mrl.trimSpaces)
+	if _, ok := me.csvAllreadyRead[filename.String()]; !ok {
+		err := me.readCSV(filename.String())
 		if err != nil {
 			return nil, err
 		}
-		mrl.cache[filename] = recordsFromFile
-		records = recordsFromFile
+
 	}
 
 	// Get template Entry value
 	var exactEntryBuffer bytes.Buffer
-	if err := mrl.temExactMatchEntry.Execute(&exactEntryBuffer, context[0].UnpackAsDict().Unordered()); err != nil {
+	if err := me.temExactMatchEntry.Execute(&exactEntryBuffer, context[0].UnpackAsDict().Unordered()); err != nil {
 		return nil, err
 	}
 	exactEntryString := exactEntryBuffer.String()
-	headers := records[0]
-	// Get template CSV value
-	for _, record := range records {
-		dictionary := model.NewDictionary()
-		for i, header := range headers {
-			if mrl.trimSpaces {
-				dictionary.Set(strings.TrimSpace(header), strings.TrimSpace(record[i]))
-			} else {
-				dictionary.Copy().Set(header, record[i])
-			}
-		}
-		var exactCSVBuffer bytes.Buffer
-		if err := mrl.temExactMatchCSV.Execute(&exactCSVBuffer, context[0].UnpackAsDict().Unordered()); err != nil {
-			return nil, err
-		}
-		exactEntryCSV := exactCSVBuffer.String()
-		if exactEntryString == exactEntryCSV {
-			if mrl.header {
-				record := records[1:][mrl.rand.Intn(len(records)-1)]
-				obj := model.NewDictionary()
-				headers := records[0]
-				for i, header := range headers {
-					if mrl.trimSpaces {
-						obj.Set(strings.TrimSpace(header), strings.TrimSpace(record[i]))
-					} else {
-						obj.Set(header, record[i])
-					}
-				}
-				return obj, nil
-			} else {
-				record := records[mrl.rand.Intn(len(records))]
-				obj := model.NewDictionary()
-				for i, value := range record {
-					if mrl.trimSpaces {
-						obj.Set(strconv.Itoa(i), strings.TrimSpace(value))
-					} else {
-						obj.Set(strconv.Itoa(i), value)
-					}
-				}
-				return obj, nil
-			}
-		}
+
+	results, ok := me.csvEntryByKey[CSVKey{
+		filename: filename.String(),
+		lineKey:  exactEntryString,
+	}]
+
+	if !ok {
+		return []model.Entry{}, nil
+	}
+	if len(results) > 0 {
+		return results[0], nil
 	}
 
-	if mrl.header {
-		record := records[1:][mrl.rand.Intn(len(records)-1)]
-		obj := model.NewDictionary()
-		headers := records[0]
-		for i, header := range headers {
-			if mrl.trimSpaces {
-				obj.Set(strings.TrimSpace(header), strings.TrimSpace(record[i]))
-			} else {
-				obj.Set(header, record[i])
-			}
-		}
-		return obj, nil
-	} else {
-		record := records[mrl.rand.Intn(len(records))]
-		obj := model.NewDictionary()
-		for i, value := range record {
-			if mrl.trimSpaces {
-				obj.Set(strconv.Itoa(i), strings.TrimSpace(value))
-			} else {
-				obj.Set(strconv.Itoa(i), value)
-			}
-		}
-		return obj, nil
+	return []model.Entry{}, nil
+}
+
+func (me *MaskEngine) readCSV(filename string) error {
+	recordsFromFile, err := uri.ReadCsv(filename, me.sep, me.comment, me.fieldsPerRecord, me.trimSpaces)
+	if err != nil {
+		return err
 	}
+
+	for _, record := range me.createEntriesFromCSVLines(recordsFromFile) {
+		lineKey, err := me.computeCSVLineKey(record)
+		if err != nil {
+			return err
+		}
+
+		key := CSVKey{
+			filename: filename,
+			lineKey:  lineKey,
+		}
+
+		if records, ok := me.csvEntryByKey[key]; ok {
+			records = append(records, record)
+			me.csvEntryByKey[key] = records
+
+		} else {
+			me.csvEntryByKey[key] = []model.Entry{record}
+		}
+
+	}
+
+	return nil
+}
+
+func (me *MaskEngine) computeCSVLineKey(record model.Dictionary) (string, error) {
+	var output bytes.Buffer
+
+	err := me.temExactMatchCSV.Execute(&output, record.Unordered())
+	if err != nil {
+		return "", err
+	}
+
+	return output.String(), nil
+}
+
+func (me *MaskEngine) createEntriesFromCSVLines(records [][]string) []model.Dictionary {
+	results := []model.Dictionary{}
+
+	for _, record := range records {
+		if me.header {
+			obj := model.NewDictionary()
+			headers := records[0]
+			for i, header := range headers {
+				if me.trimSpaces {
+					obj.Set(strings.TrimSpace(header), strings.TrimSpace(record[i]))
+				} else {
+					obj.Set(header, record[i])
+				}
+			}
+			results = append(results, obj)
+		} else {
+			obj := model.NewDictionary()
+			for i, value := range record {
+				if me.trimSpaces {
+					obj.Set(strconv.Itoa(i), strings.TrimSpace(value))
+				} else {
+					obj.Set(strconv.Itoa(i), value)
+				}
+			}
+			results = append(results, obj)
+		}
+	}
+	return results
 }
 
 // Factory create a mask from a yaml config
@@ -184,7 +211,7 @@ func Factory(conf model.MaskFactoryConfiguration) (model.MaskEngine, bool, error
 
 	if len(conf.Masking.Mask.FindInCSV.URI) != 0 {
 		mask, err := NewMask(conf.Masking.Mask.FindInCSV, conf.Seed, seeder)
-		return mask, true, err
+		return &mask, true, err
 	}
 	return nil, false, nil
 }

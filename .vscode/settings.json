@@ -1,0 +1,7 @@
+{
+    "yaml.schemas": {
+
+        "*masking*": "file:///${WORKDIR}/schema/v1/pimo.schema.json",
+
+    }
+}
