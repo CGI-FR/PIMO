@@ -12,3 +12,15 @@ masking:
         expected: "only-one"
         header: false
         trim: true
+
+  - selector:
+      jsonpath: "info"
+    mask:
+      findInCSV:
+        uri: "file://persons_same_name.csv"
+        exactMatch:
+          csv: "{{.last_name}}+123"
+          entry: "{{.nom}}+123"
+        expected: "many"
+        header: true
+        trim: true

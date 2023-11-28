@@ -124,11 +124,8 @@ func (me *MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.En
 		return []model.Entry{}, nil
 	}
 	// return the result waited in expected config
-	if len(results) > 0 {
-		return me.getExpectedResult(results)
-	}
 
-	return []model.Entry{}, nil
+	return me.getExpectedResult(results)
 }
 
 func (me *MaskEngine) readCSV(filename string) error {
@@ -202,15 +199,22 @@ func (me *MaskEngine) createEntriesFromCSVLines(records [][]string) []model.Dict
 
 // Get numbers of result waited in expected config, by default return as at-least-one
 func (me *MaskEngine) getExpectedResult(results []model.Entry) (model.Entry, error) {
-	if me.expected == "many" {
+	resultCount := len(results)
+
+	switch me.expected {
+	case "many":
 		return results, nil
-	} else if me.expected == "only-one" {
-		if len(results) > 1 {
-			return nil, fmt.Errorf("More than one result for mode 'only-one'")
+	case "only-one":
+		if resultCount != 1 {
+			return nil, fmt.Errorf("Expected one result, but got %d", resultCount)
+		}
+	default:
+		if resultCount == 0 {
+			return nil, fmt.Errorf("Expected at least one result, but got none")
 		}
 		return results[0], nil
 	}
-	// if invalid value or at-least-one
+
 	return results[0], nil
 }
 

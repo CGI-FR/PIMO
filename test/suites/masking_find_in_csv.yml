@@ -145,3 +145,12 @@ testcases:
     - result.code ShouldNotEqual 0
     - result.systemout ShouldBeEmpty
     - result.systemerr ShouldNotBeEmpty
+
+  - name: find in csv mask exactMatch expected = many
+    steps:
+      - script: |-
+          echo '{"nom":"Vidal","info":""}' | pimo -c ../masking_find_in_csv.yml
+        assertions:
+        - result.code ShouldEqual 0
+        - result.systemout ShouldEqual {"nom":"Vidal","info":[{"first_name":"Vincent","last_name":"Vidal","email":"vincent.vidal@yopmail.fr"},{"first_name":"Luce","last_name":"Vidal","email":"luce.vidal@yopmail.fr"},{"first_name":"Mac","last_name":"Vidal","email":"mac.vidal@yopmail.fr"}]}
+        - result.systemerr ShouldBeEmpty
