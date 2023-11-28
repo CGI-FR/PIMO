@@ -140,3 +140,60 @@ func TestFactoryShouldCreateAMaskWithTemplatedUri(t *testing.T) {
 	)
 	assert.Nil(t, err, "error should be nil")
 }
+
+func TestExpactedAtLeastOneShouldReturnFirstResult(t *testing.T) {
+	exactMatch := model.ExactMatchType{
+		CSV:   "{{.last_name}}+123",
+		Entry: "{{.nom}}+123",
+	}
+	config := model.FindInCSVType{
+		URI:        "file://../../test/persons_same_name.csv",
+		ExactMatch: exactMatch,
+		Expected:   "at-least-one",
+		Header:     true,
+		TrimSpace:  true,
+	}
+	maskingConfig := model.Masking{Mask: model.MaskType{FindInCSV: config}}
+	factoryConfig := model.MaskFactoryConfiguration{Masking: maskingConfig, Seed: 0}
+	mask, present, err := Factory(factoryConfig)
+	assert.Nil(t, err, "error should be nil")
+	assert.True(t, present, "should be true")
+	data := model.NewDictionary().With("nom", "Vidal").With("info_personne", "").Pack()
+	masked, err := mask.Mask("info_personne", data)
+	assert.Equal(t,
+		model.NewDictionary().
+			With("last_name", "Vidal").
+			With("email", "vincent.vidal@yopmail.fr").
+			With("first_name", "Vincent").Unordered(),
+		masked.(model.Dictionary).Unordered(),
+	)
+	assert.Nil(t, err, "error should be nil")
+}
+
+func TestExpactedByDefaultShouldReturnFirstResult(t *testing.T) {
+	exactMatch := model.ExactMatchType{
+		CSV:   "{{.last_name}}+123",
+		Entry: "{{.nom}}+123",
+	}
+	config := model.FindInCSVType{
+		URI:        "file://../../test/persons_same_name.csv",
+		ExactMatch: exactMatch,
+		Header:     true,
+		TrimSpace:  true,
+	}
+	maskingConfig := model.Masking{Mask: model.MaskType{FindInCSV: config}}
+	factoryConfig := model.MaskFactoryConfiguration{Masking: maskingConfig, Seed: 0}
+	mask, present, err := Factory(factoryConfig)
+	assert.Nil(t, err, "error should be nil")
+	assert.True(t, present, "should be true")
+	data := model.NewDictionary().With("nom", "Vidal").With("info_personne", "").Pack()
+	masked, err := mask.Mask("info_personne", data)
+	assert.Equal(t,
+		model.NewDictionary().
+			With("last_name", "Vidal").
+			With("email", "vincent.vidal@yopmail.fr").
+			With("first_name", "Vincent").Unordered(),
+		masked.(model.Dictionary).Unordered(),
+	)
+	assert.Nil(t, err, "error should be nil")
+}

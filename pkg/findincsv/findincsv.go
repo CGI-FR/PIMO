@@ -2,6 +2,7 @@ package findincsv
 
 import (
 	"bytes"
+	"fmt"
 	"hash/fnv"
 	"html/template"
 	"strconv"
@@ -122,8 +123,9 @@ func (me *MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.En
 	if !ok {
 		return []model.Entry{}, nil
 	}
+	// return the result waited in expected config
 	if len(results) > 0 {
-		return results[0], nil
+		return me.getExpectedResult(results)
 	}
 
 	return []model.Entry{}, nil
@@ -196,6 +198,20 @@ func (me *MaskEngine) createEntriesFromCSVLines(records [][]string) []model.Dict
 		}
 	}
 	return results
+}
+
+// Get numbers of result waited in expected config, by default return as at-least-one
+func (me *MaskEngine) getExpectedResult(results []model.Entry) (model.Entry, error) {
+	if me.expected == "many" {
+		return results, nil
+	} else if me.expected == "only-one" {
+		if len(results) > 1 {
+			return nil, fmt.Errorf("More than one result for mode 'only-one'")
+		}
+		return results[0], nil
+	}
+	// if invalid value or at-least-one
+	return results[0], nil
 }
 
 // Factory create a mask from a yaml config
