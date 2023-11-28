@@ -115,15 +115,10 @@ func (me *MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.En
 	}
 	exactEntryString := exactEntryBuffer.String()
 
-	results, ok := me.csvEntryByKey[CSVKey{
+	results := me.csvEntryByKey[CSVKey{
 		filename: filename.String(),
 		lineKey:  exactEntryString,
 	}]
-
-	if !ok {
-		return []model.Entry{}, nil
-	}
-	// return the result waited in expected config
 
 	return me.getExpectedResult(results)
 }

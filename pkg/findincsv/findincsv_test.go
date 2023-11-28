@@ -92,7 +92,7 @@ func TestFactoryShouldCreateAMaskAndDontFindMatch(t *testing.T) {
 	config := model.FindInCSVType{
 		URI:        "file://../../test/persons.csv",
 		ExactMatch: exactMatch,
-		Expected:   "only-one",
+		Expected:   "many",
 		Header:     false,
 		TrimSpace:  true,
 	}
@@ -105,7 +105,7 @@ func TestFactoryShouldCreateAMaskAndDontFindMatch(t *testing.T) {
 	masked, err := mask.Mask("info_personne", data)
 	assert.Nil(t, err, "error should be nil")
 
-	assert.Equal(t, []model.Entry{}, masked)
+	assert.Equal(t, []model.Entry(nil), masked)
 }
 
 func TestFactoryShouldCreateAMaskWithTemplatedUri(t *testing.T) {
@@ -160,6 +160,7 @@ func TestExpactedAtLeastOneShouldReturnFirstResult(t *testing.T) {
 	assert.True(t, present, "should be true")
 	data := model.NewDictionary().With("nom", "Vidal").With("info_personne", "").Pack()
 	masked, err := mask.Mask("info_personne", data)
+	assert.Nil(t, err, "error should be nil")
 	assert.Equal(t,
 		model.NewDictionary().
 			With("last_name", "Vidal").
@@ -167,7 +168,6 @@ func TestExpactedAtLeastOneShouldReturnFirstResult(t *testing.T) {
 			With("first_name", "Vincent").Unordered(),
 		masked.(model.Dictionary).Unordered(),
 	)
-	assert.Nil(t, err, "error should be nil")
 }
 
 func TestExpactedByDefaultShouldReturnFirstResult(t *testing.T) {
@@ -196,4 +196,49 @@ func TestExpactedByDefaultShouldReturnFirstResult(t *testing.T) {
 		masked.(model.Dictionary).Unordered(),
 	)
 	assert.Nil(t, err, "error should be nil")
+}
+
+func TestExpactedOnlyOneShouldReturnErrorWhen3Results(t *testing.T) {
+	exactMatch := model.ExactMatchType{
+		CSV:   "{{.last_name}}+123",
+		Entry: "{{.nom}}+123",
+	}
+	config := model.FindInCSVType{
+		URI:        "file://../../test/persons_same_name.csv",
+		ExactMatch: exactMatch,
+		Expected:   "only-one",
+		Header:     true,
+		TrimSpace:  true,
+	}
+	maskingConfig := model.Masking{Mask: model.MaskType{FindInCSV: config}}
+	factoryConfig := model.MaskFactoryConfiguration{Masking: maskingConfig, Seed: 0}
+	mask, present, err := Factory(factoryConfig)
+	assert.Nil(t, err, "error should be nil")
+	assert.True(t, present, "should be true")
+	data := model.NewDictionary().With("nom", "Vidal").With("info_personne", "").Pack()
+	masked, err := mask.Mask("info_personne", data)
+	assert.Equal(t, "Expected one result, but got 3", err.Error())
+	assert.Nil(t, masked, "masked should be nil")
+}
+
+func TestExpactedByDefaultShouldReturnErrorWhenNoMatch(t *testing.T) {
+	exactMatch := model.ExactMatchType{
+		CSV:   "{{.last_name}}+123",
+		Entry: "{{.nom}}+123",
+	}
+	config := model.FindInCSVType{
+		URI:        "file://../../test/persons_same_name.csv",
+		ExactMatch: exactMatch,
+		Header:     true,
+		TrimSpace:  true,
+	}
+	maskingConfig := model.Masking{Mask: model.MaskType{FindInCSV: config}}
+	factoryConfig := model.MaskFactoryConfiguration{Masking: maskingConfig, Seed: 0}
+	mask, present, err := Factory(factoryConfig)
+	assert.Nil(t, err, "error should be nil")
+	assert.True(t, present, "should be true")
+	data := model.NewDictionary().With("nom", "Vi").With("info_personne", "").Pack()
+	masked, err := mask.Mask("info_personne", data)
+	assert.Equal(t, "Expected at least one result, but got none", err.Error())
+	assert.Nil(t, masked, "masked should be nil")
 }
