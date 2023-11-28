@@ -28,6 +28,15 @@ testcases:
     - result.systemout ShouldEqual {"nom":"Vidal","info_personne":{"first_name":"Luce","last_name":"Vidal","email":"luce.vidal@yopmail.fr"}}
     - result.systemerr ShouldBeEmpty
 
+- name: find in csv mask exactMatch with index and header = false
+  steps:
+  - script: |-
+      echo '{"nom":"Vidal","info_personne":""}' | pimo -c ../masking_find_in_csv.yml
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldEqual {"nom":"Vidal","info_personne":{"0":"Luce","1":"Vidal","2":"luce.vidal@yopmail.fr"}}
+    - result.systemerr ShouldBeEmpty
+
 - name: find in csv mask exactMatch with templated uri
   steps:
   - script: rm -f masking.yml
