@@ -27,6 +27,8 @@ type MaskEngine struct {
 	templateURI        *template.Template
 	temExactMatchCSV   *tmlmask.Engine // template to compute key for a csv entry
 	temExactMatchEntry *tmlmask.Engine // template to compute key for json entry
+	temJaccardCSV      *tmlmask.Engine // template to compute key for a csv entry
+	temJaccardEntry    *tmlmask.Engine // template to compute key for json entry
 	expected           string
 	csvAllreadyRead    map[string]struct{}
 	csvEntryByKey      map[CSVKey][]model.Entry
@@ -47,6 +49,7 @@ func NewMask(conf model.FindInCSVType, seed int64, seeder model.Seeder) (MaskEng
 	if len(conf.Comment) > 0 {
 		comment, _ = utf8.DecodeRune([]byte(conf.Comment))
 	}
+
 	var tempExactMatchEntry *tmlmask.Engine
 	var tempExactMatchCSV *tmlmask.Engine
 	if len(conf.ExactMatch.CSV) > 0 && len(conf.ExactMatch.Entry) > 0 {
@@ -71,6 +74,30 @@ func NewMask(conf model.FindInCSVType, seed int64, seeder model.Seeder) (MaskEng
 		}
 	}
 
+	var temJaccardEntry *tmlmask.Engine
+	var temJaccardCSV *tmlmask.Engine
+	if len(conf.JaccardMatch.CSV) > 0 && len(conf.JaccardMatch.Entry) > 0 {
+		temJaccardEntry, err = tmlmask.NewEngine(
+			conf.JaccardMatch.Entry,
+			tmpl.FuncMap{},
+			seed,
+			"", // use for seed functions ?
+		)
+		if err != nil {
+			return MaskEngine{}, err
+		}
+
+		temJaccardCSV, err = tmlmask.NewEngine(
+			conf.JaccardMatch.CSV,
+			tmpl.FuncMap{},
+			seed,
+			"")
+
+		if err != nil {
+			return MaskEngine{}, err
+		}
+	}
+
 	var expected string
 	if len(conf.Expected) > 0 {
 		expected = conf.Expected
@@ -81,6 +108,8 @@ func NewMask(conf model.FindInCSVType, seed int64, seeder model.Seeder) (MaskEng
 		template,
 		tempExactMatchCSV,
 		tempExactMatchEntry,
+		temJaccardCSV,
+		temJaccardEntry,
 		expected,
 		map[string]struct{}{},
 		map[CSVKey][]model.Entry{},
@@ -233,12 +262,17 @@ func Factory(conf model.MaskFactoryConfiguration) (model.MaskEngine, bool, error
 
 func Func(seed int64, seedField string) interface{} {
 	var callnumber int64
-	return func(uri string, exactMatchEntry string, exactMatchCsv string, expected string, header bool, sep string, comment string, fieldsPerRecord int, trimSpaces bool) (model.Entry, error) {
+	return func(uri string, exactMatchEntry string, exactMatchCsv string, jaccardMatchEntry string, jaccardMatchCsv string, expected string, header bool, sep string, comment string, fieldsPerRecord int, trimSpaces bool) (model.Entry, error) {
 		exactMatch := model.ExactMatchType{
 			CSV:   exactMatchCsv,
 			Entry: exactMatchEntry,
 		}
-		mask, err := NewMask(model.FindInCSVType{URI: uri, Header: header, ExactMatch: exactMatch, Expected: expected, Separator: sep, Comment: comment, FieldsPerRecord: fieldsPerRecord, TrimSpace: trimSpaces}, seed+callnumber, model.NewSeeder(seedField, seed+callnumber))
+
+		jaccardMatch := model.ExactMatchType{
+			CSV:   jaccardMatchCsv,
+			Entry: jaccardMatchEntry,
+		}
+		mask, err := NewMask(model.FindInCSVType{URI: uri, Header: header, ExactMatch: exactMatch, JaccardMatch: jaccardMatch, Expected: expected, Separator: sep, Comment: comment, FieldsPerRecord: fieldsPerRecord, TrimSpace: trimSpaces}, seed+callnumber, model.NewSeeder(seedField, seed+callnumber))
 		if err != nil {
 			return "", err
 		}

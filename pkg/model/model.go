@@ -168,12 +168,14 @@ type ChoiceInCSVType struct {
 }
 
 type ExactMatchType struct {
-	CSV   string `yaml:"csv" json:"csv" jsonschema_description:"Characters to match in the csv file"`
-	Entry string `yaml:"entry" json:"entry" jsonschema_description:"Characters to find in the entry file"`
+	CSV   string `yaml:"csv" json:"csv" jsonschema_description:"Characters exact to match in the csv file"`
+	Entry string `yaml:"entry" json:"entry" jsonschema_description:"Characters exact to find in the entry file"`
 }
+
 type FindInCSVType struct {
 	URI             string         `yaml:"uri" json:"uri" jsonschema_description:"URI of the CSV resource"`
-	ExactMatch      ExactMatchType `yaml:"exactMatch,omitempty" json:"exactMatch,omitempty" jsonschema_description:"Compare csv data and entry data, find the exected matched csv line "`
+	ExactMatch      ExactMatchType `yaml:"exactMatch,omitempty" json:"exactMatch,omitempty" jsonschema_description:"Compare csv data and entry data, find the exected matched csv line"`
+	JaccardMatch    ExactMatchType `yaml:"jaccard,omitempty" json:"jaccard,omitempty" jsonschema_description:"Compare csv data and entry data with jaccard, find the similarity matched csv line"`
 	Expected        string         `yaml:"expected" json:"expected" jsonschema_description:"How much result return, 3 modes availables: only-one, at-least-one, many"`
 	Header          bool           `yaml:"header,omitempty" json:"header,omitempty" jsonschema_description:"Does the CSV resource contains a header line"`
 	Separator       string         `yaml:"separator,omitempty" json:"separator,omitempty" jsonschema_description:"Separator character"`
