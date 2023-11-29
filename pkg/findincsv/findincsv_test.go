@@ -242,3 +242,31 @@ func TestExpactedByDefaultShouldReturnErrorWhenNoMatch(t *testing.T) {
 	assert.Equal(t, "Expected at least one result, but got none", err.Error())
 	assert.Nil(t, masked, "masked should be nil")
 }
+
+func TestJaccardMatchShouldFindAMatchWithExactSameString(t *testing.T) {
+	JaccardMatch := model.ExactMatchType{
+		CSV:   "{{.last_name}}+123",
+		Entry: "{{.nom}}+123",
+	}
+	config := model.FindInCSVType{
+		URI:          "file://../../test/persons.csv",
+		JaccardMatch: JaccardMatch,
+		Header:       true,
+		TrimSpace:    true,
+	}
+	maskingConfig := model.Masking{Mask: model.MaskType{FindInCSV: config}}
+	factoryConfig := model.MaskFactoryConfiguration{Masking: maskingConfig, Seed: 0}
+	mask, present, err := Factory(factoryConfig)
+	assert.Nil(t, err, "error should be nil")
+	assert.True(t, present, "should be true")
+	data := model.NewDictionary().With("nom", "Vidal").With("info_personne", "").Pack()
+	masked, err := mask.Mask("info_personne", data)
+	assert.Nil(t, masked, "masked should be nil")
+	assert.Equal(t,
+		model.NewDictionary().
+			With("0", "Luce").
+			With("1", "Vidal").
+			With("2", "luce.vidal@yopmail.fr").Unordered(),
+		masked.(model.Dictionary).Unordered(),
+	)
+}
