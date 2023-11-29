@@ -198,6 +198,9 @@ func (me *MaskEngine) getExpectedResult(results []model.Entry) (model.Entry, err
 
 	switch me.expected {
 	case "many":
+		if resultCount < 1 {
+			return []model.Entry{}, nil
+		}
 		return results, nil
 	case "only-one":
 		if resultCount != 1 {

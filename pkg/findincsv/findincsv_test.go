@@ -105,7 +105,7 @@ func TestFactoryShouldCreateAMaskAndDontFindMatch(t *testing.T) {
 	masked, err := mask.Mask("info_personne", data)
 	assert.Nil(t, err, "error should be nil")
 
-	assert.Equal(t, []model.Entry(nil), masked)
+	assert.Equal(t, []model.Entry{}, masked)
 }
 
 func TestFactoryShouldCreateAMaskWithTemplatedUri(t *testing.T) {
