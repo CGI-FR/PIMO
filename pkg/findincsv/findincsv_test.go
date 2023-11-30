@@ -298,3 +298,31 @@ func TestJaccardMatchShouldFindMostSimilarMatch(t *testing.T) {
 		masked.(model.Dictionary).Unordered(),
 	)
 }
+
+func TestJaccardMatchShouldFindMostSimilarMatchWithoutHeader(t *testing.T) {
+	JaccardMatch := model.ExactMatchType{
+		CSV:   "{{.email}}",
+		Entry: "{{index . \"3\"}}",
+	}
+	config := model.FindInCSVType{
+		URI:          "file://../../test/persons_same_name.csv",
+		JaccardMatch: JaccardMatch,
+		Header:       false,
+		TrimSpace:    true,
+	}
+	maskingConfig := model.Masking{Mask: model.MaskType{FindInCSV: config}}
+	factoryConfig := model.MaskFactoryConfiguration{Masking: maskingConfig, Seed: 0}
+	mask, present, err := Factory(factoryConfig)
+	assert.Nil(t, err, "error should be nil")
+	assert.True(t, present, "should be true")
+	data := model.NewDictionary().With("email", "luc.vidal@yopmail.fr").With("info_personne", "").Pack()
+	masked, err := mask.Mask("info_personne", data)
+	assert.Nil(t, err, "error should be nil")
+	assert.Equal(t,
+		model.NewDictionary().
+			With("0", "Luce").
+			With("1", "Vidal").
+			With("2", "luce.vidal@yopmail.fr").Unordered(),
+		masked.(model.Dictionary).Unordered(),
+	)
+}
