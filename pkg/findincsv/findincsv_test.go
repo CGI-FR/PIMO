@@ -261,12 +261,12 @@ func TestJaccardMatchShouldFindAMatchWithExactSameString(t *testing.T) {
 	assert.True(t, present, "should be true")
 	data := model.NewDictionary().With("nom", "Vidal").With("info_personne", "").Pack()
 	masked, err := mask.Mask("info_personne", data)
-	assert.Nil(t, masked, "masked should be nil")
+	assert.Nil(t, err, "error should be nil")
 	assert.Equal(t,
 		model.NewDictionary().
-			With("0", "Luce").
-			With("1", "Vidal").
-			With("2", "luce.vidal@yopmail.fr").Unordered(),
+			With("first_name", "Luce").
+			With("last_name", "Vidal").
+			With("email", "luce.vidal@yopmail.fr").Unordered(),
 		masked.(model.Dictionary).Unordered(),
 	)
 }

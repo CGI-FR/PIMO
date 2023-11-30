@@ -5,21 +5,27 @@ import (
 	"fmt"
 	"hash/fnv"
 	"html/template"
+	"sort"
 	"strconv"
 	"strings"
-	"unicode/utf8"
-
 	tmpl "text/template"
+	"unicode/utf8"
 
 	"github.com/cgi-fr/pimo/pkg/model"
 	tmlmask "github.com/cgi-fr/pimo/pkg/template"
 	"github.com/cgi-fr/pimo/pkg/uri"
+
 	"github.com/rs/zerolog/log"
 )
 
 type CSVKey struct {
 	filename string
 	lineKey  string
+}
+
+type JaccardCSV struct {
+	csvLine model.Entry
+	lineKey string
 }
 
 type MaskEngine struct {
@@ -30,7 +36,7 @@ type MaskEngine struct {
 	temJaccardCSV      *tmlmask.Engine // template to compute key for a csv entry
 	temJaccardEntry    *tmlmask.Engine // template to compute key for json entry
 	expected           string
-	csvAllreadyRead    map[string]struct{}
+	csvAllreadyRead    map[string][]model.Dictionary
 	csvEntryByKey      map[CSVKey][]model.Entry
 	header             bool
 	sep                rune
@@ -111,7 +117,7 @@ func NewMask(conf model.FindInCSVType, seed int64, seeder model.Seeder) (MaskEng
 		temJaccardCSV,
 		temJaccardEntry,
 		expected,
-		map[string]struct{}{},
+		map[string][]model.Dictionary{},
 		map[CSVKey][]model.Entry{},
 		conf.Header,
 		sep, comment, conf.FieldsPerRecord, conf.TrimSpace,
@@ -122,44 +128,122 @@ func NewMask(conf model.FindInCSVType, seed int64, seeder model.Seeder) (MaskEng
 func (me *MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Entry, error) {
 	log.Info().Msg("Mask findInCSV")
 
-	var filename bytes.Buffer
+	var filenameBuffer bytes.Buffer
 	if len(context) == 0 {
 		context = []model.Dictionary{model.NewPackedDictionary()}
 	}
-	if err := me.templateURI.Execute(&filename, context[0].UnpackAsDict().Unordered()); err != nil {
+	if err := me.templateURI.Execute(&filenameBuffer, context[0].UnpackAsDict().Unordered()); err != nil {
 		return nil, err
 	}
-
-	if _, ok := me.csvAllreadyRead[filename.String()]; !ok {
-		err := me.readCSV(filename.String())
-		if err != nil {
+	filename := filenameBuffer.String()
+	var results []model.Entry
+	var exactMatchFinded bool
+	// Get ExactMatch results
+	// If ExactMatch is nil, return a []Model.Entry{}
+	if finded, exactMatchResult, err := me.ExactMatch(filename, context); err != nil {
+		return nil, err
+	} else {
+		exactMatchFinded = finded
+		results = exactMatchResult
+	}
+	// If exactMatch have no match, no need to pass jaccardMatch
+	if me.temJaccardEntry != nil && me.temJaccardCSV != nil && exactMatchFinded {
+		var jaccardEntryBuffer bytes.Buffer
+		if err := me.temJaccardEntry.Execute(&jaccardEntryBuffer, context[0].UnpackAsDict().Unordered()); err != nil {
 			return nil, err
 		}
+		jaccardEntryString := jaccardEntryBuffer.String()
+		// If no exactMatch config
+		if len(results) < 1 {
+			var csvList []model.Dictionary
+			if _, ok := me.csvAllreadyRead[filename]; !ok {
+				var err error
+				csvList, err = me.readCSV(filename)
+				if err != nil {
+					return nil, err
+				}
+			} else {
+				csvList = me.csvAllreadyRead[filename]
+			}
+			var records []JaccardCSV
+			for _, record := range csvList {
+				lineKey, err := me.computeCSVLineKey(record, false)
+				if err != nil {
+					return nil, err
+				}
+				records = append(records, JaccardCSV{lineKey: lineKey, csvLine: record})
+			}
+			results = sortBySimilarity(jaccardEntryString, records)
+		}
+		// results = sortBySimilarity(jaccardEntryString, results)
 	}
-
-	// Get template Entry value
-	var exactEntryBuffer bytes.Buffer
-	if err := me.temExactMatchEntry.Execute(&exactEntryBuffer, context[0].UnpackAsDict().Unordered()); err != nil {
-		return nil, err
-	}
-	exactEntryString := exactEntryBuffer.String()
-
-	results := me.csvEntryByKey[CSVKey{
-		filename: filename.String(),
-		lineKey:  exactEntryString,
-	}]
-
 	return me.getExpectedResult(results)
 }
 
-func (me *MaskEngine) readCSV(filename string) error {
+func (me *MaskEngine) ExactMatch(filename string, context []model.Dictionary) (bool, []model.Entry, error) {
+	if me.temExactMatchEntry != nil && me.temExactMatchCSV != nil {
+		var csvList []model.Dictionary
+		if _, ok := me.csvAllreadyRead[filename]; !ok {
+			var err error
+			csvList, err = me.readCSV(filename)
+			if err != nil {
+				return false, nil, err
+			}
+		}
+
+		var exactEntryBuffer bytes.Buffer
+		if err := me.temExactMatchEntry.Execute(&exactEntryBuffer, context[0].UnpackAsDict().Unordered()); err != nil {
+			return false, nil, err
+		}
+		exactEntryString := exactEntryBuffer.String()
+		err := me.getExactMatchCsvResult(filename, csvList)
+		if err != nil {
+			return false, []model.Entry{}, err
+		}
+
+		results := me.csvEntryByKey[CSVKey{
+			filename: filename,
+			lineKey:  exactEntryString,
+		}]
+		if len(results) < 1 {
+			return false, results, nil
+		}
+		return true, results, nil
+	}
+	return true, []model.Entry{}, nil
+}
+
+func (me *MaskEngine) readCSV(filename string) ([]model.Dictionary, error) {
 	recordsFromFile, err := uri.ReadCsv(filename, me.sep, me.comment, me.fieldsPerRecord, me.trimSpaces)
 	if err != nil {
-		return err
+		return nil, err
+	}
+	csvList := me.createEntriesFromCSVLines(recordsFromFile)
+	return csvList, nil
+}
+
+func (me *MaskEngine) computeCSVLineKey(record model.Dictionary, exactMatch bool) (string, error) {
+	var output bytes.Buffer
+
+	var template *tmlmask.Engine
+	if exactMatch {
+		template = me.temExactMatchCSV
+	} else {
+		template = me.temJaccardCSV
 	}
 
-	for _, record := range me.createEntriesFromCSVLines(recordsFromFile) {
-		lineKey, err := me.computeCSVLineKey(record)
+	// Définissez un point de contrôle pour le débogage
+	err := template.Execute(&output, record.Unordered())
+	if err != nil {
+		return "", err
+	}
+
+	return output.String(), nil
+}
+
+func (me *MaskEngine) getExactMatchCsvResult(filename string, csvList []model.Dictionary) error {
+	for _, record := range csvList {
+		lineKey, err := me.computeCSVLineKey(record, true)
 		if err != nil {
 			return err
 		}
@@ -178,17 +262,6 @@ func (me *MaskEngine) readCSV(filename string) error {
 	}
 
 	return nil
-}
-
-func (me *MaskEngine) computeCSVLineKey(record model.Dictionary) (string, error) {
-	var output bytes.Buffer
-
-	err := me.temExactMatchCSV.Execute(&output, record.Unordered())
-	if err != nil {
-		return "", err
-	}
-
-	return output.String(), nil
 }
 
 func (me *MaskEngine) createEntriesFromCSVLines(records [][]string) []model.Dictionary {
@@ -243,6 +316,81 @@ func (me *MaskEngine) getExpectedResult(results []model.Entry) (model.Entry, err
 	}
 
 	return results[0], nil
+}
+
+// JaccardSimilarity calculates the Jaccard similarity between two strings.
+func JaccardSimilarity(s1, s2 string) float64 {
+	if s1 == s2 {
+		return 1.0
+	}
+
+	set1 := convertStringToSet(s1)
+	set2 := convertStringToSet(s2)
+
+	intersection := setIntersection(set1, set2)
+	union := setUnion(set1, set2)
+	return float64(intersection) / float64(union)
+}
+
+// convertStringToSet converts a string into a set of tokens unordered.
+// This doesn't measure similarity between texts, but if regarding a text as bag-of-word,
+func convertStringToSet(s string) map[string]struct{} {
+	set := make(map[string]struct{})
+	for _, token := range strings.Fields(s) {
+		set[token] = struct{}{}
+	}
+	return set
+}
+
+// Get number of same elements of 2 strings
+func setIntersection(set1, set2 map[string]struct{}) int {
+	intersection := 0
+	for token := range set1 {
+		if _, exists := set2[token]; exists {
+			intersection++
+		}
+	}
+	return intersection
+}
+
+// Get union of 2 strings's elements
+func setUnion(set1, set2 map[string]struct{}) int {
+	unionSet := make(map[string]struct{})
+	for token := range set1 {
+		unionSet[token] = struct{}{}
+	}
+	for token := range set2 {
+		unionSet[token] = struct{}{}
+	}
+	return len(unionSet)
+}
+
+func sortBySimilarity(jaccardEntryString string, list []JaccardCSV) []model.Entry {
+	type EntryWithSimilarity struct {
+		Key        string
+		Entry      model.Entry
+		Similarity float64
+	}
+
+	var entriesWithSimilarity []EntryWithSimilarity
+
+	for _, record := range list {
+		similarity := JaccardSimilarity(jaccardEntryString, record.lineKey)
+		entriesWithSimilarity = append(entriesWithSimilarity, EntryWithSimilarity{Key: record.lineKey, Entry: record.csvLine, Similarity: similarity})
+	}
+
+	// Function of sort
+	sort.Slice(entriesWithSimilarity, func(i, j int) bool {
+		return entriesWithSimilarity[i].Similarity > entriesWithSimilarity[j].Similarity
+	})
+
+	// Extraire les entrées triées
+	var sortedEntries []model.Entry
+	for _, entryWithSimilarity := range entriesWithSimilarity {
+		sortedEntries = append(sortedEntries, entryWithSimilarity.Entry)
+	}
+
+	return sortedEntries
 }
 
 // Factory create a mask from a yaml config
