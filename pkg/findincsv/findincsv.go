@@ -379,7 +379,7 @@ func sortBySimilarity(jaccardEntryString string, list []JaccardCSV) []model.Entr
 		entriesWithSimilarity = append(entriesWithSimilarity, EntryWithSimilarity{Key: record.lineKey, Entry: record.csvLine, Similarity: similarity})
 	}
 
-	// Function of sort
+	// Function sort by similarity
 	sort.Slice(entriesWithSimilarity, func(i, j int) bool {
 		return entriesWithSimilarity[i].Similarity > entriesWithSimilarity[j].Similarity
 	})
