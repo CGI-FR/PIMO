@@ -333,11 +333,11 @@ func JaccardSimilarity(s1, s2 string) float64 {
 }
 
 // convertStringToSet converts a string into a set of tokens unordered.
-// This doesn't measure similarity between texts, but if regarding a text as bag-of-word,
+// This doesn't measure similarity between texts, but if regarding a text as bag-of-letter
 func convertStringToSet(s string) map[string]struct{} {
 	set := make(map[string]struct{})
-	for _, token := range strings.Fields(s) {
-		set[token] = struct{}{}
+	for _, char := range s {
+		set[string(char)] = struct{}{}
 	}
 	return set
 }
