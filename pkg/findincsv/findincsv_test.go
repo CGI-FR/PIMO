@@ -301,8 +301,8 @@ func TestJaccardMatchShouldFindMostSimilarMatch(t *testing.T) {
 
 func TestJaccardMatchShouldFindMostSimilarMatchWithoutHeader(t *testing.T) {
 	JaccardMatch := model.ExactMatchType{
-		CSV:   "{{.email}}",
-		Entry: "{{index . \"3\"}}",
+		CSV:   "{{index . \"2\"}}",
+		Entry: "{{.email}}",
 	}
 	config := model.FindInCSVType{
 		URI:          "file://../../test/persons_same_name.csv",

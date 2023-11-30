@@ -334,15 +334,20 @@ func JaccardSimilarity(s1, s2 string) float64 {
 
 // convertStringToSet converts a string into a set of tokens unordered.
 // This doesn't measure similarity between texts, but if regarding a text as bag-of-letter
+// Jaccard bigrammes
 func convertStringToSet(s string) map[string]struct{} {
 	set := make(map[string]struct{})
-	for _, char := range s {
-		set[string(char)] = struct{}{}
+	runes := []rune(s)
+
+	for i := 0; i < len(runes)-1; i++ {
+		bigram := string(runes[i]) + string(runes[i+1])
+		set[bigram] = struct{}{}
 	}
+
 	return set
 }
 
-// Get number of same elements of 2 strings
+// Get number of same bigrammes of 2 strings
 func setIntersection(set1, set2 map[string]struct{}) int {
 	intersection := 0
 	for token := range set1 {
