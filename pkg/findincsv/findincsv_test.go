@@ -327,7 +327,8 @@ func TestJaccardMatchShouldFindMostSimilarMatchWithoutHeader(t *testing.T) {
 	)
 }
 
-// Should find {Luce,Vidal,luc.vidal@yopmail.fr} not {Luce,Vida,luce.vidal@yopmail.fr}
+// Should find {Luce,Vidal,luc.vidal@yopmail.fr}
+// not {Luce,Vida,luce.vidal@yopmail.fr} or {Luce,Vidal,luce.vicol@yopmail.fr}
 func TestJaccardMatchWithExactMatchShouldFindMostSimilarMatch(t *testing.T) {
 	exactMatch := model.ExactMatchType{
 		CSV:   "{{.last_name}}+123",
@@ -362,4 +363,34 @@ func TestJaccardMatchWithExactMatchShouldFindMostSimilarMatch(t *testing.T) {
 			With("email", "luce.vidal@yopmail.fr").Unordered(),
 		masked.(model.Dictionary).Unordered(),
 	)
+}
+
+func TestJaccardMatchWithExactMatchShouldReturnError(t *testing.T) {
+	exactMatch := model.ExactMatchType{
+		CSV:   "{{.last_name}}+123",
+		Entry: "{{.nom}}+123",
+	}
+	jaccardMatch := model.ExactMatchType{
+		CSV:   "{{.email}}+456",
+		Entry: "{{.email}}+456",
+	}
+	config := model.FindInCSVType{
+		URI:          "file://../../test/persons_exact_jaccard.csv",
+		ExactMatch:   exactMatch,
+		JaccardMatch: jaccardMatch,
+		Header:       true,
+		TrimSpace:    true,
+	}
+	maskingConfig := model.Masking{Mask: model.MaskType{FindInCSV: config}}
+	factoryConfig := model.MaskFactoryConfiguration{Masking: maskingConfig, Seed: 0}
+	mask, present, err := Factory(factoryConfig)
+	assert.Nil(t, err, "error should be nil")
+	assert.True(t, present, "should be true")
+	data := model.NewDictionary().
+		With("nom", "Vidale").
+		With("email", "luc.vidal@yopmail.fr").
+		With("info_personne", "").Pack()
+	masked, err := mask.Mask("info_personne", data)
+	assert.Equal(t, "Expected at least one result, but got none", err.Error())
+	assert.Nil(t, masked)
 }
