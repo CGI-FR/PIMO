@@ -174,8 +174,17 @@ func (me *MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.En
 				records = append(records, JaccardCSV{lineKey: lineKey, csvLine: record})
 			}
 			results = sortBySimilarity(jaccardEntryString, records)
+		} else {
+			var records []JaccardCSV
+			for _, result := range results {
+				lineKey, err := me.computeCSVLineKey(result.(model.Dictionary), false)
+				if err != nil {
+					return nil, err
+				}
+				records = append(records, JaccardCSV{lineKey: lineKey, csvLine: result})
+			}
+			results = sortBySimilarity(jaccardEntryString, records)
 		}
-		// results = sortBySimilarity(jaccardEntryString, results)
 	}
 	return me.getExpectedResult(results)
 }
