@@ -185,8 +185,9 @@ testcases:
 - name: find in csv mask exact&jaccard match expected = many should return list in right order
   steps:
   - script: |-
-      echo '{"nom":"Vidal","email":"luce.vidal@yopmail.fr","info_order":""}' | pimo -c ../masking_findincsv_many.yml
+      echo '{"nom":"Vidal","email":"luc.vidal@yopmail.fr","info_order":""}' | pimo -c ../masking_findincsv_many.yml
     assertions:
     - result.code ShouldEqual 0
-    - result.systemout ShouldEqual {"nom":"Vidal","email":"luce.vidal@yopmail.fr","info_order":[{"first_name":"Luce","last_name":"Vidal","email":"luce.vidal@yopmail.fr"},{"first_name":"Mac","last_name":"Vidal","email":"mac.vidal@yopmail.fr"},{"first_name":"Vincent","last_name":"Vidal","email":"vincent.vidal@yopmail.fr"}]}
+    - result.systemout ShouldEqual {"nom":"Vidal","email":"luc.vidal@yopmail.fr","info_order":[{"first_name":"Luce","last_name":"Vidal","email":"luce.vidal@yopmail.fr"},{"first_name":"Mac","last_name":"Vidal","email":"mac.vidal@yopmail.fr"},{"first_name":"Vincent","last_name":"Vidal","email":"vincent.vidal@yopmail.fr"}]}
     - result.systemerr ShouldBeEmpty
+

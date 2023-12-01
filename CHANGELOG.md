@@ -14,6 +14,10 @@ Types of changes
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [1.21.0]
+
+- `Added` new features `findInCSV` mask to get one or multiple csv lines which matched with json value from CSV files.
+
 ## [1.20.0]
 
 - `Added` new features for parsing and masking XML files using the following command: `cat XMLfile | pimo xml --subscriber <parent tag name>=<mask name> > outputXMLfile`. This feature supports all level 1 elements that are not arrays.
