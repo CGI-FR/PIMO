@@ -125,11 +125,11 @@
       "properties": {
         "csv": {
           "type": "string",
-          "description": "Characters to match in the csv file"
+          "description": "Characters exact to match in the csv file"
         },
         "entry": {
           "type": "string",
-          "description": "Characters to find in the entry file"
+          "description": "Characters exact to find in the entry file"
         }
       },
       "additionalProperties": false,
@@ -184,7 +184,11 @@
         },
         "exactMatch": {
           "$ref": "#/$defs/ExactMatchType",
-          "description": "Compare csv data and entry data, find the exected matched csv line "
+          "description": "Compare csv data and entry data, find the exected matched csv line"
+        },
+        "jaccard": {
+          "$ref": "#/$defs/ExactMatchType",
+          "description": "Compare csv data and entry data with jaccard, find the similarity matched csv line"
         },
         "expected": {
           "type": "string",
