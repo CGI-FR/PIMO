@@ -960,6 +960,57 @@ By default, if not specified otherwise, these classes will be used (input -> out
 
 [Return to list of masks](#possible-masks)
 
+### FindInCSV
+
+[![Try it](https://img.shields.io/badge/-Try%20it%20in%20PIMO%20Play-brightgreen)](https://cgi-fr.github.io/pimo-play/#c=G4UwTgzglg9gdgLgAQCICMKBQBbAhhAayjgHMFMkkBaJCEAGxAGMAXGMcyrpAKwngAOuFgAtkKJjGwDGLEAH1iAMxhZueQp25IlxACYBJOAGEAygDUt2pAFcwUcSJYsBEBAHp3JKBBYA6b1EbACMbOjBJODkov0lsd1wwbG96Rgh3NABOABZgpiUlAGYAVgAGUrQQAHYQYOLC3AAmXAAOYOzsyrbGpgA2dzBcAHd3TMbG8rzS3F6qwr1iphBGtDRp3Fw9bOKOkD1epmyK0qVelqr3ARgCEGx4WIhgNWskEAAPXFYAWWEmMQoXpQmI9xABvUF+AAqMBYuHoAF94c9ASAomAAJ5giFsWH0eRXIbgRHI7Q8T5MRJ6KwvYHALF+AByuGwIGJAJRaMxqHBfjgzNZSPZ2gAxEgYAIWLA+fRkPB6OiqPAQAAaJDCKiMfAsRVwFVIPBwdGq4LopB6EBKXA2egsZDqzW+HUgIXcd4CZhyKmoe0gLVOlBIF1cES+80cJAsMA2ECAyii8WS+Bw5C0pAifBqtOh8BIejEEBAA&i=N4KABGBEB2CGC2BTSAuKBhWBjOsAukANOFHgPZ6wA2A+gA5kDuiATqlAMwcCsRJkWMvDpVEeRDQCW0AGZl2kSCAC+QA)
+
+```json
+{"postcode":"44000", "adress":"NewTown road, New York","info_person":""}
+```
+**persons.csv**
+
+```csv
+name,postcode,road,city,tel
+John Doe,44000,NewTown road,New York,123-456-7890
+Jane Smith,44100,Main Street,New York,987-654-3210
+```
+
+```yaml
+version: "1"
+masking:
+  - selector:
+      jsonpath: "info_person"
+    mask:
+      findInCSV:
+        uri: "file://persons.csv"
+        exactMatch:           # optional: you can only use jaccard match or both
+          csv: "{{.postcode}}"
+          entry: "{{.postcode}}"
+        jaccard:              # optional: you can only use exact match or both
+          csv: "{{.road}} {{.city}}"
+          entry: "{{.adress}}"
+        expected: "only-one"  # optional: only-one, at-least-one or many, by default: at-least-one
+        header: true          # optional: csv has a header line, use it to name fields, default: false
+        separator: ","        # optional: csv value separator is , (default value)
+        comment: "#"          # optional: csv contains comments starting with #, if empty no comment is expected (default)
+        fieldsPerRecord: 0    # optional: number of fields per record, if 0 sets it to the number of fields in the first record (default)
+                              # if negative, no check is made and records may have a variable number of fields
+        trim: true            # optional: trim space in values and headers, default: false
+```
+
+**Explanation**
+
+* `JSON Entry`: Represents a sample JSON entry with a postcode, address, and an empty `info_person` field that needs to be masked.
+* `CSV File`: A CSV file with a header containing fields like name, postcode, road, city, and telephone number.
+* `YAML` Configuration: The proposed configuration for the `findInCSV` mask.
+
+**Use Case**
+
+In this scenario, the `findInCSV` mask is applied to the "info_person" field in the JSON entry. The mask uses both exact matching on the postcode and Jaccard similarity on the combination of road and city. The expected result is set to "only-one," meaning the mask will attempt to find a single matching result based on the specified criteria. The configuration provides flexibility in handling variations in the entry, such as differences in accents or letter case, by leveraging the Jaccard similarity metric.
+
+Adjust the configuration parameters based on your specific data characteristics and requirements.
+
+[Return to list of masks](#possible-masks)
 
 ### Parsing XML files
 
