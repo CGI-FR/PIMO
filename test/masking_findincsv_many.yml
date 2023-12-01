@@ -25,3 +25,17 @@ masking:
         header: true
         trim: true
 
+  - selector:
+      jsonpath: "info_two_persons"
+    mask:
+      findInCSV:
+        uri: "file://../persons_exact_jaccard.csv"
+        exactMatch:
+          csv: "{{.last_name}}+123"
+          entry: "{{.nom}}+123"
+        jaccard:
+          csv: "{{.email}}"
+          entry: "{{.email}}"
+        expected: "many"
+        header: true
+        trim: true

@@ -163,3 +163,12 @@ testcases:
     - result.code ShouldEqual 0
     - result.systemout ShouldEqual {"nom":"Vi","info_empty":[]}
     - result.systemerr ShouldBeEmpty
+
+- name: find in csv mask exact&jaccard match expected = many should return 2 results
+  steps:
+  - script: |-
+      echo '{"nom":"Vidal","email":"luc.vidal@yopmail.fr","info_two_persons":""}' | pimo -c ../masking_findincsv_many.yml
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldEqual {"nom":"Vidal","email":"luc.vidal@yopmail.fr","info_two_persons":[{"first_name":"Luce","last_name":"Vidal","email":"luce.vidal@yopmail.fr"},{"first_name":"Luce","last_name":"Vidal","email":"luce.vicol@yopmail.fr"}]}
+    - result.systemerr ShouldBeEmpty

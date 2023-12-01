@@ -252,7 +252,6 @@ func (me *MaskEngine) computeCSVLineKey(record model.Dictionary, exactMatch bool
 		template = me.temJaccardCSV
 	}
 
-	// Définissez un point de contrôle pour le débogage
 	err := template.Execute(&output, record.Unordered())
 	if err != nil {
 		return "", err
