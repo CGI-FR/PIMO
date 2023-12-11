@@ -16,7 +16,7 @@ Types of changes
 
 ## [1.21.0]
 
-- `Added` new features `findInCSV` mask to get one or multiple csv lines which matched with json value from CSV files.
+- `Added` new features `findInCSV` mask to get one or multiple csv lines which matched with Json entry value from CSV files.
 
 ## [1.20.0]
 
