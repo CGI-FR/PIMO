@@ -384,3 +384,58 @@ func TestExecuteMapWithAttributes(t *testing.T) {
 	assert.NotEqual(t, "John", newData["name"])
 	assert.NotEqual(t, "25", newData["name@age"])
 }
+
+func BenchmarkFindInCSVIteration(b *testing.B) {
+	data := model.NewDictionary().
+		With("type_1", "fire").
+		With("name", "carmender").
+		With("info", "")
+
+	exactMatch := model.ExactMatchType{
+		CSV:   "{{(index . \"Type 1\") | lower }}",
+		Entry: "{{.type_1}}",
+	}
+	jaccardMatch := model.ExactMatchType{
+		CSV:   "{{.Name | lower }}",
+		Entry: "{{.name |lower}}",
+	}
+
+	definition := model.Definition{
+		Version:   "1",
+		Seed:      2,
+		Functions: map[string]model.Function{},
+		Masking: []model.Masking{
+			{
+				Selector: model.SelectorType{Jsonpath: "info"},
+				Mask: model.MaskType{FindInCSV: model.FindInCSVType{
+					URI:             "https://gist.githubusercontent.com/armgilles/194bcff35001e7eb53a2a8b441e8b2c6/raw/92200bc0a673d5ce2110aaad4544ed6c4010f687/pokemon.csv",
+					ExactMatch:      exactMatch,
+					JaccardMatch:    jaccardMatch,
+					Expected:        "at-least-one",
+					Header:          true,
+					Separator:       "",
+					Comment:         "",
+					FieldsPerRecord: -1,
+					TrimSpace:       true,
+				}},
+			},
+		},
+	}
+
+	zerolog.SetGlobalLevel(zerolog.WarnLevel)
+
+	ctx := pimo.NewContext(definition)
+	cfg := pimo.Config{
+		Iteration:   b.N,
+		SingleInput: &data,
+	}
+
+	if err := ctx.Configure(cfg); err != nil {
+		b.FailNow()
+	}
+
+	b.ResetTimer()
+	if _, err := ctx.Execute(io.Discard); err != nil {
+		b.FailNow()
+	}
+}

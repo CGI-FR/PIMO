@@ -427,6 +427,7 @@ func BenchmarkFindInCSVLargeVolume(b *testing.B) {
 	maskingConfig := model.Masking{Mask: model.MaskType{FindInCSV: config}}
 	factoryConfig := model.MaskFactoryConfiguration{Masking: maskingConfig, Seed: 0}
 	mask, present, err := Factory(factoryConfig)
+	assert.NoError(b, err)
 	data := model.NewDictionary().
 		With("nom", "Vidal").
 		With("email", "luc.vidal@yopmail.fr").
