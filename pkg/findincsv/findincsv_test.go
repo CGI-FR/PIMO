@@ -18,9 +18,13 @@
 package findincsv
 
 import (
+	"io/ioutil"
+	"os"
+	"strings"
 	"testing"
 
 	"github.com/cgi-fr/pimo/pkg/model"
+	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -393,4 +397,87 @@ func TestJaccardMatchWithExactMatchShouldReturnError(t *testing.T) {
 	masked, err := mask.Mask("info_personne", data)
 	assert.Equal(t, "Expected at least one result, but got none", err.Error())
 	assert.Nil(t, masked)
+}
+
+func BenchmarkFindInCSVLargeVolume(b *testing.B) {
+	// prepare a csv file with large volume
+	filePath, _, err := generateCSVData(b)
+	if err != nil {
+		b.Fatalf("Failed to generate CSV data: %v", err)
+	}
+	defer cleanupTempFile(filePath)
+
+	fileURL := "file://" + filePath
+	// prepare config
+	exactMatch := model.ExactMatchType{
+		CSV:   "{{.last_name}}+123",
+		Entry: "{{.nom}}+123",
+	}
+	jaccardMatch := model.ExactMatchType{
+		CSV:   "{{.email}}+456",
+		Entry: "{{.email}}+456",
+	}
+	config := model.FindInCSVType{
+		URI:          fileURL,
+		ExactMatch:   exactMatch,
+		JaccardMatch: jaccardMatch,
+		Header:       true,
+		TrimSpace:    true,
+	}
+	maskingConfig := model.Masking{Mask: model.MaskType{FindInCSV: config}}
+	factoryConfig := model.MaskFactoryConfiguration{Masking: maskingConfig, Seed: 0}
+	mask, present, err := Factory(factoryConfig)
+	data := model.NewDictionary().
+		With("nom", "Vidal").
+		With("email", "luc.vidal@yopmail.fr").
+		With("info_personne", "").Pack()
+
+	if present {
+		zerolog.SetGlobalLevel(zerolog.WarnLevel)
+		b.ResetTimer()
+		_, err := mask.Mask("info_personne", data)
+		if err != nil {
+			b.FailNow()
+		}
+	}
+}
+
+func generateCSVData(b *testing.B) (string, string, error) {
+	file, err := ioutil.TempFile("", "testfile*.csv")
+	if err != nil {
+		return "", "", err
+	}
+	defer file.Close()
+
+	var lines []string
+	lines = append(lines, "first_name,last_name,email")
+
+	// every itaration get 10 lines
+	for i := 0; i < b.N; i++ {
+		lines = append(lines, "Benoît,Blanc,benoit.blanc@yopmail.fr")
+		lines = append(lines, "Wilfried,Jean,wilfried.jean@yopmail.fr")
+		lines = append(lines, "Patricia,Garnier,patricia.garnier@yopmail.fr")
+		lines = append(lines, "Jean-Claude,Leclercq,jean-claude.leclercq@yopmail.fr")
+		lines = append(lines, "Gérard,Perez,gerard.perez@yopmail.fr")
+		lines = append(lines, "Anissa,Mercier,anissa.mercier@yopmail.fr")
+		lines = append(lines, "Aimée,Moreau,aimee.moreau@yopmail.fr")
+		lines = append(lines, "Aurèle,Chevalier,aurele.chevalier@yopmail.fr")
+		lines = append(lines, "Luce,Vidal,luce.vidal@yopmail.fr")
+		lines = append(lines, "Geoffroy,Dupuis,geoffroy.dupuis@yopmail.fr")
+	}
+
+	contents := strings.Join(lines, "\n")
+	_, err = file.WriteString(contents)
+	if err != nil {
+		return "", "", err
+	}
+
+	return file.Name(), contents, nil
+}
+
+func cleanupTempFile(filePath string) error {
+	if err := os.Remove(filePath); err != nil {
+		return err
+	}
+	return nil
 }
