@@ -482,3 +482,12 @@ func cleanupTempFile(filePath string) error {
 	}
 	return nil
 }
+
+func TestJaccardSimilarityShouldReturnWaitedNumber(t *testing.T) {
+	entry := "1 Boulevard Albert Einstain"
+	csv := "1 Boulevard Albert Einstein"
+
+	waited := JaccardSimilarity(entry, csv)
+	expect := 0.8518518518518519
+	assert.Equal(t, expect, waited)
+}
