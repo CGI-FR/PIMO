@@ -18,8 +18,8 @@
 package findincsv
 
 import (
-	"io/ioutil"
 	"os"
+	"strconv"
 	"strings"
 	"testing"
 
@@ -401,13 +401,31 @@ func TestJaccardMatchWithExactMatchShouldReturnError(t *testing.T) {
 
 func BenchmarkFindInCSVLargeVolume(b *testing.B) {
 	// prepare a csv file with large volume
-	filePath, _, err := generateCSVData(b)
-	if err != nil {
-		b.Fatalf("Failed to generate CSV data: %v", err)
+	file, err := os.CreateTemp("", "testfile*.csv")
+	assert.NoError(b, err)
+	lines := make([]string, 0)
+	lines = append(lines, "first_name,last_name,email")
+	// every iteration get 10 lines
+	for i := 0; i < b.N; i++ {
+		lines = append(lines, "Benoît,Blanc,benoit.blanc@yopmail.fr"+strconv.Itoa(i))
+		lines = append(lines, "Wilfried,Jean,wilfried.jean@yopmail.fr"+strconv.Itoa(i))
+		lines = append(lines, "Patricia,Garnier,patricia.garnier@yopmail.fr"+strconv.Itoa(i))
+		lines = append(lines, "Jean-Claude,Leclercq,jean-claude.leclercq@yopmail.fr"+strconv.Itoa(i))
+		lines = append(lines, "Gérard,Perez,gerard.perez@yopmail.fr"+strconv.Itoa(i))
+		lines = append(lines, "Anissa,Mercier,anissa.mercier@yopmail.fr"+strconv.Itoa(i))
+		lines = append(lines, "Aimée,Moreau,aimee.moreau@yopmail.fr"+strconv.Itoa(i))
+		lines = append(lines, "Aurèle,Chevalier,aurele.chevalier@yopmail.fr"+strconv.Itoa(i))
+		lines = append(lines, "Luce,Vidal,luce.vidal@yopmail.fr"+strconv.Itoa(i))
+		lines = append(lines, "Geoffroy,Dupuis,geoffroy.dupuis@yopmail.fr"+strconv.Itoa(i))
 	}
-	defer cleanupTempFile(filePath)
 
-	fileURL := "file://" + filePath
+	contents := strings.Join(lines, "\n")
+	_, err = file.WriteString(contents)
+	assert.NoError(b, err)
+
+	defer os.Remove(file.Name())
+
+	fileURL := "file://" + file.Name()
 	// prepare config
 	exactMatch := model.ExactMatchType{
 		CSV:   "{{.last_name}}+123",
@@ -441,46 +459,6 @@ func BenchmarkFindInCSVLargeVolume(b *testing.B) {
 			b.FailNow()
 		}
 	}
-}
-
-func generateCSVData(b *testing.B) (string, string, error) {
-	file, err := ioutil.TempFile("", "testfile*.csv")
-	if err != nil {
-		return "", "", err
-	}
-	defer file.Close()
-
-	var lines []string
-	lines = append(lines, "first_name,last_name,email")
-
-	// every itaration get 10 lines
-	for i := 0; i < b.N; i++ {
-		lines = append(lines, "Benoît,Blanc,benoit.blanc@yopmail.fr")
-		lines = append(lines, "Wilfried,Jean,wilfried.jean@yopmail.fr")
-		lines = append(lines, "Patricia,Garnier,patricia.garnier@yopmail.fr")
-		lines = append(lines, "Jean-Claude,Leclercq,jean-claude.leclercq@yopmail.fr")
-		lines = append(lines, "Gérard,Perez,gerard.perez@yopmail.fr")
-		lines = append(lines, "Anissa,Mercier,anissa.mercier@yopmail.fr")
-		lines = append(lines, "Aimée,Moreau,aimee.moreau@yopmail.fr")
-		lines = append(lines, "Aurèle,Chevalier,aurele.chevalier@yopmail.fr")
-		lines = append(lines, "Luce,Vidal,luce.vidal@yopmail.fr")
-		lines = append(lines, "Geoffroy,Dupuis,geoffroy.dupuis@yopmail.fr")
-	}
-
-	contents := strings.Join(lines, "\n")
-	_, err = file.WriteString(contents)
-	if err != nil {
-		return "", "", err
-	}
-
-	return file.Name(), contents, nil
-}
-
-func cleanupTempFile(filePath string) error {
-	if err := os.Remove(filePath); err != nil {
-		return err
-	}
-	return nil
 }
 
 func TestJaccardSimilarityShouldReturnWaitedNumber(t *testing.T) {
