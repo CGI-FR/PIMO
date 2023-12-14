@@ -63,7 +63,7 @@ func NewMask(conf model.FindInCSVType, seed int64, seeder model.Seeder) (MaskEng
 			conf.ExactMatch.Entry,
 			tmpl.FuncMap{},
 			seed,
-			"", // use for seed functions ?
+			"",
 		)
 		if err != nil {
 			return MaskEngine{}, err
@@ -87,7 +87,7 @@ func NewMask(conf model.FindInCSVType, seed int64, seeder model.Seeder) (MaskEng
 			conf.JaccardMatch.Entry,
 			tmpl.FuncMap{},
 			seed,
-			"", // use for seed functions ?
+			"",
 		)
 		if err != nil {
 			return MaskEngine{}, err
@@ -444,6 +444,7 @@ func Func(seed int64, seedField string) interface{} {
 			CSV:   jaccardMatchCsv,
 			Entry: jaccardMatchEntry,
 		}
+
 		mask, err := NewMask(model.FindInCSVType{URI: uri, Header: header, ExactMatch: exactMatch, JaccardMatch: jaccardMatch, Expected: expected, Separator: sep, Comment: comment, FieldsPerRecord: fieldsPerRecord, TrimSpace: trimSpaces}, seed+callnumber, model.NewSeeder(seedField, seed+callnumber))
 		if err != nil {
 			return "", err
