@@ -1,0 +1,193 @@
+name: find in csv features
+testcases:
+
+- name: find in csv mask exactMatch with header = true
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      seed: 1
+      masking:
+        - selector:
+            jsonpath: "info_personne"
+          mask:
+            findInCSV:
+              uri: "file://../persons.csv"
+              exactMatch:
+                csv: "{{.last_name}}+123"
+                entry: "{{.nom}}+123"
+              expected: "only-one"
+              header: true
+              trim: true
+      EOF
+  - script: |-
+      echo '{"nom":"Vidal","info_personne":""}' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldEqual {"nom":"Vidal","info_personne":{"first_name":"Luce","last_name":"Vidal","email":"luce.vidal@yopmail.fr"}}
+    - result.systemerr ShouldBeEmpty
+
+- name: find in csv mask exactMatch with index and header = false
+  steps:
+  - script: |-
+      echo '{"nom":"Vidal","info_personne":""}' | pimo -c ../masking_find_in_csv.yml
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldEqual {"nom":"Vidal","info_personne":{"0":"Luce","1":"Vidal","2":"luce.vidal@yopmail.fr"}}
+    - result.systemerr ShouldBeEmpty
+
+- name: find in csv mask exactMatch with templated uri
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      seed: 1
+      masking:
+        - selector:
+            jsonpath: "info_personne"
+          mask:
+            findInCSV:
+              uri: "file://../{{.filename}}.csv"
+              exactMatch:
+                csv: "{{.last_name}}+123"
+                entry: "{{.nom}}+123"
+              expected: "only-one"
+              header: true
+              trim: true
+      EOF
+  - script: |-
+      echo '{"filename":"persons","nom":"Vidal","info_personne":""}' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldEqual {"filename":"persons","nom":"Vidal","info_personne":{"first_name":"Luce","last_name":"Vidal","email":"luce.vidal@yopmail.fr"}}
+    - result.systemerr ShouldBeEmpty
+
+- name: find in csv with comments and different separator
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      seed: 1
+      masking:
+        - selector:
+            jsonpath: "info_personne"
+          mask:
+            findInCSV:
+              uri: "file://../persons_sep_comment.csv"
+              exactMatch:
+                csv: "{{.last_name}}+123"
+                entry: "{{.nom}}+123"
+              expected: "only-one"
+              header: true
+              separator: "%"
+              comment: "#"
+      EOF
+  - script: |-
+      echo '{"nom":"Vidal","info_personne":""}' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldEqual {"nom":"Vidal","info_personne":{"first_name":"Luce","last_name":"Vidal","email":"luce.vidal@yopmail.fr"}}
+    - result.systemerr ShouldBeEmpty
+
+- name: find in CSV expect any number of fields
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      seed: 1
+      masking:
+        - selector:
+            jsonpath: "info_personne"
+          mask:
+            findInCSV:
+              uri: "file://../persons.csv"
+              exactMatch:
+                csv: "{{.last_name}}+123"
+                entry: "{{.nom}}+123"
+              expected: "only-one"
+              header: true
+              fieldsPerRecord: -1
+      EOF
+  - script: |-
+      echo '{"nom":"Vidal","info_personne":""}' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldEqual {"nom":"Vidal","info_personne":{"first_name":"Luce","last_name":"Vidal","email":"luce.vidal@yopmail.fr"}}
+    - result.systemerr ShouldBeEmpty
+
+- name: find in CSV expect exactly 4 fields and error
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      seed: 1
+      masking:
+        - selector:
+            jsonpath: "info_personne"
+          mask:
+            findInCSV:
+              uri: "file://../persons.csv"
+              exactMatch:
+                csv: "{{.last_name}}+123"
+                entry: "{{.nom}}+123"
+              expected: "only-one"
+              header: true
+              fieldsPerRecord: 4
+      EOF
+  - script: |-
+      echo '{"nom":"Vidal","info_personne":""}' | pimo
+    assertions:
+    - result.code ShouldNotEqual 0
+    - result.systemout ShouldBeEmpty
+    - result.systemerr ShouldNotBeEmpty
+
+- name: find in csv mask exactMatch expected = many
+  steps:
+  - script: |-
+      echo '{"nom":"Vidal","info":""}' | pimo -c ../masking_findincsv_many.yml
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldEqual {"nom":"Vidal","info":[{"first_name":"Vincent","last_name":"Vidal","email":"vincent.vidal@yopmail.fr"},{"first_name":"Luce","last_name":"Vidal","email":"luce.vidal@yopmail.fr"},{"first_name":"Mac","last_name":"Vidal","email":"mac.vidal@yopmail.fr"}]}
+    - result.systemerr ShouldBeEmpty
+
+- name: find in csv mask exactMatch expected = many should return list empty
+  steps:
+  - script: |-
+      echo '{"nom":"Vi","info_empty":""}' | pimo -c ../masking_findincsv_many.yml
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldEqual {"nom":"Vi","info_empty":[]}
+    - result.systemerr ShouldBeEmpty
+
+- name: find in csv mask exact&jaccard match expected = many should return 2 results
+  steps:
+  - script: |-
+      echo '{"nom":"Vidal","email":"luc.vidal@yopmail.fr","info_two_persons":""}' | pimo -c ../masking_findincsv_many.yml
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldEqual {"nom":"Vidal","email":"luc.vidal@yopmail.fr","info_two_persons":[{"first_name":"Luce","last_name":"Vidal","email":"luce.vidal@yopmail.fr"},{"first_name":"Luce","last_name":"Vidal","email":"luce.vicol@yopmail.fr"}]}
+    - result.systemerr ShouldBeEmpty
+
+- name: find in csv mask exact&jaccard match expected = many should return empty list
+  steps:
+  - script: |-
+      echo '{"nom":"Vidale","email":"luc.vidal@yopmail.fr","info_empty":""}' | pimo -c ../masking_findincsv_many.yml
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldEqual {"nom":"Vidale","email":"luc.vidal@yopmail.fr","info_empty":[]}
+    - result.systemerr ShouldBeEmpty
+
+- name: find in csv mask exact&jaccard match expected = many should return list in right order
+  steps:
+  - script: |-
+      echo '{"nom":"Vidal","email":"luc.vidal@yopmail.fr","info_order":""}' | pimo -c ../masking_findincsv_many.yml
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldEqual {"nom":"Vidal","email":"luc.vidal@yopmail.fr","info_order":[{"first_name":"Luce","last_name":"Vidal","email":"luce.vidal@yopmail.fr"},{"first_name":"Mac","last_name":"Vidal","email":"mac.vidal@yopmail.fr"},{"first_name":"Vincent","last_name":"Vidal","email":"vincent.vidal@yopmail.fr"}]}
+    - result.systemerr ShouldBeEmpty
+

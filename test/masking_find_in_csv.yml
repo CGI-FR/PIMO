@@ -1,0 +1,38 @@
+version: "1"
+seed: 1
+masking:
+  - selector:
+      jsonpath: "info_personne"
+    mask:
+      findInCSV:
+        uri: "file://../persons.csv"
+        exactMatch:
+          csv: "{{index . \"1\"}}+123"
+          entry: "{{.nom}}+123"
+        expected: "only-one"
+        header: false
+        trim: true
+
+  - selector:
+      jsonpath: "info"
+    mask:
+      findInCSV:
+        uri: "file://persons_same_name.csv"
+        exactMatch:
+          csv: "{{.last_name}}+123"
+          entry: "{{.nom}}+123"
+        expected: "many"
+        header: true
+        trim: true
+
+  - selector:
+      jsonpath: "info_empty"
+    mask:
+      findInCSV:
+        uri: "file://persons_same_name.csv"
+        exactMatch:
+          csv: "{{.last_name}}+123"
+          entry: "{{.nom}}+123"
+        expected: "many"
+        header: true
+        trim: true

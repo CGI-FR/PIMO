@@ -960,13 +960,82 @@ By default, if not specified otherwise, these classes will be used (input -> out
 
 [Return to list of masks](#possible-masks)
 
+### FindInCSV
+
+[![Try it](https://img.shields.io/badge/-Try%20it%20in%20PIMO%20Play-brightgreen)](https://cgi-fr.github.io/pimo-play/#c=G4UwTgzglg9gdgLgAQCICMKBQBbAhhAayjgHMFMkkBaJCEAGxAGMAXGMcyrpAKwngAOuFgAtkKYgDMYWbnkIRO3aklwATNUnGzlNScTUBJOAGEAygDUlyrgFcwUcSJYsBigPTuSUCCwB03qK2AEa2dGBM8CwgcP6R2O64YNje9IwQ7mgAnAAswUySkgDMAKwADGVoIADsIMElRbgATLgAHME5OVXtTUwAbO5guADu7llNTRX5Zbh91UVqJUwgTWhoM7jqOSWdIGp9TDmVZZJ9rdXuAjAEINjwfkwQwDo2lCAAHrisALLCTGIUV7cR7AZAAcgA3hCABQGD5IPyoAAqAE8BCAkBgAJRIAA+SHoMGG4CQAF9SWDAUC3rEwCjxFC-Cw0SAAPpockvV48L5MJJqazUkHgxkAOVw2Ax+MJxLAZIpVOpMRYdIZEL8cAlUpl4E51K4ipsH3RrD24mEVEY+BYVHgIC5NhEIHU4GQKtsIENyhVUGwbrAHswQA&i=N4KABGBEAuCeAOBTA+gRkgLigMwJYCdFIAacKAOwEMBbIrSAY0v1vIBNF9IQBfIA)
+
+This mask compares targeted values or combinations of values from a JSON Entry with values from a CSV file, inserting the matched CSV line into the designated field of the JSON entry.
+
+```json
+{"type_1": "fire", "name": "carmender"}
+```
+
+#### Input CSV
+
+```csv
+#,Name,Type 1,Type 2,Total,HP,Attack,Defense,Sp. Atk,Sp. Def,Speed,Generation,Legendary
+1,Bulbasaur,Grass,Poison,318,45,49,49,65,65,45,1,False
+...
+4,Charmander,Fire,,309,39,52,43,60,50,65,1,False
+...
+```
+
+[![Pokemon CSV](https://img.shields.io/badge/-Try%20it%20in%20PIMO%20Play-brightgreen)](https://gist.githubusercontent.com/armgilles/194bcff35001e7eb53a2a8b441e8b2c6/raw/92200bc0a673d5ce2110aaad4544ed6c4010f687/pokemon.csv)
+
+```yaml
+version: "1"
+masking:
+  - selector:
+      jsonpath: "info"
+    masks:
+        - add : ""                                       # add key "info" with value "" in json Entry
+        - findInCSV:
+            uri: "https://gist.githubusercontent.com/armgilles/194bcff35001e7eb53a2a8b441e8b2c6/raw/92200bc0a673d5ce2110aaad4544ed6c4010f687/pokemon.csv"
+            exactMatch:                                  # optional: you can only use exact match or both
+                csv: '{{(index . "Type 1") | lower }}'
+                entry: "{{.type_1}}"
+            jaccard:                                     # optional: you can only use jaccard match or both
+                csv: "{{.Name | lower }}"
+                entry: "{{.name |lower}}"
+            expected: "at-least-one"                     # optional: only-one, at-least-one or many, by default: at-least-one
+            header: true                                 # optional: csv has a header line, use it to name fields, default: false
+            trim: true                                   # optional: trim space in values and headers, default: false
+```
+
+In this scenario, the `findInCSV` mask is applied to the "info" field in the JSON entry. The mask utilizes both exact matching and Jaccard similarity. The expected results passes to Jaccard similarity. The configuration `expected: "at-least-one"` will return the most similar CSV line which is then saved in the `info` field. If `expected: "many"` is used, Jaccard match will return all expected matched lines in order of similarity.Using `expected: "only-one"` result in an error if the match yields more than one line. Jaccard match offers flexibility in handling variations in the entry, such as differences in accents or letter case, by leveraging the Jaccard similarity metric.
+
+Here is the result of excution:
+
+```json
+{
+  "type_1": "fire",
+  "name": "carmender",
+  "info": {
+    "#": "4",
+    "Name": "Charmander",
+    "Type 1": "Fire",
+    "Type 2": "",
+    "Total": "309",
+    "HP": "39",
+    "Attack": "52",
+    "Defense": "43",
+    "Sp. Atk": "60",
+    "Sp. Def": "50",
+    "Speed": "65",
+    "Generation": "1",
+    "Legendary": "False"
+  }
+}
+```
+
+[Return to list of masks](#possible-masks)
 
 ### Parsing XML files
 
 To use PIMO to masking data in an XML file, use in the following way :
 
 ```bash
-  `cat data.xml | pimo xml --subscriber parentTagName=MaskName.yml > maskedData.xml`
+  cat data.xml | pimo xml --subscriber parentTagName=MaskName.yml > maskedData.xml
 ```
 
 Pimo selects specific tags within a predefined parent tag to replace the text and store the entire data in a new XML file. These specific tags should not contain any other nested tags.
@@ -1003,7 +1072,7 @@ For example, consider an XML file named data.xml:
 In this example, you can mask the values of `agency_number` in the `agency` tag and the values of `name` and `account_number` in the `account` tag using the following command:
 
 ```bash
-  `cat data.xml | pimo xml --subscriber agency=masking_agency.yml --subscriber account=masking_account.yml > maskedData.xml`
+  cat data.xml | pimo xml --subscriber agency=masking_agency.yml --subscriber account=masking_account.yml > maskedData.xml
 ```
 
 **`masking_agency.yml`**

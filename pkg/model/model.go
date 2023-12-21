@@ -167,6 +167,23 @@ type ChoiceInCSVType struct {
 	TrimSpace       bool   `yaml:"trim,omitempty" json:"trim,omitempty" jsonschema_description:"If true leading white space in a field is ignored"`
 }
 
+type ExactMatchType struct {
+	CSV   string `yaml:"csv" json:"csv" jsonschema_description:"Characters exact to match in the csv file"`
+	Entry string `yaml:"entry" json:"entry" jsonschema_description:"Characters exact to find in the entry file"`
+}
+
+type FindInCSVType struct {
+	URI             string         `yaml:"uri" json:"uri" jsonschema_description:"URI of the CSV resource"`
+	ExactMatch      ExactMatchType `yaml:"exactMatch,omitempty" json:"exactMatch,omitempty" jsonschema_description:"Compare csv data and entry data, find the exected matched csv line"`
+	JaccardMatch    ExactMatchType `yaml:"jaccard,omitempty" json:"jaccard,omitempty" jsonschema_description:"Compare csv data and entry data with jaccard, find the similarity matched csv line"`
+	Expected        string         `yaml:"expected" json:"expected" jsonschema_description:"How much result return, 3 modes availables: only-one, at-least-one, many"`
+	Header          bool           `yaml:"header,omitempty" json:"header,omitempty" jsonschema_description:"Does the CSV resource contains a header line"`
+	Separator       string         `yaml:"separator,omitempty" json:"separator,omitempty" jsonschema_description:"Separator character"`
+	Comment         string         `yaml:"comment,omitempty" json:"comment,omitempty" jsonschema_description:"Lines beginning with the comment character without preceding whitespace are ignored"`
+	FieldsPerRecord int            `yaml:"fieldsPerRecord,omitempty" json:"fieldsPerRecord,omitempty" jsonschema_description:"FieldsPerRecord is the number of expected fields per record, 0 means the number of fields in the first record"`
+	TrimSpace       bool           `yaml:"trim,omitempty" json:"trim,omitempty" jsonschema_description:"If true leading white space in a field is ignored"`
+}
+
 type MaskType struct {
 	Add               Entry                `yaml:"add,omitempty" json:"add,omitempty" jsonschema:"oneof_required=Add,title=Add Mask,description=Add a new field in the JSON stream"`
 	AddTransient      Entry                `yaml:"add-transient,omitempty" json:"add-transient,omitempty" jsonschema:"oneof_required=AddTransient,title=Add Transient Mask" jsonschema_description:"Add a new temporary field, that will not show in the JSON output"`
@@ -200,6 +217,7 @@ type MaskType struct {
 	Luhn              *LuhnType            `yaml:"luhn,omitempty" json:"luhn,omitempty" jsonschema:"oneof_required=Luhn,title=Luhn Mask" jsonschema_description:"Concatenate a checksum key to the input value computed with the luhn algorithm"`
 	Markov            MarkovType           `yaml:"markov,omitempty" json:"markov,omitempty" jsonschema:"oneof_required=Markov,title=Markov Mask" jsonschema_description:"Produces pseudo text based on sample text"`
 	Transcode         *TranscodeType       `yaml:"transcode,omitempty" json:"transcode,omitempty" jsonschema:"oneof_required=Transcode,title=Transcode Mask" jsonschema_description:"Produce a random string by preserving character classes from the original value"`
+	FindInCSV         FindInCSVType        `yaml:"findInCSV,omitempty" json:"findInCSV,omitempty" jsonschema:"oneof_required=FindInCSV,title=Find in CSV Mask" jsonschema_description:"find matched values in a CSV file based on input json file and save the matched csv line as type objet"`
 }
 
 type Masking struct {

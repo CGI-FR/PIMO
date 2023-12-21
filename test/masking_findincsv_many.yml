@@ -1,0 +1,71 @@
+version: "1"
+seed: 1
+masking:
+  - selector:
+      jsonpath: "info"
+    mask:
+      findInCSV:
+        uri: "file://../persons_same_name.csv"
+        exactMatch:
+          csv: "{{.last_name}}+123"
+          entry: "{{.nom}}+123"
+        expected: "many"
+        header: true
+        trim: true
+
+  - selector:
+      jsonpath: "info_empty"
+    mask:
+      findInCSV:
+        uri: "file://../persons_same_name.csv"
+        exactMatch:
+          csv: "{{.last_name}}+123"
+          entry: "{{.nom}}+123"
+        expected: "many"
+        header: true
+        trim: true
+
+  - selector:
+      jsonpath: "info_two_persons"
+    mask:
+      findInCSV:
+        uri: "file://../persons_exact_jaccard.csv"
+        exactMatch:
+          csv: "{{.last_name}}+123"
+          entry: "{{.nom}}+123"
+        jaccard:
+          csv: "{{.email}}"
+          entry: "{{.email}}"
+        expected: "many"
+        header: true
+        trim: true
+
+  - selector:
+      jsonpath: "info_empty"
+    mask:
+      findInCSV:
+        uri: "file://../persons_exact_jaccard.csv"
+        exactMatch:
+          csv: "{{.last_name}}+123"
+          entry: "{{.nom}}+123"
+        jaccard:
+          csv: "{{.email}}"
+          entry: "{{.email}}"
+        expected: "many"
+        header: true
+        trim: true
+
+  - selector:
+      jsonpath: "info_order"
+    mask:
+      findInCSV:
+        uri: "file://../persons_same_name.csv"
+        exactMatch:
+          csv: "{{.last_name}}+123"
+          entry: "{{.nom}}+123"
+        jaccard:
+          csv: "{{.email}}"
+          entry: "{{.email}}"
+        expected: "many"
+        header: true
+        trim: true
