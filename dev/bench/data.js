@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1700662832596,
+  "lastUpdate": 1703172770880,
   "repoUrl": "https://github.com/CGI-FR/PIMO",
   "entries": {
     "Benchmark": [
@@ -4482,6 +4482,102 @@ window.BENCHMARK_DATA = {
             "value": 5906,
             "unit": "allocs/op",
             "extra": "6465 times\n4 procs"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "youen.peron@cgi.com",
+            "name": "Youen Péron",
+            "username": "youen"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "752f1728d52647c3189de163f6db9f4955bea3a5",
+          "message": "Feat new mask find in csv (#276)\n\n* feat: init fonction and add TestFactoryShouldCreateAMask\r\n\r\n* feat: change template.template en template.engine\r\n\r\n* feat(findincsv): exact match with csv\r\n\r\n* feat: add test without header and without match\r\n\r\n* feat: add maskFactory in pimp.go and add venom test exactmatch\r\n\r\n* feat: add template uri test unitaire and test venom\r\n\r\n* feat: add venom test with comments and different separator\r\n\r\n* feat(findInCsv): add venom test for fieldsPerRecord all or pass limite\r\n\r\n* feat(findInCsv): add venom test with index and without header\r\n\r\n* feat(findInCsv): add function get expectedResult and TU\r\n\r\n* feat(findInCsv): refactor getExpectedResult and venom test expected many\r\n\r\n* feat(findInCsv): add gestion error and unit test no match\r\n\r\n* feat(findInCsv): add venom test expected many return list empty\r\n\r\n* feat(findInCsv): add jaccardMatch in model et maskEngine\r\n\r\n* feat(findInCsv): add Unit Test JaccardFindMatch with 2 smae string\r\n\r\n* feat(findInCsv): add jaccardMatch functions\r\n\r\n* feat(findincsv): add test similar match\r\n\r\n* feat(findincsv): change convertStringToSet to seperate string to letters\r\n\r\n* feat(findincsv): add test similar match header=false\r\n\r\n* feat(findincsv): change convertStringToSet to get bigrammes\r\n\r\n* feat(findincsv): add test exact+jaccard match and update jsonschema\r\n\r\n* feat(findincsv): update test csv and exactmatch result pass jaccard\r\n\r\n* feat(findincsv): add test exactmatch find nothing return error\r\n\r\n* refactor: separate JaccardMatch from Mask\r\n\r\n* feat(findincsv): add venom test exact+jaccard should return 2 results\r\n\r\n* feat(findincsv): add test exact+jaccard return list in right order\r\n\r\n* feat(findincsv): update CHANGELOG.md\r\n\r\n* feat(findincsv): add README version incomplet\r\n\r\n* feat(findincsv): update readme and changelog for new mask\r\n\r\n* feat(findincsv): add bench test with a large volume csv file\r\n\r\n* feat: add Iteration N times bench test\r\n\r\n* feat: add Jaccard distance test\r\n\r\n* fix(findincsv): remplace ioutil.TempFile with os.CreatFile\r\n\r\n* refactor: change benchtest findincsv with a local file\r\n\r\n---------\r\n\r\nCo-authored-by: jianchao.ma <jianchao.ma@cgi.com>",
+          "timestamp": "2023-12-21T16:23:10+01:00",
+          "tree_id": "e1462033fbebcc3c908a131b8ebb5de53851cb57",
+          "url": "https://github.com/CGI-FR/PIMO/commit/752f1728d52647c3189de163f6db9f4955bea3a5"
+        },
+        "date": 1703172770152,
+        "tool": "go",
+        "benches": [
+          {
+            "name": "BenchmarkPimoRun - ns/op",
+            "value": 27993,
+            "unit": "ns/op",
+            "extra": "413100 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkPimoRun - B/op",
+            "value": 17336,
+            "unit": "B/op",
+            "extra": "413100 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkPimoRun - allocs/op",
+            "value": 181,
+            "unit": "allocs/op",
+            "extra": "413100 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge - ns/op",
+            "value": 1754185,
+            "unit": "ns/op",
+            "extra": "6494 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge - B/op",
+            "value": 683007,
+            "unit": "B/op",
+            "extra": "6494 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge - allocs/op",
+            "value": 5905,
+            "unit": "allocs/op",
+            "extra": "6494 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkFindInCSVIteration - ns/op",
+            "value": 92717725,
+            "unit": "ns/op",
+            "extra": "438 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkFindInCSVIteration - B/op",
+            "value": 37717541,
+            "unit": "B/op",
+            "extra": "438 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkFindInCSVIteration - allocs/op",
+            "value": 602176,
+            "unit": "allocs/op",
+            "extra": "438 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkFindInCSVLargeVolume - ns/op",
+            "value": 50784,
+            "unit": "ns/op",
+            "extra": "239554 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkFindInCSVLargeVolume - B/op",
+            "value": 26108,
+            "unit": "B/op",
+            "extra": "239554 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkFindInCSVLargeVolume - allocs/op",
+            "value": 376,
+            "unit": "allocs/op",
+            "extra": "239554 times\n4 procs"
           }
         ]
       }
