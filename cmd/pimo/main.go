@@ -172,7 +172,10 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 					if err != nil {
 						return nil, err
 					}
-					return transformedData, nil
+					for k, v := range transformedData {
+						m[k] = v.(string)
+					}
+					return m, nil
 				})
 			}
 			err := parser.Stream()
