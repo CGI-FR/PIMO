@@ -106,7 +106,7 @@ func payloadInputHandler(ctx echo.Context) error {
 		return nil
 	}() //nolint:errcheck
 
-	var payload map[string]any
+	payload := map[string]any{}
 
 	if err := ctx.Bind(&payload); err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err)
