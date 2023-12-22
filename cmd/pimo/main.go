@@ -164,7 +164,11 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 				}
 
 				parser.RegisterMapCallback(elementName, func(m map[string]string) (map[string]string, error) {
-					transformedData, err := ctx.ExecuteMap(m)
+					copy := make(map[string]any, len(m))
+					for k, v := range m {
+						copy[k] = v
+					}
+					transformedData, err := ctx.ExecuteMap(copy)
 					if err != nil {
 						return nil, err
 					}

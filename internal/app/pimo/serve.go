@@ -88,7 +88,7 @@ func emptyInputHandler(ctx echo.Context) error {
 		return nil
 	}() //nolint:errcheck
 
-	result, err := pimo.ExecuteMap(map[string]string{})
+	result, err := pimo.ExecuteMap(map[string]any{})
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err)
 	}
@@ -106,7 +106,7 @@ func payloadInputHandler(ctx echo.Context) error {
 		return nil
 	}() //nolint:errcheck
 
-	var payload map[string]string
+	var payload map[string]any
 
 	if err := ctx.Bind(&payload); err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err)

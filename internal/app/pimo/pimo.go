@@ -340,7 +340,7 @@ func updateContext(counter int) {
 	over.MDC().Set("context", re.ReplaceAllString(context, fmt.Sprintf("[%d]", counter)))
 }
 
-func (ctx *Context) ExecuteMap(data map[string]string) (map[string]string, error) {
+func (ctx *Context) ExecuteMap(data map[string]any) (map[string]string, error) {
 	input := model.NewDictionary()
 
 	for k, v := range data {
