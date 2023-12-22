@@ -44,6 +44,7 @@ func Serve(port int) {
 	}))
 
 	router.GET("/", emptyInputHandler)
+	router.POST("/", payloadInputHandler)
 
 	config := Config{
 		EmptyInput:       false,
