@@ -340,7 +340,7 @@ func updateContext(counter int) {
 	over.MDC().Set("context", re.ReplaceAllString(context, fmt.Sprintf("[%d]", counter)))
 }
 
-func (ctx *Context) ExecuteMap(data map[string]string) (map[string]string, error) {
+func (ctx *Context) ExecuteMap(data map[string]any) (map[string]any, error) {
 	input := model.NewDictionary()
 
 	for k, v := range data {
@@ -357,7 +357,7 @@ func (ctx *Context) ExecuteMap(data map[string]string) (map[string]string, error
 		return nil, err
 	}
 
-	newData := make(map[string]string)
+	newData := make(map[string]any)
 
 	if len(result) > 0 {
 		new_map, ok := result[0].(model.Dictionary)
@@ -366,11 +366,7 @@ func (ctx *Context) ExecuteMap(data map[string]string) (map[string]string, error
 		}
 		unordered := new_map.Unordered()
 		for k, v := range unordered {
-			stringValue, ok := v.(string)
-			if !ok {
-				return nil, fmt.Errorf("Result is not a string")
-			}
-			newData[k] = stringValue
+			newData[k] = v
 		}
 		return newData, nil
 	}

@@ -20,6 +20,7 @@ package main
 import (
 	"bytes"
 	"fmt"
+	"net/http"
 	netHttp "net/http"
 	"os"
 	"runtime"
@@ -32,6 +33,7 @@ import (
 	"github.com/cgi-fr/pimo/pkg/flow"
 	"github.com/cgi-fr/pimo/pkg/model"
 	"github.com/cgi-fr/pimo/pkg/statistics"
+	"github.com/labstack/echo/v4"
 	"github.com/mattn/go-isatty"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
@@ -68,6 +70,7 @@ var (
 	statsDestinationEnv   = os.Getenv("PIMO_STATS_URL")
 	statsTemplateEnv      = os.Getenv("PIMO_STATS_TEMPLATE")
 	xmlSubscriberName     map[string]string
+	serve                 string
 )
 
 func main() {
@@ -109,6 +112,7 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 	rootCmd.PersistentFlags().StringVar(&repeatWhile, "repeat-while", "", "mask each input repeatedly while the given condition is met")
 	rootCmd.PersistentFlags().StringVar(&statisticsDestination, "stats", statsDestinationEnv, "generate execution statistics in the specified dump file")
 	rootCmd.PersistentFlags().StringVar(&statsTemplate, "statsTemplate", statsTemplateEnv, "template string to format stats (to include them you have to specify them as `{{ .Stats }}` like `{\"software\":\"PIMO\",\"stats\":{{ .Stats }}}`)")
+	rootCmd.Flags().StringVar(&serve, "serve", "", "listen/respond to HTTP interface and port instead of stdin/stdout, <ip>:<port> or :<port> to listen to all local networks")
 
 	rootCmd.AddCommand(&cobra.Command{
 		Use: "jsonschema",
@@ -164,11 +168,23 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 				}
 
 				parser.RegisterMapCallback(elementName, func(m map[string]string) (map[string]string, error) {
-					transformedData, err := ctx.ExecuteMap(m)
+					dictionary := make(map[string]any, len(m))
+					for k, v := range m {
+						dictionary[k] = v
+					}
+					transformedData, err := ctx.ExecuteMap(dictionary)
 					if err != nil {
 						return nil, err
 					}
-					return transformedData, nil
+					result := make(map[string]string, len(m))
+					for k, v := range transformedData {
+						stringValue, ok := v.(string)
+						if !ok {
+							return nil, fmt.Errorf("Result is not a string")
+						}
+						result[k] = stringValue
+					}
+					return result, nil
 				})
 			}
 			err := parser.Stream()
@@ -241,6 +257,7 @@ func run(cmd *cobra.Command) {
 		SkipLogFile:      skipLogFile,
 		CachesToDump:     cachesToDump,
 		CachesToLoad:     cachesToLoad,
+		XMLCallback:      len(serve) > 0,
 	}
 
 	var pdef model.Definition
@@ -269,19 +286,56 @@ func run(cmd *cobra.Command) {
 		os.Exit(1)
 	}
 
-	startTime := time.Now()
+	if len(serve) > 0 {
+		router := echo.New()
+		router.HideBanner = true
+		router.GET("/", httpHandler(ctx))
+		router.POST("/", httpHandler(ctx))
+		if err := router.Start(serve); err != nil {
+			log.Err(err).Msg("Failed to start server")
+			os.Exit(8)
+		}
+	} else {
+		startTime := time.Now()
+		stats, err := ctx.Execute(os.Stdout)
+		if err != nil {
+			log.Err(err).Msg("Cannot execute pipeline")
+			log.Warn().Int("return", stats.GetErrorCode()).Msg("End PIMO")
+			os.Exit(stats.GetErrorCode())
+		}
 
-	stats, err := ctx.Execute(os.Stdout)
-	if err != nil {
-		log.Err(err).Msg("Cannot execute pipeline")
-		log.Warn().Int("return", stats.GetErrorCode()).Msg("End PIMO")
-		os.Exit(stats.GetErrorCode())
+		duration := time.Since(startTime)
+		statistics.SetDuration(duration)
+		dumpStats(stats)
 	}
 
-	duration := time.Since(startTime)
-	statistics.SetDuration(duration)
-	dumpStats(stats)
 	os.Exit(0)
+}
+
+func httpHandler(pimo pimo.Context) func(ctx echo.Context) error {
+	return func(ctx echo.Context) error {
+		// dont't panic
+		defer func() error {
+			if r := recover(); r != nil {
+				log.Error().AnErr("panic", r.(error)).Msg("Recovering from panic in rest server.")
+				return ctx.String(http.StatusInternalServerError, r.(error).Error())
+			}
+			return nil
+		}() //nolint:errcheck
+
+		payload := map[string]any{}
+
+		if err := ctx.Bind(&payload); err != nil {
+			return echo.NewHTTPError(http.StatusInternalServerError, err)
+		}
+
+		result, err := pimo.ExecuteMap(payload)
+		if err != nil {
+			return echo.NewHTTPError(http.StatusInternalServerError, err)
+		}
+
+		return ctx.JSON(http.StatusOK, result)
+	}
 }
 
 func initLog() {

@@ -341,7 +341,7 @@ func Test2BaliseIdentity(t *testing.T) {
 	err := ctx.Configure(cfg)
 	assert.Nil(t, err)
 
-	data := map[string]string{"name": "John"}
+	data := map[string]any{"name": "John"}
 	newData1, err := ctx.ExecuteMap(data)
 	assert.Nil(t, err)
 	newData2, err := ctx.ExecuteMap(data)
@@ -376,7 +376,7 @@ func TestExecuteMapWithAttributes(t *testing.T) {
 	err := ctx.Configure(cfg)
 	assert.Nil(t, err)
 
-	data := map[string]string{"name": "John", "name@age": "25"}
+	data := map[string]any{"name": "John", "name@age": "25"}
 
 	newData, err := ctx.ExecuteMap(data)
 
