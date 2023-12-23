@@ -18,6 +18,7 @@ Types of changes
 
 - `Added` new features `findInCSV` mask to get one or multiple csv lines which matched with Json entry value from CSV files.
 - `Added` new flag `--serve` to start a HTTP server that apply masking to JSON body of requests.
+- `Fixed` some bugs with selectors.
 
 ## [1.20.0]
 
