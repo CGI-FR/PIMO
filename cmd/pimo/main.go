@@ -168,18 +168,23 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 				}
 
 				parser.RegisterMapCallback(elementName, func(m map[string]string) (map[string]string, error) {
-					copy := make(map[string]any, len(m))
+					dictionary := make(map[string]any, len(m))
 					for k, v := range m {
-						copy[k] = v
+						dictionary[k] = v
 					}
-					transformedData, err := ctx.ExecuteMap(copy)
+					transformedData, err := ctx.ExecuteMap(dictionary)
 					if err != nil {
 						return nil, err
 					}
+					result := make(map[string]string, len(m))
 					for k, v := range transformedData {
-						m[k] = v.(string)
+						stringValue, ok := v.(string)
+						if !ok {
+							return nil, fmt.Errorf("Result is not a string")
+						}
+						result[k] = stringValue
 					}
-					return m, nil
+					return result, nil
 				})
 			}
 			err := parser.Stream()
