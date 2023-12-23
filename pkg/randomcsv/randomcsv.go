@@ -77,7 +77,7 @@ func (mrl MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.En
 	if len(context) == 0 {
 		context = []model.Dictionary{model.NewPackedDictionary()}
 	}
-	if err := mrl.template.Execute(&output, context[0].UnpackAsDict().Unordered()); err != nil {
+	if err := mrl.template.Execute(&output, context[0].UnpackUnordered()); err != nil {
 		return nil, err
 	}
 	filename := output.String()

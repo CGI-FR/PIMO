@@ -132,7 +132,7 @@ func (me *MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.En
 	if len(context) == 0 {
 		context = []model.Dictionary{model.NewPackedDictionary()}
 	}
-	if err := me.templateURI.Execute(&filenameBuffer, context[0].UnpackAsDict().Unordered()); err != nil {
+	if err := me.templateURI.Execute(&filenameBuffer, context[0].UnpackUnordered()); err != nil {
 		return nil, err
 	}
 	filename := filenameBuffer.String()
@@ -158,7 +158,7 @@ func (me *MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.En
 // getJaccardMatchResults calculates Jaccard similarity for the given CSV filename and exact match results.
 func (me *MaskEngine) getJaccardMatchResults(filename string, exactMatchResults []model.Entry, context []model.Dictionary) ([]model.Entry, error) {
 	var jaccardEntryBuffer bytes.Buffer
-	if err := me.temJaccardEntry.Execute(&jaccardEntryBuffer, context[0].UnpackAsDict().Unordered()); err != nil {
+	if err := me.temJaccardEntry.Execute(&jaccardEntryBuffer, context[0].UnpackUnordered()); err != nil {
 		return nil, err
 	}
 	jaccardEntryString := jaccardEntryBuffer.String()
@@ -212,7 +212,7 @@ func (me *MaskEngine) ExactMatch(filename string, context []model.Dictionary) (b
 		}
 
 		var exactEntryBuffer bytes.Buffer
-		if err := me.temExactMatchEntry.Execute(&exactEntryBuffer, context[0].UnpackAsDict().Unordered()); err != nil {
+		if err := me.temExactMatchEntry.Execute(&exactEntryBuffer, context[0].UnpackUnordered()); err != nil {
 			return false, nil, err
 		}
 		exactEntryString := exactEntryBuffer.String()
