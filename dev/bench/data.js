@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1703354404591,
+  "lastUpdate": 1703369304082,
   "repoUrl": "https://github.com/CGI-FR/PIMO",
   "entries": {
     "Benchmark": [
@@ -4674,6 +4674,102 @@ window.BENCHMARK_DATA = {
             "value": 376,
             "unit": "allocs/op",
             "extra": "222187 times\n4 procs"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "44274230+adrienaury@users.noreply.github.com",
+            "name": "Adrien Aury",
+            "username": "adrienaury"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "919fdf00bc13b1395871b649e3bf9db31e06b313",
+          "message": "fix: bug with contexts (#280)",
+          "timestamp": "2023-12-23T22:59:07+01:00",
+          "tree_id": "4dbd901ca182ad9fabf4134bf4de85040e2e104e",
+          "url": "https://github.com/CGI-FR/PIMO/commit/919fdf00bc13b1395871b649e3bf9db31e06b313"
+        },
+        "date": 1703369303762,
+        "tool": "go",
+        "benches": [
+          {
+            "name": "BenchmarkPimoRun - ns/op",
+            "value": 28204,
+            "unit": "ns/op",
+            "extra": "359838 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkPimoRun - B/op",
+            "value": 18626,
+            "unit": "B/op",
+            "extra": "359838 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkPimoRun - allocs/op",
+            "value": 196,
+            "unit": "allocs/op",
+            "extra": "359838 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge - ns/op",
+            "value": 1755190,
+            "unit": "ns/op",
+            "extra": "6495 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge - B/op",
+            "value": 685183,
+            "unit": "B/op",
+            "extra": "6495 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge - allocs/op",
+            "value": 5937,
+            "unit": "allocs/op",
+            "extra": "6495 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkFindInCSVIteration - ns/op",
+            "value": 91351279,
+            "unit": "ns/op",
+            "extra": "435 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkFindInCSVIteration - B/op",
+            "value": 37489049,
+            "unit": "B/op",
+            "extra": "435 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkFindInCSVIteration - allocs/op",
+            "value": 598552,
+            "unit": "allocs/op",
+            "extra": "435 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkFindInCSVLargeVolume - ns/op",
+            "value": 48246,
+            "unit": "ns/op",
+            "extra": "219784 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkFindInCSVLargeVolume - B/op",
+            "value": 25810,
+            "unit": "B/op",
+            "extra": "219784 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkFindInCSVLargeVolume - allocs/op",
+            "value": 376,
+            "unit": "allocs/op",
+            "extra": "219784 times\n4 procs"
           }
         ]
       }
