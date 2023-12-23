@@ -15,17 +15,14 @@ testcases:
               - "Mathieu"
               - "Marcel"
       EOF
-  - script: pimo -s 1 --serve :8080 &
-  - script: curl http://localhost:8080
+  - type: exec
+    script: |
+      pimo -s 1 --serve :8080 &
+      sleep 2
+      curl -X POST -H 'Content-Type: application/json' -d '{"name":"Toto"}' -s http://localhost:8080
+      kill %1
     assertions:
     - result.code ShouldEqual 0
-    - result.systemoutjson.name ShouldBeIn Mickael Mathieu Marcel
-    - result.systemerr ShouldBeEmpty
-  - script: |
-      curl -X POST -H 'Content-Type: application/json' -d '{"name": "Toto"}' http://localhost:8080
-    assertions:
-    - result.code ShouldEqual 0
-    - result.systemoutjson.name ShouldNotEqual Toto
-    - result.systemoutjson.name ShouldBeIn Mickael Mathieu Marcel
+    - result.systemout ShouldContainSubstring {"name":"Mickael"}
     - result.systemerr ShouldBeEmpty
 
