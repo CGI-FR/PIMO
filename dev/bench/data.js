@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1703172770880,
+  "lastUpdate": 1703354404591,
   "repoUrl": "https://github.com/CGI-FR/PIMO",
   "entries": {
     "Benchmark": [
@@ -4578,6 +4578,102 @@ window.BENCHMARK_DATA = {
             "value": 376,
             "unit": "allocs/op",
             "extra": "239554 times\n4 procs"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "44274230+adrienaury@users.noreply.github.com",
+            "name": "Adrien Aury",
+            "username": "adrienaury"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "c0c663ace1ba62cf598a3d6d86cb6f0d0c0120e8",
+          "message": "feat: serve pimo via http server (#279)\n\n* feat(serve): add command\r\n\r\n* feat(serve): add endpoint with payload\r\n\r\n* feat(serve): fix string problem\r\n\r\n* feat(serve): fix string problem\r\n\r\n* feat(serve): fix string problem\r\n\r\n* feat(serve): use option\r\n\r\n* feat(serve): venom test\r\n\r\n* feat(serve): fix venom test\r\n\r\n* feat(serve): update changelog\r\n\r\n* feat(serve): fix XIXO safe copy",
+          "timestamp": "2023-12-23T18:50:32+01:00",
+          "tree_id": "f033b972138c438dc15d781938e1d541131d0671",
+          "url": "https://github.com/CGI-FR/PIMO/commit/c0c663ace1ba62cf598a3d6d86cb6f0d0c0120e8"
+        },
+        "date": 1703354404311,
+        "tool": "go",
+        "benches": [
+          {
+            "name": "BenchmarkPimoRun - ns/op",
+            "value": 29013,
+            "unit": "ns/op",
+            "extra": "419610 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkPimoRun - B/op",
+            "value": 17325,
+            "unit": "B/op",
+            "extra": "419610 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkPimoRun - allocs/op",
+            "value": 181,
+            "unit": "allocs/op",
+            "extra": "419610 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge - ns/op",
+            "value": 1840575,
+            "unit": "ns/op",
+            "extra": "6295 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge - B/op",
+            "value": 683169,
+            "unit": "B/op",
+            "extra": "6295 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge - allocs/op",
+            "value": 5906,
+            "unit": "allocs/op",
+            "extra": "6295 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkFindInCSVIteration - ns/op",
+            "value": 91973887,
+            "unit": "ns/op",
+            "extra": "418 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkFindInCSVIteration - B/op",
+            "value": 36168195,
+            "unit": "B/op",
+            "extra": "418 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkFindInCSVIteration - allocs/op",
+            "value": 577903,
+            "unit": "allocs/op",
+            "extra": "418 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkFindInCSVLargeVolume - ns/op",
+            "value": 49484,
+            "unit": "ns/op",
+            "extra": "222187 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkFindInCSVLargeVolume - B/op",
+            "value": 25778,
+            "unit": "B/op",
+            "extra": "222187 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkFindInCSVLargeVolume - allocs/op",
+            "value": 376,
+            "unit": "allocs/op",
+            "extra": "222187 times\n4 procs"
           }
         ]
       }
