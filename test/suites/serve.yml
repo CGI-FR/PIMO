@@ -1,0 +1,31 @@
+name: random features
+testcases:
+- name: mask on HTTP
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "name"
+          mask:
+            randomChoice:
+              - "Mickael"
+              - "Mathieu"
+              - "Marcel"
+      EOF
+  - script: pimo -s 1 --serve :8080 &
+  - script: curl http://localhost:8080
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemoutjson.name ShouldBeIn Mickael Mathieu Marcel
+    - result.systemerr ShouldBeEmpty
+  - script: |
+      curl -X POST -H 'Content-Type: application/json' -d '{"name": "Toto"}' http://localhost:8080
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemoutjson.name ShouldNotEqual Toto
+    - result.systemoutjson.name ShouldBeIn Mickael Mathieu Marcel
+    - result.systemerr ShouldBeEmpty
+

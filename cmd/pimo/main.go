@@ -112,7 +112,7 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 	rootCmd.PersistentFlags().StringVar(&repeatWhile, "repeat-while", "", "mask each input repeatedly while the given condition is met")
 	rootCmd.PersistentFlags().StringVar(&statisticsDestination, "stats", statsDestinationEnv, "generate execution statistics in the specified dump file")
 	rootCmd.PersistentFlags().StringVar(&statsTemplate, "statsTemplate", statsTemplateEnv, "template string to format stats (to include them you have to specify them as `{{ .Stats }}` like `{\"software\":\"PIMO\",\"stats\":{{ .Stats }}}`)")
-	rootCmd.Flags().StringVar(&serve, "serve", "", "listen/respond to interface and port instead of stdin/stdout")
+	rootCmd.Flags().StringVar(&serve, "serve", "", "listen/respond to HTTP interface and port instead of stdin/stdout, <ip>:<port> or :<port> to listen to all local networks")
 
 	rootCmd.AddCommand(&cobra.Command{
 		Use: "jsonschema",
@@ -228,8 +228,6 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 	playCmd.PersistentFlags().BoolVarP(&playSecure, "secure", "s", false, "enable security features (use this flag if PIMO Play is publicly exposed)")
 	rootCmd.AddCommand(playCmd)
 
-	rootCmd.AddCommand(pimo.ServeCommand())
-
 	if err := rootCmd.Execute(); err != nil {
 		log.Err(err).Msg("Error when executing command")
 		os.Exit(1)
@@ -285,9 +283,11 @@ func run(cmd *cobra.Command) {
 
 	if len(serve) > 0 {
 		router := echo.New()
+		router.HideBanner = true
 		router.GET("/", httpHandler(ctx))
 		router.POST("/", httpHandler(ctx))
 		if err := router.Start(serve); err != nil {
+			log.Err(err).Msg("Failed to start server")
 			os.Exit(8)
 		}
 	} else {
