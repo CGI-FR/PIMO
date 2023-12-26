@@ -49,7 +49,7 @@ func (engine MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model
 
 // Create a mask from a configuration
 func Factory(conf model.MaskFactoryConfiguration) (model.MaskEngine, bool, error) {
-	if len(conf.Masking.Mask.XML.XPath) != 0 && len(conf.Masking.Mask.XML.Masking) != 0 {
+	if len(conf.Masking.Mask.XML.XPath) != 0 || len(conf.Masking.Mask.XML.Masking) != 0 {
 		seeder := model.NewSeeder(conf.Masking.Seed.Field, conf.Seed)
 		if len(conf.Masking.Mask.XML.InjectParent) == 0 {
 			conf.Masking.Mask.XML.InjectParent = ""
@@ -66,19 +66,11 @@ func Factory(conf model.MaskFactoryConfiguration) (model.MaskEngine, bool, error
 	return nil, false, nil
 }
 
-// func Func(seed int64, seedField string) interface{} {
-// 	var callnumber int64
-// 	return func(dateminstr string, datemaxstr string) (model.Entry, error) {
-// 		datemin, err := time.Parse(time.RFC3339, dateminstr)
-// 		if err != nil {
-// 			return nil, err
-// 		}
-// 		datemax, err := time.Parse(time.RFC3339, datemaxstr)
-// 		if err != nil {
-// 			return nil, err
-// 		}
-// 		mask := NewMask(datemin, datemax, seed+callnumber, model.NewSeeder(seedField, seed+callnumber))
-// 		callnumber++
-// 		return mask.Mask(nil)
-// 	}
-// }
+func Func(seed int64, seedField string) interface{} {
+	var callnumber int64
+	return func(xPath string, injectParent string, masking string) (model.Entry, error) {
+		mask := NewMask(xPath, injectParent, masking, seed+callnumber, model.NewSeeder(seedField, seed+callnumber))
+		callnumber++
+		return mask.Mask(nil)
+	}
+}
