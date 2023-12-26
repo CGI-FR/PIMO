@@ -224,7 +224,7 @@ type MaskType struct {
 	Markov            MarkovType           `yaml:"markov,omitempty" json:"markov,omitempty" jsonschema:"oneof_required=Markov,title=Markov Mask" jsonschema_description:"Produces pseudo text based on sample text"`
 	Transcode         *TranscodeType       `yaml:"transcode,omitempty" json:"transcode,omitempty" jsonschema:"oneof_required=Transcode,title=Transcode Mask" jsonschema_description:"Produce a random string by preserving character classes from the original value"`
 	FindInCSV         FindInCSVType        `yaml:"findInCSV,omitempty" json:"findInCSV,omitempty" jsonschema:"oneof_required=FindInCSV,title=Find in CSV Mask" jsonschema_description:"Find matched values in a CSV file based on input json file and save the matched csv line as type objet"`
-	XML               XMLType              `yaml:"xml,omitempty" json:"xml,omitempty" jsonschema:"oneof_required=XML,title=XML Mask" jsonschema_description:"Apply mask for XML content within JSON values"`
+	XML               XMLType              `yaml:"xml,omitempty" json:"xml,omitempty" jsonschema:"oneof_required=xml,title=XML Mask" jsonschema_description:"Apply mask for XML content within JSON values"`
 }
 
 type Masking struct {
