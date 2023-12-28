@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with PIMO.  If not, see <http://www.gnu.org/licenses/>.
 
-package xml
+package pimo
 
 import (
 	"testing"
@@ -50,10 +50,11 @@ func TestFactoryShouldNotCreateAMaskFromAnEmptyConfig(t *testing.T) {
 
 func TestMaskShouldRemoveTargetAttribute(t *testing.T) {
 	subMasking := `
-	- selector:
-		jsonpath: "@author"
-  	mask:
-	  remove: true`
+    - selector:
+          jsonpath: "@author"
+      mask:
+        remove: true
+`
 
 	config := model.XMLType{
 		XPath:        "note",
@@ -74,7 +75,7 @@ func TestMaskShouldRemoveTargetAttribute(t *testing.T) {
 	assert.Equal(t,
 		model.NewDictionary().
 			With("title", "my blog note").
-			With("content", `<note><date>10/10/2023</date>This is a note of my blog....</note>`).
+			With("content", `<note author="New Author Name"><date>10/10/2023</date>This is a note of my blog....</note>`).
 			Unordered(),
 		masked.(model.Dictionary).Unordered(),
 	)

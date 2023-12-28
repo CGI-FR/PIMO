@@ -15,13 +15,16 @@
 // You should have received a copy of the GNU General Public License
 // along with PIMO.  If not, see <http://www.gnu.org/licenses/>.
 
-package xml
+package pimo
 
 import (
 	"hash/fnv"
 	"math/rand"
+	"strings"
 
+	"github.com/cgi-fr/pimo/internal/app/pimo"
 	"github.com/cgi-fr/pimo/pkg/model"
+	"github.com/goccy/go-yaml"
 	"github.com/rs/zerolog/log"
 )
 
@@ -36,6 +39,13 @@ type MaskEngine struct {
 
 // NewMask return a MaskEngine from 2 dates
 func NewMask(xPath, injectParent, subMasking string, seed int64, seeder model.Seeder) MaskEngine {
+	prefix := `version: "1"
+seed: 42
+masking:`
+
+	subMasking = prefix + subMasking
+	subMasking = strings.ReplaceAll(subMasking, "\t", "  ")
+
 	maskingConfig := []byte(subMasking)
 	return MaskEngine{rand.New(rand.NewSource(seed)), seeder, xPath, injectParent, maskingConfig}
 }
@@ -43,6 +53,29 @@ func NewMask(xPath, injectParent, subMasking string, seed int64, seeder model.Se
 // Mask choose a mask date randomly
 func (engine MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Entry, error) {
 	log.Info().Msg("Mask XML")
+	// Get masking configuration
+	var conf model.Definition
+	err := yaml.Unmarshal(engine.masking, &conf)
+	if err != nil {
+		return conf, err
+	}
+
+	(&conf).SetSeed(engine.rand.Int63())
+	ctx := pimo.NewContext(conf)
+	cfg := pimo.Config{
+		Iteration:   1,
+		XMLCallback: true,
+	}
+	if err := ctx.Configure(cfg); err != nil {
+		log.Err(err).Msg("Cannot configure pipeline")
+		log.Warn().Int("return", 1).Msg("End PIMO")
+		// os.Exit(1)
+	}
+	// Get xml value
+
+	// apply masking
+
+	// Return masked xml value in json
 	var transformedXML string
 	return transformedXML, nil
 }
