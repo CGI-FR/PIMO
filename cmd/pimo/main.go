@@ -168,23 +168,7 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 				}
 
 				parser.RegisterMapCallback(elementName, func(m map[string]string) (map[string]string, error) {
-					dictionary := make(map[string]any, len(m))
-					for k, v := range m {
-						dictionary[k] = v
-					}
-					transformedData, err := ctx.ExecuteMap(dictionary)
-					if err != nil {
-						return nil, err
-					}
-					result := make(map[string]string, len(m))
-					for k, v := range transformedData {
-						stringValue, ok := v.(string)
-						if !ok {
-							return nil, fmt.Errorf("Result is not a string")
-						}
-						result[k] = stringValue
-					}
-					return result, nil
+					return pimo.XMLCallback(ctx, m)
 				})
 			}
 			err := parser.Stream()

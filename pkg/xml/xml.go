@@ -18,8 +18,11 @@
 package pimo
 
 import (
+	"bytes"
 	"hash/fnv"
+	"io"
 	"math/rand"
+	"os"
 	"strings"
 
 	"github.com/cgi-fr/pimo/internal/app/pimo"
@@ -28,7 +31,7 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-// MaskEngine is a struct to mask the date
+// MaskEngine is a struct to mask XML content within JSON values
 type MaskEngine struct {
 	rand         *rand.Rand
 	seeder       model.Seeder
@@ -37,7 +40,7 @@ type MaskEngine struct {
 	masking      []byte
 }
 
-// NewMask return a MaskEngine from 2 dates
+// NewMask return a MaskEngine from xPath name, injectParent and Masking config
 func NewMask(xPath, injectParent, subMasking string, seed int64, seeder model.Seeder) MaskEngine {
 	prefix := `version: "1"
 seed: 42
@@ -50,7 +53,7 @@ masking:`
 	return MaskEngine{rand.New(rand.NewSource(seed)), seeder, xPath, injectParent, maskingConfig}
 }
 
-// Mask choose a mask date randomly
+// Mask choose the target attribute or tag value and apply masking configuration
 func (engine MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Entry, error) {
 	log.Info().Msg("Mask XML")
 	// Get masking configuration
@@ -66,18 +69,27 @@ func (engine MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model
 		Iteration:   1,
 		XMLCallback: true,
 	}
+
 	if err := ctx.Configure(cfg); err != nil {
 		log.Err(err).Msg("Cannot configure pipeline")
 		log.Warn().Int("return", 1).Msg("End PIMO")
-		// os.Exit(1)
 	}
 	// Get xml value
+	jsonDict := context[0].UnpackAsDict().Unordered()
+	xmlValue := jsonDict[e.(string)]
 
-	// apply masking
-
+	// Create xml parser
+	contentReader := strings.NewReader(xmlValue.(string))
+	var resultBuffer bytes.Buffer
+	outputWriter := io.MultiWriter(&resultBuffer, os.Stdout)
+	parser := pimo.ParseXML(contentReader, outputWriter)
+	// Apply masking
+	parser.RegisterMapCallback(engine.xPath, func(m map[string]string) (map[string]string, error) {
+		return pimo.XMLCallback(ctx, m)
+	})
 	// Return masked xml value in json
-	var transformedXML string
-	return transformedXML, nil
+	result := resultBuffer.String()
+	return result, nil
 }
 
 // Create a mask from a configuration

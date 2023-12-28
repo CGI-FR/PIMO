@@ -372,3 +372,23 @@ func (ctx *Context) ExecuteMap(data map[string]any) (map[string]any, error) {
 	}
 	return nil, fmt.Errorf("Result is not a map[string]string")
 }
+
+func XMLCallback(ctx Context, xmlList map[string]string) (map[string]string, error) {
+	dictionary := make(map[string]any, len(xmlList))
+	for k, v := range xmlList {
+		dictionary[k] = v
+	}
+	transformedData, err := ctx.ExecuteMap(dictionary)
+	if err != nil {
+		return nil, err
+	}
+	result := make(map[string]string, len(xmlList))
+	for k, v := range transformedData {
+		stringValue, ok := v.(string)
+		if !ok {
+			return nil, fmt.Errorf("Result is not a string")
+		}
+		result[k] = stringValue
+	}
+	return result, nil
+}
