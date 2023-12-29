@@ -63,7 +63,6 @@ func (engine MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model
 		return conf, err
 	}
 
-	(&conf).SetSeed(engine.rand.Int63())
 	ctx := pimo.NewContext(conf)
 	cfg := pimo.Config{
 		Iteration:   1,
@@ -121,10 +120,7 @@ func Factory(conf model.MaskFactoryConfiguration) (model.MaskEngine, bool, error
 		if len(conf.Masking.Mask.XML.InjectParent) == 0 {
 			conf.Masking.Mask.XML.InjectParent = ""
 		}
-		// This mask need origin seed, it will get different seed base on jsonpath in execution
-		// h := fnv.New64a()
-		// h.Write([]byte(conf.Masking.Selector.Jsonpath))
-		// conf.Seed += int64(h.Sum64())
+		// This mask need origin seed, it will get different seed base on jsonpath in execution of other mask
 		return NewMask(conf.Masking.Mask.XML.XPath,
 			conf.Masking.Mask.XML.InjectParent,
 			conf.Masking.Mask.XML.Masking,
