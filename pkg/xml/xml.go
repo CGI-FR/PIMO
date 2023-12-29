@@ -20,37 +20,31 @@ package pimo
 import (
 	"bytes"
 	"io"
-	"math/rand"
 	"os"
-	"strconv"
 	"strings"
 
 	"github.com/cgi-fr/pimo/internal/app/pimo"
 	"github.com/cgi-fr/pimo/pkg/model"
-	"github.com/goccy/go-yaml"
 	"github.com/rs/zerolog/log"
 )
 
 // MaskEngine is a struct to mask XML content within JSON values
 type MaskEngine struct {
-	rand         *rand.Rand
+	seed         int64
 	seeder       model.Seeder
 	xPath        string
-	injectParent string
-	masking      []byte
+	injectParent map[string]string
+	masking      []model.Masking
 }
 
 // NewMask return a MaskEngine from xPath name, injectParent and Masking config
-func NewMask(xPath, injectParent, subMasking string, seed int64, seeder model.Seeder) MaskEngine {
-	prefix := `version: "1"
-seed: `
-	prefixMasking := `
-masking:`
-	subMasking = prefix + strconv.Itoa(int(seed)) + prefixMasking + subMasking
-	subMasking = strings.ReplaceAll(subMasking, "\t", "  ")
-
-	maskingConfig := []byte(subMasking)
-	return MaskEngine{rand.New(rand.NewSource(seed)), seeder, xPath, injectParent, maskingConfig}
+func NewMask(xPath, injectParent string, subMasking []model.Masking, seed int64, seeder model.Seeder) MaskEngine {
+	// Stock inject parent
+	injectParentMap := make(map[string]string)
+	if len(injectParent) > 0 {
+		injectParentMap[injectParent] = xPath
+	}
+	return MaskEngine{seed, seeder, xPath, injectParentMap, subMasking}
 }
 
 // Mask choose the target attribute or tag value and apply masking configuration
@@ -58,11 +52,8 @@ func (engine MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model
 	log.Info().Msg("Mask XML")
 	// Get masking configuration
 	var conf model.Definition
-	err := yaml.Unmarshal(engine.masking, &conf)
-	if err != nil {
-		return conf, err
-	}
-
+	conf.Masking = engine.masking
+	conf.SetSeed(engine.seed)
 	ctx := pimo.NewContext(conf)
 	cfg := pimo.Config{
 		Iteration:   1,
@@ -84,7 +75,7 @@ func (engine MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model
 	parser := pimo.ParseXML(contentReader, outputWriter)
 	// Apply masking
 	parser.RegisterMapCallback(engine.xPath, func(m map[string]string) (map[string]string, error) {
-		a, _ := pimo.XMLCallback(ctx, m)
+		newList, _ := pimo.XMLCallback(ctx, m)
 		// remove feature possiblity - stream find *remove, don't put in output - xixo XMLElement.String() à changer - ligne 92
 		// for _, key := range n.AttrKeys {
 		// 	if n.Attrs[key].Value != "*remove" {
@@ -92,14 +83,14 @@ func (engine MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model
 		// 	}
 		// }
 		for k := range m {
-			if _, ok := a[k]; !ok {
-				a[k] = "*remove"
+			if _, ok := newList[k]; !ok {
+				newList[k] = "*remove"
 			}
 		}
-		return a, nil
+		return newList, nil
 	})
 
-	err = parser.Stream()
+	err := parser.Stream()
 	if err != nil {
 		log.Err(err).Msg("Error during parsing XML document")
 	}
@@ -131,7 +122,7 @@ func Factory(conf model.MaskFactoryConfiguration) (model.MaskEngine, bool, error
 
 func Func(seed int64, seedField string) interface{} {
 	var callnumber int64
-	return func(xPath string, injectParent string, masking string) (model.Entry, error) {
+	return func(xPath string, injectParent string, masking []model.Masking) (model.Entry, error) {
 		mask := NewMask(xPath, injectParent, masking, seed+callnumber, model.NewSeeder(seedField, seed+callnumber))
 		callnumber++
 		return mask.Mask(nil)

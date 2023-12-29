@@ -149,6 +149,8 @@ The following types of masks can be used :
   * [`pipe`](#pipe) is a mask to handle complex nested array structures, it can read an array as an object stream and process it with a sub-pipeline.
   * [`luhn`](#luhn) can generate valid numbers using the Luhn algorithm (e.g. french SIRET or SIREN).
   * [`markov`](#markov) can generate pseudo text based on a sample text.
+  * [`findInCSV`](#findincsv) get one or multiple csv lines which matched with Json entry value from CSV files.
+  * [`xml`](#xml) can manipulate XML content within JSON values.
 
 A full `masking.yml` file example, using every kind of mask, is given with the source code.
 
@@ -1030,7 +1032,55 @@ Here is the result of excution:
 
 [Return to list of masks](#possible-masks)
 
-### Parsing XML files
+### XML
+
+[![Try it](https://img.shields.io/badge/-Try%20it%20in%20PIMO%20Play-brightgreen)](https://cgi-fr.github.io/pimo-play/#c=G4UwTgzglg9gdgLgAQCICMKBQBbAhhAayjgHMFMkkBaJCEAGxAGMAXGMcyrpAKwngAOuFgAtkKJvBYg4LLNzyFO3JAA9s9ZSrVDR4uDGnztSYj2YsACrjAyW4gPrHtioqS0madRq3YeTXHyCwmKoAAK4AK6i7M4BSK7+8dLYAvTCIOIAciAA7kgAgtEi7EhZuNggKEA&i=N4KABBYEQC4JYwDYFMoC5oFsCeYBGiA9gOZgB2hMqANOJFAMaFlUvrQA8FVYAhgK4wAFoQBOAXgDkAKUJCyYACKFkkgHwcAJrypqAjAAYA9IaMAmA2YDMHI9t0AVIXADOYV33KVkYQgDMwHHwiYgA6cNDbbmQ1KBAAXyA)
+
+The XML mask feature enhances PIMO's capabilities by enabling users to manipulate XML content within JSON values. The proposed syntax aims to align with existing masking conventions for ease of use.
+
+**`Input JSON`**
+
+```json
+{
+    "title": "my blog note",
+    "content": "<note author='John Doe'><date>10/10/2023</date>This is a note of my blog....</note>"
+}
+```
+
+**`masking.yml`**
+
+```yaml
+version: "1"
+masking:
+  - selector:
+      jsonpath: "content"
+    mask:
+      xml:
+        xpath: "note"
+        injectParent: "_"
+        masking:
+          - selector:
+              jsonpath: "@author"
+            mask:
+              template: "New Author Name"
+```
+
+This example masks the original attribute value with the specified template value. `jsonpath: "content"` point to the key in json that contains target XML content to be masked. The `masking` section applies all masks to the target attribute or tag in XML.
+
+For more infomation on pasing XML files. refer to [Parsing-XML-files](#parsing-xml-files)
+
+**`Output JSON`**
+
+```json
+{
+    "title": "my blog note",
+    "content": "<note author='New Author Name'><date>10/10/2023</date>This is a note of my blog....</note>"
+}
+```
+
+[Return to list of masks](#possible-masks)
+
+### Parsing-XML-files
 
 To use PIMO to masking data in an XML file, use in the following way :
 

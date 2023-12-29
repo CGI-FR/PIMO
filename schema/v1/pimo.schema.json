@@ -952,7 +952,10 @@
           "description": "Injects the parent element into a variable for access in subsequent masks"
         },
         "masking": {
-          "type": "string",
+          "items": {
+            "$ref": "#/$defs/Masking"
+          },
+          "type": "array",
           "description": "Sub-list of masks to be applied inside the selected XML element"
         }
       },

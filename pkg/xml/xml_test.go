@@ -26,12 +26,13 @@ import (
 
 func TestFactoryShouldCreateAMask(t *testing.T) {
 	xPath := "content"
-	subMasking := `
-	- selector:
-		jsonpath: "@author"
-  	mask:
-		template: "New Author Name"`
-	maskingConfig := model.Masking{Mask: model.MaskType{XML: model.XMLType{XPath: xPath, InjectParent: "", Masking: subMasking}}}
+	masking := []model.Masking{
+		{
+			Selector: model.SelectorType{Jsonpath: "@author"},
+			Mask:     model.MaskType{Template: "new name"},
+		},
+	}
+	maskingConfig := model.Masking{Mask: model.MaskType{XML: model.XMLType{XPath: xPath, InjectParent: "", Masking: masking}}}
 	factoryConfig := model.MaskFactoryConfiguration{Masking: maskingConfig, Seed: 0}
 	config, present, err := Factory(factoryConfig)
 	assert.NotNil(t, config, "config shouldn't be nil")
@@ -49,17 +50,16 @@ func TestFactoryShouldNotCreateAMaskFromAnEmptyConfig(t *testing.T) {
 }
 
 func TestMaskShouldReplaceTargetAttributeValue(t *testing.T) {
-	subMasking := `
-    - selector:
-          jsonpath: "@author"
-      mask:
-        template: "new name"
-`
-
+	masking := []model.Masking{
+		{
+			Selector: model.SelectorType{Jsonpath: "@author"},
+			Mask:     model.MaskType{Template: "new name"},
+		},
+	}
 	config := model.XMLType{
 		XPath:        "note",
 		InjectParent: "",
-		Masking:      subMasking,
+		Masking:      masking,
 	}
 	maskingConfig := model.Masking{Mask: model.MaskType{XML: config}}
 	factoryConfig := model.MaskFactoryConfiguration{Masking: maskingConfig, Seed: 42}
@@ -83,17 +83,16 @@ func TestMaskShouldReplaceTargetAttributeValue(t *testing.T) {
 }
 
 func TestMaskShouldRemoveTargetAttribute(t *testing.T) {
-	subMasking := `
-    - selector:
-          jsonpath: "@author"
-      mask:
-        remove: true
-`
-
+	masking := []model.Masking{
+		{
+			Selector: model.SelectorType{Jsonpath: "@author"},
+			Mask:     model.MaskType{Remove: true},
+		},
+	}
 	config := model.XMLType{
 		XPath:        "note",
-		InjectParent: "",
-		Masking:      subMasking,
+		InjectParent: "_",
+		Masking:      masking,
 	}
 	maskingConfig := model.Masking{Mask: model.MaskType{XML: config}}
 	factoryConfig := model.MaskFactoryConfiguration{Masking: maskingConfig, Seed: 42}
