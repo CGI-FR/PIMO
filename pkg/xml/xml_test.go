@@ -48,6 +48,40 @@ func TestFactoryShouldNotCreateAMaskFromAnEmptyConfig(t *testing.T) {
 	assert.Nil(t, err, "error should be nil")
 }
 
+func TestMaskShouldReplaceTargetAttributeValue(t *testing.T) {
+	subMasking := `
+    - selector:
+          jsonpath: "@author"
+      mask:
+        template: "new name"
+`
+
+	config := model.XMLType{
+		XPath:        "note",
+		InjectParent: "",
+		Masking:      subMasking,
+	}
+	maskingConfig := model.Masking{Mask: model.MaskType{XML: config}}
+	factoryConfig := model.MaskFactoryConfiguration{Masking: maskingConfig, Seed: 0}
+	mask, present, err := Factory(factoryConfig)
+	assert.Nil(t, err, "error should be nil")
+	assert.True(t, present, "should be true")
+	data := model.NewDictionary().
+		With("title", "my blog note").
+		With("content", `<note author="John Doe"><date>10/10/2023</date>This is a note of my blog....</note>`).
+		Pack()
+	masked, err := mask.Mask("content", data)
+
+	assert.Equal(t,
+		model.NewDictionary().
+			With("title", "my blog note").
+			With("content", `<note author="new name"><date>10/10/2023</date>This is a note of my blog....</note>`).
+			Unordered(),
+		masked.(model.Dictionary).Unordered(),
+	)
+	assert.Nil(t, err, "error should be nil")
+}
+
 func TestMaskShouldRemoveTargetAttribute(t *testing.T) {
 	subMasking := `
     - selector:
@@ -75,7 +109,7 @@ func TestMaskShouldRemoveTargetAttribute(t *testing.T) {
 	assert.Equal(t,
 		model.NewDictionary().
 			With("title", "my blog note").
-			With("content", `<note author="New Author Name"><date>10/10/2023</date>This is a note of my blog....</note>`).
+			With("content", `<note author="*remove"><date>10/10/2023</date>This is a note of my blog....</note>`).
 			Unordered(),
 		masked.(model.Dictionary).Unordered(),
 	)

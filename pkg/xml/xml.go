@@ -85,11 +85,33 @@ func (engine MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model
 	parser := pimo.ParseXML(contentReader, outputWriter)
 	// Apply masking
 	parser.RegisterMapCallback(engine.xPath, func(m map[string]string) (map[string]string, error) {
-		return pimo.XMLCallback(ctx, m)
+		a, _ := pimo.XMLCallback(ctx, m)
+		// remove feature possiblity - stream find *remove, don't put in output - xixo XMLElement.String() à changer - ligne 92
+		// for _, key := range n.AttrKeys {
+		// 	if n.Attrs[key].Value != "*remove" {
+		// 		attributes += n.Attrs[key].String() + " "
+		// 	}
+		// }
+		for k := range m {
+			if _, ok := a[k]; !ok {
+				a[k] = "*remove"
+			}
+		}
+		return a, nil
 	})
-	// Return masked xml value in json
+
+	err = parser.Stream()
+	if err != nil {
+		log.Err(err).Msg("Error during parsing XML document")
+	}
+	// Return masked xml value in dictionary
 	result := resultBuffer.String()
-	return result, nil
+	jsonDict[e.(string)] = result
+	resultDict := model.NewDictionary()
+	for k, v := range jsonDict {
+		resultDict = resultDict.With(k, v)
+	}
+	return resultDict, nil
 }
 
 // Create a mask from a configuration
