@@ -19,10 +19,10 @@ package pimo
 
 import (
 	"bytes"
-	"hash/fnv"
 	"io"
 	"math/rand"
 	"os"
+	"strconv"
 	"strings"
 
 	"github.com/cgi-fr/pimo/internal/app/pimo"
@@ -43,10 +43,10 @@ type MaskEngine struct {
 // NewMask return a MaskEngine from xPath name, injectParent and Masking config
 func NewMask(xPath, injectParent, subMasking string, seed int64, seeder model.Seeder) MaskEngine {
 	prefix := `version: "1"
-seed: 42
+seed: `
+	prefixMasking := `
 masking:`
-
-	subMasking = prefix + subMasking
+	subMasking = prefix + strconv.Itoa(int(seed)) + prefixMasking + subMasking
 	subMasking = strings.ReplaceAll(subMasking, "\t", "  ")
 
 	maskingConfig := []byte(subMasking)
@@ -121,10 +121,10 @@ func Factory(conf model.MaskFactoryConfiguration) (model.MaskEngine, bool, error
 		if len(conf.Masking.Mask.XML.InjectParent) == 0 {
 			conf.Masking.Mask.XML.InjectParent = ""
 		}
-		// set differents seeds for differents jsonpath
-		h := fnv.New64a()
-		h.Write([]byte(conf.Masking.Selector.Jsonpath))
-		conf.Seed += int64(h.Sum64())
+		// This mask need origin seed, it will get different seed base on jsonpath in execution
+		// h := fnv.New64a()
+		// h.Write([]byte(conf.Masking.Selector.Jsonpath))
+		// conf.Seed += int64(h.Sum64())
 		return NewMask(conf.Masking.Mask.XML.XPath,
 			conf.Masking.Mask.XML.InjectParent,
 			conf.Masking.Mask.XML.Masking,

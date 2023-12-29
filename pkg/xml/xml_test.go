@@ -62,7 +62,7 @@ func TestMaskShouldReplaceTargetAttributeValue(t *testing.T) {
 		Masking:      subMasking,
 	}
 	maskingConfig := model.Masking{Mask: model.MaskType{XML: config}}
-	factoryConfig := model.MaskFactoryConfiguration{Masking: maskingConfig, Seed: 0}
+	factoryConfig := model.MaskFactoryConfiguration{Masking: maskingConfig, Seed: 42}
 	mask, present, err := Factory(factoryConfig)
 	assert.Nil(t, err, "error should be nil")
 	assert.True(t, present, "should be true")
@@ -96,7 +96,7 @@ func TestMaskShouldRemoveTargetAttribute(t *testing.T) {
 		Masking:      subMasking,
 	}
 	maskingConfig := model.Masking{Mask: model.MaskType{XML: config}}
-	factoryConfig := model.MaskFactoryConfiguration{Masking: maskingConfig, Seed: 0}
+	factoryConfig := model.MaskFactoryConfiguration{Masking: maskingConfig, Seed: 42}
 	mask, present, err := Factory(factoryConfig)
 	assert.Nil(t, err, "error should be nil")
 	assert.True(t, present, "should be true")
