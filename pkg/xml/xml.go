@@ -76,12 +76,7 @@ func (engine MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model
 	// Apply masking
 	parser.RegisterMapCallback(engine.xPath, func(m map[string]string) (map[string]string, error) {
 		newList, _ := pimo.XMLCallback(ctx, m)
-		// remove feature possiblity - stream find *remove, don't put in output - xixo XMLElement.String() à changer - ligne 92
-		// for _, key := range n.AttrKeys {
-		// 	if n.Attrs[key].Value != "*remove" {
-		// 		attributes += n.Attrs[key].String() + " "
-		// 	}
-		// }
+		// remove element/attribute return *remove as value
 		for k := range m {
 			if _, ok := newList[k]; !ok {
 				newList[k] = "*remove"
