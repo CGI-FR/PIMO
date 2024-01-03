@@ -114,3 +114,36 @@ func TestMaskShouldRemoveTargetAttribute(t *testing.T) {
 	)
 	assert.Nil(t, err, "error should be nil")
 }
+
+func TestMaskShouldAddInjectParentValueToTargetAttribute(t *testing.T) {
+	masking := []model.Masking{
+		{
+			Selector: model.SelectorType{Jsonpath: "@author"},
+			Mask:     model.MaskType{Template: " "},
+		},
+	}
+	config := model.XMLType{
+		XPath:        "note",
+		InjectParent: "title",
+		Masking:      masking,
+	}
+	maskingConfig := model.Masking{Mask: model.MaskType{XML: config}}
+	factoryConfig := model.MaskFactoryConfiguration{Masking: maskingConfig, Seed: 42}
+	mask, present, err := Factory(factoryConfig)
+	assert.Nil(t, err, "error should be nil")
+	assert.True(t, present, "should be true")
+	data := model.NewDictionary().
+		With("title", "my blog note").
+		With("content", `<note author="John Doe"><date>10/10/2023</date>This is a note of my blog....</note>`).
+		Pack()
+	masked, err := mask.Mask("content", data)
+
+	assert.Equal(t,
+		model.NewDictionary().
+			With("title", "my blog note").
+			With("content", `<note author=" my blog note"><date>10/10/2023</date>This is a note of my blog....</note>`).
+			Unordered(),
+		masked.(model.Dictionary).Unordered(),
+	)
+	assert.Nil(t, err, "error should be nil")
+}

@@ -33,18 +33,13 @@ type MaskEngine struct {
 	seed         int64
 	seeder       model.Seeder
 	xPath        string
-	injectParent map[string]string
+	injectParent string
 	masking      []model.Masking
 }
 
 // NewMask return a MaskEngine from xPath name, injectParent and Masking config
 func NewMask(xPath, injectParent string, subMasking []model.Masking, seed int64, seeder model.Seeder) MaskEngine {
-	// Stock inject parent
-	injectParentMap := make(map[string]string)
-	if len(injectParent) > 0 {
-		injectParentMap[injectParent] = xPath
-	}
-	return MaskEngine{seed, seeder, xPath, injectParentMap, subMasking}
+	return MaskEngine{seed, seeder, xPath, injectParent, subMasking}
 }
 
 // Mask choose the target attribute or tag value and apply masking configuration
@@ -76,12 +71,22 @@ func (engine MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model
 	// Apply masking
 	parser.RegisterMapCallback(engine.xPath, func(m map[string]string) (map[string]string, error) {
 		newList, _ := pimo.XMLCallback(ctx, m)
-		// remove element/attribute return *remove as value
+		// add injectParent value
+		if len(engine.injectParent) > 0 {
+			if injectParentValue, ok := jsonDict[engine.injectParent]; ok {
+				for _, masking := range conf.Masking {
+					newList[masking.Selector.Jsonpath] += injectParentValue.(string)
+				}
+			}
+		}
+
 		for k := range m {
+			// remove element/attribute return *remove as value
 			if _, ok := newList[k]; !ok {
 				newList[k] = "*remove"
 			}
 		}
+
 		return newList, nil
 	})
 
