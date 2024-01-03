@@ -79,9 +79,8 @@ func (engine MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model
 				}
 			}
 		}
-
+		// Mask remove return *remove as value to element/attribute
 		for k := range m {
-			// remove element/attribute return *remove as value
 			if _, ok := newList[k]; !ok {
 				newList[k] = "*remove"
 			}
