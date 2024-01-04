@@ -360,11 +360,11 @@ func (ctx *Context) ExecuteMap(data map[string]any) (map[string]any, error) {
 	newData := make(map[string]any)
 
 	if len(result) > 0 {
-		new_map, ok := result[0].(model.Dictionary)
+		newMap, ok := result[0].(model.Dictionary)
 		if !ok {
 			return nil, fmt.Errorf("result is not Dictionary")
 		}
-		unordered := new_map.Unordered()
+		unordered := newMap.Unordered()
 		for k, v := range unordered {
 			newData[k] = v
 		}

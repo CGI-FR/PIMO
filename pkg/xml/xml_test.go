@@ -15,12 +15,13 @@
 // You should have received a copy of the GNU General Public License
 // along with PIMO.  If not, see <http://www.gnu.org/licenses/>.
 
-package pimo
+package xml
 
 import (
 	"testing"
 
 	"github.com/cgi-fr/pimo/pkg/model"
+	"github.com/cgi-fr/pimo/pkg/templatemask"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -32,7 +33,8 @@ func TestFactoryShouldCreateAMask(t *testing.T) {
 			Mask:     model.MaskType{Template: "new name"},
 		},
 	}
-	maskingConfig := model.Masking{Mask: model.MaskType{XML: model.XMLType{XPath: xPath, InjectParent: "", Masking: masking}}}
+	model.InjectMaskFactories([]model.MaskFactory{templatemask.Factory})
+	maskingConfig := model.Masking{Mask: model.MaskType{XML: model.XMLType{XPath: xPath, InjectParent: "", Masking: masking, DefinitionFile: ""}}}
 	factoryConfig := model.MaskFactoryConfiguration{Masking: maskingConfig, Seed: 0}
 	config, present, err := Factory(factoryConfig)
 	assert.NotNil(t, config, "config shouldn't be nil")
@@ -61,6 +63,7 @@ func TestMaskShouldReplaceTargetAttributeValue(t *testing.T) {
 		InjectParent: "",
 		Masking:      masking,
 	}
+	model.InjectMaskFactories([]model.MaskFactory{templatemask.Factory})
 	maskingConfig := model.Masking{Mask: model.MaskType{XML: config}}
 	factoryConfig := model.MaskFactoryConfiguration{Masking: maskingConfig, Seed: 42}
 	mask, present, err := Factory(factoryConfig)

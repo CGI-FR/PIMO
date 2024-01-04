@@ -15,14 +15,17 @@
 // You should have received a copy of the GNU General Public License
 // along with PIMO.  If not, see <http://www.gnu.org/licenses/>.
 
-package pimo
+package xml
 
 import (
 	"bytes"
-	"io"
-	"os"
+	"fmt"
+	"hash/fnv"
+	"html/template"
+	"regexp"
 	"strings"
 
+	over "github.com/adrienaury/zeromdc"
 	"github.com/cgi-fr/pimo/internal/app/pimo"
 	"github.com/cgi-fr/pimo/pkg/model"
 	"github.com/rs/zerolog/log"
@@ -30,35 +33,48 @@ import (
 
 // MaskEngine is a struct to mask XML content within JSON values
 type MaskEngine struct {
-	seed         int64
-	seeder       model.Seeder
+	source       string
 	xPath        string
 	injectParent string
-	masking      []model.Masking
+	pipeline     model.Pipeline
 }
 
 // NewMask return a MaskEngine from xPath name, injectParent and Masking config
-func NewMask(xPath, injectParent string, subMasking []model.Masking, seed int64, seeder model.Seeder) MaskEngine {
-	return MaskEngine{seed, seeder, xPath, injectParent, subMasking}
+func NewMask(xPath, injectParent string, caches map[string]model.Cache, fns template.FuncMap, filename string, seed int64, subMasking ...model.Masking) (MaskEngine, error) {
+	var definition model.Definition
+	var err error
+	if len(filename) > 0 {
+		definition, err = model.LoadPipelineDefinitionFromFile(filename)
+		if err != nil {
+			return MaskEngine{filename, xPath, injectParent, nil}, err
+		}
+		// merge the current seed with the seed provided by configuration on the pipe
+		definition.Seed += seed
+	} else {
+		definition = model.Definition{Seed: seed + 1, Masking: subMasking}
+	}
+	pipeline := model.NewPipeline(nil)
+	pipeline, _, err = model.BuildPipeline(pipeline, definition, caches, fns, "", "")
+	return MaskEngine{"", xPath, injectParent, pipeline}, err
 }
 
 // Mask choose the target attribute or tag value and apply masking configuration
 func (engine MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Entry, error) {
 	log.Info().Msg("Mask XML")
 	// Get masking configuration
-	var conf model.Definition
-	conf.Masking = engine.masking
-	conf.SetSeed(engine.seed)
-	ctx := pimo.NewContext(conf)
-	cfg := pimo.Config{
-		Iteration:   1,
-		XMLCallback: true,
-	}
+	// var conf model.Definition
+	// conf.Masking = engine.masking
+	// conf.SetSeed(engine.seed)
+	// ctx := pimo.NewContext(conf)
+	// cfg := pimo.Config{
+	// 	Iteration:   1,
+	// 	XMLCallback: true,
+	// }
 
-	if err := ctx.Configure(cfg); err != nil {
-		log.Err(err).Msg("Cannot configure pipeline")
-		log.Warn().Int("return", 1).Msg("End PIMO")
-	}
+	// if err := ctx.Configure(cfg); err != nil {
+	// 	log.Err(err).Msg("Cannot configure pipeline")
+	// 	log.Warn().Int("return", 1).Msg("End PIMO")
+	// }
 	// Get xml value
 	jsonDict := context[0].UnpackAsDict().Unordered()
 	xmlValue := jsonDict[e.(string)]
@@ -66,27 +82,65 @@ func (engine MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model
 	// Create xml parser
 	contentReader := strings.NewReader(xmlValue.(string))
 	var resultBuffer bytes.Buffer
-	outputWriter := io.MultiWriter(&resultBuffer, os.Stdout)
-	parser := pimo.ParseXML(contentReader, outputWriter)
+	parser := pimo.ParseXML(contentReader, &resultBuffer)
 	// Apply masking
 	parser.RegisterMapCallback(engine.xPath, func(m map[string]string) (map[string]string, error) {
-		newList, _ := pimo.XMLCallback(ctx, m)
-		// add injectParent value
-		if len(engine.injectParent) > 0 {
-			if injectParentValue, ok := jsonDict[engine.injectParent]; ok {
-				for _, masking := range conf.Masking {
-					newList[masking.Selector.Jsonpath] += injectParentValue.(string)
-				}
-			}
+		// dictionary := make(map[string]any, len(m))
+		// for k, v := range m {
+		// 	dictionary[k] = v
+		// }
+		source := model.NewCallableMapSource()
+		input := model.NewDictionary()
+		for k, v := range m {
+			input = input.With(k, v)
 		}
-		// Mask remove return *remove as value to element/attribute
-		for k := range m {
-			if _, ok := newList[k]; !ok {
-				newList[k] = "*remove"
-			}
+		// source, ok := newSource.(*model.CallableMapSource)
+		// if !ok {
+		// 	return nil, fmt.Errorf("Source is not CallableMapSource")
+		// }
+		source.SetValue(input)
+		result := []model.Entry{}
+		err := engine.pipeline.AddSink(model.NewSinkToSlice(&result)).Run()
+		if err != nil {
+			return nil, err
 		}
 
-		return newList, nil
+		if len(result) > 0 {
+			newMap, ok := result[0].(model.Dictionary)
+			if !ok {
+				return nil, fmt.Errorf("result is not Dictionary")
+			}
+			unordered := newMap.Unordered()
+			result := make(map[string]string, len(unordered))
+			for k, v := range unordered {
+				stringValue, ok := v.(string)
+				if !ok {
+					return nil, fmt.Errorf("Result is not a string")
+				}
+				result[k] = stringValue
+			}
+			return result, nil
+		} else {
+			return nil, fmt.Errorf("Result is not a map[string]string")
+		}
+
+		// // newList, _ := pimo.XMLCallback(ctx, m)
+		// // add injectParent value
+		// // if len(engine.injectParent) > 0 {
+		// // 	if injectParentValue, ok := jsonDict[engine.injectParent]; ok {
+		// // 		for _, masking := range conf.Masking {
+		// // 			newList[masking.Selector.Jsonpath] += injectParentValue.(string)
+		// // 		}
+		// // 	}
+		// // }
+		// // // Mask remove return *remove as value to element/attribute
+		// // for k := range m {
+		// // 	if _, ok := newList[k]; !ok {
+		// // 		newList[k] = "*remove"
+		// // 	}
+		// // }
+
+		// return nil, nil
 	})
 
 	err := parser.Stream()
@@ -105,25 +159,22 @@ func (engine MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model
 
 // Create a mask from a configuration
 func Factory(conf model.MaskFactoryConfiguration) (model.MaskEngine, bool, error) {
-	if len(conf.Masking.Mask.XML.XPath) != 0 || len(conf.Masking.Mask.XML.Masking) != 0 {
-		seeder := model.NewSeeder(conf.Masking.Seed.Field, conf.Seed)
-		if len(conf.Masking.Mask.XML.InjectParent) == 0 {
-			conf.Masking.Mask.XML.InjectParent = ""
+	if len(conf.Masking.Mask.XML.XPath) > 0 && len(conf.Masking.Mask.XML.Masking) > 0 {
+		h := fnv.New64a()
+		h.Write([]byte(conf.Masking.Selector.Jsonpath))
+		conf.Seed += int64(h.Sum64())
+		mask, err := NewMask(conf.Masking.Mask.XML.XPath, conf.Masking.Mask.XML.InjectParent, conf.Cache, conf.Functions, conf.Masking.Mask.XML.DefinitionFile, conf.Seed, conf.Masking.Mask.XML.Masking...)
+		if err != nil {
+			return mask, true, err
 		}
-		// This mask need origin seed, it will get different seed base on jsonpath in execution of other mask
-		return NewMask(conf.Masking.Mask.XML.XPath,
-			conf.Masking.Mask.XML.InjectParent,
-			conf.Masking.Mask.XML.Masking,
-			conf.Seed, seeder), true, nil
+		return mask, true, nil
 	}
 	return nil, false, nil
 }
 
-func Func(seed int64, seedField string) interface{} {
-	var callnumber int64
-	return func(xPath string, injectParent string, masking []model.Masking) (model.Entry, error) {
-		mask := NewMask(xPath, injectParent, masking, seed+callnumber, model.NewSeeder(seedField, seed+callnumber))
-		callnumber++
-		return mask.Mask(nil)
-	}
+var re = regexp.MustCompile(`(\[\d*\])?$`)
+
+func updateContext(counter int) {
+	context := over.MDC().GetString("context")
+	over.MDC().Set("context", re.ReplaceAllString(context, fmt.Sprintf("[%d]", counter)))
 }
