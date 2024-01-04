@@ -61,6 +61,7 @@ import (
 	"github.com/cgi-fr/pimo/pkg/templatemask"
 	"github.com/cgi-fr/pimo/pkg/transcode"
 	"github.com/cgi-fr/pimo/pkg/weightedchoice"
+	"github.com/cgi-fr/pimo/pkg/xml"
 	"github.com/invopop/jsonschema"
 	"github.com/rs/zerolog/log"
 )
@@ -299,6 +300,7 @@ func injectMaskFactories() []model.MaskFactory {
 		randomcsv.Factory,
 		hashcsv.Factory,
 		findincsv.Factory,
+		xml.Factory,
 	}
 }
 

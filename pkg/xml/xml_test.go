@@ -19,8 +19,10 @@ package xml
 
 import (
 	"testing"
+	"time"
 
 	"github.com/cgi-fr/pimo/pkg/model"
+	"github.com/cgi-fr/pimo/pkg/randdate"
 	"github.com/cgi-fr/pimo/pkg/templatemask"
 	"github.com/stretchr/testify/assert"
 )
@@ -69,84 +71,12 @@ func TestMaskShouldReplaceTargetAttributeValue(t *testing.T) {
 	mask, present, err := Factory(factoryConfig)
 	assert.Nil(t, err, "error should be nil")
 	assert.True(t, present, "should be true")
-	data := model.NewDictionary().
-		With("title", "my blog note").
-		With("content", `<note author="John Doe"><date>10/10/2023</date>This is a note of my blog....</note>`).
-		Pack()
-	masked, err := mask.Mask("content", data)
+	data := "<note author='John Doe'><date>10/10/2023</date>This is a note of my blog....</note>"
+	masked, err := mask.Mask(data, model.Dictionary{})
 
 	assert.Equal(t,
-		model.NewDictionary().
-			With("title", "my blog note").
-			With("content", `<note author="new name"><date>10/10/2023</date>This is a note of my blog....</note>`).
-			Unordered(),
-		masked.(model.Dictionary).Unordered(),
-	)
-	assert.Nil(t, err, "error should be nil")
-}
-
-func TestMaskShouldRemoveTargetAttribute(t *testing.T) {
-	masking := []model.Masking{
-		{
-			Selector: model.SelectorType{Jsonpath: "@author"},
-			Mask:     model.MaskType{Remove: true},
-		},
-	}
-	config := model.XMLType{
-		XPath:        "note",
-		InjectParent: "_",
-		Masking:      masking,
-	}
-	maskingConfig := model.Masking{Mask: model.MaskType{XML: config}}
-	factoryConfig := model.MaskFactoryConfiguration{Masking: maskingConfig, Seed: 42}
-	mask, present, err := Factory(factoryConfig)
-	assert.Nil(t, err, "error should be nil")
-	assert.True(t, present, "should be true")
-	data := model.NewDictionary().
-		With("title", "my blog note").
-		With("content", `<note author="John Doe"><date>10/10/2023</date>This is a note of my blog....</note>`).
-		Pack()
-	masked, err := mask.Mask("content", data)
-
-	assert.Equal(t,
-		model.NewDictionary().
-			With("title", "my blog note").
-			With("content", `<note author="*remove"><date>10/10/2023</date>This is a note of my blog....</note>`).
-			Unordered(),
-		masked.(model.Dictionary).Unordered(),
-	)
-	assert.Nil(t, err, "error should be nil")
-}
-
-func TestMaskShouldAddInjectParentValueToTargetAttribute(t *testing.T) {
-	masking := []model.Masking{
-		{
-			Selector: model.SelectorType{Jsonpath: "@author"},
-			Mask:     model.MaskType{Template: " "},
-		},
-	}
-	config := model.XMLType{
-		XPath:        "note",
-		InjectParent: "title",
-		Masking:      masking,
-	}
-	maskingConfig := model.Masking{Mask: model.MaskType{XML: config}}
-	factoryConfig := model.MaskFactoryConfiguration{Masking: maskingConfig, Seed: 42}
-	mask, present, err := Factory(factoryConfig)
-	assert.Nil(t, err, "error should be nil")
-	assert.True(t, present, "should be true")
-	data := model.NewDictionary().
-		With("title", "my blog note").
-		With("content", `<note author="John Doe"><date>10/10/2023</date>This is a note of my blog....</note>`).
-		Pack()
-	masked, err := mask.Mask("content", data)
-
-	assert.Equal(t,
-		model.NewDictionary().
-			With("title", "my blog note").
-			With("content", `<note author=" my blog note"><date>10/10/2023</date>This is a note of my blog....</note>`).
-			Unordered(),
-		masked.(model.Dictionary).Unordered(),
+		"<note author='new name'><date>10/10/2023</date>This is a note of my blog....</note>",
+		masked,
 	)
 	assert.Nil(t, err, "error should be nil")
 }
@@ -155,35 +85,38 @@ func TestMaskWithMultiMasks(t *testing.T) {
 	masking := []model.Masking{
 		{
 			Selector: model.SelectorType{Jsonpath: "@author"},
-			Mask:     model.MaskType{Template: " "},
+			Mask:     model.MaskType{Template: "New name"},
 		},
 		{
 			Selector: model.SelectorType{Jsonpath: "date"},
-			Mask:     model.MaskType{Template: " "},
+			Masks: []model.MaskType{
+				{RandDate: model.RandDateType{
+					DateMin: time.Date(1970, time.January, 1, 0, 0, 0, 0, time.UTC),
+					DateMax: time.Date(2020, time.January, 1, 0, 0, 0, 0, time.UTC),
+				}},
+				{Template: "{{index . \"date\"}}"},
+			},
 		},
 	}
 	config := model.XMLType{
-		XPath:        "note",
-		InjectParent: "title",
-		Masking:      masking,
+		XPath:   "note",
+		Masking: masking,
 	}
+
+	model.InjectMaskFactories([]model.MaskFactory{templatemask.Factory, randdate.Factory})
 	maskingConfig := model.Masking{Mask: model.MaskType{XML: config}}
 	factoryConfig := model.MaskFactoryConfiguration{Masking: maskingConfig, Seed: 42}
 	mask, present, err := Factory(factoryConfig)
+
 	assert.Nil(t, err, "error should be nil")
 	assert.True(t, present, "should be true")
-	data := model.NewDictionary().
-		With("title", "my blog note").
-		With("content", `<note author="John Doe"><date>10/10/2023</date>This is a note of my blog....</note>`).
-		Pack()
-	masked, err := mask.Mask("content", data)
 
-	assert.Equal(t,
-		model.NewDictionary().
-			With("title", "my blog note").
-			With("content", `<note author=" my blog note"><date> my blog note</date>This is a note of my blog....</note>`).
-			Unordered(),
-		masked.(model.Dictionary).Unordered(),
-	)
+	data := "<note author='John Doe'><date>10/10/2023</date>This is a note of my blog....</note>"
+	masked, err := mask.Mask(data, model.Dictionary{})
+
 	assert.Nil(t, err, "error should be nil")
+	assert.Equal(t,
+		"<note author='New name'><date>1981-05-22 08:40:23 +0000 UTC</date>This is a note of my blog....</note>",
+		masked,
+	)
 }

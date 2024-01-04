@@ -2,26 +2,8 @@ name: XML masking features
 testcases:
   - name: replace target attribute value
     steps:
-      - script: rm -f masking.yml
       - script: |-
-          cat > masking.yml <<EOF
-          version: "1"
-          seed: 42
-          masking:
-            - selector:
-                jsonpath: "content"
-              mask:
-                xml:
-                  xpath: "note"
-                  injectParent: "title"
-                  masking:
-                    - selector:
-                        jsonpath: "@author"
-                      mask:
-                        template: "New Author Name"
-          EOF
-      - script: |-
-          echo '{"title": "my blog note","content": "<note author='John Doe'><date>10/10/2023</date>This is a note of my blog....</note>"}' | pimo
+          echo '{"title": "my blog note","content": "<note author='John Doe'><date>10/10/2023</date>This is a note of my blog....</note>"}' | pimo -c ../masking_xml_mask.yml
         assertions:
           - result.code ShouldEqual 0
           - result.systemout ShouldEqual {"title":"my blog note","content":"<note author='New Author Name'><date>10/10/2023</date>This is a note of my blog....</note>"}

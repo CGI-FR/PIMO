@@ -22,11 +22,9 @@ import (
 	"fmt"
 	"hash/fnv"
 	"html/template"
-	"regexp"
 	"strings"
 
-	over "github.com/adrienaury/zeromdc"
-	"github.com/cgi-fr/pimo/internal/app/pimo"
+	"github.com/CGI-FR/xixo/pkg/xixo"
 	"github.com/cgi-fr/pimo/pkg/model"
 	"github.com/rs/zerolog/log"
 )
@@ -61,46 +59,25 @@ func NewMask(xPath, injectParent string, caches map[string]model.Cache, fns temp
 // Mask choose the target attribute or tag value and apply masking configuration
 func (engine MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Entry, error) {
 	log.Info().Msg("Mask XML")
-	// Get masking configuration
-	// var conf model.Definition
-	// conf.Masking = engine.masking
-	// conf.SetSeed(engine.seed)
-	// ctx := pimo.NewContext(conf)
-	// cfg := pimo.Config{
-	// 	Iteration:   1,
-	// 	XMLCallback: true,
-	// }
 
-	// if err := ctx.Configure(cfg); err != nil {
-	// 	log.Err(err).Msg("Cannot configure pipeline")
-	// 	log.Warn().Int("return", 1).Msg("End PIMO")
-	// }
-	// Get xml value
-	jsonDict := context[0].UnpackAsDict().Unordered()
-	xmlValue := jsonDict[e.(string)]
-
+	stringXML, ok := e.(string)
+	if !ok {
+		return nil, fmt.Errorf("jsonpath content is not a string")
+	}
 	// Create xml parser
-	contentReader := strings.NewReader(xmlValue.(string))
+	contentReader := strings.NewReader(stringXML)
 	var resultBuffer bytes.Buffer
-	parser := pimo.ParseXML(contentReader, &resultBuffer)
+	parser := xixo.NewXMLParser(contentReader, &resultBuffer).EnableXpath()
 	// Apply masking
 	parser.RegisterMapCallback(engine.xPath, func(m map[string]string) (map[string]string, error) {
-		// dictionary := make(map[string]any, len(m))
-		// for k, v := range m {
-		// 	dictionary[k] = v
-		// }
 		source := model.NewCallableMapSource()
 		input := model.NewDictionary()
 		for k, v := range m {
 			input = input.With(k, v)
 		}
-		// source, ok := newSource.(*model.CallableMapSource)
-		// if !ok {
-		// 	return nil, fmt.Errorf("Source is not CallableMapSource")
-		// }
 		source.SetValue(input)
 		result := []model.Entry{}
-		err := engine.pipeline.AddSink(model.NewSinkToSlice(&result)).Run()
+		err := engine.pipeline.WithSource(source).AddSink(model.NewSinkToSlice(&result)).Run()
 		if err != nil {
 			return nil, err
 		}
@@ -123,24 +100,6 @@ func (engine MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model
 		} else {
 			return nil, fmt.Errorf("Result is not a map[string]string")
 		}
-
-		// // newList, _ := pimo.XMLCallback(ctx, m)
-		// // add injectParent value
-		// // if len(engine.injectParent) > 0 {
-		// // 	if injectParentValue, ok := jsonDict[engine.injectParent]; ok {
-		// // 		for _, masking := range conf.Masking {
-		// // 			newList[masking.Selector.Jsonpath] += injectParentValue.(string)
-		// // 		}
-		// // 	}
-		// // }
-		// // // Mask remove return *remove as value to element/attribute
-		// // for k := range m {
-		// // 	if _, ok := newList[k]; !ok {
-		// // 		newList[k] = "*remove"
-		// // 	}
-		// // }
-
-		// return nil, nil
 	})
 
 	err := parser.Stream()
@@ -149,12 +108,7 @@ func (engine MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model
 	}
 	// Return masked xml value in dictionary
 	result := resultBuffer.String()
-	jsonDict[e.(string)] = result
-	resultDict := model.NewDictionary()
-	for k, v := range jsonDict {
-		resultDict = resultDict.With(k, v)
-	}
-	return resultDict, nil
+	return result, nil
 }
 
 // Create a mask from a configuration
@@ -170,11 +124,4 @@ func Factory(conf model.MaskFactoryConfiguration) (model.MaskEngine, bool, error
 		return mask, true, nil
 	}
 	return nil, false, nil
-}
-
-var re = regexp.MustCompile(`(\[\d*\])?$`)
-
-func updateContext(counter int) {
-	context := over.MDC().GetString("context")
-	over.MDC().Set("context", re.ReplaceAllString(context, fmt.Sprintf("[%d]", counter)))
 }
