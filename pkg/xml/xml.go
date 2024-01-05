@@ -60,13 +60,14 @@ func NewMask(xPath, injectParent string, caches map[string]model.Cache, fns temp
 func (engine MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Entry, error) {
 	log.Info().Msg("Mask XML")
 
+	// Prepare date
 	stringXML, ok := e.(string)
 	if !ok {
 		return nil, fmt.Errorf("jsonpath content is not a string")
 	}
-	// Create xml parser
 	contentReader := strings.NewReader(stringXML)
 	var resultBuffer bytes.Buffer
+	// Create xml parser
 	parser := xixo.NewXMLParser(contentReader, &resultBuffer).EnableXpath()
 	// Apply masking
 	parser.RegisterMapCallback(engine.xPath, func(m map[string]string) (map[string]string, error) {
@@ -85,7 +86,7 @@ func (engine MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model
 		if len(result) > 0 {
 			newMap, ok := result[0].(model.Dictionary)
 			if !ok {
-				return nil, fmt.Errorf("result is not Dictionary")
+				return nil, fmt.Errorf("Result is not Dictionary")
 			}
 			unordered := newMap.Unordered()
 			result := make(map[string]string, len(unordered))
@@ -119,6 +120,7 @@ func Factory(conf model.MaskFactoryConfiguration) (model.MaskEngine, bool, error
 		conf.Seed += int64(h.Sum64())
 		mask, err := NewMask(conf.Masking.Mask.XML.XPath, conf.Masking.Mask.XML.InjectParent, conf.Cache, conf.Functions, conf.Masking.Mask.XML.DefinitionFile, conf.Seed, conf.Masking.Mask.XML.Masking...)
 		if err != nil {
+			log.Err(err).Msg("Error during factoring XML mask")
 			return mask, true, err
 		}
 		return mask, true, nil
