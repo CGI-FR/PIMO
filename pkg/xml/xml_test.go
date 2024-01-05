@@ -120,3 +120,30 @@ func TestMaskWithMultiMasks(t *testing.T) {
 		masked,
 	)
 }
+
+func TestMaskWithoutXmlValueShouldReturnErrorAndStop(t *testing.T) {
+	masking := []model.Masking{
+		{
+			Selector: model.SelectorType{Jsonpath: "@author"},
+			Mask:     model.MaskType{Template: "new name"},
+		},
+	}
+	config := model.XMLType{
+		XPath:   "note",
+		Masking: masking,
+	}
+
+	model.InjectMaskFactories([]model.MaskFactory{templatemask.Factory, randdate.Factory})
+	maskingConfig := model.Masking{Mask: model.MaskType{XML: config}}
+	factoryConfig := model.MaskFactoryConfiguration{Masking: maskingConfig, Seed: 42}
+	mask, present, err := Factory(factoryConfig)
+
+	assert.Nil(t, err, "error should be nil")
+	assert.True(t, present, "should be true")
+
+	data := "Not a XML"
+	masked, err := mask.Mask(data, model.Dictionary{})
+
+	assert.Equal(t, err.Error(), "Jsonpath content is not a valid XML")
+	assert.Nil(t, masked)
+}

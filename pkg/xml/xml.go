@@ -19,6 +19,7 @@ package xml
 
 import (
 	"bytes"
+	"encoding/xml"
 	"fmt"
 	"hash/fnv"
 	"html/template"
@@ -64,6 +65,10 @@ func (engine MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model
 	stringXML, ok := e.(string)
 	if !ok {
 		return nil, fmt.Errorf("jsonpath content is not a string")
+	}
+	// Check entry is a valid XML
+	if !isXMLValid(stringXML) {
+		return nil, fmt.Errorf("Jsonpath content is not a valid XML")
 	}
 	contentReader := strings.NewReader(stringXML)
 	var resultBuffer bytes.Buffer
@@ -127,4 +132,10 @@ func Factory(conf model.MaskFactoryConfiguration) (model.MaskEngine, bool, error
 		return mask, true, nil
 	}
 	return nil, false, nil
+}
+
+func isXMLValid(xmlString string) bool {
+	var dummy interface{}
+	err := xml.Unmarshal([]byte(xmlString), &dummy)
+	return err == nil
 }
