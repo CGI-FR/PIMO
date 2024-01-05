@@ -2,9 +2,34 @@ name: XML masking features
 testcases:
   - name: replace target attribute value
     steps:
+      - script: rm -f masking.yml
       - script: |-
-          echo '{"title": "my blog note","content": "<note author='John Doe'><date>10/10/2023</date>This is a note of my blog....</note>"}' | pimo -c ../masking_xml_mask.yml
+          cat > expected.json <<EOF
+          {"title":"my blog note","content":"\u003cnote author=\"New Author Name\"\u003e\u003cdate\u003e10/10/2023\u003c/date\u003eThis is a note of my blog....\u003c/note\u003e"}
+          EOF
+      - script: |-
+          cat > masking.yml <<EOF
+          version: "1"
+          masking:
+            - selector:
+                jsonpath: "content"
+              mask:
+                xml:
+                  xpath: "note"
+                  masking:
+                    - selector:
+                        jsonpath: "@author"
+                      mask:
+                        template: "New Author Name"
+
+          EOF
+      - script: |-
+          echo '{"title": "my blog note","content": "<note author=\"John Doe\"><date>10/10/2023</date>This is a note of my blog....</note>"}' | pimo > output.json
         assertions:
-          - result.code ShouldEqual 0
-          - result.systemout ShouldEqual {"title":"my blog note","content":"<note author='New Author Name'><date>10/10/2023</date>This is a note of my blog....</note>"}
-          - result.systemerr ShouldBeEmpty
+        - result.code ShouldEqual 0
+        - result.systemerr ShouldBeEmpty
+      - script: diff expected.json output.json
+        assertions:
+        - result.systemout ShouldBeEmpty
+      - script: rm -f expected.json
+      - script: rm -f output.json

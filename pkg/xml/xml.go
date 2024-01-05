@@ -69,9 +69,9 @@ func (engine MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model
 	var resultBuffer bytes.Buffer
 	// Create xml parser
 	parser := xixo.NewXMLParser(contentReader, &resultBuffer).EnableXpath()
+	source := model.NewCallableMapSource()
 	// Apply masking
 	parser.RegisterMapCallback(engine.xPath, func(m map[string]string) (map[string]string, error) {
-		source := model.NewCallableMapSource()
 		input := model.NewDictionary()
 		for k, v := range m {
 			input = input.With(k, v)
@@ -105,7 +105,8 @@ func (engine MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model
 
 	err := parser.Stream()
 	if err != nil {
-		log.Err(err).Msg("Error during parsing XML document")
+		log.Err(err).Str("xml", stringXML).Msg("Error during parsing XML document")
+		return nil, fmt.Errorf("Error during parsing XML document")
 	}
 	// Return masked xml value in dictionary
 	result := resultBuffer.String()
