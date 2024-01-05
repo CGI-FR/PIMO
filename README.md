@@ -1034,7 +1034,7 @@ Here is the result of excution:
 
 ### XML
 
-[![Try it](https://img.shields.io/badge/-Try%20it%20in%20PIMO%20Play-brightgreen)](https://cgi-fr.github.io/pimo-play/#c=G4UwTgzglg9gdgLgAQCICMKBQBbAhhAayjgHMFMkkBaJCEAGxAGMAXGMcyrpAKwngAOuFgAtkKJvBYg4LLNzyFO3JAA9s9ZSrVDR4uDGnztSYj2YsACrjAyW4gPrHtioqS0madRq3YeTXHyCwmKoAAK4AK6i7M4BSK7+8dLYAvTCIOIAciAA7kgAgtEi7EhZuNggKEA&i=N4KABBYEQC4JYwDYFMoC5oFsCeYBGiA9gOZgB2hMqANOJFAMaFlUvrQA8FVYAhgK4wAFoQBOAXgDkAKUJCyYACKFkkgHwcAJrypqAjAAYA9IaMAmA2YDMHI9t0AVIXADOYV33KVkYQgDMwHHwiYgA6cNDbbmQ1KBAAXyA)
+[![Try it](https://img.shields.io/badge/-Try%20it%20in%20PIMO%20Play-brightgreen)](http://cgi-fr.github.io/pimo-play/#c=G4UwTgzglg9gdgLgAQCICMKBQBbAhhAayjgHMFMkkBaJCEAGxAGMAXGMcyrpAKwngAOuFgAtkKJvBYg4LLNzyFO3JAA9s9ZSrVDR4uDGnztSAMRJRIJELAyWSGACMezewApcSACYw8xAJRIAO5Q9PRIjla4TEwgENCOjMFQohYiVigA+ihIwLhgULiJVnC42CAAdBQmxC6sAAr5duLZ1dqKRKRaKjR0jKzs3Sa8-HC6YqgAArgArqLsxsMdQybmACowSDN0SJ42drm49DNWxBYg2AL0wiDIAN53FUgA1Ei1ro22sgByZVavfHgAGkQABPAC+4Law3Ol2u0nEDwqmRYKUYkMWPVoDFcg2hw0BY2EExQXhumPa+AIEBW2hoYFwcC8ABEbrSYWTpABZYjiNAATgA7AAGKjCtBitBrYXChAyuXCgBaFJhlE5IC5uFU4gATMK9ZLJdLZfKZcr8SYaNI4WzUA9iF4QKokE8ADqkm7ujFAA&i=N4KABGBEAuCW0BsCmkBcUC2BPMAjBA9gOZgB2B0KANOFAMYGmVNpQA85lYAhgK7QALAgCcAvAHIAUgQGkwAEQJJxAPjYATbpRUBGAAwB6fQYBMekwGY2BzdoAqA2AGcwznmQpIwBAGZhseIREAHShwdacSCqQIAC+IEA)
 
 The XML mask feature enhances PIMO's capabilities by enabling users to manipulate XML content within JSON values. The proposed syntax aims to align with existing masking conventions for ease of use.
 
@@ -1057,15 +1057,27 @@ masking:
     mask:
       xml:
         xpath: "note"
+        # the parent object (a domain) will be accessible with the "_" variable name.
         injectParent: "_"
         masking:
-          - selector:
-              jsonpath: "@author"
-            mask:
-              template: "New Author Name"
+        - selector:
+            jsonpath: "@author"
+          mask:
+            # To use a parent value in template: {{. + injectParentName + jsonKey}}
+            template: "{{._title}}"
+        - selector:
+            jsonpath: "date"
+          masks:
+            - randDate:
+                dateMin: "1970-01-01T00:00:00Z"
+                dateMax: "2020-01-01T00:00:00Z"
+            - template: "{{index . \"date\"}}"
 ```
 
 This example masks the original attribute value with the specified template value. `jsonpath: "content"` point to the key in json that contains target XML content to be masked. The `masking` section applies all masks to the target attribute or tag in XML.
+
+the parent object (a domain) will be accessible with the "_" variable name.
+To use a parent value in template: `{{. + injectParentName + jsonKey}}`
 
 For more infomation on pasing XML files. refer to [Parsing-XML-files](#parsing-xml-files)
 
@@ -1073,8 +1085,8 @@ For more infomation on pasing XML files. refer to [Parsing-XML-files](#parsing-x
 
 ```json
 {
-    "title": "my blog note",
-    "content": "<note author='New Author Name'><date>10/10/2023</date>This is a note of my blog....</note>"
+  "title": "my blog note",
+  "content": "<note author='my blog note'><date>2008-06-07 04:34:17 +0000 UTC</date>This is a note of my blog....</note>"
 }
 ```
 
