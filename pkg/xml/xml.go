@@ -70,17 +70,31 @@ func (engine MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model
 	if !isXMLValid(stringXML) {
 		return nil, fmt.Errorf("Jsonpath content is not a valid XML")
 	}
+
 	contentReader := strings.NewReader(stringXML)
 	var resultBuffer bytes.Buffer
 	// Create xml parser
 	parser := xixo.NewXMLParser(contentReader, &resultBuffer).EnableXpath()
 	source := model.NewCallableMapSource()
+	input := model.NewDictionary()
+	// Get injectParent
+	if len(engine.injectParent) > 0 {
+		entryContext, ok := context[0].GetValue(".")
+		if !ok {
+			return nil, fmt.Errorf("Error during get context json")
+		}
+
+		dictContext := entryContext.(model.Dictionary).Unordered()
+		for k, v := range dictContext {
+			input.Set(engine.injectParent+k, v)
+		}
+	}
 	// Apply masking
 	parser.RegisterMapCallback(engine.xPath, func(m map[string]string) (map[string]string, error) {
-		input := model.NewDictionary()
 		for k, v := range m {
 			input = input.With(k, v)
 		}
+
 		source.SetValue(input)
 		result := []model.Entry{}
 		err := engine.pipeline.WithSource(source).AddSink(model.NewSinkToSlice(&result)).Run()

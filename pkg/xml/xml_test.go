@@ -147,3 +147,32 @@ func TestMaskWithoutXmlValueShouldReturnErrorAndStop(t *testing.T) {
 	assert.Equal(t, err.Error(), "Jsonpath content is not a valid XML")
 	assert.Nil(t, masked)
 }
+
+func TestMaskShouldReplaceTargetAttributeValueWithInjectParent(t *testing.T) {
+	masking := []model.Masking{
+		{
+			Selector: model.SelectorType{Jsonpath: "@author"},
+			Mask:     model.MaskType{Template: "{{._title}}"},
+		},
+	}
+	config := model.XMLType{
+		XPath:        "note",
+		InjectParent: "_",
+		Masking:      masking,
+	}
+	model.InjectMaskFactories([]model.MaskFactory{templatemask.Factory})
+	maskingConfig := model.Masking{Mask: model.MaskType{XML: config}}
+	factoryConfig := model.MaskFactoryConfiguration{Masking: maskingConfig, Seed: 42}
+	mask, present, err := Factory(factoryConfig)
+	assert.Nil(t, err, "error should be nil")
+	assert.True(t, present, "should be true")
+	data := "<note author='John Doe'><date>10/10/2023</date>This is a note of my blog....</note>"
+	dict := model.NewDictionary().With("title", "this is my blog title").With("content", data).Pack()
+	masked, err := mask.Mask(data, dict)
+
+	assert.Equal(t,
+		"<note author='this is my blog title'><date>10/10/2023</date>This is a note of my blog....</note>",
+		masked,
+	)
+	assert.Nil(t, err, "error should be nil")
+}
