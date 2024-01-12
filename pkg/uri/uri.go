@@ -20,6 +20,7 @@ package uri
 import (
 	"bufio"
 	"encoding/csv"
+	"errors"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -29,6 +30,8 @@ import (
 	"github.com/cgi-fr/pimo/pkg/maskingdata"
 	"github.com/cgi-fr/pimo/pkg/model"
 )
+
+var MaxCapacityForEachLine = bufio.MaxScanTokenSize
 
 func ReadCsv(uri string, sep rune, comment rune, fieldsPerRecord int, trimLeadingSpaces bool) ([][]string, error) {
 	u, err := url.Parse(uri)
@@ -92,6 +95,7 @@ func Read(uri string) ([]model.Entry, error) {
 			return nil, err
 		}
 		scanner := bufio.NewScanner(file)
+		scanner.Buffer(make([]byte, MaxCapacityForEachLine), MaxCapacityForEachLine)
 		for scanner.Scan() {
 			value := scanner.Text()
 			intValue, err := strconv.Atoi(value)
@@ -101,7 +105,10 @@ func Read(uri string) ([]model.Entry, error) {
 				result = append(result, scanner.Text())
 			}
 		}
-		return result, nil
+		if errors.Is(scanner.Err(), bufio.ErrTooLong) {
+			return result, errors.New("error reading " + uri + ": line is too long, use --buffer-size parameter to increase buffer size")
+		}
+		return result, scanner.Err()
 	}
 	if u.Scheme == "http" || u.Scheme == "https" {
 		/* #nosec */
@@ -111,6 +118,7 @@ func Read(uri string) ([]model.Entry, error) {
 		}
 		defer rep.Body.Close()
 		scanner := bufio.NewScanner(rep.Body)
+		scanner.Buffer(make([]byte, MaxCapacityForEachLine), MaxCapacityForEachLine)
 		for scanner.Scan() {
 			value := scanner.Text()
 			intValue, err := strconv.Atoi(value)
@@ -120,7 +128,10 @@ func Read(uri string) ([]model.Entry, error) {
 				result = append(result, scanner.Text())
 			}
 		}
-		return result, nil
+		if errors.Is(scanner.Err(), bufio.ErrTooLong) {
+			return result, errors.New("error reading " + uri + ": line is too long, use --buffer-size parameter to increase buffer size")
+		}
+		return result, scanner.Err()
 	}
 	if u.Scheme == "pimo" {
 		list, ok := maskingdata.MapData[u.Host]
