@@ -18,7 +18,6 @@
 package main
 
 import (
-	"bufio"
 	"bytes"
 	"fmt"
 	"net/http"
@@ -116,7 +115,7 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 	rootCmd.PersistentFlags().StringVar(&statisticsDestination, "stats", statsDestinationEnv, "generate execution statistics in the specified dump file")
 	rootCmd.PersistentFlags().StringVar(&statsTemplate, "statsTemplate", statsTemplateEnv, "template string to format stats (to include them you have to specify them as `{{ .Stats }}` like `{\"software\":\"PIMO\",\"stats\":{{ .Stats }}}`)")
 	rootCmd.Flags().StringVar(&serve, "serve", "", "listen/respond to HTTP interface and port instead of stdin/stdout, <ip>:<port> or :<port> to listen to all local networks")
-	rootCmd.Flags().IntVar(&maxBufferCapacity, "buffer-size", bufio.MaxScanTokenSize, "buffer size in kB to load data from uri for each line")
+	rootCmd.Flags().IntVar(&maxBufferCapacity, "buffer-size", 64, "buffer size in kB to load data from uri for each line")
 
 	rootCmd.AddCommand(&cobra.Command{
 		Use: "jsonschema",
