@@ -32,29 +32,20 @@ import (
 
 // MaskEngine is a struct to mask XML content within JSON values
 type MaskEngine struct {
-	source       string
 	xPath        string
 	injectParent string
 	pipeline     model.Pipeline
 }
 
 // NewMask return a MaskEngine from xPath name, injectParent and Masking config
-func NewMask(xPath, injectParent string, caches map[string]model.Cache, fns template.FuncMap, filename string, seed int64, subMasking ...model.Masking) (MaskEngine, error) {
+func NewMask(xPath, injectParent string, caches map[string]model.Cache, fns template.FuncMap, seed int64, subMasking ...model.Masking) (MaskEngine, error) {
 	var definition model.Definition
 	var err error
-	if len(filename) > 0 {
-		definition, err = model.LoadPipelineDefinitionFromFile(filename)
-		if err != nil {
-			return MaskEngine{filename, xPath, injectParent, nil}, err
-		}
-		// merge the current seed with the seed provided by configuration on the pipe
-		definition.Seed += seed
-	} else {
-		definition = model.Definition{Seed: seed + 1, Masking: subMasking}
-	}
+
+	definition = model.Definition{Seed: seed + 1, Masking: subMasking}
 	pipeline := model.NewPipeline(nil)
 	pipeline, _, err = model.BuildPipeline(pipeline, definition, caches, fns, "", "")
-	return MaskEngine{"", xPath, injectParent, pipeline}, err
+	return MaskEngine{xPath, injectParent, pipeline}, err
 }
 
 // Mask choose the target attribute or tag value and apply masking configuration
@@ -138,7 +129,7 @@ func Factory(conf model.MaskFactoryConfiguration) (model.MaskEngine, bool, error
 		h := fnv.New64a()
 		h.Write([]byte(conf.Masking.Selector.Jsonpath))
 		conf.Seed += int64(h.Sum64())
-		mask, err := NewMask(conf.Masking.Mask.XML.XPath, conf.Masking.Mask.XML.InjectParent, conf.Cache, conf.Functions, conf.Masking.Mask.XML.DefinitionFile, conf.Seed, conf.Masking.Mask.XML.Masking...)
+		mask, err := NewMask(conf.Masking.Mask.XML.XPath, conf.Masking.Mask.XML.InjectParent, conf.Cache, conf.Functions, conf.Seed, conf.Masking.Mask.XML.Masking...)
 		if err != nil {
 			log.Err(err).Msg("Error during factoring XML mask")
 			return mask, true, err

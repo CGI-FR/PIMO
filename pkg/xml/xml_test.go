@@ -36,7 +36,7 @@ func TestFactoryShouldCreateAMask(t *testing.T) {
 		},
 	}
 	model.InjectMaskFactories([]model.MaskFactory{templatemask.Factory})
-	maskingConfig := model.Masking{Mask: model.MaskType{XML: model.XMLType{XPath: xPath, InjectParent: "", Masking: masking, DefinitionFile: ""}}}
+	maskingConfig := model.Masking{Mask: model.MaskType{XML: model.XMLType{XPath: xPath, InjectParent: "", Masking: masking}}}
 	factoryConfig := model.MaskFactoryConfiguration{Masking: maskingConfig, Seed: 0}
 	config, present, err := Factory(factoryConfig)
 	assert.NotNil(t, config, "config shouldn't be nil")

@@ -185,10 +185,9 @@ type FindInCSVType struct {
 }
 
 type XMLType struct {
-	XPath          string    `yaml:"xpath" json:"xpath" jsonschema_description:"Specifies the XPath expression to target the XML"`
-	InjectParent   string    `yaml:"injectParent,omitempty" json:"injectParent,omitempty" jsonschema_description:"Injects the parent element into a variable for access in subsequent masks"`
-	Masking        []Masking `yaml:"masking,omitempty" json:"masking,omitempty" jsonschema_description:"Sub-list of masks to be applied inside the selected XML element"`
-	DefinitionFile string    `yaml:"file,omitempty" json:"file,omitempty" jsonschema_description:"URI to an external resource to read the pipeline definition"`
+	XPath        string    `yaml:"xpath" json:"xpath" jsonschema_description:"Specifies the XPath expression to target the XML"`
+	InjectParent string    `yaml:"injectParent,omitempty" json:"injectParent,omitempty" jsonschema_description:"Injects the parent element into a variable for access in subsequent masks"`
+	Masking      []Masking `yaml:"masking,omitempty" json:"masking,omitempty" jsonschema_description:"Sub-list of masks to be applied inside the selected XML element"`
 }
 
 type MaskType struct {

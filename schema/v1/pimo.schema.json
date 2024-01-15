@@ -957,10 +957,6 @@
           },
           "type": "array",
           "description": "Sub-list of masks to be applied inside the selected XML element"
-        },
-        "file": {
-          "type": "string",
-          "description": "URI to an external resource to read the pipeline definition"
         }
       },
       "additionalProperties": false,
