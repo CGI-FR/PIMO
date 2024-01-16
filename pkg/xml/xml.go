@@ -82,35 +82,11 @@ func (engine MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model
 	}
 	// Apply masking
 	parser.RegisterMapCallback(engine.xPath, func(m map[string]string) (map[string]string, error) {
-		for k, v := range m {
-			input = input.With(k, v)
-		}
-
-		source.SetValue(input)
-		result := []model.Entry{}
-		err := engine.pipeline.WithSource(source).AddSink(model.NewSinkToSlice(&result)).Run()
+		resultMap, err := engine.xmlCallback(m, source, input)
 		if err != nil {
 			return nil, err
 		}
-
-		if len(result) > 0 {
-			newMap, ok := result[0].(model.Dictionary)
-			if !ok {
-				return nil, fmt.Errorf("Result is not Dictionary")
-			}
-			unordered := newMap.Unordered()
-			result := make(map[string]string, len(unordered))
-			for k, v := range unordered {
-				stringValue, ok := v.(string)
-				if !ok {
-					return nil, fmt.Errorf("Result is not a string")
-				}
-				result[k] = stringValue
-			}
-			return result, nil
-		} else {
-			return nil, fmt.Errorf("Result is not a map[string]string")
-		}
+		return resultMap, nil
 	})
 
 	err := parser.Stream()
@@ -143,4 +119,36 @@ func isXMLValid(xmlString string) bool {
 	var dummy interface{}
 	err := xml.Unmarshal([]byte(xmlString), &dummy)
 	return err == nil
+}
+
+func (engine MaskEngine) xmlCallback(xmlMap map[string]string, source *model.CallableMapSource, input model.Dictionary) (map[string]string, error) {
+	for k, v := range xmlMap {
+		input = input.With(k, v)
+	}
+
+	source.SetValue(input)
+	result := []model.Entry{}
+	err := engine.pipeline.WithSource(source).AddSink(model.NewSinkToSlice(&result)).Run()
+	if err != nil {
+		return nil, err
+	}
+
+	if len(result) > 0 {
+		newMap, ok := result[0].(model.Dictionary)
+		if !ok {
+			return nil, fmt.Errorf("Result is not Dictionary")
+		}
+		unordered := newMap.Unordered()
+		result := make(map[string]string, len(unordered))
+		for k, v := range unordered {
+			stringValue, ok := v.(string)
+			if !ok {
+				return nil, fmt.Errorf("Result is not a string")
+			}
+			result[k] = stringValue
+		}
+		return result, nil
+	} else {
+		return nil, fmt.Errorf("Result is not a map[string]string")
+	}
 }
