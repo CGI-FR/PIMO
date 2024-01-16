@@ -52,7 +52,7 @@ func NewMask(xPath, injectParent string, caches map[string]model.Cache, fns temp
 func (engine MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Entry, error) {
 	log.Info().Msg("Mask XML")
 
-	// Prepare date
+	// Prepare data
 	stringXML, ok := e.(string)
 	if !ok {
 		return nil, fmt.Errorf("jsonpath content is not a string")

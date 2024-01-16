@@ -169,12 +169,6 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 
 				parser.RegisterMapCallback(elementName, func(m map[string]string) (map[string]string, error) {
 					newList, _ := pimo.XMLCallback(ctx, m)
-					// remove element/attribute return *remove as value
-					for k := range m {
-						if _, ok := newList[k]; !ok {
-							newList[k] = "*remove"
-						}
-					}
 					return newList, nil
 				})
 			}
