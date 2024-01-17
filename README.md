@@ -1034,7 +1034,7 @@ Here is the result of excution:
 
 ### XML
 
-[![Try it](https://img.shields.io/badge/-Try%20it%20in%20PIMO%20Play-brightgreen)](http://cgi-fr.github.io/pimo-play/#c=G4UwTgzglg9gdgLgAQCICMKBQBbAhhAayjgHMFMkkBaJCEAGxAGMAXGMcyrpAKwngAOuFgAtkKJvBYg4LLNzyFO3JAA9s9ZSrVDR4uDGnztSAMRJRIJELAyWSGACMezewApcSACYw8xAJRIAO5Q9PRIjla4TEwgENCOjMFQohYiVigA+ihIwLhgULiJVnC42CAAdBQmxC6sAAr5duLZ1dqKRKRaKjR0jKzs3Sa8-HC6YqgAArgArqLsxsMdQybmACowSDN0SJ42drm49DNWxBYg2AL0wiDIAN53FUgA1Ei1ro22sgByZVavfHgAGkQABPAC+4Law3Ol2u0nEDwqmRYKUYkMWPVoDFcg2hw0BY2EExQXhumPa+AIEBW2hoYFwcC8ABEbrSYWTpABZYjiNAATgA7AAGKjCtBitBrYXChAyuXCgBaFJhlE5IC5uFU4gATMK9ZLJdLZfKZcr8SYaNI4WzUA9iF4QKokE8ADqkm7ujFAA&i=N4KABGBEAuCW0BsCmkBcUC2BPMAjBA9gOZgB2B0KANOFAMYGmVNpQA85lYAhgK7QALAgCcAvAHIAUgQGkwAEQJJxAPjYATbpRUBGAAwB6fQYBMekwGY2BzdoAqA2AGcwznmQpIwBAGZhseIREAHShwdacSCqQIAC+IEA)
+[![Try it](https://img.shields.io/badge/-Try%20it%20in%20PIMO%20Play-brightgreen)](http://cgi-fr.github.io/pimo-play/#c=G4UwTgzglg9gdgLgAQCICMKBQBbAhhAayjgHMFMkkBaJCEAGxAGMAXGMcyrpAKwngAOuFgAtkKJvBYg4LLNzyFO3JAA9s9ZSrVDR4uDGnztSAMRJRIJELAyWSGACMezewApcSACYw8xAJRIAO5Q9PRIjla4TEwgENCOjMFQohYiVigA+ihIwLhgULiJVnC42CAAdBQmxC6sAAr5duLZ1dqKRKRaKjR0jKzs3Sa8-HC6YqgAArgArqLsxsMdQybmACowSDN0SJ42drm49DNWxBYg2AL0wiDIAN53FUgA1Ei1ro22sgByZVavT1efHgAGkQABPAC+kLaw3Ol2u0nEDwqmQqLBSjGhix6tAYrkGsOGwLGwgmKC8Nxx7XwBAgK20NDAuDgXgAIjcGXDKdIALLEcRoACcAHYAAxUMVoSVoNZisUIeWKsUALWpcMoPJAvNwqnEACYxYaZTK5QqlfK1USTDRpAjOagHsQvCBVEgngAdCk3L3YoA&i=N4KABGBEAuCW0BsCmkBcUC2BPMAjBA9gOZgB2B0KANOFAMYGmVNpQA85lYAhgK7QALAgCcAvAHIAUgQGkwAEQJJxAPjYATbpRUBGAAwB6fQYBMekwGY2BzdoAqA2AGcwznmQpIwBAGZhseIREAHShwdacSCqQIAC+QA)
 
 The XML mask feature enhances PIMO's capabilities by enabling users to manipulate XML content within JSON values. The proposed syntax aims to align with existing masking conventions for ease of use.
 
@@ -1063,8 +1063,8 @@ masking:
         - selector:
             jsonpath: "@author"
           mask:
-            # To use a parent value in template: {{. + injectParentName + jsonKey}}
-            template: "{{._title}}"
+            # To use a parent value in template: {{. + injectParentName + . + jsonKey}}
+            template: "{{._.title}}"
         - selector:
             jsonpath: "date"
           masks:
@@ -1077,7 +1077,7 @@ masking:
 This example masks the original attribute value with the specified template value. `jsonpath: "content"` point to the key in json that contains target XML content to be masked. The `masking` section applies all masks to the target attribute or tag in XML.
 
 the parent object (a domain) will be accessible with the "_" variable name.
-To use a parent value in template: `{{. + injectParentName + jsonKey}}`
+To use a parent value in template: `{{. + injectParentName + . + jsonKey}}`
 
 For more infomation on pasing XML files. refer to [Parsing-XML-files](#parsing-xml-files)
 
