@@ -144,15 +144,19 @@ func TestMaskWithoutXmlValueShouldReturnErrorAndStop(t *testing.T) {
 	data := "Not a XML"
 	masked, err := mask.Mask(data, model.Dictionary{})
 
-	assert.Equal(t, err.Error(), "Jsonpath content is not a valid XML")
 	assert.Nil(t, masked)
+	assert.Equal(t, err.Error(), "Jsonpath content is not a valid XML")
 }
 
 func TestMaskShouldReplaceTargetAttributeValueWithInjectParent(t *testing.T) {
 	masking := []model.Masking{
 		{
 			Selector: model.SelectorType{Jsonpath: "@author"},
-			Mask:     model.MaskType{Template: "{{._title}}"},
+			Mask:     model.MaskType{Template: "{{._.title}}"},
+		},
+		{
+			Selector: model.SelectorType{Jsonpath: "date"},
+			Mask:     model.MaskType{Template: "{{._.city}}"},
 		},
 	}
 	config := model.XMLType{
@@ -167,11 +171,11 @@ func TestMaskShouldReplaceTargetAttributeValueWithInjectParent(t *testing.T) {
 	assert.Nil(t, err, "error should be nil")
 	assert.True(t, present, "should be true")
 	data := "<note author='John Doe'><date>10/10/2023</date>This is a note of my blog....</note>"
-	dict := model.NewDictionary().With("title", "this is my blog title").With("content", data).Pack()
+	dict := model.NewDictionary().With("title", "this is my blog title").With("content", data).With("city", "Nantes").Pack()
 	masked, err := mask.Mask(data, dict)
 
 	assert.Equal(t,
-		"<note author='this is my blog title'><date>10/10/2023</date>This is a note of my blog....</note>",
+		"<note author='this is my blog title'><date>Nantes</date>This is a note of my blog....</note>",
 		masked,
 	)
 	assert.Nil(t, err, "error should be nil")

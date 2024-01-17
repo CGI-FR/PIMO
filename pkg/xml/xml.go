@@ -74,11 +74,7 @@ func (engine MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model
 		if !ok {
 			return nil, fmt.Errorf("Error during get context json")
 		}
-
-		dictContext := entryContext.(model.Dictionary).Unordered()
-		for k, v := range dictContext {
-			input.Set(engine.injectParent+k, v)
-		}
+		input.Set(engine.injectParent, entryContext)
 	}
 	// Apply masking
 	parser.RegisterMapCallback(engine.xPath, func(m map[string]string) (map[string]string, error) {
@@ -141,6 +137,11 @@ func (engine MaskEngine) xmlCallback(xmlMap map[string]string, source *model.Cal
 		unordered := newMap.Unordered()
 		result := make(map[string]string, len(unordered))
 		for k, v := range unordered {
+			// check if v is type map[string]Entry and k is injectParent. It means it's injectParent value, not error.
+			if _, ok := v.(map[string]model.Entry); ok && k == engine.injectParent {
+				// passe for next iteration
+				continue
+			}
 			stringValue, ok := v.(string)
 			if !ok {
 				return nil, fmt.Errorf("Result is not a string")
