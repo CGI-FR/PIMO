@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1705074607011,
+  "lastUpdate": 1705942893973,
   "repoUrl": "https://github.com/CGI-FR/PIMO",
   "entries": {
     "Benchmark": [
@@ -5058,6 +5058,102 @@ window.BENCHMARK_DATA = {
             "value": 376,
             "unit": "allocs/op",
             "extra": "238515 times\n4 procs"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "114090113+Chao-Ma5566@users.noreply.github.com",
+            "name": "Chao-Ma5566",
+            "username": "Chao-Ma5566"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "5fa4e5490697db19831e917cccf3f78105d24c4c",
+          "message": "Merge pull request #281 from CGI-FR/272-proposal-xml-mask-for-xml-in-json\n\n272 proposal xml mask for xml in json",
+          "timestamp": "2024-01-22T17:52:05+01:00",
+          "tree_id": "8de280a39ba964ca3a613b7afdeb797c96ef3bbf",
+          "url": "https://github.com/CGI-FR/PIMO/commit/5fa4e5490697db19831e917cccf3f78105d24c4c"
+        },
+        "date": 1705942893490,
+        "tool": "go",
+        "benches": [
+          {
+            "name": "BenchmarkPimoRun - ns/op",
+            "value": 30076,
+            "unit": "ns/op",
+            "extra": "339148 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkPimoRun - B/op",
+            "value": 18676,
+            "unit": "B/op",
+            "extra": "339148 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkPimoRun - allocs/op",
+            "value": 196,
+            "unit": "allocs/op",
+            "extra": "339148 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge - ns/op",
+            "value": 1752302,
+            "unit": "ns/op",
+            "extra": "6385 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge - B/op",
+            "value": 685269,
+            "unit": "B/op",
+            "extra": "6385 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge - allocs/op",
+            "value": 5938,
+            "unit": "allocs/op",
+            "extra": "6385 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkFindInCSVIteration - ns/op",
+            "value": 92996086,
+            "unit": "ns/op",
+            "extra": "436 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkFindInCSVIteration - B/op",
+            "value": 37566864,
+            "unit": "B/op",
+            "extra": "436 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkFindInCSVIteration - allocs/op",
+            "value": 599768,
+            "unit": "allocs/op",
+            "extra": "436 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkFindInCSVLargeVolume - ns/op",
+            "value": 46687,
+            "unit": "ns/op",
+            "extra": "244647 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkFindInCSVLargeVolume - B/op",
+            "value": 26039,
+            "unit": "B/op",
+            "extra": "244647 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkFindInCSVLargeVolume - allocs/op",
+            "value": 376,
+            "unit": "allocs/op",
+            "extra": "244647 times\n4 procs"
           }
         ]
       }
