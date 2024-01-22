@@ -184,6 +184,12 @@ type FindInCSVType struct {
 	TrimSpace       bool           `yaml:"trim,omitempty" json:"trim,omitempty" jsonschema_description:"If true leading white space in a field is ignored"`
 }
 
+type XMLType struct {
+	XPath        string    `yaml:"xpath" json:"xpath" jsonschema_description:"Specifies the XPath expression to target the XML"`
+	InjectParent string    `yaml:"injectParent,omitempty" json:"injectParent,omitempty" jsonschema_description:"Injects the parent element into a variable for access in subsequent masks"`
+	Masking      []Masking `yaml:"masking,omitempty" json:"masking,omitempty" jsonschema_description:"Sub-list of masks to be applied inside the selected XML element"`
+}
+
 type MaskType struct {
 	Add               Entry                `yaml:"add,omitempty" json:"add,omitempty" jsonschema:"oneof_required=Add,title=Add Mask,description=Add a new field in the JSON stream"`
 	AddTransient      Entry                `yaml:"add-transient,omitempty" json:"add-transient,omitempty" jsonschema:"oneof_required=AddTransient,title=Add Transient Mask" jsonschema_description:"Add a new temporary field, that will not show in the JSON output"`
@@ -217,7 +223,8 @@ type MaskType struct {
 	Luhn              *LuhnType            `yaml:"luhn,omitempty" json:"luhn,omitempty" jsonschema:"oneof_required=Luhn,title=Luhn Mask" jsonschema_description:"Concatenate a checksum key to the input value computed with the luhn algorithm"`
 	Markov            MarkovType           `yaml:"markov,omitempty" json:"markov,omitempty" jsonschema:"oneof_required=Markov,title=Markov Mask" jsonschema_description:"Produces pseudo text based on sample text"`
 	Transcode         *TranscodeType       `yaml:"transcode,omitempty" json:"transcode,omitempty" jsonschema:"oneof_required=Transcode,title=Transcode Mask" jsonschema_description:"Produce a random string by preserving character classes from the original value"`
-	FindInCSV         FindInCSVType        `yaml:"findInCSV,omitempty" json:"findInCSV,omitempty" jsonschema:"oneof_required=FindInCSV,title=Find in CSV Mask" jsonschema_description:"find matched values in a CSV file based on input json file and save the matched csv line as type objet"`
+	FindInCSV         FindInCSVType        `yaml:"findInCSV,omitempty" json:"findInCSV,omitempty" jsonschema:"oneof_required=FindInCSV,title=Find in CSV Mask" jsonschema_description:"Find matched values in a CSV file based on input json file and save the matched csv line as type objet"`
+	XML               XMLType              `yaml:"xml,omitempty" json:"xml,omitempty" jsonschema:"oneof_required=xml,title=XML Mask" jsonschema_description:"Apply mask for XML content within JSON values"`
 }
 
 type Masking struct {

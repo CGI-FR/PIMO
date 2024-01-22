@@ -14,6 +14,10 @@ Types of changes
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [1.22.0]
+
+- `Added` new features `xml` mask to to manipulate XML content within JSON values. The proposed syntax aims to align with existing masking conventions for ease of use.
+
 ## [1.21.0]
 
 - `Added` new features `findInCSV` mask to get one or multiple csv lines which matched with Json entry value from CSV files.

@@ -492,6 +492,12 @@
             "findInCSV"
           ],
           "title": "FindInCSV"
+        },
+        {
+          "required": [
+            "xml"
+          ],
+          "title": "xml"
         }
       ],
       "properties": {
@@ -660,7 +666,12 @@
         "findInCSV": {
           "$ref": "#/$defs/FindInCSVType",
           "title": "Find in CSV Mask",
-          "description": "find matched values in a CSV file based on input json file and save the matched csv line as type objet"
+          "description": "Find matched values in a CSV file based on input json file and save the matched csv line as type objet"
+        },
+        "xml": {
+          "$ref": "#/$defs/XMLType",
+          "title": "XML Mask",
+          "description": "Apply mask for XML content within JSON values"
         }
       },
       "additionalProperties": false,
@@ -928,6 +939,30 @@
       "required": [
         "choice",
         "weight"
+      ]
+    },
+    "XMLType": {
+      "properties": {
+        "xpath": {
+          "type": "string",
+          "description": "Specifies the XPath expression to target the XML"
+        },
+        "injectParent": {
+          "type": "string",
+          "description": "Injects the parent element into a variable for access in subsequent masks"
+        },
+        "masking": {
+          "items": {
+            "$ref": "#/$defs/Masking"
+          },
+          "type": "array",
+          "description": "Sub-list of masks to be applied inside the selected XML element"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "xpath"
       ]
     }
   }

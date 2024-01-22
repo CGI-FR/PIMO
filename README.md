@@ -149,6 +149,8 @@ The following types of masks can be used :
   * [`pipe`](#pipe) is a mask to handle complex nested array structures, it can read an array as an object stream and process it with a sub-pipeline.
   * [`luhn`](#luhn) can generate valid numbers using the Luhn algorithm (e.g. french SIRET or SIREN).
   * [`markov`](#markov) can generate pseudo text based on a sample text.
+  * [`findInCSV`](#findincsv) get one or multiple csv lines which matched with Json entry value from CSV files.
+  * [`xml`](#xml) can manipulate XML content within JSON values.
 
 A full `masking.yml` file example, using every kind of mask, is given with the source code.
 
@@ -1030,7 +1032,67 @@ Here is the result of excution:
 
 [Return to list of masks](#possible-masks)
 
-### Parsing XML files
+### XML
+
+[![Try it](https://img.shields.io/badge/-Try%20it%20in%20PIMO%20Play-brightgreen)](http://cgi-fr.github.io/pimo-play/#c=G4UwTgzglg9gdgLgAQCICMKBQBbAhhAayjgHMFMkkBaJCEAGxAGMAXGMcyrpAKwngAOuFgAtkKJvBYg4LLNzyFO3JAA9s9ZSrVDR4uDGnztSAMRJRIJELAyWSGACMezewApcSACYw8xAJRIAO5Q9PRIjla4TEwgENCOjMFQohYiVigA+ihIwLhgULiJVnC42CAAdBQmxC6sAAr5duLZ1dqKRKRaKjR0jKzs3Sa8-HC6YqgAArgArqLsxsMdQybmACowSDN0SJ42drm49DNWxBYg2AL0wiDIAN53FUgA1Ei1ro22sgByZVavT1efHgAGkQABPAC+kLaw3Ol2u0nEDwqmQqLBSjGhix6tAYrkGsOGwLGwgmKC8Nxx7XwBAgK20NDAuDgXgAIjcGXDKdIALLEcRoACcAHYAAxUMVoSVoNZisUIeWKsUALWpcMoPJAvNwqnEACYxYaZTK5QqlfK1USTDRpAjOagHsQvCBVEgngAdCk3L3YoA&i=N4KABGBEAuCW0BsCmkBcUC2BPMAjBA9gOZgB2B0KANOFAMYGmVNpQA85lYAhgK7QALAgCcAvAHIAUgQGkwAEQJJxAPjYATbpRUBGAAwB6fQYBMekwGY2BzdoAqA2AGcwznmQpIwBAGZhseIREAHShwdacSCqQIAC+QA)
+
+The XML mask feature enhances PIMO's capabilities by enabling users to manipulate XML content within JSON values. The proposed syntax aims to align with existing masking conventions for ease of use.
+
+**`Input JSON`**
+
+```json
+{
+    "title": "my blog note",
+    "content": "<note author='John Doe'><date>10/10/2023</date>This is a note of my blog....</note>"
+}
+```
+
+**`masking.yml`**
+
+```yaml
+version: "1"
+masking:
+  - selector:
+      jsonpath: "content"
+    mask:
+      xml:
+        xpath: "note"
+        # the parent object (a domain) will be accessible with the "_" variable name.
+        injectParent: "_"
+        masking:
+        - selector:
+            jsonpath: "@author"
+          mask:
+            # To use a parent value in template: {{. + injectParentName + . + jsonKey}}
+            template: "{{._.title}}"
+        - selector:
+            jsonpath: "date"
+          masks:
+            - randDate:
+                dateMin: "1970-01-01T00:00:00Z"
+                dateMax: "2020-01-01T00:00:00Z"
+            - template: "{{index . \"date\"}}"
+```
+
+This example masks the original attribute value with the specified template value. `jsonpath: "content"` point to the key in json that contains target XML content to be masked. The `masking` section applies all masks to the target attribute or tag in XML.
+
+the parent object (a domain) will be accessible with the "_" variable name.
+To use a parent value in template: `{{. + injectParentName + . + jsonKey}}`
+
+For more infomation on pasing XML files. refer to [Parsing-XML-files](#parsing-xml-files)
+
+**`Output JSON`**
+
+```json
+{
+  "title": "my blog note",
+  "content": "<note author='my blog note'><date>2008-06-07 04:34:17 +0000 UTC</date>This is a note of my blog....</note>"
+}
+```
+
+[Return to list of masks](#possible-masks)
+
+### Parsing-XML-files
 
 To use PIMO to masking data in an XML file, use in the following way :
 

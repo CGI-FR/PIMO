@@ -61,6 +61,7 @@ import (
 	"github.com/cgi-fr/pimo/pkg/templatemask"
 	"github.com/cgi-fr/pimo/pkg/transcode"
 	"github.com/cgi-fr/pimo/pkg/weightedchoice"
+	"github.com/cgi-fr/pimo/pkg/xml"
 	"github.com/invopop/jsonschema"
 	"github.com/rs/zerolog/log"
 )
@@ -299,6 +300,7 @@ func injectMaskFactories() []model.MaskFactory {
 		randomcsv.Factory,
 		hashcsv.Factory,
 		findincsv.Factory,
+		xml.Factory,
 	}
 }
 
@@ -360,15 +362,35 @@ func (ctx *Context) ExecuteMap(data map[string]any) (map[string]any, error) {
 	newData := make(map[string]any)
 
 	if len(result) > 0 {
-		new_map, ok := result[0].(model.Dictionary)
+		newMap, ok := result[0].(model.Dictionary)
 		if !ok {
 			return nil, fmt.Errorf("result is not Dictionary")
 		}
-		unordered := new_map.Unordered()
+		unordered := newMap.Unordered()
 		for k, v := range unordered {
 			newData[k] = v
 		}
 		return newData, nil
 	}
 	return nil, fmt.Errorf("Result is not a map[string]string")
+}
+
+func XMLCallback(ctx Context, xmlList map[string]string) (map[string]string, error) {
+	dictionary := make(map[string]any, len(xmlList))
+	for k, v := range xmlList {
+		dictionary[k] = v
+	}
+	transformedData, err := ctx.ExecuteMap(dictionary)
+	if err != nil {
+		return nil, err
+	}
+	result := make(map[string]string, len(xmlList))
+	for k, v := range transformedData {
+		stringValue, ok := v.(string)
+		if !ok {
+			return nil, fmt.Errorf("Result is not a string")
+		}
+		result[k] = stringValue
+	}
+	return result, nil
 }
