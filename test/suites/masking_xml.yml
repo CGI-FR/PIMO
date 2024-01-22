@@ -68,3 +68,42 @@ testcases:
         - result.systemout ShouldBeEmpty
       - script: rm -f expected.json
       - script: rm -f output.json
+
+  - name: remove target attribute and tag
+    steps:
+      - script: rm -f masking.yml
+      - script: |-
+          cat > expected.json <<EOF
+          {"title":"my blog note","content":"\u003cnote\u003eThis is a note of my blog....\u003c/note\u003e"}
+          EOF
+      - script: |-
+          cat > masking.yml <<EOF
+          version: "1"
+          masking:
+            - selector:
+                jsonpath: "content"
+              mask:
+                xml:
+                  xpath: "note"
+                  masking:
+                    - selector:
+                        jsonpath: "@author"
+                      mask:
+                        remove: true
+                    - selector:
+                        jsonpath: "date"
+                      mask:
+                        remove: true
+
+
+          EOF
+      - script: |-
+          echo '{"title": "my blog note","content": "<note author=\"John Doe\"><date>10/10/2023</date>This is a note of my blog....</note>"}' | pimo > output.json
+        assertions:
+        - result.code ShouldEqual 0
+        - result.systemerr ShouldBeEmpty
+      - script: diff expected.json output.json
+        assertions:
+        - result.systemout ShouldBeEmpty
+      - script: rm -f expected.json
+      - script: rm -f output.json
