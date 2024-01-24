@@ -12,6 +12,7 @@ require (
 	github.com/labstack/echo/v4 v4.11.4
 	github.com/mattn/anko v0.1.9
 	github.com/mattn/go-isatty v0.0.20
+	github.com/pkg/profile v1.7.0
 	github.com/rs/zerolog v1.31.0
 	github.com/spf13/cast v1.5.1
 	github.com/spf13/cobra v1.8.0
@@ -28,8 +29,10 @@ require (
 	github.com/buger/jsonparser v1.1.1 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/fatih/color v1.13.0 // indirect
+	github.com/felixge/fgprof v0.9.3 // indirect
 	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
 	github.com/google/gxui v0.0.0-20151028112939-f85e0a97b3a4 // indirect
+	github.com/google/pprof v0.0.0-20211214055906-6f57359322fd // indirect
 	github.com/google/uuid v1.1.2 // indirect
 	github.com/huandu/xstrings v1.3.3 // indirect
 	github.com/imdario/mergo v0.3.11 // indirect

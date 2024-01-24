@@ -36,6 +36,7 @@ import (
 	"github.com/cgi-fr/pimo/pkg/uri"
 	"github.com/labstack/echo/v4"
 	"github.com/mattn/go-isatty"
+	"github.com/pkg/profile"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
@@ -73,6 +74,7 @@ var (
 	xmlSubscriberName     map[string]string
 	serve                 string
 	maxBufferCapacity     int
+	profiling             string
 )
 
 func main() {
@@ -116,6 +118,7 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 	rootCmd.PersistentFlags().StringVar(&statsTemplate, "statsTemplate", statsTemplateEnv, "template string to format stats (to include them you have to specify them as `{{ .Stats }}` like `{\"software\":\"PIMO\",\"stats\":{{ .Stats }}}`)")
 	rootCmd.Flags().StringVar(&serve, "serve", "", "listen/respond to HTTP interface and port instead of stdin/stdout, <ip>:<port> or :<port> to listen to all local networks")
 	rootCmd.Flags().IntVar(&maxBufferCapacity, "buffer-size", 64, "buffer size in kB to load data from uri for each line")
+	rootCmd.Flags().StringVar(&profiling, "pprof", "", "create a pprof file - use 'cpu' to create a CPU pprof file or 'mem' to create an memory pprof file")
 
 	rootCmd.AddCommand(&cobra.Command{
 		Use: "jsonschema",
@@ -278,6 +281,14 @@ func run(cmd *cobra.Command) {
 		os.Exit(1)
 	}
 
+	var profiler interface{ Stop() }
+
+	if profiling == "cpu" {
+		profiler = profile.Start(profile.CPUProfile, profile.ProfilePath("."), profile.Quiet)
+	} else if profiling == "memory" {
+		profiler = profile.Start(profile.MemProfile, profile.ProfilePath("."), profile.Quiet)
+	}
+
 	if len(serve) > 0 {
 		router := echo.New()
 		router.HideBanner = true
@@ -299,6 +310,10 @@ func run(cmd *cobra.Command) {
 		duration := time.Since(startTime)
 		statistics.SetDuration(duration)
 		dumpStats(stats)
+	}
+
+	if profiling == "cpu" || profiling == "memory" {
+		profiler.Stop()
 	}
 
 	os.Exit(0)
