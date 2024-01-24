@@ -17,10 +17,7 @@ Types of changes
 ## [1.23.0]
 
 - `Added` `--pprof` flag to create a `cpu` or `memory` pprof file
-
-## [1.22.0]
-
-- `Added` new features `xml` mask to to manipulate XML content within JSON values. The proposed syntax aims to align with existing masking conventions for ease of use
+- `Added` new features `xml` mask to to manipulate XML content within JSON values - the proposed syntax aims to align with existing masking conventions for ease of use
 
 ## [1.21.0]
 
