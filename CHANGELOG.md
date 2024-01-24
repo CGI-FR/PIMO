@@ -14,26 +14,30 @@ Types of changes
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [1.23.0]
+
+- `Added` `--pprof` flag to create a `cpu` or `memory` pprof file
+
 ## [1.22.0]
 
-- `Added` new features `xml` mask to to manipulate XML content within JSON values. The proposed syntax aims to align with existing masking conventions for ease of use.
+- `Added` new features `xml` mask to to manipulate XML content within JSON values. The proposed syntax aims to align with existing masking conventions for ease of use
 
 ## [1.21.0]
 
-- `Added` new features `findInCSV` mask to get one or multiple csv lines which matched with Json entry value from CSV files.
-- `Added` new flag `--serve` to start a HTTP server that apply masking to JSON body of requests.
+- `Added` new features `findInCSV` mask to get one or multiple csv lines which matched with Json entry value from CSV files
+- `Added` new flag `--serve` to start a HTTP server that apply masking to JSON body of requests
 - `Added` new flag `--buffer-size` to increase the buffer used to load files from URI
-- `Fixed` some bugs with selectors.
+- `Fixed` some bugs with selectors
 
 ## [1.20.0]
 
-- `Added` new features for parsing and masking XML files using the following command: `cat XMLfile | pimo xml --subscriber <parent tag name>=<mask name> > outputXMLfile`. This feature supports all level 1 elements that are not arrays.
+- `Added` new features for parsing and masking XML files using the following command: `cat XMLfile | pimo xml --subscriber <parent tag name>=<mask name> > outputXMLfile` - this feature supports all level 1 elements that are not arrays
 
 ## [1.19.0]
 
-- `Added` new features for ff1 mask : `domain`, `preserve` and `onError`.
-- `Added` possibility to use `.` in the jsonpath field of selectors.
-- `Added` option `--skip-log-file <filename>` to log skipped lines on error when using `--skip-line-on-error`.
+- `Added` new features for ff1 mask : `domain`, `preserve` and `onError`
+- `Added` possibility to use `.` in the jsonpath field of selectors
+- `Added` option `--skip-log-file <filename>` to log skipped lines on error when using `--skip-line-on-error`
 
 ## [1.18.1]
 
