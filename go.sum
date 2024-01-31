@@ -6,8 +6,8 @@ github.com/Masterminds/semver/v3 v3.2.0 h1:3MEsd0SM6jqZojhjLWWeBY+Kcjy9i6MQAeY7Y
 github.com/Masterminds/semver/v3 v3.2.0/go.mod h1:qvl/7zhW3nngYb5+80sSMF+FG2BjYrf8m9wsX0PNOMQ=
 github.com/Masterminds/sprig/v3 v3.2.3 h1:eL2fZNezLomi0uOLqjQoN6BfsDD+fyLtgbJMAj9n6YA=
 github.com/Masterminds/sprig/v3 v3.2.3/go.mod h1:rXcFaZ2zZbLRJv/xSysmlgIM1u11eBaRMhvYXJNkGuM=
-github.com/adrienaury/zeromdc v0.0.0-20221116212822-6a366c26ee61 h1:GXmgCyG0oDr3BFL+NYcwKEP2H3L9DuBo66ZR++zNasA=
-github.com/adrienaury/zeromdc v0.0.0-20221116212822-6a366c26ee61/go.mod h1:5UlMlw0MRjEAms20gDadR5GrN2wEp9XEXTBiMp/XI4E=
+github.com/adrienaury/zeromdc v0.1.0 h1:eVv6/dAjKycQOIC/QcWA7lrcPqOabHC26OBAcM5e3sk=
+github.com/adrienaury/zeromdc v0.1.0/go.mod h1:5UlMlw0MRjEAms20gDadR5GrN2wEp9XEXTBiMp/XI4E=
 github.com/bahlo/generic-list-go v0.2.0 h1:5sz/EEAK+ls5wF+NeqDpk5+iNdMDXrh3z3nPnH1Wvgk=
 github.com/bahlo/generic-list-go v0.2.0/go.mod h1:2KvAjgMlE5NNynlg/5iLrrCCZ2+5xWbdbCW3pNTGyYg=
 github.com/buger/jsonparser v1.1.1 h1:2PnMjfWD7wBILjqQbt530v576A/cAbQvEW9gGIpYMUs=
