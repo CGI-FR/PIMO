@@ -14,11 +14,11 @@ Types of changes
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
-## [1.23.1]
+## [1.22.1]
 
 - `Fixed` memory leak with context logs
 
-## [1.23.0]
+## [1.22.0]
 
 - `Added` `--pprof` flag to create a `cpu` or `memory` pprof file
 - `Added` new features `xml` mask to to manipulate XML content within JSON values - the proposed syntax aims to align with existing masking conventions for ease of use
