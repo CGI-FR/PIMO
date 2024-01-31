@@ -5,7 +5,7 @@ go 1.20
 require (
 	github.com/CGI-FR/xixo v0.1.8
 	github.com/Masterminds/sprig/v3 v3.2.3
-	github.com/adrienaury/zeromdc v0.0.0-20221116212822-6a366c26ee61
+	github.com/adrienaury/zeromdc v0.1.0
 	github.com/capitalone/fpe v1.2.1
 	github.com/goccy/go-yaml v1.11.2
 	github.com/invopop/jsonschema v0.12.0

@@ -14,6 +14,10 @@ Types of changes
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [1.23.1]
+
+- `Fixed` memory leak with context logs
+
 ## [1.23.0]
 
 - `Added` `--pprof` flag to create a `cpu` or `memory` pprof file
