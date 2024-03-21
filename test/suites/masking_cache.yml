@@ -282,6 +282,43 @@ testcases:
     - result.code ShouldEqual 4
     - result.systemerr ShouldContainSubstring "Unique value not found"
 
+- name: error when no more value for unique cache using --load-cache
+  steps:
+  - script: rm -f masking.yml
+  - script: rm name.jsonl
+  - script: |-
+      cat > name.jsonl <<EOF
+      {"key": "Toto", "value": "Mickael"}
+      {"key": "Dorothy", "value": "Mathieu"}
+      {"key": "Justine", "value": "Marcel"}
+      EOF
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      seed: 1
+      masking:
+        - selector:
+            jsonpath: "name"
+          mask:
+            randomChoice:
+              - "Mickael"
+              - "Mathieu"
+              - "Marcel"
+          cache: "name"
+
+      caches:
+        name :
+          unique: true
+
+      EOF
+  - script: |-
+      pimo --load-cache name=name.jsonl <<EOF
+      {"name": "NoMore", "id":7}
+      EOF
+    assertions:
+    - result.code ShouldEqual 4
+    - result.systemerr ShouldContainSubstring "Unique value not found"
+
 - name: masking with value from cache
   steps:
   - script: rm -f masking.yml
