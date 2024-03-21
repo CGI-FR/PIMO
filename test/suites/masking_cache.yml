@@ -285,7 +285,7 @@ testcases:
 - name: error when no more value for unique cache using --load-cache
   steps:
   - script: rm -f masking.yml
-  - script: rm name.jsonl
+  - script: rm -f name.jsonl
   - script: |-
       cat > name.jsonl <<EOF
       {"key": "Toto", "value": "Mickael"}
