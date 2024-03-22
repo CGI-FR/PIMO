@@ -14,6 +14,10 @@ Types of changes
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [1.22.2]
+
+- `Fixed` load data for unique cache
+
 ## [1.22.1]
 
 - `Fixed` memory leak with context logs

@@ -96,13 +96,17 @@ type UniqueMemCache struct {
 	values map[Entry]struct{}
 }
 
+func (mc *UniqueMemCache) Put(key Entry, value Entry) {
+	mc.PutUnique(key, value)
+}
+
 func (mc *UniqueMemCache) PutUnique(key Entry, value Entry) bool {
 	_, valueAlerdyUse := mc.values[value]
 
 	if valueAlerdyUse {
 		return false
 	}
-	mc.Put(key, value)
+	mc.MemCache.Put(key, value)
 	mc.values[value] = struct{}{}
 
 	return true
