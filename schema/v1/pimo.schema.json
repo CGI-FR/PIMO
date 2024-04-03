@@ -498,6 +498,12 @@
             "xml"
           ],
           "title": "xml"
+        },
+        {
+          "required": [
+            "timeline"
+          ],
+          "title": "TimeLine"
         }
       ],
       "properties": {
@@ -672,6 +678,11 @@
           "$ref": "#/$defs/XMLType",
           "title": "XML Mask",
           "description": "Apply mask for XML content within JSON values"
+        },
+        "timeline": {
+          "$ref": "#/$defs/TimeLineType",
+          "title": "TimeLine Mask",
+          "description": "Generate a timeline under constraints and rules"
         }
       },
       "additionalProperties": false,
@@ -910,6 +921,112 @@
       },
       "additionalProperties": false,
       "type": "object"
+    },
+    "TimeLineConstraintType": {
+      "oneOf": [
+        {
+          "required": [
+            "before"
+          ],
+          "title": "Before"
+        },
+        {
+          "required": [
+            "after"
+          ],
+          "title": "After"
+        }
+      ],
+      "properties": {
+        "before": {
+          "type": "string",
+          "title": "Before",
+          "description": "Name the point which should serve as the upper limit"
+        },
+        "after": {
+          "type": "string",
+          "title": "After",
+          "description": "Name the point which should serve as the lower limit"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "TimeLinePointType": {
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name of the point in the timeline"
+        },
+        "from": {
+          "type": "string",
+          "description": "Name of the reference point in the timeline to create this point"
+        },
+        "min": {
+          "type": "string",
+          "description": "Minimum shift relative to the reference point (ISO 8601 notation)"
+        },
+        "max": {
+          "type": "string",
+          "description": "Maximum shift relative to the reference point (ISO 8601 notation)"
+        },
+        "constraints": {
+          "items": {
+            "$ref": "#/$defs/TimeLineConstraintType"
+          },
+          "type": "array",
+          "description": "List of constraints to fulfill"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "name",
+        "min",
+        "max"
+      ]
+    },
+    "TimeLineStartType": {
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name of the starting point in the timeline"
+        },
+        "value": {
+          "type": "string",
+          "description": "Value of the starting point in the timeline, in RFC3339 format (2006-01-02T15:04:05Z07:00), if omitted equals to now"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "name"
+      ]
+    },
+    "TimeLineType": {
+      "properties": {
+        "start": {
+          "$ref": "#/$defs/TimeLineStartType",
+          "description": "Origin of the timeline"
+        },
+        "format": {
+          "type": "string",
+          "description": "Format of datetimes, it should always display the following date : Mon Jan 2 15:04:05 -0700 MST 2006 or the constant value 'unixEpoch'"
+        },
+        "points": {
+          "items": {
+            "$ref": "#/$defs/TimeLinePointType"
+          },
+          "type": "array",
+          "description": "List of points in the timeline"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "start",
+        "points"
+      ]
     },
     "TranscodeType": {
       "properties": {
