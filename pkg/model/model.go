@@ -190,6 +190,28 @@ type XMLType struct {
 	Masking      []Masking `yaml:"masking,omitempty" json:"masking,omitempty" jsonschema_description:"Sub-list of masks to be applied inside the selected XML element"`
 }
 
+type TimeLineConstraintType struct {
+	Before string `yaml:"before,omitempty" json:"before,omitempty" jsonschema:"oneof_required=Before,title=Before,description=Name the point which should serve as the upper limit"`
+	After  string `yaml:"after,omitempty" json:"after,omitempty" jsonschema:"oneof_required=After,title=After,description=Name the point which should serve as the lower limit"`
+}
+
+type TimeLinePointType struct {
+	Name string `yaml:"name" json:"name" jsonschema_description:"Name of the point in the timeline"`
+	Min  int64  `yaml:"min" json:"min" jsonschema_description:"Minimum shift relative to the reference point"`
+	Max  int64  `yaml:"max" json:"max" jsonschema_description:"Maximum shift relative to the reference point"`
+}
+
+type TimeLineStartType struct {
+	Name  string `yaml:"name" json:"name" jsonschema_description:"Name of the starting point in the timeline"`
+	Value string `yaml:"value,omitempty" json:"value,omitempty" jsonschema_description:"Value of the starting point in the timeline, if omited equals to now"`
+}
+
+type TimeLineType struct {
+	Start  TimeLineStartType   `yaml:"start" json:"start" jsonschema_description:"Origin of the timeline"`
+	Format string              `yaml:"format,omitempty" json:"format,omitempty" jsonschema_description:"Format of datetimes, it should always display the following date : Mon Jan 2 15:04:05 -0700 MST 2006 or the constant value 'unixEpoch'"`
+	Points []TimeLinePointType `yaml:"points" json:"points" jsonschema_description:"List of points in the timeline"`
+}
+
 type MaskType struct {
 	Add               Entry                `yaml:"add,omitempty" json:"add,omitempty" jsonschema:"oneof_required=Add,title=Add Mask,description=Add a new field in the JSON stream"`
 	AddTransient      Entry                `yaml:"add-transient,omitempty" json:"add-transient,omitempty" jsonschema:"oneof_required=AddTransient,title=Add Transient Mask" jsonschema_description:"Add a new temporary field, that will not show in the JSON output"`
@@ -225,6 +247,7 @@ type MaskType struct {
 	Transcode         *TranscodeType       `yaml:"transcode,omitempty" json:"transcode,omitempty" jsonschema:"oneof_required=Transcode,title=Transcode Mask" jsonschema_description:"Produce a random string by preserving character classes from the original value"`
 	FindInCSV         FindInCSVType        `yaml:"findInCSV,omitempty" json:"findInCSV,omitempty" jsonschema:"oneof_required=FindInCSV,title=Find in CSV Mask" jsonschema_description:"Find matched values in a CSV file based on input json file and save the matched csv line as type objet"`
 	XML               XMLType              `yaml:"xml,omitempty" json:"xml,omitempty" jsonschema:"oneof_required=xml,title=XML Mask" jsonschema_description:"Apply mask for XML content within JSON values"`
+	TimeLine          TimeLineType         `yaml:"timeline,omitempty" json:"timeline,omitempty" jsonschema:"oneof_required=TimeLine,title=TimeLine Mask" jsonschema_description:"Generate a timeline under constraints and rules"`
 }
 
 type Masking struct {
