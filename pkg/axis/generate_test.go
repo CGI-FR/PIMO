@@ -18,6 +18,7 @@
 package axis_test
 
 import (
+	"math/rand"
 	"testing"
 
 	"github.com/cgi-fr/pimo/pkg/axis"
@@ -31,7 +32,7 @@ func TestSimple(t *testing.T) {
 	generator.SetPoint("contract", "birth", 18, 40, axis.LowerThan("start", axis.Retry))
 	generator.SetPoint("promotion", "contract", 0, 5)
 
-	result := generator.Generate(11)
+	result := generator.Generate(rand.New(rand.NewSource(11)))
 
 	for key, value := range result {
 		if value != nil {

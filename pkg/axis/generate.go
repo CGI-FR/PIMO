@@ -30,41 +30,43 @@ type Range struct {
 type Generator struct {
 	originName  string
 	originValue int64
-	ranges      map[string]Range
+	points      []Range
 }
 
-func NewGenerator(originName string, originValue int64) Generator {
-	return Generator{
+func NewGenerator(originName string, originValue int64) *Generator {
+	return &Generator{
 		originName:  originName,
 		originValue: originValue,
-		ranges:      make(map[string]Range, 0),
+		points:      make([]Range, 0, 5),
 	}
 }
 
-func (g Generator) SetPoint(name string, reference string, min, max int64, constraints ...Constraint) {
-	g.ranges[name] = Range{
+func (g *Generator) SetPoint(name string, reference string, min, max int64, constraints ...Constraint) {
+	if reference == "" {
+		reference = g.originName
+	}
+
+	g.points = append(g.points, Range{
 		name:        name,
 		ref:         reference,
 		min:         min,
 		max:         max,
 		constraints: constraints,
-	}
+	})
 }
 
-func (g Generator) Generate(seed int64) map[string]*int64 {
-	rng := rand.New(rand.NewSource(seed)) //nolint:gosec
-
+func (g *Generator) Generate(rng *rand.Rand) map[string]*int64 {
 	loopCount := 0
 
 Loop:
 	for {
 		loopCount++
 
-		result := make(map[string]*int64, len(g.ranges)+1)
+		result := make(map[string]*int64, len(g.points)+1)
 
 		result[g.originName] = &g.originValue
 
-		for name, point := range g.ranges {
+		for _, point := range g.points {
 			var pointer *int64
 
 			if ref := result[point.ref]; ref != nil {
@@ -79,10 +81,10 @@ Loop:
 						case Nullify:
 							pointer = nil
 						case Reject:
-							panic("rejected timeline generation, can't find valid value for " + name)
+							panic("rejected timeline generation, can't find valid value for " + point.name)
 						case Retry:
 							if loopCount > 200 {
-								panic("rejected timeline generation, can't find valid value for " + name)
+								panic("rejected timeline generation, can't find valid value for " + point.name)
 							}
 
 							continue Loop
@@ -91,7 +93,7 @@ Loop:
 				}
 			}
 
-			result[name] = pointer
+			result[point.name] = pointer
 		}
 
 		return result
