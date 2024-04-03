@@ -65,7 +65,17 @@ func NewMask(model model.TimeLineType, seed int64, seeder model.Seeder) (MaskEng
 			return MaskEngine{}, err
 		}
 
-		generator.SetPoint(point.Name, point.From, pointMin, pointMax)
+		constraints := []axis.Constraint{}
+		for _, constraint := range point.Constraints {
+			if len(constraint.Before) > 0 {
+				constraints = append(constraints, axis.LowerThan(constraint.Before, axis.Retry))
+			}
+			if len(constraint.After) > 0 {
+				constraints = append(constraints, axis.GreaterThan(constraint.After, axis.Retry))
+			}
+		}
+
+		generator.SetPoint(point.Name, point.From, pointMin, pointMax, constraints...)
 	}
 
 	return MaskEngine{
@@ -97,6 +107,7 @@ func (me MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Ent
 	timestamps := me.Generate(me.rand)
 
 	result := model.NewDictionary()
+	result.Set(me.Generator.Origin(), me.formatDate(*(timestamps[me.Generator.Origin()])))
 	for _, point := range me.points {
 		result.Set(point, me.formatDate(*(timestamps[point])))
 	}

@@ -99,3 +99,7 @@ Loop:
 		return result
 	}
 }
+
+func (g *Generator) Origin() string {
+	return g.originName
+}
