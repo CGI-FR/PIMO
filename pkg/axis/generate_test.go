@@ -32,7 +32,7 @@ func TestSimple(t *testing.T) {
 	generator.SetPoint("contract", "birth", 18, 40, axis.LowerThan("start", axis.Retry))
 	generator.SetPoint("promotion", "contract", 0, 5)
 
-	result := generator.Generate(rand.New(rand.NewSource(11)))
+	result := generator.Generate(rand.New(rand.NewSource(11))) //nolint:gosec
 
 	for key, value := range result {
 		if value != nil {

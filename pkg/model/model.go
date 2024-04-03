@@ -204,7 +204,7 @@ type TimeLinePointType struct {
 
 type TimeLineStartType struct {
 	Name  string `yaml:"name" json:"name" jsonschema_description:"Name of the starting point in the timeline"`
-	Value string `yaml:"value,omitempty" json:"value,omitempty" jsonschema_description:"Value of the starting point in the timeline, in RFC3339 format (2006-01-02T15:04:05Z07:00), if omited equals to now"`
+	Value string `yaml:"value,omitempty" json:"value,omitempty" jsonschema_description:"Value of the starting point in the timeline, in RFC3339 format (2006-01-02T15:04:05Z07:00), if omitted equals to now"`
 }
 
 type TimeLineType struct {

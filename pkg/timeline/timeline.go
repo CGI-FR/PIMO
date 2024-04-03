@@ -132,8 +132,8 @@ func (me MaskEngine) formatDate(timestamp int64) model.Entry {
 	return time.Unix(timestamp, 0).Format(time.RFC3339)
 }
 
-func durationToSeconds(ISO8601 string) (int64, error) {
-	dur, err := duration.ParseDuration(ISO8601)
+func durationToSeconds(iso8601 string) (int64, error) {
+	dur, err := duration.ParseDuration(iso8601)
 	if err != nil {
 		return 0, err
 	}
