@@ -52,7 +52,7 @@ func (g Generator) SetPoint(name string, reference string, min, max int64, const
 }
 
 func (g Generator) Generate(seed int64) map[string]*int64 {
-	rng := rand.New(rand.NewSource(seed))
+	rng := rand.New(rand.NewSource(seed)) //nolint:gosec
 
 	loopCount := 0
 
@@ -84,6 +84,7 @@ Loop:
 							if loopCount > 200 {
 								panic("rejected timeline generation, can't find valid value for " + name)
 							}
+
 							continue Loop
 						}
 					}
