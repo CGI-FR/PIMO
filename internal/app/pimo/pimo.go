@@ -59,6 +59,7 @@ import (
 	"github.com/cgi-fr/pimo/pkg/template"
 	"github.com/cgi-fr/pimo/pkg/templateeach"
 	"github.com/cgi-fr/pimo/pkg/templatemask"
+	"github.com/cgi-fr/pimo/pkg/timeline"
 	"github.com/cgi-fr/pimo/pkg/transcode"
 	"github.com/cgi-fr/pimo/pkg/weightedchoice"
 	"github.com/cgi-fr/pimo/pkg/xml"
@@ -301,6 +302,7 @@ func injectMaskFactories() []model.MaskFactory {
 		hashcsv.Factory,
 		findincsv.Factory,
 		xml.Factory,
+		timeline.Factory,
 	}
 }
 

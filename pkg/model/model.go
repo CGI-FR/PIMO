@@ -197,8 +197,9 @@ type TimeLineConstraintType struct {
 
 type TimeLinePointType struct {
 	Name string `yaml:"name" json:"name" jsonschema_description:"Name of the point in the timeline"`
-	Min  int64  `yaml:"min" json:"min" jsonschema_description:"Minimum shift relative to the reference point"`
-	Max  int64  `yaml:"max" json:"max" jsonschema_description:"Maximum shift relative to the reference point"`
+	From string `yaml:"from,omitempty" json:"from,omitempty" jsonschema_description:"Name of the reference point in the timeline to create this point"`
+	Min  string `yaml:"min" json:"min" jsonschema_description:"Minimum shift relative to the reference point (ISO 8601 notation)"`
+	Max  string `yaml:"max" json:"max" jsonschema_description:"Maximum shift relative to the reference point (ISO 8601 notation)"`
 }
 
 type TimeLineStartType struct {
