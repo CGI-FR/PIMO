@@ -26,13 +26,13 @@ jobs:
           fetch-depth: 0
 
       - name: Build
-        run: docker-compose -f .devcontainer/docker-compose.yml build
+        run: docker compose -f .devcontainer/docker-compose.yml build
 
       - name: Start services
-        run: docker-compose -f .devcontainer/docker-compose.yml up -d vscode
+        run: docker compose -f .devcontainer/docker-compose.yml up -d vscode
 
       - name: Init env
-        run: docker-compose -f .devcontainer/docker-compose.yml exec -T -u root -w /workspace vscode make init
+        run: docker compose -f .devcontainer/docker-compose.yml exec -T -u root -w /workspace vscode make init
 
       - uses: FranzDiebold/github-env-vars-action@v2
       - name: Release
@@ -40,11 +40,11 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DOCKERHUB_PASS: ${{ secrets.DOCKERHUB_PASS }}
         run: |
-          docker-compose -f .devcontainer/docker-compose.yml exec -T -u root -w /workspace vscode git reset --hard
-          docker-compose -f .devcontainer/docker-compose.yml exec -e GITHUB_TOKEN=${GITHUB_TOKEN} -T -u root vscode bash -c 'echo "GITHUB_TOKEN: ${GITHUB_TOKEN}" > ~/.github.yml'
-          docker-compose -f .devcontainer/docker-compose.yml exec -T -u root vscode bash -c 'echo "DOCKERHUB_USER: cgibot" > ~/.dockerhub.yml'
-          docker-compose -f .devcontainer/docker-compose.yml exec -e DOCKERHUB_PASS=${DOCKERHUB_PASS} -T -u root vscode bash -c 'echo "DOCKERHUB_PASS: ${DOCKERHUB_PASS}" >> ~/.dockerhub.yml'
-          docker-compose -f .devcontainer/docker-compose.yml exec \
+          docker compose -f .devcontainer/docker-compose.yml exec -T -u root -w /workspace vscode git reset --hard
+          docker compose -f .devcontainer/docker-compose.yml exec -e GITHUB_TOKEN=${GITHUB_TOKEN} -T -u root vscode bash -c 'echo "GITHUB_TOKEN: ${GITHUB_TOKEN}" > ~/.github.yml'
+          docker compose -f .devcontainer/docker-compose.yml exec -T -u root vscode bash -c 'echo "DOCKERHUB_USER: cgibot" > ~/.dockerhub.yml'
+          docker compose -f .devcontainer/docker-compose.yml exec -e DOCKERHUB_PASS=${DOCKERHUB_PASS} -T -u root vscode bash -c 'echo "DOCKERHUB_PASS: ${DOCKERHUB_PASS}" >> ~/.dockerhub.yml'
+          docker compose -f .devcontainer/docker-compose.yml exec \
             -T \
             -u root \
             -w /workspace \
@@ -52,7 +52,7 @@ jobs:
             vscode \
             neon -props "{tag: ${CI_ACTION_REF_NAME}, MODULE: github.com/${CI_REPOSITORY,,}, BY: ${CI_ACTOR}, dockerfiles: {'Dockerfile': '.'}, latest: true}" publish docker-push build-web-wasm
       - name: Test version
-        run: docker-compose -f .devcontainer/docker-compose.yml exec -T -u root vscode /workspace/bin/dist/cmd/pimo_linux_amd64_v1/pimo --version
+        run: docker compose -f .devcontainer/docker-compose.yml exec -T -u root vscode /workspace/bin/dist/cmd/pimo_linux_amd64_v1/pimo --version
       - name: Push pimo play to  github pages repository
         uses: cpina/github-action-push-to-another-repository@v1.7.2
         env:
