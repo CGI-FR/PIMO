@@ -93,6 +93,9 @@ Loop:
 
 			if pointer != nil {
 				for _, constraint := range point.constraints {
+					if pointer == nil {
+						break
+					}
 					if !constraint.Validate(*pointer, result) {
 						if loopCount <= g.maxRetry {
 							continue Loop // next try, better luck ?
