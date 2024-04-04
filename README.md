@@ -19,7 +19,7 @@ You can also generate data with a simple yaml configuration file.
 - credibility : generated data is not distinguishable from real data
 - data synthesis : generate data from nothing
 - data masking, including
-  - randomization : protect sensitive data by writing over it
+  - randomization : protect personal or sensitive data by writing over it
   - pseudonymization, on 3 levels
     - consistent pseudonymisation : real value A is always replaced by pseudo-value X but X can be attributed to other values than A
     - identifiant pseudonymisation : real value A is always replaced by pseudo-value X and X *CANNOT* be attributed to other values than A
@@ -1098,9 +1098,9 @@ $ pimo --empty-input
                 - before: "begin"
 ```
 
-The dates `begin` and `end` will both be chosen from the same interval, but `end` will always be `begin`.
+The dates `begin` and `end` will both be chosen from the same interval, but `end` will always be after `begin`.
 
-To enforce this, the timeline mask will regerate all date until all constraints are met, up to 200 retries. If there is still unsatified contraints after 200 retries, the mask will set the date to `null`.
+To enforce this, the timeline mask will regerate all date until all constraints are met, up to 200 retries. If there is still unsatified contraints after 200 attempts, the mask will set the date to `null`.
 
 This default behavior can be changed with the following parameters :
 
@@ -1115,8 +1115,8 @@ This default behavior can be changed with the following parameters :
                 retry: 0 # constraints will fail immediatly if not satisfied
   ```
 
-- `onError` will change the default behavior that set date with unsatisfied contraint to `null`, following values are accepted :
-  - `default` : use a default value, this is the standard behavior when `onError` is unset
+- `onError` will change the default behavior that set date to `null` if contraints cannot be satified, following values are accepted :
+  - `default` : use a default value, this is the standard behavior when `onError` is unset (see next item for how to change the default value)
   - `reject` : fail masking of the current line with an error
 
   `onError` is defined on each constraint, for example :
@@ -1133,7 +1133,7 @@ This default behavior can be changed with the following parameters :
                   onError: "reject"
   ```
 
-  - `default` set the default value to use when an error occurs, if not specified the `null` value is the default
+  - `default` set the default value to use when an error occurs, if not set `null` value is the default
 
   ```yaml
             - name: "begin"
