@@ -191,8 +191,10 @@ type XMLType struct {
 }
 
 type TimeLineConstraintType struct {
-	Before string `yaml:"before,omitempty" json:"before,omitempty" jsonschema:"oneof_required=Before,title=Before,description=Name the point which should serve as the upper limit"`
-	After  string `yaml:"after,omitempty" json:"after,omitempty" jsonschema:"oneof_required=After,title=After,description=Name the point which should serve as the lower limit"`
+	Before  string `yaml:"before,omitempty" json:"before,omitempty" jsonschema:"oneof_required=Before,title=Before,description=Name the point which should serve as the upper limit"`
+	After   string `yaml:"after,omitempty" json:"after,omitempty" jsonschema:"oneof_required=After,title=After,description=Name the point which should serve as the lower limit"`
+	OnError string `yaml:"onError,omitempty" json:"onError,omitempty" jsonschema:"enum=null,enum=reject" jsonschema_description:"What to do if there is an error : null = set date as null (default), reject = fail masking for this line"`
+	// Default string `yaml:"default,omitempty" json:"default,omitempty" jsonschema_description:"Name a point of the timeline to use as a default value if onError=replace"`
 }
 
 type TimeLinePointType struct {
@@ -209,9 +211,10 @@ type TimeLineStartType struct {
 }
 
 type TimeLineType struct {
-	Start  TimeLineStartType   `yaml:"start" json:"start" jsonschema_description:"Origin of the timeline"`
-	Format string              `yaml:"format,omitempty" json:"format,omitempty" jsonschema_description:"Format of datetimes, it should always display the following date : Mon Jan 2 15:04:05 -0700 MST 2006 or the constant value 'unixEpoch'"`
-	Points []TimeLinePointType `yaml:"points" json:"points" jsonschema_description:"List of points in the timeline"`
+	Start    TimeLineStartType   `yaml:"start" json:"start" jsonschema_description:"Origin of the timeline"`
+	Format   string              `yaml:"format,omitempty" json:"format,omitempty" jsonschema_description:"Format of datetimes, it should always display the following date : Mon Jan 2 15:04:05 -0700 MST 2006 or the constant value 'unixEpoch'"`
+	Points   []TimeLinePointType `yaml:"points" json:"points" jsonschema_description:"List of points in the timeline"`
+	MaxRetry *int                `yaml:"retry,omitempty" json:"retry,omitempty" jsonschema_description:"Maximum number of retry if constraint fail before error (default : 200)"`
 }
 
 type MaskType struct {

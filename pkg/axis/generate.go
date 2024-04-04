@@ -35,16 +35,25 @@ type Generator struct {
 	originName  string
 	originValue int64
 	points      []Range
+	maxRetry    int
 }
 
-const DefaultPointsSize = 5
+const (
+	DefaultPointsSize = 5
+	DefaultMaxRetry   = 200
+)
 
 func NewGenerator(originName string, originValue int64) *Generator {
 	return &Generator{
 		originName:  originName,
 		originValue: originValue,
 		points:      make([]Range, 0, DefaultPointsSize),
+		maxRetry:    DefaultMaxRetry,
 	}
+}
+
+func (g *Generator) SetMaxRetry(maxRetry int) {
+	g.maxRetry = maxRetry
 }
 
 func (g *Generator) SetPoint(name string, reference string, min, max int64, constraints ...Constraint) {
@@ -83,17 +92,15 @@ Loop:
 			if pointer != nil {
 				for _, constraint := range point.constraints {
 					if !constraint.Validate(*pointer, result) {
+						if loopCount <= g.maxRetry {
+							continue Loop // next try, better luck ?
+						}
+
 						switch constraint.Behavior() {
 						case Nullify:
 							pointer = nil
 						case Reject:
 							return nil, fmt.Errorf("%w: %s", ErrRejectedGeneration, point.name)
-						case Retry:
-							if loopCount > 200 {
-								return nil, fmt.Errorf("%w: %s", ErrRejectedGeneration, point.name)
-							}
-
-							continue Loop
 						}
 					}
 				}

@@ -30,7 +30,7 @@ func TestSimple(t *testing.T) {
 	generator := axis.NewGenerator("start", 0)
 
 	generator.SetPoint("birth", "start", -80, -18)
-	generator.SetPoint("contract", "birth", 18, 40, axis.LowerThan("start", axis.Retry))
+	generator.SetPoint("contract", "birth", 18, 40, axis.LowerThan("start", axis.Reject))
 	generator.SetPoint("promotion", "contract", 0, 5)
 
 	result, err := generator.Generate(rand.New(rand.NewSource(11))) //nolint:gosec

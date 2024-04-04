@@ -21,7 +21,6 @@ type ConstraintBehavior int
 
 const (
 	Reject ConstraintBehavior = iota
-	Retry
 	Nullify
 )
 

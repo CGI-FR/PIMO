@@ -51,6 +51,10 @@ func NewMask(model model.TimeLineType, seed int64, seeder model.Seeder) (MaskEng
 
 	generator := axis.NewGenerator(model.Start.Name, origin.Unix())
 
+	if model.MaxRetry != nil {
+		generator.SetMaxRetry(*model.MaxRetry)
+	}
+
 	points := make([]string, len(model.Points))
 	for i, point := range model.Points {
 		points[i] = point.Name
@@ -66,12 +70,17 @@ func NewMask(model model.TimeLineType, seed int64, seeder model.Seeder) (MaskEng
 		}
 
 		constraints := []axis.Constraint{}
+
 		for _, constraint := range point.Constraints {
+			behavior := axis.Nullify
+			if constraint.OnError == "reject" {
+				behavior = axis.Reject
+			}
 			if len(constraint.Before) > 0 {
-				constraints = append(constraints, axis.LowerThan(constraint.Before, axis.Retry))
+				constraints = append(constraints, axis.LowerThan(constraint.Before, behavior))
 			}
 			if len(constraint.After) > 0 {
-				constraints = append(constraints, axis.GreaterThan(constraint.After, axis.Retry))
+				constraints = append(constraints, axis.GreaterThan(constraint.After, behavior))
 			}
 		}
 
@@ -112,7 +121,12 @@ func (me MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Ent
 	result := model.NewDictionary()
 	result.Set(me.Generator.Origin(), me.formatDate(*(timestamps[me.Generator.Origin()])))
 	for _, point := range me.points {
-		result.Set(point, me.formatDate(*(timestamps[point])))
+		value := timestamps[point]
+		if value != nil {
+			result.Set(point, me.formatDate(*value))
+		} else {
+			result.Set(point, nil)
+		}
 	}
 
 	return result, nil
