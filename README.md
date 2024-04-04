@@ -15,6 +15,16 @@ PIMO is a tool for data masking. It can mask data from a JSONline stream and ret
 You can use [LINO](https://github.com/CGI-FR/LINO) to extract sample data from a database, which you can then use as input data for PIMO's data masking.
 You can also generate data with a simple yaml configuration file.
 
+**Capabilities**
+- credibility : generated data is not distinguishable from real data
+- data synthesis : generate data from nothing
+- data masking, including
+  - randomization : protect sensitive data by writing over it
+  - pseudonymization, on 3 levels
+    - consistent pseudonymisation : real value A is always replaced by pseudo-value X but X can be attributed to other values than A
+    - identifiant pseudonymisation : real value A is always replaced by pseudo-value X and X *CANNOT* be attributed to other values than A
+    - reversible pseudonymisation : real value A can be generated from pseudo-value X
+
 ## Configuration file needed
 
 PIMO requires a yaml configuration file to works. By default, the file is named `masking.yml` and is placed in the working directory. The file must respect the following format :
@@ -122,6 +132,7 @@ The following types of masks can be used :
   * [`randomChoiceInUri`](#randomchoiceinuri) is to mask with a random value from an external resource.
   * [`randomChoiceInCSV`](#randomchoiceincsv) is to mask with a random value from an external CSV resource.
   * [`transcode`](#transcode) is to mask a value randomly with character class preservation.
+  * [`timeline`](#timeline) to generate a set of dates related to each other (by rules and constraints)
 * K-Anonymization
   * [`range`](#range) is to mask a integer value by a range of value (e.g. replace `5` by `[0,10]`).
   * [`duration`](#duration) is to mask a date by adding or removing a certain number of days.
@@ -1029,6 +1040,112 @@ Here is the result of excution:
   }
 }
 ```
+
+[Return to list of masks](#possible-masks)
+
+### Timeline
+
+[![Try it](https://img.shields.io/badge/-Try%20it%20in%20PIMO%20Play-brightgreen)](https://cgi-fr.github.io/pimo-play/#c=G4UwTgzglg9gdgLgAQCICMKBQEQgCbIAsATJgLYCGEA1lHAOYKZJIC0SOANiAMYAuMMExYikAKwjwADhT4ALZCj5QyITnRBZRlGhGGi2SCngKotB9stXq4IfQZEQ+FMH3sORcCqsVOXfFCQAYiQvVSR5ECQAMyhIPiQpGDoEugi5KKs1DWYPUWAKTgBXO1RiAAZygDZWcrRa4gAVNABWBHLCdpaALUCQmClleEKkZB4isDAQOAS8WSioaNCYBIgpXkWofFy86MFKNzLKmrqGvqQYIr4pK5j92TuwdMyVbNsdjySUvQ+89jDSigAEZxeTmPLaOiKVgABQAHOUAJrnTgwADu4CQQMucDwj3SUAgSDmfCiAEkAMoAeSQcKqdWJE1ksDgvwhlAAHtCYWg4cjgkgilJ1k9sUVcfj5ITifMkJSaXSGXgmUNWRCRP9vICePA+GAKPxweqYmAYGRFCDXHJzmLcfgkFNOMzQBEYKhLWCkAAKRbLVbrHibfAAGmecAdamdmTdflciWSMwAlGy8mQoagANQ8vlG9WcxRZwhI3MQnVwJz677uY2GIEgPZTXzOVwlhyanyoKSmsgrFmtjzRbuKMt6g0BFMeNOITMw8r9hz5mctZGYIA&i=N4XyA)
+
+This mask can generate multiple dates related to each other, for example :
+
+```yaml
+version: "1"
+seed: 42
+masking:
+  - selector:
+      jsonpath: "timeline"
+    masks:
+      - add: ""
+      - timeline:
+          start:
+            name: "start" # name the first point in the timeline
+            value: "2006-01-02T15:04:05Z" # optional : current date if not specified
+          format: "2006-01-02" # output format for the timeline
+          points:
+            - name: "birth"
+              min: "-P80Y" # lower bound for this date ISO 8601 duration
+              max: "-P18Y" # upper bound for this date ISO 8601 duration
+            - name: "contract"
+              from: "birth" # bounded relative to "birth" (if not specified, then relative to start point)
+              min: "+P18Y"
+              max: "+P40Y"
+            - name: "promotion"
+              from: "contract"
+              min: "+P0"
+              max: "+P5Y"
+```
+
+Will generate :
+
+```console
+$ pimo --empty-input
+{"timeline":{"start":"2006-01-02","birth":"1980-12-01","contract":"2010-07-16","promotion":"2010-12-06"}}
+```
+
+#### Constraints
+
+`before` and `after` constraints can be set to create better timelines, for example :
+
+```yaml
+            - name: "begin"
+              min: "P0"
+              max: "+P80Y"
+            - name: "end"
+              min: "P0"
+              max: "+P80Y"
+              constraints:
+                - before: "begin"
+```
+
+The dates `begin` and `end` will both be chosen from the same interval, but `end` will always be `begin`.
+
+To enforce this, the timeline mask will regerate all date until all constraints are met, up to 200 retries. If there is still unsatified contraints after 200 retries, the mask will set the date to `null`.
+
+This default behavior can be changed with the following parameters :
+
+- `retry` sets the maximum number of retry (it can be set to `0` to disable retrying)
+
+  ```yaml
+            - timeline:
+                start:
+                  name: "start"
+                  value: "2006-01-02T15:04:05Z"
+                format: "2006-01-02"
+                retry: 0 # constraints will fail immediatly if not satisfied
+  ```
+
+- `onError` will change the default behavior that set date with unsatisfied contraint to `null`, following values are accepted :
+  - `default` : use a default value, this is the standard behavior when `onError` is unset
+  - `reject` : fail masking of the current line with an error
+
+  `onError` is defined on each constraint, for example :
+
+  ```yaml
+            - name: "begin"
+              min: "P0"
+              max: "+P80Y"
+            - name: "end"
+              min: "P0"
+              max: "+P80Y"
+              constraints:
+                - before: "begin"
+                  onError: "reject"
+  ```
+
+  - `default` set the default value to use when an error occurs, if not specified the `null` value is the default
+
+  ```yaml
+            - name: "begin"
+              min: "P0"
+              max: "+P80Y"
+            - name: "end"
+              min: "P0"
+              max: "+P80Y"
+              constraints:
+                - before: "begin"
+              default: "begin" # use begin date if constraint can't be satisfied
+  ```
 
 [Return to list of masks](#possible-masks)
 
