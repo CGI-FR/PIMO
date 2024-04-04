@@ -104,7 +104,10 @@ func (me MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Ent
 		}
 	}
 
-	timestamps := me.Generate(me.rand)
+	timestamps, err := me.Generate(me.rand)
+	if err != nil {
+		return nil, err
+	}
 
 	result := model.NewDictionary()
 	result.Set(me.Generator.Origin(), me.formatDate(*(timestamps[me.Generator.Origin()])))

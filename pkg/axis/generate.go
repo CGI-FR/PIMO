@@ -18,8 +18,12 @@
 package axis
 
 import (
+	"errors"
+	"fmt"
 	"math/rand"
 )
+
+var ErrRejectedGeneration = errors.New("rejected timeline generation, can't find a value that satisfy constraint")
 
 type Range struct {
 	name, ref   string
@@ -33,11 +37,13 @@ type Generator struct {
 	points      []Range
 }
 
+const DefaultPointsSize = 5
+
 func NewGenerator(originName string, originValue int64) *Generator {
 	return &Generator{
 		originName:  originName,
 		originValue: originValue,
-		points:      make([]Range, 0, 5),
+		points:      make([]Range, 0, DefaultPointsSize),
 	}
 }
 
@@ -55,7 +61,7 @@ func (g *Generator) SetPoint(name string, reference string, min, max int64, cons
 	})
 }
 
-func (g *Generator) Generate(rng *rand.Rand) map[string]*int64 {
+func (g *Generator) Generate(rng *rand.Rand) (map[string]*int64, error) {
 	loopCount := 0
 
 Loop:
@@ -81,10 +87,10 @@ Loop:
 						case Nullify:
 							pointer = nil
 						case Reject:
-							panic("rejected timeline generation, can't find valid value for " + point.name)
+							return nil, fmt.Errorf("%w: %s", ErrRejectedGeneration, point.name)
 						case Retry:
 							if loopCount > 200 {
-								panic("rejected timeline generation, can't find valid value for " + point.name)
+								return nil, fmt.Errorf("%w: %s", ErrRejectedGeneration, point.name)
 							}
 
 							continue Loop
@@ -96,7 +102,7 @@ Loop:
 			result[point.name] = pointer
 		}
 
-		return result
+		return result, nil
 	}
 }
 
