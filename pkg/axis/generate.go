@@ -93,9 +93,6 @@ Loop:
 
 			if pointer != nil {
 				for _, constraint := range point.constraints {
-					if pointer == nil {
-						break
-					}
 					if !constraint.Validate(*pointer, result) {
 						if loopCount <= g.maxRetry {
 							continue Loop // next try, better luck ?
@@ -111,6 +108,8 @@ Loop:
 						case Reject:
 							return nil, fmt.Errorf("%w: %s", ErrRejectedGeneration, point.name)
 						}
+
+						break // do not check next constraint, not necessary because pointer is nil
 					}
 				}
 			}
