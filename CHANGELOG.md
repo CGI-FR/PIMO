@@ -14,6 +14,10 @@ Types of changes
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [1.23.0]
+
+- `Added` mask `timeline` to generate timelines from rules and constraints between dates
+
 ## [1.22.2]
 
 - `Fixed` load data for unique cache
