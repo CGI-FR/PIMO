@@ -1133,7 +1133,7 @@ This default behavior can be changed with the following parameters :
                   onError: "reject"
   ```
 
-  - `default` set the default value to use when an error occurs, if not set `null` value is the default
+- `default` set the default value to use when an error occurs, if not set `null` value is the default
 
   ```yaml
             - name: "begin"
