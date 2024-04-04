@@ -26,9 +26,10 @@ import (
 var ErrRejectedGeneration = errors.New("rejected timeline generation, can't find a value that satisfy constraint")
 
 type Range struct {
-	name, ref   string
-	min, max    int64
-	constraints []Constraint
+	name, ref          string
+	min, max           int64
+	constraints        []Constraint
+	onErrorReplaceWith string
 }
 
 type Generator struct {
@@ -56,17 +57,18 @@ func (g *Generator) SetMaxRetry(maxRetry int) {
 	g.maxRetry = maxRetry
 }
 
-func (g *Generator) SetPoint(name string, reference string, min, max int64, constraints ...Constraint) {
+func (g *Generator) SetPoint(name string, reference string, min, max int64, defaultValueFrom string, constraints ...Constraint) {
 	if reference == "" {
 		reference = g.originName
 	}
 
 	g.points = append(g.points, Range{
-		name:        name,
-		ref:         reference,
-		min:         min,
-		max:         max,
-		constraints: constraints,
+		name:               name,
+		ref:                reference,
+		min:                min,
+		max:                max,
+		constraints:        constraints,
+		onErrorReplaceWith: defaultValueFrom,
 	})
 }
 
@@ -99,6 +101,10 @@ Loop:
 						switch constraint.Behavior() {
 						case Nullify:
 							pointer = nil
+						case Replace:
+							pointer = result[point.onErrorReplaceWith]
+						// case Default:
+						// 	pointer = &point.defaultValue
 						case Reject:
 							return nil, fmt.Errorf("%w: %s", ErrRejectedGeneration, point.name)
 						}

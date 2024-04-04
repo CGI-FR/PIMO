@@ -193,8 +193,7 @@ type XMLType struct {
 type TimeLineConstraintType struct {
 	Before  string `yaml:"before,omitempty" json:"before,omitempty" jsonschema:"oneof_required=Before,title=Before,description=Name the point which should serve as the upper limit"`
 	After   string `yaml:"after,omitempty" json:"after,omitempty" jsonschema:"oneof_required=After,title=After,description=Name the point which should serve as the lower limit"`
-	OnError string `yaml:"onError,omitempty" json:"onError,omitempty" jsonschema:"enum=null,enum=reject" jsonschema_description:"What to do if there is an error : null = set date as null (default), reject = fail masking for this line"`
-	// Default string `yaml:"default,omitempty" json:"default,omitempty" jsonschema_description:"Name a point of the timeline to use as a default value if onError=replace"`
+	OnError string `yaml:"onError,omitempty" json:"onError,omitempty" jsonschema:"enum=default,enum=reject" jsonschema_description:"What to do if there is an error : default = use point default value (or null if not set), reject = fail masking for this line, default = use default value for the point"`
 }
 
 type TimeLinePointType struct {
@@ -203,6 +202,7 @@ type TimeLinePointType struct {
 	Min         string                   `yaml:"min" json:"min" jsonschema_description:"Minimum shift relative to the reference point (ISO 8601 notation)"`
 	Max         string                   `yaml:"max" json:"max" jsonschema_description:"Maximum shift relative to the reference point (ISO 8601 notation)"`
 	Constraints []TimeLineConstraintType `yaml:"constraints,omitempty" json:"constraints,omitempty" jsonschema_description:"List of constraints to fulfill"`
+	Default     string                   `yaml:"default,omitempty" json:"default,omitempty" jsonschema_description:"Name a point of the timeline to use as a default value if a constraint fail (with onError=default)"`
 }
 
 type TimeLineStartType struct {

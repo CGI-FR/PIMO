@@ -947,6 +947,14 @@
           "type": "string",
           "title": "After",
           "description": "Name the point which should serve as the lower limit"
+        },
+        "onError": {
+          "type": "string",
+          "enum": [
+            "default",
+            "reject"
+          ],
+          "description": "What to do if there is an error : default = use point default value (or null if not set), reject = fail masking for this line, default = use default value for the point"
         }
       },
       "additionalProperties": false,
@@ -976,6 +984,10 @@
           },
           "type": "array",
           "description": "List of constraints to fulfill"
+        },
+        "default": {
+          "type": "string",
+          "description": "Name a point of the timeline to use as a default value if a constraint fail (with onError=default)"
         }
       },
       "additionalProperties": false,
@@ -1019,6 +1031,10 @@
           },
           "type": "array",
           "description": "List of points in the timeline"
+        },
+        "retry": {
+          "type": "integer",
+          "description": "Maximum number of retry if constraint fail before error (default : 200)"
         }
       },
       "additionalProperties": false,

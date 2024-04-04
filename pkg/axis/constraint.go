@@ -22,6 +22,8 @@ type ConstraintBehavior int
 const (
 	Reject ConstraintBehavior = iota
 	Nullify
+	Replace
+	// Default
 )
 
 type Constraint interface {

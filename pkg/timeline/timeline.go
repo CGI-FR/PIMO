@@ -72,7 +72,7 @@ func NewMask(model model.TimeLineType, seed int64, seeder model.Seeder) (MaskEng
 		constraints := []axis.Constraint{}
 
 		for _, constraint := range point.Constraints {
-			behavior := axis.Nullify
+			behavior := axis.Replace // we will try to use the default value of the point
 			if constraint.OnError == "reject" {
 				behavior = axis.Reject
 			}
@@ -84,7 +84,7 @@ func NewMask(model model.TimeLineType, seed int64, seeder model.Seeder) (MaskEng
 			}
 		}
 
-		generator.SetPoint(point.Name, point.From, pointMin, pointMax, constraints...)
+		generator.SetPoint(point.Name, point.From, pointMin, pointMax, point.Default, constraints...)
 	}
 
 	return MaskEngine{
