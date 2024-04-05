@@ -7,7 +7,7 @@
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/CGI-FR/PIMO)
 
 [![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/CGI-FR/PIMO/blob/main/README.md)
-[![zh-cn](https://img.shields.io/badge/lang-zh-cn-green.svg)](https://github.com/CGI-FR/PIMO/blob/main/README.chs.md)
+[![zh-cn](https://img.shields.io/badge/lang-chs-green.svg)](https://github.com/CGI-FR/PIMO/blob/main/README.chs.md)
 
 # PIMO : Private Input, Masked Output
 
