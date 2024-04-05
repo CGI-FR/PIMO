@@ -1,0 +1,248 @@
+name: Generate Timelines
+testcases:
+- name: default case
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      seed: 42
+      masking:
+        - selector:
+            jsonpath: "timeline"
+          masks:
+            - add: ""
+            - timeline:
+                start:
+                  name: "start"
+                  value: "2006-01-02T15:04:05Z"
+                format: "2006-01-02"
+                points:
+                  - name: "birth" # without from by default this point is chosen relative to the start of the timeline
+                    min: "-P80Y"
+                    max: "-P18Y"
+                  - name: "contract"
+                    from: "birth" # contract point is located relatively to the "birth" point
+                    min: "+P18Y"
+                    max: "+P40Y"
+                  - name: "promotion"
+                    from: "contract" # promotion point is located relatively to the "contract" point
+                    min: "+P0"
+                    max: "+P5Y"
+      EOF
+  - script: pimo --empty-input
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemoutjson.timeline.start ShouldEqual "2006-01-02"
+    - result.systemoutjson.timeline.birth ShouldEqual "1980-12-01"
+    - result.systemoutjson.timeline.contract ShouldEqual "2010-07-16"
+    - result.systemoutjson.timeline.promotion ShouldEqual "2010-12-06"
+    - result.systemerr ShouldBeEmpty
+
+- name: constraints should activate and generate null by default
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      seed: 3 # this specific seed will activate the constraint
+      masking:
+        - selector:
+            jsonpath: "timeline"
+          masks:
+            - add: ""
+            - timeline:
+                start:
+                  name: "start"
+                  value: "2006-01-02T15:04:05Z"
+                format: "2006-01-02"
+                retry: 0 # the constraint will fail immediatly
+                points:
+                  - name: "birth" # without from by default this point is chosen relative to the start of the timeline
+                    min: "-P80Y"
+                    max: "-P18Y"
+                  - name: "contract"
+                    from: "birth" # contract point is located relatively to the "birth" point
+                    min: "+P18Y"
+                    max: "+P40Y"
+                    constraints:
+                      - before: "start"
+                  - name: "promotion"
+                    from: "contract" # promotion point is located relatively to the "contract" point
+                    min: "+P0"
+                    max: "+P5Y"
+      EOF
+  - script: pimo --empty-input
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemoutjson.timeline.start ShouldEqual "2006-01-02"
+    - result.systemoutjson.timeline.birth ShouldEqual "1983-06-24"
+    - result.systemoutjson.timeline.contract ShouldBeEmpty # is empty because the constraint on contract failed
+    - result.systemoutjson.timeline.promotion ShouldBeEmpty # is empty because promotion is relative to contract date
+    - result.systemerr ShouldBeEmpty
+
+- name: constraints should activate and use other point in timeline when default is set
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      seed: 3 # this specific seed will activate the constraint
+      masking:
+        - selector:
+            jsonpath: "timeline"
+          masks:
+            - add: ""
+            - timeline:
+                start:
+                  name: "start"
+                  value: "2006-01-02T15:04:05Z"
+                format: "2006-01-02"
+                retry: 0 # the constraint will fail immediatly
+                points:
+                  - name: "birth" # without from by default this point is chosen relative to the start of the timeline
+                    min: "-P80Y"
+                    max: "-P18Y"
+                  - name: "contract"
+                    from: "birth" # contract point is located relatively to the "birth" point
+                    min: "+P18Y"
+                    max: "+P40Y"
+                    constraints:
+                      - before: "start"
+                    default: "birth" # birthdate will be used by default is no valid value
+                  - name: "promotion"
+                    from: "contract" # promotion point is located relatively to the "contract" point
+                    min: "+P0"
+                    max: "+P5Y"
+      EOF
+  - script: pimo --empty-input
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemoutjson.timeline.start ShouldEqual "2006-01-02"
+    - result.systemoutjson.timeline.birth ShouldEqual "1983-06-24"
+    - result.systemoutjson.timeline.contract ShouldEqual "1983-06-24" # is equal to birthdate because the constraint on contract failed
+    - result.systemoutjson.timeline.promotion ShouldEqual "1986-04-08"
+    - result.systemerr ShouldBeEmpty
+
+- name: constraints should activate and next retry should generate valid values
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      seed: 3 # this specific seed will activate the constraint
+      masking:
+        - selector:
+            jsonpath: "timeline"
+          masks:
+            - add: ""
+            - timeline:
+                start:
+                  name: "start"
+                  value: "2006-01-02T15:04:05Z"
+                format: "2006-01-02"
+                retry: 1 # the constraint will fail first, but succeed on first retry
+                points:
+                  - name: "birth" # without from by default this point is chosen relative to the start of the timeline
+                    min: "-P80Y"
+                    max: "-P18Y"
+                  - name: "contract"
+                    from: "birth" # contract point is located relatively to the "birth" point
+                    min: "+P18Y"
+                    max: "+P40Y"
+                    constraints:
+                      - before: "start"
+                  - name: "promotion"
+                    from: "contract" # promotion point is located relatively to the "contract" point
+                    min: "+P0"
+                    max: "+P5Y"
+      EOF
+  - script: pimo --empty-input
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemoutjson.timeline.start ShouldEqual "2006-01-02"
+    - result.systemoutjson.timeline.birth ShouldEqual "1951-11-01"
+    - result.systemoutjson.timeline.contract ShouldEqual "1970-06-05" # success on retry!
+    - result.systemoutjson.timeline.promotion ShouldEqual "1974-02-28"
+    - result.systemerr ShouldBeEmpty
+
+- name: constraints should activate and fail when onError is 'reject'
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      seed: 3 # this specific seed will activate the constraint
+      masking:
+        - selector:
+            jsonpath: "timeline"
+          masks:
+            - add: ""
+            - timeline:
+                start:
+                  name: "start"
+                  value: "2006-01-02T15:04:05Z"
+                format: "2006-01-02"
+                retry: 0 # the constraint will fail immediately
+                points:
+                  - name: "birth" # without from by default this point is chosen relative to the start of the timeline
+                    min: "-P80Y"
+                    max: "-P18Y"
+                  - name: "contract"
+                    from: "birth" # contract point is located relatively to the "birth" point
+                    min: "+P18Y"
+                    max: "+P40Y"
+                    constraints:
+                      - before: "start"
+                        onError: "reject" # it will fail and the line will not be masked
+                  - name: "promotion"
+                    from: "contract" # promotion point is located relatively to the "contract" point
+                    min: "+P0"
+                    max: "+P5Y"
+      EOF
+  - script: pimo --empty-input
+    assertions:
+    - result.code ShouldEqual 4
+    - |
+      result.systemerr ShouldContainSubstring rejected timeline generation, can't find a value that satisfy constraint: contract
+
+- name: impossible constraint reach the maximum number of retries (200)
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      seed: 3 # this specific seed will activate the constraint
+      masking:
+        - selector:
+            jsonpath: "timeline"
+          masks:
+            - add: ""
+            - timeline:
+                start:
+                  name: "start"
+                  value: "2006-01-02T15:04:05Z"
+                format: "2006-01-02"
+                points:
+                  - name: "birth" # without from by default this point is chosen relative to the start of the timeline
+                    min: "-P80Y"
+                    max: "-P18Y"
+                  - name: "contract"
+                    from: "birth" # contract point is located relatively to the "birth" point
+                    min: "+P18Y"
+                    max: "+P40Y"
+                    constraints:
+                      - before: "start"
+                        onError: "reject" # it will fail and the line will not be masked
+                      - after: "start"
+                        onError: "reject" # it will fail and the line will not be masked
+                  - name: "promotion"
+                    from: "contract" # promotion point is located relatively to the "contract" point
+                    min: "+P0"
+                    max: "+P5Y"
+      EOF
+  - script: pimo --empty-input
+    assertions:
+    - result.code ShouldEqual 4
+    - |
+      result.systemerr ShouldContainSubstring rejected timeline generation, can't find a value that satisfy constraint: contract
