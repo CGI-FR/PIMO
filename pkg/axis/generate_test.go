@@ -27,6 +27,8 @@ import (
 )
 
 func TestSimple(t *testing.T) {
+	t.Parallel()
+
 	generator := axis.NewGenerator("start", 0)
 
 	generator.SetPoint("birth", "start", -80, -18, "")
@@ -34,6 +36,42 @@ func TestSimple(t *testing.T) {
 	generator.SetPoint("promotion", "contract", 0, 5, "")
 
 	result, err := generator.Generate(rand.New(rand.NewSource(11))) //nolint:gosec
+
+	require.NoError(t, err)
+
+	for key, value := range result {
+		if value != nil {
+			println(key, *value)
+		} else {
+			println(key, "nil")
+		}
+	}
+
+	assert.Len(t, result, 4)
+}
+
+func TestInitialState(t *testing.T) {
+	t.Parallel()
+
+	generator := axis.NewGenerator("start", 0)
+
+	generator.SetPoint("birth", "birth", 0, 20, "")
+	generator.SetPoint("contract", "contract", -5, 5, "", axis.GreaterThan("birth", axis.Nullify))
+	generator.SetPoint("promotion", "promotion", -5, 5, "", axis.GreaterThan("contract", axis.Nullify))
+
+	generator.SetMaxRetry(1)
+
+	birth := int64(0)
+	contract := int64(25)
+	promotion := int64(27)
+
+	state := map[string]*int64{
+		"birth":     &birth,
+		"contract":  &contract,
+		"promotion": &promotion,
+	}
+
+	result, err := generator.Generate(rand.New(rand.NewSource(8)), state) //nolint:gosec
 
 	require.NoError(t, err)
 
