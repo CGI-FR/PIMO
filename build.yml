@@ -165,7 +165,7 @@ targets:
         3x: true
       - if: MODULE == ""
         then:
-          - $: "git config --local remote.origin.url | sed -n 's#^.*//\\(.*\\)\\.git$#\\1#p' | tr '[:upper:]' '[:lower:]'" # .*//(.*)\.git => https://github.com/<user>/<repo>.git => github.com/<user>/<repo>
+          - $: git config --local remote.origin.url | sed -E 's/^\s*.*:\/\///g' | tr '[:upper:]' '[:lower:]' | sed -E 's/.git$//g'
             1=: "mod"
             3x: true
         else:
@@ -313,6 +313,18 @@ targets:
   test-int:
     doc: "Run all integration tests"
     depends: ["info", "refresh", "lint", "test", "bench", "release", "build-web-wasm"]
+    steps:
+      - delete: venom*.log
+      - delete: ={TEST_WS_DIR}/**
+      - mkdir: =TEST_WS_DIR
+      - copy: "**/*.yml"
+        dir: "test/suites"
+        todir: =TEST_WS_DIR
+      - $: venom run --stop-on-failure ={TEST_WS_DIR}/={testsuites}
+
+  # to pass a single test use :
+  # neon -props '{testsuites: "<test suite filename>"}' test-int-debug
+  test-int-debug:
     steps:
       - delete: venom*.log
       - delete: ={TEST_WS_DIR}/**
