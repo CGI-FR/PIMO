@@ -113,7 +113,20 @@ func (me MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Ent
 		}
 	}
 
-	timestamps, err := me.Generate(me.rand)
+	initialState := map[string]*int64{}
+	if dict, ok := e.(model.Dictionary); ok {
+		iter := dict.EntriesIter()
+		for {
+			pair, ok := iter()
+			if !ok {
+				break
+			}
+
+			initialState[pair.Key] = me.formatTimestamp(pair.Value)
+		}
+	}
+
+	timestamps, err := me.Generate(me.rand, initialState)
 	if err != nil {
 		return nil, err
 	}
@@ -158,6 +171,22 @@ func (me MaskEngine) formatDate(timestamp int64) model.Entry {
 	}
 
 	return time.Unix(timestamp, 0).Format(time.RFC3339)
+}
+
+func (me MaskEngine) formatTimestamp(date model.Entry) *int64 {
+	switch typedDate := date.(type) {
+	case nil:
+		return nil
+	case string:
+		t, err := time.Parse(me.format, typedDate)
+		if err != nil {
+			return nil
+		}
+		timestamp := t.Unix()
+		return &timestamp
+	default:
+		return nil
+	}
 }
 
 func durationToSeconds(iso8601 string) (int64, error) {
