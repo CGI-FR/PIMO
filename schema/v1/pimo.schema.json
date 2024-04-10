@@ -1035,6 +1035,10 @@
         "retry": {
           "type": "integer",
           "description": "Maximum number of retry if constraint fail before error (default : 200)"
+        },
+        "epsilon": {
+          "type": "string",
+          "description": "Minimum period to consider 2 dates unequals (default : P0)"
         }
       },
       "additionalProperties": false,

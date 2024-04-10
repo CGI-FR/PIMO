@@ -215,6 +215,7 @@ type TimeLineType struct {
 	Format   string              `yaml:"format,omitempty" json:"format,omitempty" jsonschema_description:"Format of datetimes, it should always display the following date : Mon Jan 2 15:04:05 -0700 MST 2006 or the constant value 'unixEpoch'"`
 	Points   []TimeLinePointType `yaml:"points" json:"points" jsonschema_description:"List of points in the timeline"`
 	MaxRetry *int                `yaml:"retry,omitempty" json:"retry,omitempty" jsonschema_description:"Maximum number of retry if constraint fail before error (default : 200)"`
+	Epsilon  string              `yaml:"epsilon,omitempty" json:"epsilon,omitempty" jsonschema_description:"Minimum period to consider 2 dates unequals (default : P0)"`
 }
 
 type MaskType struct {
