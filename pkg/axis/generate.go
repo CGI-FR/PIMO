@@ -89,8 +89,17 @@ Loop:
 			var pointer *int64
 
 			if ref := result[point.ref]; ref != nil {
-				value := rng.Int63n(point.max-point.min) + point.min + *ref
-				pointer = &(value)
+				switch {
+				case point.max > point.min:
+					value := rng.Int63n(point.max-point.min) + point.min + *ref
+					pointer = &(value)
+				case point.max == point.min:
+					value := point.max + *ref
+					pointer = &(value)
+				case point.max < point.min:
+					value := rng.Int63n(point.min-point.max) + point.max + *ref
+					pointer = &(value)
+				}
 			}
 
 			if pointer != nil {
