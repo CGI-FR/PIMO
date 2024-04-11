@@ -289,3 +289,92 @@ testcases:
     - result.systemoutjson.timeline.contract ShouldEqual "2007-08-24"
     - result.systemoutjson.timeline.promotion ShouldBeEmpty # is empty because the constraint failed
     - result.systemerr ShouldBeEmpty
+
+- name: setting epsilon to prevent close dates
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      seed: 4
+      masking:
+        - selector:
+            jsonpath: "timeline"
+          masks:
+            - timeline:
+                start:
+                  name: "today"
+                  value: "2006-01-02T15:04:05Z"
+                format: "2006-01-02"
+                retry: 0
+                epsilon: "P1Y" # minimum 1 year between dates (in constraints)
+                points:
+                  - name: "birth"
+                    from: "birth"
+                    min: "-P1Y"
+                    max: "+P1Y"
+                  - name: "contract"
+                    from: "contract"
+                    min: "-P1Y"
+                    max: "+P1Y"
+                    constraints:
+                      - after: "birth"
+                  - name: "promotion"
+                    from: "promotion"
+                    min: "-P1Y"
+                    max: "+P1Y"
+                    constraints:
+                      - after: "contract"
+      EOF
+  - script: echo '{"timeline":{"birth":"1984-06-09","contract":"2007-01-02","promotion":"2007-10-26"}}' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemoutjson.timeline.birth ShouldEqual "1984-06-14"
+    - result.systemoutjson.timeline.contract ShouldEqual "2007-12-20"
+    - result.systemoutjson.timeline.promotion ShouldBeEmpty # if epsilon was 0 then "2008-05-21" would have been chosen
+    - result.systemerr ShouldBeEmpty
+
+- name: setting local epsilon should override global epsilon
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      seed: 4
+      masking:
+        - selector:
+            jsonpath: "timeline"
+          masks:
+            - timeline:
+                start:
+                  name: "today"
+                  value: "2006-01-02T15:04:05Z"
+                format: "2006-01-02"
+                retry: 0
+                epsilon: "P1Y" # minimum 1 year between dates (in constraints)
+                points:
+                  - name: "birth"
+                    from: "birth"
+                    min: "-P1Y"
+                    max: "+P1Y"
+                  - name: "contract"
+                    from: "contract"
+                    min: "-P1Y"
+                    max: "+P1Y"
+                    constraints:
+                      - after: "birth"
+                  - name: "promotion"
+                    from: "promotion"
+                    min: "-P1Y"
+                    max: "+P1Y"
+                    constraints:
+                      - after: "contract"
+                        epsilon: "P0" # will override global epsilon config
+      EOF
+  - script: echo '{"timeline":{"birth":"1984-06-09","contract":"2007-01-02","promotion":"2007-10-26"}}' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemoutjson.timeline.birth ShouldEqual "1984-06-14"
+    - result.systemoutjson.timeline.contract ShouldEqual "2007-12-20"
+    - result.systemoutjson.timeline.promotion ShouldEqual "2008-05-21"
+    - result.systemerr ShouldBeEmpty

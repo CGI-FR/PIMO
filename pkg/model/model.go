@@ -194,6 +194,7 @@ type TimeLineConstraintType struct {
 	Before  string `yaml:"before,omitempty" json:"before,omitempty" jsonschema:"oneof_required=Before,title=Before,description=Name the point which should serve as the upper limit"`
 	After   string `yaml:"after,omitempty" json:"after,omitempty" jsonschema:"oneof_required=After,title=After,description=Name the point which should serve as the lower limit"`
 	OnError string `yaml:"onError,omitempty" json:"onError,omitempty" jsonschema:"enum=default,enum=reject" jsonschema_description:"What to do if there is an error : default = use point default value (or null if not set), reject = fail masking for this line, default = use default value for the point"`
+	Epsilon string `yaml:"epsilon,omitempty" json:"epsilon,omitempty" jsonschema_description:"Minimum period to consider 2 dates unequals for this constraint"`
 }
 
 type TimeLinePointType struct {
@@ -215,6 +216,7 @@ type TimeLineType struct {
 	Format   string              `yaml:"format,omitempty" json:"format,omitempty" jsonschema_description:"Format of datetimes, it should always display the following date : Mon Jan 2 15:04:05 -0700 MST 2006 or the constant value 'unixEpoch'"`
 	Points   []TimeLinePointType `yaml:"points" json:"points" jsonschema_description:"List of points in the timeline"`
 	MaxRetry *int                `yaml:"retry,omitempty" json:"retry,omitempty" jsonschema_description:"Maximum number of retry if constraint fail before error (default : 200)"`
+	Epsilon  string              `yaml:"epsilon,omitempty" json:"epsilon,omitempty" jsonschema_description:"Minimum period to consider 2 dates unequals (default : P0)"`
 }
 
 type MaskType struct {
