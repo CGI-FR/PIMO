@@ -13,7 +13,7 @@ require (
 	github.com/mattn/anko v0.1.9
 	github.com/mattn/go-isatty v0.0.20
 	github.com/pkg/profile v1.7.0
-	github.com/rs/zerolog v1.31.0
+	github.com/rs/zerolog v1.32.0
 	github.com/spf13/cast v1.5.1
 	github.com/spf13/cobra v1.8.0
 	github.com/stretchr/testify v1.8.4
