@@ -955,6 +955,10 @@
             "reject"
           ],
           "description": "What to do if there is an error : default = use point default value (or null if not set), reject = fail masking for this line, default = use default value for the point"
+        },
+        "epsilon": {
+          "type": "string",
+          "description": "Minimum period to consider 2 dates unequals for this constraint"
         }
       },
       "additionalProperties": false,

@@ -1147,9 +1147,11 @@ This default behavior can be changed with the following parameters :
               default: "begin" # use begin date if constraint can't be satisfied
   ```
 
-#### Epsilon (minimum period of time between two date to validate a constraint)
+#### Epsilon
 
-The `epsilon` parameter can be set globally on the timeline to make sure dates under constraints have a minimum amount of time between them.
+The `epsilon` parameter is the minimum period of time between two date to validate a constraint.
+
+It can be set globally on the timeline to make sure dates under constraints have a minimum amount of time between them.
 
 ```yaml
             - timeline:
@@ -1169,6 +1171,14 @@ For example this contraint will fail if begin is 2007-12-20 and end is 2008-05-2
               max: "+P80Y"
               constraints:
                 - after: "begin"
+```
+
+It can be set locally on a single constraint (override global epsilon parameter).
+
+```yaml
+                    constraints:
+                      - after: "contract"
+                        epsilon: "P0" # will override global epsilon config
 ```
 
 [Return to list of masks](#possible-masks)

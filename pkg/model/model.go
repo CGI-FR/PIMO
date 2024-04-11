@@ -194,6 +194,7 @@ type TimeLineConstraintType struct {
 	Before  string `yaml:"before,omitempty" json:"before,omitempty" jsonschema:"oneof_required=Before,title=Before,description=Name the point which should serve as the upper limit"`
 	After   string `yaml:"after,omitempty" json:"after,omitempty" jsonschema:"oneof_required=After,title=After,description=Name the point which should serve as the lower limit"`
 	OnError string `yaml:"onError,omitempty" json:"onError,omitempty" jsonschema:"enum=default,enum=reject" jsonschema_description:"What to do if there is an error : default = use point default value (or null if not set), reject = fail masking for this line, default = use default value for the point"`
+	Epsilon string `yaml:"epsilon,omitempty" json:"epsilon,omitempty" jsonschema_description:"Minimum period to consider 2 dates unequals for this constraint"`
 }
 
 type TimeLinePointType struct {
