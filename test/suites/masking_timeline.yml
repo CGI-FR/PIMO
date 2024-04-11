@@ -378,3 +378,31 @@ testcases:
     - result.systemoutjson.timeline.contract ShouldEqual "2007-12-20"
     - result.systemoutjson.timeline.promotion ShouldEqual "2008-05-21"
     - result.systemerr ShouldBeEmpty
+
+- name: min and max can be equals
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "timeline"
+          masks:
+            - timeline:
+                start:
+                  name: "today"
+                  value: "2006-01-02T15:04:05Z"
+                format: "2006-01-02"
+                retry: 0
+                points:
+                  - name: "birth"
+                    from: "birth"
+                    min: "+P1Y"
+                    max: "+P1Y"
+      EOF
+  - script: echo '{"timeline":{"birth":"1984-06-09"}}' | pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemoutjson.timeline.birth ShouldEqual "1985-06-09"
+    - result.systemerr ShouldBeEmpty
