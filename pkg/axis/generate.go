@@ -90,14 +90,14 @@ Loop:
 
 			if ref := result[point.ref]; ref != nil {
 				switch {
+				case point.max > point.min:
+					value := rng.Int63n(point.max-point.min) + point.min + *ref
+					pointer = &(value)
 				case point.max == point.min:
 					value := point.max + *ref
 					pointer = &(value)
 				case point.max < point.min:
 					value := rng.Int63n(point.min-point.max) + point.max + *ref
-					pointer = &(value)
-				default:
-					value := rng.Int63n(point.max-point.min) + point.min + *ref
 					pointer = &(value)
 				}
 			}
