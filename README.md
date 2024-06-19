@@ -1408,7 +1408,8 @@ Using this configuration, the schema will be applied on every YAML file containi
 ## Contributors
 
 * CGI France ✉[Contact support](mailto:LINO.fr@cgi.com)
-* Pole Emploi
+* Pôle Emploi
+* BGPN - Groupe La Poste
 
 ## Licence
 
