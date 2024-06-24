@@ -72,23 +72,34 @@ func (g *Generator) SetPoint(name string, reference string, min, max int64, defa
 	})
 }
 
-func (g *Generator) Generate(rng *rand.Rand) (map[string]*int64, error) {
+func (g *Generator) Generate(rng *rand.Rand, initialStates ...map[string]*int64) (map[string]*int64, error) {
 	loopCount := 0
 
 Loop:
 	for {
 		loopCount++
 
-		result := make(map[string]*int64, len(g.points)+1)
+		result := make(map[string]*int64, len(g.points)*2+1)
 
 		result[g.originName] = &g.originValue
+
+		loadStates(result, initialStates)
 
 		for _, point := range g.points {
 			var pointer *int64
 
 			if ref := result[point.ref]; ref != nil {
-				value := rng.Int63n(point.max-point.min) + point.min + *ref
-				pointer = &(value)
+				switch {
+				case point.max > point.min:
+					value := rng.Int63n(point.max-point.min) + point.min + *ref
+					pointer = &(value)
+				case point.max == point.min:
+					value := point.max + *ref
+					pointer = &(value)
+				case point.max < point.min:
+					value := rng.Int63n(point.min-point.max) + point.max + *ref
+					pointer = &(value)
+				}
 			}
 
 			if pointer != nil {
@@ -123,4 +134,12 @@ Loop:
 
 func (g *Generator) Origin() string {
 	return g.originName
+}
+
+func loadStates(target map[string]*int64, states []map[string]*int64) {
+	for _, state := range states {
+		for name, value := range state {
+			target[name] = value
+		}
+	}
 }

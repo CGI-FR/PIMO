@@ -7,16 +7,16 @@ require (
 	github.com/Masterminds/sprig/v3 v3.2.3
 	github.com/adrienaury/zeromdc v0.1.1
 	github.com/capitalone/fpe v1.2.1
-	github.com/goccy/go-yaml v1.11.2
+	github.com/goccy/go-yaml v1.11.3
 	github.com/invopop/jsonschema v0.12.0
 	github.com/labstack/echo/v4 v4.11.4
 	github.com/mattn/anko v0.1.9
 	github.com/mattn/go-isatty v0.0.20
 	github.com/pkg/profile v1.7.0
-	github.com/rs/zerolog v1.31.0
-	github.com/spf13/cast v1.5.1
+	github.com/rs/zerolog v1.32.0
+	github.com/spf13/cast v1.6.0
 	github.com/spf13/cobra v1.8.0
-	github.com/stretchr/testify v1.8.4
+	github.com/stretchr/testify v1.9.0
 	github.com/zach-klippenstein/goregen v0.0.0-20160303162051-795b5e3961ea
 	gitlab.com/c0b/go-ordered-json v0.0.0-20201030195603-febf46534d5a
 	golang.org/x/text v0.14.0

@@ -33,6 +33,7 @@ type Constraint interface {
 
 type constraint struct {
 	behavior  ConstraintBehavior
+	epsilon   int64
 	reference string
 }
 
@@ -40,10 +41,11 @@ func (c constraint) Behavior() ConstraintBehavior {
 	return c.behavior
 }
 
-func LowerThan(reference string, behavior ConstraintBehavior) Constraint {
+func LowerThan(reference string, epsilon int64, behavior ConstraintBehavior) Constraint {
 	return lowerThan{
 		constraint: constraint{
 			behavior:  behavior,
+			epsilon:   epsilon,
 			reference: reference,
 		},
 	}
@@ -60,13 +62,14 @@ func (lt lowerThan) Validate(value int64, points map[string]*int64) bool {
 		return true
 	}
 
-	return value < *ref
+	return value+lt.epsilon < *ref
 }
 
-func GreaterThan(reference string, behavior ConstraintBehavior) Constraint {
+func GreaterThan(reference string, epsilon int64, behavior ConstraintBehavior) Constraint {
 	return greaterThan{
 		constraint: constraint{
 			behavior:  behavior,
+			epsilon:   epsilon,
 			reference: reference,
 		},
 	}
@@ -83,5 +86,5 @@ func (gt greaterThan) Validate(value int64, points map[string]*int64) bool {
 		return true
 	}
 
-	return value > *ref
+	return value-gt.epsilon > *ref
 }

@@ -1146,9 +1146,43 @@ This default behavior can be changed with the following parameters :
               min: "P0"
               max: "+P80Y"
               constraints:
-                - before: "begin"
+                - after: "begin"
               default: "begin" # use begin date if constraint can't be satisfied
   ```
+
+#### Epsilon
+
+The `epsilon` parameter is the minimum period of time between two date to validate a constraint.
+
+It can be set globally on the timeline to make sure dates under constraints have a minimum amount of time between them.
+
+```yaml
+            - timeline:
+                start:
+                  name: "today"
+                  value: "2006-01-02T15:04:05Z"
+                format: "2006-01-02"
+                retry: 0
+                epsilon: "P1Y" # minimum 1 year between dates (in constraints)
+```
+
+For example this contraint will fail if begin is 2007-12-20 and end is 2008-05-21 (less than a year between dates).
+
+```yaml
+            - name: "end"
+              min: "P0"
+              max: "+P80Y"
+              constraints:
+                - after: "begin"
+```
+
+It can be set locally on a single constraint (override global epsilon parameter).
+
+```yaml
+                    constraints:
+                      - after: "contract"
+                        epsilon: "P0" # will override global epsilon config
+```
 
 [Return to list of masks](#possible-masks)
 
@@ -1377,7 +1411,8 @@ Using this configuration, the schema will be applied on every YAML file containi
 ## Contributors
 
 * CGI France ✉[Contact support](mailto:LINO.fr@cgi.com)
-* Pole Emploi
+* Pôle Emploi
+* BGPN - Groupe La Poste
 
 ## Licence
 

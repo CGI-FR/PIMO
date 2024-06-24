@@ -71,16 +71,32 @@ func NewMask(model model.TimeLineType, seed int64, seeder model.Seeder) (MaskEng
 
 		constraints := []axis.Constraint{}
 
+		var epsilon int64
+
+		if model.Epsilon != "" {
+			epsilon, err = durationToSeconds(model.Epsilon)
+			if err != nil {
+				return MaskEngine{}, err
+			}
+		}
+
 		for _, constraint := range point.Constraints {
 			behavior := axis.Replace // we will try to use the default value of the point
 			if constraint.OnError == "reject" {
 				behavior = axis.Reject
 			}
+			localEpsilon := epsilon
+			if constraint.Epsilon != "" {
+				localEpsilon, err = durationToSeconds(constraint.Epsilon)
+				if err != nil {
+					return MaskEngine{}, err
+				}
+			}
 			if len(constraint.Before) > 0 {
-				constraints = append(constraints, axis.LowerThan(constraint.Before, behavior))
+				constraints = append(constraints, axis.LowerThan(constraint.Before, localEpsilon, behavior))
 			}
 			if len(constraint.After) > 0 {
-				constraints = append(constraints, axis.GreaterThan(constraint.After, behavior))
+				constraints = append(constraints, axis.GreaterThan(constraint.After, localEpsilon, behavior))
 			}
 		}
 
@@ -113,7 +129,20 @@ func (me MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Ent
 		}
 	}
 
-	timestamps, err := me.Generate(me.rand)
+	initialState := map[string]*int64{}
+	if dict, ok := e.(model.Dictionary); ok {
+		iter := dict.EntriesIter()
+		for {
+			pair, ok := iter()
+			if !ok {
+				break
+			}
+
+			initialState[pair.Key] = me.formatTimestamp(pair.Value)
+		}
+	}
+
+	timestamps, err := me.Generate(me.rand, initialState)
 	if err != nil {
 		return nil, err
 	}
@@ -158,6 +187,22 @@ func (me MaskEngine) formatDate(timestamp int64) model.Entry {
 	}
 
 	return time.Unix(timestamp, 0).Format(time.RFC3339)
+}
+
+func (me MaskEngine) formatTimestamp(date model.Entry) *int64 {
+	switch typedDate := date.(type) {
+	case nil:
+		return nil
+	case string:
+		t, err := time.Parse(me.format, typedDate)
+		if err != nil {
+			return nil
+		}
+		timestamp := t.Unix()
+		return &timestamp
+	default:
+		return nil
+	}
 }
 
 func durationToSeconds(iso8601 string) (int64, error) {
