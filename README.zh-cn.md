@@ -1142,9 +1142,43 @@ $ pimo --empty-input
               min: "P0"
               max: "+P80Y"
               constraints:
-                - before: "begin"
+                - after: "begin"
               default: "begin" # 如果无法满足约束，则使用 begin 日期
   ```
+
+#### Epsilon
+
+`epsilon` 约束是验证两个日期之间的最小时间间隔的参数。
+
+它可以设置在时间轴全局范围上，以确保约束下的日期之间有最小的时间间隔。
+
+```yaml
+            - timeline:
+                start:
+                  name: "today"
+                  value: "2006-01-02T15:04:05Z"
+                format: "2006-01-02"
+                retry: 0
+                epsilon: "P1Y" # 日期之间至少要间隔1年（在约束条件中）
+```
+
+例如，如果起始日期是2007-12-20，结束日期是2008-05-21，则此约束将失败（日期间隔少于1年）。
+
+```yaml
+            - name: "end"
+              min: "P0"
+              max: "+P80Y"
+              constraints:
+                - after: "begin"
+```
+
+它也可以在单个约束条件中局部设置（覆盖全局的 epsilon 参数）。
+
+```yaml
+                    constraints:
+                      - after: "contract"
+                        epsilon: "P0" # 将覆盖全局的 epsilon 设置
+```
 
 [返回到加密列表](#possible-masks)
 
