@@ -18,6 +18,16 @@ PIMO 是一款用于加密数据的工具。它可以从 JSONline流 中加密�
 你可以使用 [LINO](https://github.com/CGI-FR/LINO) 从数据库中提取简单数据, 来输入到PIMO中来进行加密.
 你也可以使用一个简单的yaml配置文件来生成简单数据.
 
+**功能**
+- 可信度 : 可生成与真实数据无法区分的测试数据
+- 数据合成 : 不需要任何基础数据来生成
+- 数据脱敏, 包括
+  - 随机化 : 通过覆盖方式保护个人或敏感数据。
+  - 擬名化, 包括三个级别
+    - 一致性擬名化 : 真实值 A 总是被擬名值 X 替换，但 X 可能被分配到除 A 以外的其他值。
+    - 标识符擬名化 : 真实值 A 总是被擬名值 X 替换，并且 X *无法* 被归属到除 A 以外的其他值。
+    - 可逆擬名化 : 真实值 A 可以从擬名值 X 生成。
+
 ## 必要的配置文件
 
 PIMO 需要一个 YAML 配置文件才能运行。默认情况下，该文件的名称为 `masking.yml`，并放在工作目录中。文件必须遵循以下格式：
@@ -125,6 +135,7 @@ masking:
   * [`randomChoiceInUri`](#randomchoiceinuri) 用于从外部资源中加密成随机值。
   * [`randomChoiceInCSV`](#randomchoiceincsv) 用于从外部 CSV 资源中加密成随机值。
   * [`transcode`](#transcode) 用于保留字符类别并以随机方式加密值。
+  * [`timeline`](#timeline) 用于生成彼此相关的一组日期 (根据规则和约束)
 * K-Anonymization
   * [`range`](#range) 用于通过一定范围的值来加密整数值（例如，将 `5` 替换为 `[0,10]`）。
   * [`duration`](#duration) 用于通过添加或减去一定数量的天来加密日期。
@@ -1028,6 +1039,112 @@ masking:
   }
 }
 ```
+
+[返回到加密列表](#possible-masks)
+
+### Timeline
+
+[![Try it](https://img.shields.io/badge/-Try%20it%20in%20PIMO%20Play-brightgreen)](https://cgi-fr.github.io/pimo-play/#c=G4UwTgzglg9gdgLgAQCICMKBQEQgCbIAsATJgLYCGEA1lHAOYKZJIC0SOANiAMYAuMMExYikAKwjwADhT4ALZCj5QyITnRBZRlGhGGi2SCngKotB9stXq4IfQZEQ+FMH3sORcCqsVOXfFCQAYiQvVSR5ECQAMyhIPiQpGDoEugi5KKs1DWYPUWAKTgBXO1RiAAZygDZWcrRa4gAVNABWBHLCdpaALUCQmClleEKkZB4isDAQOAS8WSioaNCYBIgpXkWofFy86MFKNzLKmrqGvqQYIr4pK5j92TuwdMyVbNsdjySUvQ+89jDSigAEZxeTmPLaOiKVgABQAHOUAJrnTgwADu4CQQMucDwj3SUAgSDmfCiAEkAMoAeSQcKqdWJE1ksDgvwhlAAHtCYWg4cjgkgilJ1k9sUVcfj5ITifMkJSaXSGXgmUNWRCRP9vICePA+GAKPxweqYmAYGRFCDXHJzmLcfgkFNOMzQBEYKhLWCkAAKRbLVbrHibfAAGmecAdamdmTdflciWSMwAlGy8mQoagANQ8vlG9WcxRZwhI3MQnVwJz677uY2GIEgPZTXzOVwlhyanyoKSmsgrFmtjzRbuKMt6g0BFMeNOITMw8r9hz5mctZGYIA&i=N4XyA)
+
+此加密用于生成彼此相关的一组日期, 比如 :
+
+```yaml
+version: "1"
+seed: 42
+masking:
+  - selector:
+      jsonpath: "timeline"
+    masks:
+      - add: ""
+      - timeline:
+          start:
+            name: "start" # 命名时间线中的第一个点
+            value: "2006-01-02T15:04:05Z" # 可选项 : 如未选择则使用当前日期
+          format: "2006-01-02" # 时间线日期的输出格式
+          points:
+            - name: "birth"
+              min: "-P80Y" # 此日期的下界 符合ISO 8601 duration标准
+              max: "-P18Y" # 此日期的上界 符合ISO 8601 duration标准
+            - name: "contract"
+              from: "birth" # 相对于 "birth" 设定边界(如果未指定, 则取决于时间线的起始点)
+              min: "+P18Y"
+              max: "+P40Y"
+            - name: "promotion"
+              from: "contract"
+              min: "+P0"
+              max: "+P5Y"
+```
+
+这将生成 ：
+
+```console
+$ pimo --empty-input
+{"timeline":{"start":"2006-01-02","birth":"1980-12-01","contract":"2010-07-16","promotion":"2010-12-06"}}
+```
+
+#### 约束
+
+可以设置 `before` 和 `after` 约束来创建更好的时间线，例如 :
+
+```yaml
+            - name: "begin"
+              min: "P0"
+              max: "+P80Y"
+            - name: "end"
+              min: "P0"
+              max: "+P80Y"
+              constraints:
+                - before: "begin"
+```
+
+`begin` 和 `end` 日期都将从相同的间隔中选择，但 `end` 将始终在 `begin` 之后。
+
+为了强制执行这一点, 时间线掩码将重新生成所有日期直到所有约束都满足为止, 最多尝试200次。如果200次尝试后仍然存在未满足的约束，则该日期将设置为 `null`.
+
+可以使用以下参数更改此默认行为 :
+
+- `retry` 设置最大重试次数（可以设置为 `0` 以禁用重试）
+
+  ```yaml
+            - timeline:
+                start:
+                  name: "start"
+                  value: "2006-01-02T15:04:05Z"
+                format: "2006-01-02"
+                retry: 0 # 如果未满足约束，立即失败
+  ```
+
+- `onError` 将更改无法满足约束时的默认设置 `null` 值的行为, 可以接受以下值 :
+  - `default` : 使用默认值，这是未设置 `onError` 时的标准行为（见下一条如何更改默认值）
+  - `reject` : 在当前行的掩码失败时抛出错误
+
+  `onError` 在每个约束上都有定义，例如 ：
+
+  ```yaml
+            - name: "begin"
+              min: "P0"
+              max: "+P80Y"
+            - name: "end"
+              min: "P0"
+              max: "+P80Y"
+              constraints:
+                - before: "begin"
+                  onError: "reject"
+  ```
+
+- `default` 设置在发生错误时使用的默认值，如果未设置，则默认为 `null`
+
+  ```yaml
+            - name: "begin"
+              min: "P0"
+              max: "+P80Y"
+            - name: "end"
+              min: "P0"
+              max: "+P80Y"
+              constraints:
+                - before: "begin"
+              default: "begin" # 如果无法满足约束，则使用 begin 日期
+  ```
 
 [返回到加密列表](#possible-masks)
 
