@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1721043926877,
+  "lastUpdate": 1721048295897,
   "repoUrl": "https://github.com/CGI-FR/PIMO",
   "entries": {
     "Benchmark": [
@@ -7218,6 +7218,126 @@ window.BENCHMARK_DATA = {
             "value": 376,
             "unit": "allocs/op",
             "extra": "246620 times\n4 procs"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "44274230+adrienaury@users.noreply.github.com",
+            "name": "Adrien Aury",
+            "username": "adrienaury"
+          },
+          "committer": {
+            "email": "44274230+adrienaury@users.noreply.github.com",
+            "name": "Adrien Aury",
+            "username": "adrienaury"
+          },
+          "distinct": true,
+          "id": "4284f2aaeed5b4d41c5599811bb957fecfde421f",
+          "message": "fix: MaskSequence template function signature",
+          "timestamp": "2024-07-15T12:48:29Z",
+          "tree_id": "c86fce3da1a4e649189d70e8190b6ef7a1d92d47",
+          "url": "https://github.com/CGI-FR/PIMO/commit/4284f2aaeed5b4d41c5599811bb957fecfde421f"
+        },
+        "date": 1721048295276,
+        "tool": "go",
+        "benches": [
+          {
+            "name": "BenchmarkPimoRun",
+            "value": 27697,
+            "unit": "ns/op\t   17884 B/op\t     196 allocs/op",
+            "extra": "402642 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkPimoRun - ns/op",
+            "value": 27697,
+            "unit": "ns/op",
+            "extra": "402642 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkPimoRun - B/op",
+            "value": 17884,
+            "unit": "B/op",
+            "extra": "402642 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkPimoRun - allocs/op",
+            "value": 196,
+            "unit": "allocs/op",
+            "extra": "402642 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge",
+            "value": 1877782,
+            "unit": "ns/op\t  682376 B/op\t    5937 allocs/op",
+            "extra": "5782 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge - ns/op",
+            "value": 1877782,
+            "unit": "ns/op",
+            "extra": "5782 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge - B/op",
+            "value": 682376,
+            "unit": "B/op",
+            "extra": "5782 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge - allocs/op",
+            "value": 5937,
+            "unit": "allocs/op",
+            "extra": "5782 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkFindInCSVIteration",
+            "value": 89625429,
+            "unit": "ns/op\t36090645 B/op\t  576707 allocs/op",
+            "extra": "417 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkFindInCSVIteration - ns/op",
+            "value": 89625429,
+            "unit": "ns/op",
+            "extra": "417 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkFindInCSVIteration - B/op",
+            "value": 36090645,
+            "unit": "B/op",
+            "extra": "417 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkFindInCSVIteration - allocs/op",
+            "value": 576707,
+            "unit": "allocs/op",
+            "extra": "417 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkFindInCSVLargeVolume",
+            "value": 50241,
+            "unit": "ns/op\t   26190 B/op\t     376 allocs/op",
+            "extra": "233726 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkFindInCSVLargeVolume - ns/op",
+            "value": 50241,
+            "unit": "ns/op",
+            "extra": "233726 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkFindInCSVLargeVolume - B/op",
+            "value": 26190,
+            "unit": "B/op",
+            "extra": "233726 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkFindInCSVLargeVolume - allocs/op",
+            "value": 376,
+            "unit": "allocs/op",
+            "extra": "233726 times\n4 procs"
           }
         ]
       }
