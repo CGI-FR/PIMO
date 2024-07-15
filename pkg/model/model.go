@@ -219,6 +219,11 @@ type TimeLineType struct {
 	Epsilon  string              `yaml:"epsilon,omitempty" json:"epsilon,omitempty" jsonschema_description:"Minimum period to consider 2 dates unequals (default : P0)"`
 }
 
+type SequenceType struct {
+	Format  string `yaml:"format" json:"format" jsonschema_description:"Format of the sequenced ID"`
+	Varying string `yaml:"varying,omitempty" json:"varying,omitempty" jsonschema_description:"List of varying characters in the sequence (default : 0123456789)"`
+}
+
 type MaskType struct {
 	Add               Entry                `yaml:"add,omitempty" json:"add,omitempty" jsonschema:"oneof_required=Add,title=Add Mask,description=Add a new field in the JSON stream"`
 	AddTransient      Entry                `yaml:"add-transient,omitempty" json:"add-transient,omitempty" jsonschema:"oneof_required=AddTransient,title=Add Transient Mask" jsonschema_description:"Add a new temporary field, that will not show in the JSON output"`
@@ -255,6 +260,7 @@ type MaskType struct {
 	FindInCSV         FindInCSVType        `yaml:"findInCSV,omitempty" json:"findInCSV,omitempty" jsonschema:"oneof_required=FindInCSV,title=Find in CSV Mask" jsonschema_description:"Find matched values in a CSV file based on input json file and save the matched csv line as type objet"`
 	XML               XMLType              `yaml:"xml,omitempty" json:"xml,omitempty" jsonschema:"oneof_required=xml,title=XML Mask" jsonschema_description:"Apply mask for XML content within JSON values"`
 	TimeLine          TimeLineType         `yaml:"timeline,omitempty" json:"timeline,omitempty" jsonschema:"oneof_required=TimeLine,title=TimeLine Mask" jsonschema_description:"Generate a timeline under constraints and rules"`
+	Sequence          SequenceType         `yaml:"sequence,omitempty" json:"sequence,omitempty" jsonschema:"oneof_required=Sequence,title=Sequence Mask" jsonschema_description:"Generate a sequenced ID that follows specified format"`
 }
 
 type Masking struct {

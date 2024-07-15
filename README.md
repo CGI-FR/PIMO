@@ -155,6 +155,7 @@ The following types of masks can be used :
   * [`constant`](#constant) is to mask the value by a constant value given in argument.
   * [`command`](#command) is to mask with the output of a console command given in argument.
   * [`incremental`](#incremental) is to mask data with incremental value starting from `start` with a step of `increment`.
+  * [`sequence`](#sequence) generate sequenced IDs of any format.
   * [`fluxUri`](#fluxuri) is to replace by a sequence of values defined in an external resource.
   * [`replacement`](#replacement) is to mask a data with another data from the jsonline.
   * [`pipe`](#pipe) is a mask to handle complex nested array structures, it can read an array as an object stream and process it with a sub-pipeline.
@@ -522,6 +523,35 @@ This example will mask the `date` field of the input jsonlines by decreasing its
 ```
 
 This example will mask the `id` field of the input jsonlines with incremental values. The first jsonline's `id` will be masked by 1, the second's by 2, etc...
+
+[Return to list of masks](#possible-masks)
+
+### Sequence
+
+[![Try it](https://img.shields.io/badge/-Try%20it%20in%20PIMO%20Play-brightgreen)](https://cgi-fr.github.io/pimo-play/#c=G4UwTgzglg9gdgLgAQCICMKBQBbAhhAayjgHMFMkkBaJCEAGxAGMAXGMcyrpAKwngAOuFgAtkKKABMs3PIU7daIAI4BXEHCYgFipADN2eFuICiAJTNUADDatYgA&i=N4KABGBECWAmkC4wDsCuAbdIC+Q)
+
+```yaml
+  - selector:
+      jsonpath: "id"
+    mask:
+      sequence:
+        format: "ERR-0000"
+```
+
+This example will generate the `id` field of the input jsonlines with sequenced values. The first jsonline's `id` will be masked by `ERR-0000`, the second's by `ERR-0001`, etc...
+
+By default, the varying part of the ID is numbers, but this can be changed :
+
+```yaml
+  - selector:
+      jsonpath: "id"
+    mask:
+      sequence:
+        format: "ERR-0000"
+        varying: "ER"
+```
+
+With this configuration, the first jsonline's `id` will be masked by `EEE-0000`, the second's by `EER-0000`, the third by `ERE-0000` etc...
 
 [Return to list of masks](#possible-masks)
 

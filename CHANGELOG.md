@@ -18,6 +18,7 @@ Types of changes
 
 - `Added` mask `ff1` preserve specific domain
 - `Added` mask `ff1` log field value as WARN when an error is catched by `onError`
+- `Added` mask `sequence` to generate sequenced ID of any format
 
 ## [1.23.0]
 
