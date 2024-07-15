@@ -1,0 +1,44 @@
+name: sequence features
+testcases:
+  - name: default usage
+    steps:
+      - script: rm -f masking.yml
+      - script: |-
+          cat > masking.yml <<EOF
+          version: "1"
+          masking:
+            - selector:
+                jsonpath: "id"
+              mask:
+                sequence:
+                  format: "ERR-1234"
+          EOF
+      - script: |-
+          echo -e '{"name": "Toto", "id": 12}\n{"name": "Dorothy", "id":3}' | pimo
+        assertions:
+          - result.code ShouldEqual 0
+          - result.systemout ShouldContainSubstring "name":"Toto","id":"ERR-0000"
+          - result.systemout ShouldContainSubstring "name":"Dorothy","id":"ERR-0001"
+          - result.systemerr ShouldBeEmpty
+
+  - name: change varying characters
+    steps:
+      - script: rm -f masking.yml
+      - script: |-
+          cat > masking.yml <<EOF
+          version: "1"
+          masking:
+            - selector:
+                jsonpath: "id"
+              mask:
+                sequence:
+                  format: "ERR-1234"
+                  varying: "RE"
+          EOF
+      - script: |-
+          echo -e '{"name": "Toto", "id": 12}\n{"name": "Dorothy", "id":3}' | pimo
+        assertions:
+          - result.code ShouldEqual 0
+          - result.systemout ShouldContainSubstring "name":"Toto","id":"RRR-1234"
+          - result.systemout ShouldContainSubstring "name":"Dorothy","id":"RRE-1234"
+          - result.systemerr ShouldBeEmpty
