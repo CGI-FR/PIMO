@@ -18,6 +18,8 @@
 package sequence
 
 import (
+	"strings"
+
 	"github.com/cgi-fr/pimo/pkg/model"
 	"github.com/rs/zerolog/log"
 )
@@ -25,6 +27,11 @@ import (
 type MaskEngine struct {
 	format  string
 	varying string
+
+	runesCount int
+	runes      []rune
+	varunes    []rune
+	counters   []int
 }
 
 func NewMask(format string, varying string) (MaskEngine, error) {
@@ -32,16 +39,58 @@ func NewMask(format string, varying string) (MaskEngine, error) {
 		varying = "0123456789"
 	}
 
+	runes := []rune(format)
+	runesCount := len(runes)
+
+	lenVarying := 0
+	for _, c := range runes {
+		if strings.ContainsRune(varying, c) {
+			lenVarying++
+		}
+	}
+
+	counters := make([]int, lenVarying)
+
 	return MaskEngine{
-		format:  format,
-		varying: varying,
+		format:     format,
+		varying:    varying,
+		runesCount: runesCount,
+		runes:      runes,
+		varunes:    []rune(varying),
+		counters:   counters,
 	}, nil
 }
 
 func (me MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Entry, error) {
 	log.Info().Msg("Mask sequence")
 
-	return e, nil
+	result := make([]rune, me.runesCount)
+
+	counterIdx := 0
+	for i := range me.runes {
+		char := me.runes[me.runesCount-i-1]
+		if strings.ContainsRune(me.varying, char) {
+			result[me.runesCount-i-1] = me.varunes[me.counters[counterIdx]]
+			counterIdx++
+		} else {
+			result[me.runesCount-i-1] = char
+		}
+	}
+
+	me.increment()
+
+	return string(result), nil
+}
+
+func (me MaskEngine) increment() {
+	for i := range me.counters {
+		if me.counters[i] < len(me.varunes)-1 {
+			me.counters[i] = me.counters[i] + 1
+			break
+		} else {
+			me.counters[i] = 0
+		}
+	}
 }
 
 func Factory(conf model.MaskFactoryConfiguration) (model.MaskEngine, bool, error) {
