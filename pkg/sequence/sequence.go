@@ -18,62 +18,81 @@
 package sequence
 
 import (
-	"strings"
-
 	"github.com/cgi-fr/pimo/pkg/model"
 	"github.com/rs/zerolog/log"
+	"golang.org/x/exp/slices"
 )
 
-type MaskEngine struct {
-	format  string
-	varying string
-
-	runesCount int
-	runes      []rune
-	varunes    []rune
-	counters   []int
+type MaskEngineState struct {
+	counter int
 }
 
-func NewMask(format string, varying string) (MaskEngine, error) {
+func (mes MaskEngineState) toCounters(length int, base int) []int {
+	result := make([]int, length)
+
+	counter := mes.counter
+	for counter > 0 {
+		result = append([]int{counter % base}, result...)
+		counter = counter / base
+	}
+
+	return result
+}
+
+type MaskEngine struct {
+	format   []rune
+	varying  []rune
+	state    *MaskEngineState
+	base     int
+	length   int
+	counters []int
+}
+
+func NewMask(format string, varying string, state *MaskEngineState) (MaskEngine, error) {
 	if len(varying) == 0 {
 		varying = "0123456789"
 	}
 
-	runes := []rune(format)
-	runesCount := len(runes)
+	if state == nil {
+		state = &MaskEngineState{counter: 0}
+	}
 
-	lenVarying := 0
-	for _, c := range runes {
-		if strings.ContainsRune(varying, c) {
-			lenVarying++
+	formatRunes := []rune(format)
+	varyingRunes := []rune(varying)
+
+	varyingLength := 0
+	for _, char := range formatRunes {
+		if slices.Contains(varyingRunes, char) {
+			varyingLength++
 		}
 	}
 
-	counters := make([]int, lenVarying)
+	length := len(formatRunes)
+	base := len(varyingRunes)
 
 	return MaskEngine{
-		format:     format,
-		varying:    varying,
-		runesCount: runesCount,
-		runes:      runes,
-		varunes:    []rune(varying),
-		counters:   counters,
+		format:   formatRunes,
+		varying:  varyingRunes,
+		state:    state,
+		base:     base,
+		length:   length,
+		counters: state.toCounters(varyingLength, base),
 	}, nil
 }
 
 func (me MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Entry, error) {
 	log.Info().Msg("Mask sequence")
 
-	result := make([]rune, me.runesCount)
+	result := make([]rune, me.length)
 
 	counterIdx := 0
-	for i := range me.runes {
-		char := me.runes[me.runesCount-i-1]
-		if strings.ContainsRune(me.varying, char) {
-			result[me.runesCount-i-1] = me.varunes[me.counters[counterIdx]]
+	for i := range me.format {
+		char := me.format[me.length-i-1]
+		if slices.Contains(me.varying, char) {
+			result[me.length-i-1] = me.varying[me.counters[counterIdx]]
 			counterIdx++
 		} else {
-			result[me.runesCount-i-1] = char
+			result[me.length-i-1] = char
 		}
 	}
 
@@ -83,19 +102,21 @@ func (me MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Ent
 }
 
 func (me MaskEngine) increment() {
+	me.state.counter++
 	for i := range me.counters {
-		if me.counters[i] < len(me.varunes)-1 {
+		if me.counters[i] < me.base-1 {
 			me.counters[i]++
-			break
+			return
 		} else {
 			me.counters[i] = 0
 		}
 	}
+	me.state.counter = 0
 }
 
 func Factory(conf model.MaskFactoryConfiguration) (model.MaskEngine, bool, error) {
 	if len(conf.Masking.Mask.Sequence.Format) > 0 {
-		mask, err := NewMask(conf.Masking.Mask.Sequence.Format, conf.Masking.Mask.Sequence.Varying)
+		mask, err := NewMask(conf.Masking.Mask.Sequence.Format, conf.Masking.Mask.Sequence.Varying, nil)
 		if err != nil {
 			return nil, false, err
 		}
@@ -105,8 +126,9 @@ func Factory(conf model.MaskFactoryConfiguration) (model.MaskEngine, bool, error
 }
 
 func Func(seed int64, seedField string) interface{} {
+	state := &MaskEngineState{counter: 0}
 	return func(format string, varying string) (model.Entry, error) {
-		mask, err := NewMask(format, varying)
+		mask, err := NewMask(format, varying, state)
 		if err != nil {
 			return nil, err
 		}
