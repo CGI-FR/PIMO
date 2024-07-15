@@ -105,11 +105,11 @@ func Factory(conf model.MaskFactoryConfiguration) (model.MaskEngine, bool, error
 }
 
 func Func(seed int64, seedField string) interface{} {
-	return func(format string, varying string, input model.Entry) (model.Entry, error) {
+	return func(format string, varying string) (model.Entry, error) {
 		mask, err := NewMask(format, varying)
 		if err != nil {
 			return nil, err
 		}
-		return mask.Mask(input)
+		return mask.Mask(nil)
 	}
 }
