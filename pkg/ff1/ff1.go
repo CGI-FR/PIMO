@@ -216,7 +216,7 @@ func toFF1Domain(value string, domain string, preserve string, preserveV1 bool) 
 			result.WriteByte(ff1domain[index])
 		case preserveV1:
 			preserved[pos] = char
-		case !preserveV1 && strings.IndexRune(preserve, char) > -1:
+		case !preserveV1 && strings.ContainsRune(preserve, char):
 			preserved[pos] = char
 		default:
 			return value, nil, fmt.Errorf("character %c is outside of the domain %s", char, domain)
