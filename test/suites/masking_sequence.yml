@@ -42,3 +42,25 @@ testcases:
           - result.systemout ShouldContainSubstring "name":"Toto","id":"RRR-1234"
           - result.systemout ShouldContainSubstring "name":"Dorothy","id":"RRE-1234"
           - result.systemerr ShouldBeEmpty
+
+  - name: template usage
+    steps:
+      - script: rm -f masking.yml
+      - script: |-
+          cat > masking.yml <<EOF
+          version: "1"
+          masking:
+            - selector:
+                jsonpath: "id"
+              mask:
+                template: '[[MaskSequence "ERR-1234" "0123456789"]]'
+          EOF
+      - script: sed -i  "s/\[\[/\{\{/g"  masking.yml
+      - script: sed -i  "s/\]\]/\}\}/g"  masking.yml
+      - script: |-
+          echo -e '{"name": "Toto", "id": 12}\n{"name": "Dorothy", "id":3}' | pimo
+        assertions:
+          - result.code ShouldEqual 0
+          - result.systemout ShouldContainSubstring "name":"Toto","id":"ERR-0000"
+          - result.systemout ShouldContainSubstring "name":"Dorothy","id":"ERR-0001"
+          - result.systemerr ShouldBeEmpty

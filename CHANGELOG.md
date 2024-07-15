@@ -14,6 +14,10 @@ Types of changes
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [1.24.1]
+
+- `Fixed` template function `MaskSequence` does not increment correctly
+
 ## [1.24.0]
 
 - `Added` mask `ff1` preserve specific domain
