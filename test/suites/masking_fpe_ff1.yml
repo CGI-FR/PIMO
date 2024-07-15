@@ -287,3 +287,29 @@ testcases:
     - result.code ShouldEqual 0
     - result.systemoutjson.name ShouldEqual 3DC3-5678
     - result.systemerr ShouldBeEmpty
+
+- name: on error should log field value in warn level
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "name"
+          mask:
+            ff1:
+              domain: "0123456789"
+              onError: "Invalid value : {{.name}}"
+              keyFromEnv: "FF1_ENCRYPTION_KEY"
+      EOF
+  - script: |-
+      echo '{"name": "1234ABCD"}' | FF1_ENCRYPTION_KEY="70NZ2NWAqk9/A21vBPxqlA==" pimo -vwarn
+    assertions:
+    - result.code ShouldEqual 0
+    - |
+      result.systemoutjson.name ShouldEqual "Invalid value : 1234ABCD"
+    - result.systemerr ShouldContainSubstring error="character A is outside of the domain 0123456789"
+    - |
+      result.systemerr ShouldContainSubstring replacement="Invalid value : 1234ABCD"
+    - result.systemerr ShouldContainSubstring value=1234ABCD
