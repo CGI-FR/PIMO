@@ -23,6 +23,7 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	tmpl "text/template"
 
 	"github.com/capitalone/fpe/ff1"
 	"github.com/cgi-fr/pimo/pkg/model"
@@ -37,13 +38,15 @@ type MaskEngine struct {
 	radix      uint
 	decrypt    bool
 	domain     string
-	preserve   bool
+	preserve   string
+	preserveV1 bool // old preserve version where all characters outside of domain are preserved if true
 	onError    *template.Engine
 }
 
 // NewMask return a MaskEngine from a value
-func NewMask(key string, tweak string, radix uint, decrypt bool, domain string, preserve bool, onError *template.Engine) MaskEngine {
-	return MaskEngine{key, tweak, radix, decrypt, domain, preserve, onError}
+func NewMask(key string, tweak string, radix uint, decrypt bool, domain string, preserve string, onError *template.Engine) MaskEngine {
+	preserveV1, preserve := compatibilityParsePreserveAsBool(preserve)
+	return MaskEngine{key, tweak, radix, decrypt, domain, preserve, preserveV1, onError}
 }
 
 // Mask return a Constant from a MaskEngine
@@ -76,7 +79,7 @@ func (ff1m MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.E
 	value := e.(string)
 	var preserved map[int]rune
 	if len(ff1m.domain) > 0 {
-		if value, preserved, err = toFF1Domain(value, ff1m.domain, ff1m.preserve); err != nil {
+		if value, preserved, err = toFF1Domain(value, ff1m.domain, ff1m.preserve, ff1m.preserveV1); err != nil {
 			if ff1m.onError != nil {
 				return executeTemplate(ff1m.onError, context)
 			}
@@ -156,7 +159,7 @@ func Factory(conf model.MaskFactoryConfiguration) (model.MaskEngine, bool, error
 func Func(seed int64, seedField string) interface{} {
 	return func(key string, tweak string, radix uint, decrypt bool, input model.Entry) (model.Entry, error) {
 		context := model.NewDictionary().With("tweak", tweak).Pack()
-		mask := NewMask(key, "tweak", radix, decrypt, "", false, nil)
+		mask := NewMask(key, "tweak", radix, decrypt, "", "", nil)
 		return mask.Mask(input, context)
 	}
 }
@@ -164,14 +167,46 @@ func Func(seed int64, seedField string) interface{} {
 func FuncV2(seed int64, seedField string) interface{} {
 	return func(key string, tweak string, domain string, preserve bool, decrypt bool, input model.Entry) (model.Entry, error) {
 		context := model.NewDictionary().With("tweak", tweak).Pack()
-		mask := NewMask(key, "tweak", 0, decrypt, domain, preserve, nil)
+		mask := NewMask(key, "tweak", 0, decrypt, domain, compatibilityParsePreserveAsString(preserve), nil)
 		return mask.Mask(input, context)
 	}
 }
 
+func FuncV3(seed int64, seedField string) interface{} {
+	return func(key string, tweak string, domain string, preserve string, decrypt bool, onErrorTemplate string, input model.Entry) (model.Entry, error) {
+		context := model.NewDictionary().With("tweak", tweak).Pack()
+		var onError *template.Engine
+		if len(onErrorTemplate) > 0 {
+			if temp, err := template.NewEngine(onErrorTemplate, tmpl.FuncMap{}, seed, seedField); err != nil {
+				return nil, err
+			} else {
+				onError = temp
+			}
+		}
+		mask := NewMask(key, "tweak", 0, decrypt, domain, preserve, onError)
+		return mask.Mask(input, context)
+	}
+}
+
+func compatibilityParsePreserveAsBool(preserve string) (bool, string) {
+	if preserve == "true" {
+		return true, ""
+	} else if preserve == "false" {
+		return false, ""
+	}
+	return false, preserve
+}
+
+func compatibilityParsePreserveAsString(preserve bool) string {
+	if preserve {
+		return "true"
+	}
+	return ""
+}
+
 const ff1domain = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
-func toFF1Domain(value string, domain string, preserve bool) (string, map[int]rune, error) {
+func toFF1Domain(value string, domain string, preserve string, preserveV1 bool) (string, map[int]rune, error) {
 	preserved := map[int]rune{}
 	var result strings.Builder
 	for pos, char := range value {
@@ -179,7 +214,9 @@ func toFF1Domain(value string, domain string, preserve bool) (string, map[int]ru
 		switch {
 		case index > -1:
 			result.WriteByte(ff1domain[index])
-		case preserve:
+		case preserveV1:
+			preserved[pos] = char
+		case !preserveV1 && strings.ContainsRune(preserve, char):
 			preserved[pos] = char
 		default:
 			return value, nil, fmt.Errorf("character %c is outside of the domain %s", char, domain)

@@ -120,7 +120,7 @@ type FF1Type struct {
 	TweakField string  `yaml:"tweakField,omitempty" json:"tweakField,omitempty" jsonschema_description:"Name of the field to use as 'tweak' value : reduce the attack surface by using a varying value on each record, it can be considered as an extension of the secret key that change on each record"`
 	Radix      uint    `yaml:"radix,omitempty" json:"radix,omitempty" jsonschema_description:"determine which part of the fixed FF1 domain definition will actually be used, for example 10 will use the first 10 characters of 0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"`
 	Domain     string  `yaml:"domain,omitempty" json:"domain,omitempty" jsonschema_description:"allowed characters domain that will be encrypted, do not use radix and domain at the same time"`
-	Preserve   bool    `yaml:"preserve,omitempty" json:"preserve,omitempty" jsonschema_description:"preserve characters that are not part of the allowed domain"`
+	Preserve   string  `yaml:"preserve,omitempty" json:"preserve,omitempty" jsonschema_description:"preserve characters that are not part of the allowed domain"`
 	OnError    *string `yaml:"onError,omitempty" json:"onError,omitempty" jsonschema_description:"template to execute if there is an error while encrypting value"`
 	Decrypt    bool    `yaml:"decrypt,omitempty" json:"decrypt,omitempty" jsonschema_description:"Decrypt the value instead of encrypt"`
 }

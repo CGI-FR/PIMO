@@ -30,7 +30,7 @@ func TestMaskingShouldEncryptStringWithTweak(t *testing.T) {
 	context := model.NewDictionary().
 		With("name", "Toto").
 		With("tweak", "mytweak").Pack()
-	ff1Mask := NewMask("FF1_ENCRYPTION_KEY", "tweak", 62, false, "", false, nil)
+	ff1Mask := NewMask("FF1_ENCRYPTION_KEY", "tweak", 62, false, "", "false", nil)
 	line := "Toto"
 	result, err := ff1Mask.Mask(line, context)
 	assert.Nil(t, err)
@@ -41,7 +41,7 @@ func TestMaskingShouldEncryptStringWithoutTweak(t *testing.T) {
 	os.Setenv("FF1_ENCRYPTION_KEY", "70NZ2NWAqk9/A21vBPxqlA==")
 	context := model.NewDictionary().
 		With("name", "Toto").Pack()
-	ff1Mask := NewMask("FF1_ENCRYPTION_KEY", "tweak", 62, false, "", false, nil)
+	ff1Mask := NewMask("FF1_ENCRYPTION_KEY", "tweak", 62, false, "", "false", nil)
 	line := "Toto"
 	result, err := ff1Mask.Mask(line, context)
 	assert.Nil(t, err)
@@ -53,7 +53,7 @@ func TestMaskingShouldDecryptStringWithTweak(t *testing.T) {
 	context := model.NewDictionary().
 		With("name", "nhIy").
 		With("tweak", "mytweak").Pack()
-	ff1Mask := NewMask("FF1_ENCRYPTION_KEY", "tweak", 62, true, "", false, nil)
+	ff1Mask := NewMask("FF1_ENCRYPTION_KEY", "tweak", 62, true, "", "false", nil)
 	line := "nhIy"
 	result, err := ff1Mask.Mask(line, context)
 	assert.Nil(t, err)
@@ -64,7 +64,7 @@ func TestMaskingShouldDecryptStringWithoutTweak(t *testing.T) {
 	os.Setenv("FF1_ENCRYPTION_KEY", "70NZ2NWAqk9/A21vBPxqlA==")
 	context := model.NewDictionary().
 		With("name", "Uaow").Pack()
-	ff1Mask := NewMask("FF1_ENCRYPTION_KEY", "tweak", 62, true, "", false, nil)
+	ff1Mask := NewMask("FF1_ENCRYPTION_KEY", "tweak", 62, true, "", "false", nil)
 	line := "Uaow"
 	result, err := ff1Mask.Mask(line, context)
 	assert.Nil(t, err)
