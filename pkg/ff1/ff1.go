@@ -81,7 +81,7 @@ func (ff1m MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.E
 	if len(ff1m.domain) > 0 {
 		if value, preserved, err = toFF1Domain(value, ff1m.domain, ff1m.preserve, ff1m.preserveV1); err != nil {
 			if ff1m.onError != nil {
-				return executeTemplate(ff1m.onError, context)
+				return executeTemplate(ff1m.onError, context, value, err)
 			}
 			return nil, err
 		}
@@ -104,7 +104,7 @@ func (ff1m MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.E
 	}
 	if err != nil {
 		if ff1m.onError != nil {
-			return executeTemplate(ff1m.onError, context)
+			return executeTemplate(ff1m.onError, context, value, err)
 		}
 		return nil, err
 	}
@@ -248,10 +248,11 @@ func fromFF1Domain(value string, domain string, preserved map[int]rune) string {
 	return result.String()
 }
 
-func executeTemplate(engine *template.Engine, contexts []model.Dictionary) (string, error) {
+func executeTemplate(engine *template.Engine, contexts []model.Dictionary, value string, err error) (string, error) {
 	var output bytes.Buffer
 	if err := engine.Execute(&output, contexts[0].UnpackUnordered()); err != nil {
 		return "", err
 	}
+	log.Warn().Str("value", value).Str("replacement", output.String()).AnErr("error", err).Msg("catched error on FF1 mask")
 	return output.String(), nil
 }

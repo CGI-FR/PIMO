@@ -17,6 +17,7 @@ Types of changes
 ## [1.24.0]
 
 - `Added` mask `ff1` preserve specific domain
+- `Added` mask `ff1` log field value as WARN when an error is catched by `onError`
 
 ## [1.23.0]
 
