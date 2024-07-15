@@ -85,7 +85,7 @@ func (me MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Ent
 func (me MaskEngine) increment() {
 	for i := range me.counters {
 		if me.counters[i] < len(me.varunes)-1 {
-			me.counters[i] = me.counters[i] + 1
+			me.counters[i]++
 			break
 		} else {
 			me.counters[i] = 0
