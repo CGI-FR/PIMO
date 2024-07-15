@@ -14,6 +14,10 @@ Types of changes
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [1.24.0]
+
+- `Added` mask `ff1` preserve specific domain
+
 ## [1.23.0]
 
 - `Added` mask `timeline` to generate timelines from rules and constraints between dates
