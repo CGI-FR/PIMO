@@ -23,6 +23,7 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	tmpl "text/template"
 
 	"github.com/capitalone/fpe/ff1"
 	"github.com/cgi-fr/pimo/pkg/model"
@@ -167,6 +168,22 @@ func FuncV2(seed int64, seedField string) interface{} {
 	return func(key string, tweak string, domain string, preserve bool, decrypt bool, input model.Entry) (model.Entry, error) {
 		context := model.NewDictionary().With("tweak", tweak).Pack()
 		mask := NewMask(key, "tweak", 0, decrypt, domain, compatibilityParsePreserveAsString(preserve), nil)
+		return mask.Mask(input, context)
+	}
+}
+
+func FuncV3(seed int64, seedField string) interface{} {
+	return func(key string, tweak string, domain string, preserve string, decrypt bool, onErrorTemplate string, input model.Entry) (model.Entry, error) {
+		context := model.NewDictionary().With("tweak", tweak).Pack()
+		var onError *template.Engine
+		if len(onErrorTemplate) > 0 {
+			if temp, err := template.NewEngine(onErrorTemplate, tmpl.FuncMap{}, seed, seedField); err != nil {
+				return nil, err
+			} else {
+				onError = temp
+			}
+		}
+		mask := NewMask(key, "tweak", 0, decrypt, domain, preserve, onError)
 		return mask.Mask(input, context)
 	}
 }
