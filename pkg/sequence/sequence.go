@@ -33,7 +33,7 @@ func (mes MaskEngineState) toCounters(length int, base int) []int {
 	counter := mes.counter
 	for counter > 0 {
 		result = append([]int{counter % base}, result...)
-		counter = counter / base
+		counter /= base
 	}
 
 	return result
