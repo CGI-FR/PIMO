@@ -158,7 +158,7 @@
           "description": "allowed characters domain that will be encrypted, do not use radix and domain at the same time"
         },
         "preserve": {
-          "type": "boolean",
+          "type": "string",
           "description": "preserve characters that are not part of the allowed domain"
         },
         "onError": {

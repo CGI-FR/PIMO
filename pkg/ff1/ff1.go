@@ -22,6 +22,7 @@ import (
 	b64 "encoding/base64"
 	"fmt"
 	"os"
+	"strconv"
 	"strings"
 
 	"github.com/capitalone/fpe/ff1"
@@ -37,12 +38,12 @@ type MaskEngine struct {
 	radix      uint
 	decrypt    bool
 	domain     string
-	preserve   bool
+	preserve   string
 	onError    *template.Engine
 }
 
 // NewMask return a MaskEngine from a value
-func NewMask(key string, tweak string, radix uint, decrypt bool, domain string, preserve bool, onError *template.Engine) MaskEngine {
+func NewMask(key string, tweak string, radix uint, decrypt bool, domain string, preserve string, onError *template.Engine) MaskEngine {
 	return MaskEngine{key, tweak, radix, decrypt, domain, preserve, onError}
 }
 
@@ -156,7 +157,7 @@ func Factory(conf model.MaskFactoryConfiguration) (model.MaskEngine, bool, error
 func Func(seed int64, seedField string) interface{} {
 	return func(key string, tweak string, radix uint, decrypt bool, input model.Entry) (model.Entry, error) {
 		context := model.NewDictionary().With("tweak", tweak).Pack()
-		mask := NewMask(key, "tweak", radix, decrypt, "", false, nil)
+		mask := NewMask(key, "tweak", radix, decrypt, "", "", nil)
 		return mask.Mask(input, context)
 	}
 }
@@ -164,14 +165,29 @@ func Func(seed int64, seedField string) interface{} {
 func FuncV2(seed int64, seedField string) interface{} {
 	return func(key string, tweak string, domain string, preserve bool, decrypt bool, input model.Entry) (model.Entry, error) {
 		context := model.NewDictionary().With("tweak", tweak).Pack()
-		mask := NewMask(key, "tweak", 0, decrypt, domain, preserve, nil)
+		mask := NewMask(key, "tweak", 0, decrypt, domain, compatibilityParsePreserveAsString(preserve), nil)
 		return mask.Mask(input, context)
 	}
 }
 
+func compatibilityParsePreserveAsBool(preserve string) bool {
+	result, err := strconv.ParseBool(preserve)
+	if err != nil {
+		return false
+	}
+	return result
+}
+
+func compatibilityParsePreserveAsString(preserve bool) string {
+	if preserve {
+		return "true"
+	}
+	return ""
+}
+
 const ff1domain = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
-func toFF1Domain(value string, domain string, preserve bool) (string, map[int]rune, error) {
+func toFF1Domain(value string, domain string, preserve string) (string, map[int]rune, error) {
 	preserved := map[int]rune{}
 	var result strings.Builder
 	for pos, char := range value {
@@ -179,7 +195,7 @@ func toFF1Domain(value string, domain string, preserve bool) (string, map[int]ru
 		switch {
 		case index > -1:
 			result.WriteByte(ff1domain[index])
-		case preserve:
+		case compatibilityParsePreserveAsBool(preserve):
 			preserved[pos] = char
 		default:
 			return value, nil, fmt.Errorf("character %c is outside of the domain %s", char, domain)
