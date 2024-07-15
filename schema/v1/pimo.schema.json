@@ -504,6 +504,12 @@
             "timeline"
           ],
           "title": "TimeLine"
+        },
+        {
+          "required": [
+            "sequence"
+          ],
+          "title": "Sequence"
         }
       ],
       "properties": {
@@ -683,6 +689,11 @@
           "$ref": "#/$defs/TimeLineType",
           "title": "TimeLine Mask",
           "description": "Generate a timeline under constraints and rules"
+        },
+        "sequence": {
+          "$ref": "#/$defs/SequenceType",
+          "title": "Sequence Mask",
+          "description": "Generate a sequenced ID that follows specified format"
         }
       },
       "additionalProperties": false,
@@ -902,6 +913,23 @@
       "type": "object",
       "required": [
         "jsonpath"
+      ]
+    },
+    "SequenceType": {
+      "properties": {
+        "format": {
+          "type": "string",
+          "description": "Format of the sequenced ID"
+        },
+        "varying": {
+          "type": "string",
+          "description": "List of varying characters in the sequence (default : 0123456789)"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "format"
       ]
     },
     "TemplateEachType": {

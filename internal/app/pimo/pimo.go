@@ -55,6 +55,7 @@ import (
 	"github.com/cgi-fr/pimo/pkg/regex"
 	"github.com/cgi-fr/pimo/pkg/remove"
 	"github.com/cgi-fr/pimo/pkg/replacement"
+	"github.com/cgi-fr/pimo/pkg/sequence"
 	"github.com/cgi-fr/pimo/pkg/statistics"
 	"github.com/cgi-fr/pimo/pkg/template"
 	"github.com/cgi-fr/pimo/pkg/templateeach"
@@ -303,6 +304,7 @@ func injectMaskFactories() []model.MaskFactory {
 		findincsv.Factory,
 		xml.Factory,
 		timeline.Factory,
+		sequence.Factory,
 	}
 }
 
@@ -337,6 +339,7 @@ func injectTemplateFuncs() {
 	template.InjectSeededFuncGenerator("MaskHashInCSV", hashcsv.Func)
 	template.InjectSeededFuncGenerator("MaskFindInCSV", findincsv.Func)
 	template.InjectSeededFuncGenerator("MaskFindInCsv", findincsv.Func)
+	template.InjectSeededFuncGenerator("MaskSequence", sequence.Func)
 }
 
 var re = regexp.MustCompile(`(\[\d*\])?$`)
