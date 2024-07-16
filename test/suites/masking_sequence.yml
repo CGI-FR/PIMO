@@ -64,3 +64,41 @@ testcases:
           - result.systemout ShouldContainSubstring "name":"Toto","id":"ERR-0000"
           - result.systemout ShouldContainSubstring "name":"Dorothy","id":"ERR-0001"
           - result.systemerr ShouldBeEmpty
+
+  - name: fix bug with sequence in template
+    steps:
+      - script: rm -f masking.yml
+      - script: |-
+          cat > masking.yml <<EOF
+          version: "1"
+          seed: 2
+          masking:
+            - selector:
+                jsonpath: "id"
+              masks:
+                - add: ""
+                - regex: "[0-9]{4}"
+                - ff1:
+                    domain: "012345678"
+                    onError: '[[MaskSequence "ERR-0000" "0123456789"]]'
+                    keyFromEnv: "FF1_ENCRYPTION_KEY"
+          EOF
+      - script: sed -i  "s/\[\[/\{\{/g"  masking.yml
+      - script: sed -i  "s/\]\]/\}\}/g"  masking.yml
+      - script: |-
+          FF1_ENCRYPTION_KEY="70NZ2NWAqk9/A21vBPxqlA==" pimo --empty-input --repeat 30
+        assertions:
+          - result.code ShouldEqual 0
+          - result.systemout ShouldContainSubstring "id":"ERR-0001"
+          - result.systemout ShouldContainSubstring "id":"ERR-0002"
+          - result.systemout ShouldContainSubstring "id":"ERR-0003"
+          - result.systemout ShouldContainSubstring "id":"ERR-0004"
+          - result.systemout ShouldContainSubstring "id":"ERR-0005"
+          - result.systemout ShouldContainSubstring "id":"ERR-0006"
+          - result.systemout ShouldContainSubstring "id":"ERR-0007"
+          - result.systemout ShouldContainSubstring "id":"ERR-0008"
+          - result.systemout ShouldContainSubstring "id":"ERR-0009"
+          - result.systemout ShouldContainSubstring "id":"ERR-0010"
+          - result.systemout ShouldContainSubstring "id":"ERR-0011"
+          - result.systemout ShouldContainSubstring "id":"ERR-0012"
+          - result.systemerr ShouldBeEmpty

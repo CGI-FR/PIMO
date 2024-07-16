@@ -31,8 +31,8 @@ func (mes MaskEngineState) toCounters(length int, base int) []int {
 	result := make([]int, length)
 
 	counter := mes.counter
-	for counter > 0 {
-		result = append([]int{counter % base}, result...)
+	for idx := 0; counter > 0; idx++ {
+		result[idx] = counter % base
 		counter /= base
 	}
 
