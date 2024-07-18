@@ -15,7 +15,7 @@ require (
 	github.com/pkg/profile v1.7.0
 	github.com/rs/zerolog v1.32.0
 	github.com/spf13/cast v1.6.0
-	github.com/spf13/cobra v1.8.0
+	github.com/spf13/cobra v1.8.1
 	github.com/stretchr/testify v1.9.0
 	github.com/zach-klippenstein/goregen v0.0.0-20160303162051-795b5e3961ea
 	gitlab.com/c0b/go-ordered-json v0.0.0-20201030195603-febf46534d5a
