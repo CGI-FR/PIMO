@@ -20,7 +20,7 @@ require (
 	github.com/zach-klippenstein/goregen v0.0.0-20160303162051-795b5e3961ea
 	gitlab.com/c0b/go-ordered-json v0.0.0-20201030195603-febf46534d5a
 	golang.org/x/exp v0.0.0-20240707233637-46b078467d37
-	golang.org/x/text v0.14.0
+	golang.org/x/text v0.16.0
 )
 
 require (
