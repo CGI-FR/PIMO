@@ -18,6 +18,7 @@
 package sha3
 
 import (
+	"encoding/binary"
 	"fmt"
 
 	"github.com/cgi-fr/pimo/pkg/model"
@@ -29,15 +30,21 @@ import (
 type MaskEngine struct {
 	length int
 	domain string
+	salt   []byte
+	seeder model.Seeder
 }
 
-func NewMask(length int, domain string) MaskEngine {
+func NewMask(length int, domain string, seed int64, seeder model.Seeder) MaskEngine {
 	if len(domain) < 2 {
 		domain = "0123456789abcdef"
 	}
+	salt := make([]byte, 0, 16)
+	salt = binary.LittleEndian.AppendUint64(salt, uint64(seed))
 	return MaskEngine{
 		length: length,
 		domain: domain,
+		salt:   salt,
+		seeder: seeder,
 	}
 }
 
@@ -49,11 +56,29 @@ func (me MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Ent
 	}
 
 	if str, ok := e.(string); ok {
+		salt := me.salt
+		if len(context) > 0 {
+			seed, ok, err := me.seeder(context[0])
+			if err != nil {
+				return nil, err
+			}
+			if ok {
+				salt = binary.LittleEndian.AppendUint64(me.salt, uint64(seed))
+			}
+		}
+
 		h := make([]byte, me.length)
-		sha3.ShakeSum256(h, []byte(str))
+		cshake := sha3.NewCShake256([]byte{}, salt)
+		if _, err := cshake.Write([]byte(str)); err != nil {
+			return e, err
+		}
+		if _, err := cshake.Read(h); err != nil {
+			return e, err
+		}
 
 		if me.domain != "0123456789abcdef" {
-			return baseconv.Convert(fmt.Sprintf("%x", h), "0123456789abcdef", me.domain)
+			conv, err := baseconv.Convert(fmt.Sprintf("%x", h), "0123456789abcdef", me.domain)
+			return conv, err
 		}
 	}
 
@@ -62,7 +87,9 @@ func (me MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Ent
 
 func Factory(conf model.MaskFactoryConfiguration) (model.MaskEngine, bool, error) {
 	if conf.Masking.Mask.Sha3.Length > 0 {
-		return NewMask(conf.Masking.Mask.Sha3.Length, conf.Masking.Mask.Sha3.Domain), true, nil
+		seeder := model.NewSeeder(conf.Masking.Seed.Field, conf.Seed)
+
+		return NewMask(conf.Masking.Mask.Sha3.Length, conf.Masking.Mask.Sha3.Domain, conf.Seed, seeder), true, nil
 	}
 	return nil, false, nil
 }
