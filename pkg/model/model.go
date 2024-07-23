@@ -224,6 +224,11 @@ type SequenceType struct {
 	Varying string `yaml:"varying,omitempty" json:"varying,omitempty" jsonschema_description:"List of varying characters in the sequence (default : 0123456789)"`
 }
 
+type Sha3Type struct {
+	Length int    `yaml:"length" json:"length" jsonschema_description:"Length of the produced output in bytes"`
+	Domain string `yaml:"domain,omitempty" json:"domain,omitempty" jsonschema_description:"allowed characters domain in the output, default to hexadecimal (0123456789abcdef)"`
+}
+
 type MaskType struct {
 	Add               Entry                `yaml:"add,omitempty" json:"add,omitempty" jsonschema:"oneof_required=Add,title=Add Mask,description=Add a new field in the JSON stream"`
 	AddTransient      Entry                `yaml:"add-transient,omitempty" json:"add-transient,omitempty" jsonschema:"oneof_required=AddTransient,title=Add Transient Mask" jsonschema_description:"Add a new temporary field, that will not show in the JSON output"`
@@ -261,6 +266,7 @@ type MaskType struct {
 	XML               XMLType              `yaml:"xml,omitempty" json:"xml,omitempty" jsonschema:"oneof_required=xml,title=XML Mask" jsonschema_description:"Apply mask for XML content within JSON values"`
 	TimeLine          TimeLineType         `yaml:"timeline,omitempty" json:"timeline,omitempty" jsonschema:"oneof_required=TimeLine,title=TimeLine Mask" jsonschema_description:"Generate a timeline under constraints and rules"`
 	Sequence          SequenceType         `yaml:"sequence,omitempty" json:"sequence,omitempty" jsonschema:"oneof_required=Sequence,title=Sequence Mask" jsonschema_description:"Generate a sequenced ID that follows specified format"`
+	Sha3              Sha3Type             `yaml:"sha3,omitempty" json:"sha3,omitempty" jsonschema:"oneof_required=Sha3,title=Sha3 Mask" jsonschema_description:"Generate a variable-length crytographic hash (collision resistant)"`
 }
 
 type Masking struct {

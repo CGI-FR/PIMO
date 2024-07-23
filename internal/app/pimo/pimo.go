@@ -56,6 +56,7 @@ import (
 	"github.com/cgi-fr/pimo/pkg/remove"
 	"github.com/cgi-fr/pimo/pkg/replacement"
 	"github.com/cgi-fr/pimo/pkg/sequence"
+	"github.com/cgi-fr/pimo/pkg/sha3"
 	"github.com/cgi-fr/pimo/pkg/statistics"
 	"github.com/cgi-fr/pimo/pkg/template"
 	"github.com/cgi-fr/pimo/pkg/templateeach"
@@ -305,6 +306,7 @@ func injectMaskFactories() []model.MaskFactory {
 		xml.Factory,
 		timeline.Factory,
 		sequence.Factory,
+		sha3.Factory,
 	}
 }
 

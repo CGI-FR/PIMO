@@ -510,6 +510,12 @@
             "sequence"
           ],
           "title": "Sequence"
+        },
+        {
+          "required": [
+            "sha3"
+          ],
+          "title": "Sha3"
         }
       ],
       "properties": {
@@ -694,6 +700,11 @@
           "$ref": "#/$defs/SequenceType",
           "title": "Sequence Mask",
           "description": "Generate a sequenced ID that follows specified format"
+        },
+        "sha3": {
+          "$ref": "#/$defs/Sha3Type",
+          "title": "Sha3 Mask",
+          "description": "Generate a variable-length crytographic hash (collision resistant)"
         }
       },
       "additionalProperties": false,
@@ -930,6 +941,23 @@
       "type": "object",
       "required": [
         "format"
+      ]
+    },
+    "Sha3Type": {
+      "properties": {
+        "length": {
+          "type": "integer",
+          "description": "Length of the produced output in bytes"
+        },
+        "domain": {
+          "type": "string",
+          "description": "allowed characters domain in the output, default to hexadecimal (0123456789abcdef)"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "length"
       ]
     },
     "TemplateEachType": {
