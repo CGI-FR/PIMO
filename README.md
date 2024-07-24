@@ -142,6 +142,7 @@ The following types of masks can be used :
   * [`hashInCSV`](#hashincsv) is to mask with a value from an external CSV resource, by matching the original value, allowing to mask a value the same way every time.
   * [`fromCache`](#fromcache) is a mask to obtain a value from a cache.
   * [`ff1`](#ff1) mask allows the use of <abbr title="Format Preserving Encryption">FPE</abbr> which enable private-key based re-identification.
+  * [`sha3`](#sha3) masks will apply a variable length cryptographic hash (SHAKE variable-output-length hash function defined by FIPS-202) and then apply a base-conversion to the output.
 * Formatting
   * [`dateParser`](#dateparser) is to change a date format.
   * [`template`](#template) is to mask a data with a template using other values from the jsonline.
@@ -768,6 +769,30 @@ This example will encrypt the `siret` column with the private key base64-encoded
 Characters outside of the domain can be preserved with `preserve: true` option.
 
 Be sure to check [the full FPE demo](demo/demo7) to get more details about this mask.
+
+[Return to list of masks](#possible-masks)
+
+### Sha3
+
+[![Try it](https://img.shields.io/badge/-Try%20it%20in%20PIMO%20Play-brightgreen)](https://cgi-fr.github.io/pimo-play/#c=G4UwTgzglg9gdgLgAQCICMKBQEQgCbJoBMAzJgLYCGEA1lHAOYKZJIC0SOANiAMYAuMMM1aikAKwjwADpX4ALZChBUoXLGKq0RYzvMokdupD0YLCRJAGIk+iPKSCkAOSQAjAJ78QEADRJeGC4uKGh4JDAfUP5KOF4QJFCkIgA9AApnAHoAFgBKFmMkPBhVRFQABmISbIBWADYAdgAOAE4UawD4UDB+Rxh3agS0cqQAdygFIqgGCYgkcrYWzCA&i=N4KABGBECmC2CGBLANpAXFAdvW0B0AzgK4BO2uAAgCYD2CimeAxnZCAL5A)
+
+The sha3 mask will apply a variable length cryptographic hash (SHAKE variable-output-length hash function defined by FIPS-202) and then apply a base-conversion to the output.
+
+This is useful to mask any input data into a coherent and collision resistant ID.
+
+```yaml
+version: "1"
+seed: 123 # needed to salt the hash (can also be set via command line argument --seed 123)
+masking:
+  - selector:
+      jsonpath: "email"
+    mask:
+      sha3:
+        length: 12 # hash to N bytes, collision resistance is 2^(N*4)
+        domain: "0123456789" # convert to base 10 with digits 0-9
+```
+
+In this example, the email will be replaced with a 29-digit collision resistant number. The collision resistance will be considered very good if the number of ID generated is less than `2^(12*8/2)`.
 
 [Return to list of masks](#possible-masks)
 

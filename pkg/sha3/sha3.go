@@ -79,6 +79,8 @@ func (me MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Ent
 		if me.domain != "0123456789abcdef" {
 			conv, err := baseconv.Convert(fmt.Sprintf("%x", h), "0123456789abcdef", me.domain)
 			return conv, err
+		} else {
+			return fmt.Sprintf("%x", h), nil
 		}
 	}
 

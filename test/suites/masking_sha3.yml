@@ -1,0 +1,24 @@
+name: sha3 mask
+testcases:
+
+- name: sha3 mask with length and domain
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "email"
+          mask:
+            sha3:
+              length: 12 # hash to N bytes, collision resistance is 2^(N*4)
+              domain: "0123456789" # convert to base 10 with digits 0-9
+      EOF
+  - script: |-
+      echo '{"email": "name.surname@domain.com"}' | pimo -s 123
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemoutjson.email ShouldEqual 33041256087479515201948511676
+    - result.systemerr ShouldBeEmpty
+
