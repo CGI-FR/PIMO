@@ -774,7 +774,7 @@ Be sure to check [the full FPE demo](demo/demo7) to get more details about this 
 
 ### Sha3
 
-[![Try it](https://img.shields.io/badge/-Try%20it%20in%20PIMO%20Play-brightgreen)](https://cgi-fr.github.io/pimo-play/#c=G4UwTgzglg9gdgLgAQCICMKBQEQgCbJoBMAzJgLYCGEA1lHAOYKZJIC0SOANiAMYAuMMM1aikAKwjwADpX4ALZChBUoXLGKq0RYzvMokdupD0YLCRJAGIk+iPKSCkAOSQAjAJ78QEADRJeGC4uKGh4JDAfUP5KOF4QJFCkIgA9AApnAHoAFgBKFmMkPBhVRFQABmISbIBWADYAdgAOAE4UawD4UDB+Rxh3agS0cqQAdygFIqgGCYgkcrYWzCA&i=N4KABGBECmC2CGBLANpAXFAdvW0B0AzgK4BO2uAAgCYD2CimeAxnZCAL5A)
+[![Try it](https://img.shields.io/badge/-Try%20it%20in%20PIMO%20Play-brightgreen)](https://cgi-fr.github.io/pimo-play/#c=G4UwTgzglg9gdgLgAQCICMKBQEQgCbJoBMAzJgLYCGEA1lHAOYKZJIC0SOANiAMYAuMMM1aikAKwjwADpX4ALZChBUoXLGKq0RYzvMokdupD0YLCRJAGIk+iPKSCkAOSQAjAJ78QEADRJeGC4uKGh4JDAfUP5KOF4QJFCkIgA9AApnACoAFgBKFmMkPBhVRFQABmISbIBWADYAdgAOAE4UawD4UDB+Rxh3agS0cqQAdygFIqgGCYgkcrYWzCA&i=N4KABGBECmC2CGBLANpAXFAdvW0B0AzgK4BO2uAAgCYD2CimeAxnZCAL5A)
 
 The sha3 mask will apply a variable length cryptographic hash (SHAKE variable-output-length hash function defined by FIPS-202) and then apply a base-conversion to the output.
 
