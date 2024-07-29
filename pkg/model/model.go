@@ -225,8 +225,9 @@ type SequenceType struct {
 }
 
 type Sha3Type struct {
-	Length int    `yaml:"length" json:"length" jsonschema_description:"Length of the produced output in bytes"`
-	Domain string `yaml:"domain,omitempty" json:"domain,omitempty" jsonschema_description:"allowed characters domain in the output, default to hexadecimal (0123456789abcdef)"`
+	Length     int    `yaml:"length" json:"length" jsonschema_description:"Length of the produced output in bytes" jsonschema:"oneof_required=Length"`
+	Resistance int    `yaml:"resistance" json:"resistance" jsonschema_description:"Collision resistance of the produced hash" jsonschema:"oneof_required=Resistance"`
+	Domain     string `yaml:"domain,omitempty" json:"domain,omitempty" jsonschema_description:"allowed characters domain in the output, default to hexadecimal (0123456789abcdef)"`
 }
 
 type MaskType struct {

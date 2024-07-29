@@ -944,10 +944,28 @@
       ]
     },
     "Sha3Type": {
+      "oneOf": [
+        {
+          "required": [
+            "length"
+          ],
+          "title": "Length"
+        },
+        {
+          "required": [
+            "resistance"
+          ],
+          "title": "Resistance"
+        }
+      ],
       "properties": {
         "length": {
           "type": "integer",
           "description": "Length of the produced output in bytes"
+        },
+        "resistance": {
+          "type": "integer",
+          "description": "Collision resistance of the produced hash"
         },
         "domain": {
           "type": "string",
@@ -957,7 +975,8 @@
       "additionalProperties": false,
       "type": "object",
       "required": [
-        "length"
+        "length",
+        "resistance"
       ]
     },
     "TemplateEachType": {

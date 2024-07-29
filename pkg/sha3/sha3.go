@@ -20,6 +20,7 @@ package sha3
 import (
 	"encoding/binary"
 	"fmt"
+	"math"
 
 	"github.com/cgi-fr/pimo/pkg/model"
 	"github.com/kenshaw/baseconv"
@@ -34,9 +35,12 @@ type MaskEngine struct {
 	seeder model.Seeder
 }
 
-func NewMask(length int, domain string, seed int64, seeder model.Seeder) MaskEngine {
+func NewMask(length int, resistance int, domain string, seed int64, seeder model.Seeder) MaskEngine {
 	if len(domain) < 2 {
 		domain = "0123456789abcdef"
+	}
+	if resistance > 0 {
+		length = lengthWithResistance(resistance)
 	}
 	salt := make([]byte, 0, 16)
 	salt = binary.LittleEndian.AppendUint64(salt, uint64(seed))
@@ -88,10 +92,28 @@ func (me MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Ent
 }
 
 func Factory(conf model.MaskFactoryConfiguration) (model.MaskEngine, bool, error) {
-	if conf.Masking.Mask.Sha3.Length > 0 {
+	if conf.Masking.Mask.Sha3.Length > 0 || conf.Masking.Mask.Sha3.Resistance > 0 {
 		seeder := model.NewSeeder(conf.Masking.Seed.Field, conf.Seed)
 
-		return NewMask(conf.Masking.Mask.Sha3.Length, conf.Masking.Mask.Sha3.Domain, conf.Seed, seeder), true, nil
+		return NewMask(conf.Masking.Mask.Sha3.Length, conf.Masking.Mask.Sha3.Resistance, conf.Masking.Mask.Sha3.Domain, conf.Seed, seeder), true, nil
 	}
 	return nil, false, nil
+}
+
+const (
+	BASE2 = 2
+	BASE8 = 8
+)
+
+func lengthWithResistance(resistance int) int {
+	power := 1
+
+	for {
+		if math.Pow(BASE2, float64(power)) > float64(resistance) {
+			break
+		}
+		power++
+	}
+
+	return int(math.Ceil(float64(power) * BASE2 / BASE8))
 }
