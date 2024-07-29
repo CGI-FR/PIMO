@@ -794,6 +794,22 @@ masking:
 
 In this example, the email will be replaced with a 29-digit collision resistant number. The collision resistance will be considered very good if the number of ID generated is less than `2^(12*8/2)`.
 
+An alternative configuration to the previous example is :
+
+```yaml
+version: "1"
+seed: 123 # needed to salt the hash (can also be set via command line argument --seed 123)
+masking:
+  - selector:
+      jsonpath: "email"
+    mask:
+      sha3:
+        resistance: 10000000 # set the collision resistance to 10M, so the required length for the id will be calculated to have a minimum collision-resistance value of 10M
+        domain: "0123456789" # convert to base 10 with digits 0-9
+```
+
+Here the length parameter is not given, but with the `resistance` parameter set to 10M, the mask will calculate the minimum length required (6 bytes in this example because 2^(6*8/2) > 10M).
+
 [Return to list of masks](#possible-masks)
 
 ### Range

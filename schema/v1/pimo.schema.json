@@ -143,10 +143,12 @@
       "properties": {
         "length": {
           "type": "integer",
+          "title": "Length",
           "description": "Length of the produced output in bytes"
         },
         "resistance": {
           "type": "integer",
+          "title": "Resistance",
           "description": "Collision resistance of the produced hash"
         },
         "domain": {
@@ -161,8 +163,6 @@
       "additionalProperties": false,
       "type": "object",
       "required": [
-        "length",
-        "resistance",
         "field"
       ]
     },
@@ -1006,10 +1006,12 @@
       "properties": {
         "length": {
           "type": "integer",
+          "title": "Length",
           "description": "Length of the produced output in bytes"
         },
         "resistance": {
           "type": "integer",
+          "title": "Resistance",
           "description": "Collision resistance of the produced hash"
         },
         "domain": {
@@ -1018,11 +1020,7 @@
         }
       },
       "additionalProperties": false,
-      "type": "object",
-      "required": [
-        "length",
-        "resistance"
-      ]
+      "type": "object"
     },
     "TemplateEachType": {
       "properties": {
