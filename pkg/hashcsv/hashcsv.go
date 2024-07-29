@@ -61,15 +61,15 @@ func NewMask(conf model.ChoiceInCSVType, seed int64, seeder model.Seeder) (MaskE
 	}
 	// nolint: gosec
 	return MaskEngine{
-		rand:            &rand.Rand{},
+		rand:            rand.New(rand.NewSource(seed)),
 		seeder:          seeder,
 		template:        template,
 		cache:           map[string][][]string{},
-		header:          false,
+		header:          conf.Header,
 		sep:             sep,
 		comment:         comment,
-		fieldsPerRecord: 0,
-		trimSpaces:      false,
+		fieldsPerRecord: conf.FieldsPerRecord,
+		trimSpaces:      conf.TrimSpace,
 		identifierField: conf.Identifier.Field,
 		identifierGen:   sha3.NewMask(conf.Identifier.Length, conf.Identifier.Resistance, conf.Identifier.Domain, seed, seeder),
 	}, err

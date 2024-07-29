@@ -59,36 +59,33 @@ func (me MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Ent
 		return e, nil
 	}
 
-	if str, ok := e.(string); ok {
-		salt := me.salt
-		if len(context) > 0 {
-			seed, ok, err := me.seeder(context[0])
-			if err != nil {
-				return nil, err
-			}
-			if ok {
-				salt = binary.LittleEndian.AppendUint64(me.salt, uint64(seed))
-			}
-		}
+	str := fmt.Sprintf("%v", e)
 
-		h := make([]byte, me.length)
-		cshake := sha3.NewCShake256([]byte{}, salt)
-		if _, err := cshake.Write([]byte(str)); err != nil {
-			return e, err
+	salt := me.salt
+	if len(context) > 0 {
+		seed, ok, err := me.seeder(context[0])
+		if err != nil {
+			return nil, err
 		}
-		if _, err := cshake.Read(h); err != nil {
-			return e, err
-		}
-
-		if me.domain != "0123456789abcdef" {
-			conv, err := baseconv.Convert(fmt.Sprintf("%x", h), "0123456789abcdef", me.domain)
-			return conv, err
-		} else {
-			return fmt.Sprintf("%x", h), nil
+		if ok {
+			salt = binary.LittleEndian.AppendUint64(me.salt, uint64(seed))
 		}
 	}
 
-	return e, nil
+	h := make([]byte, me.length)
+	cshake := sha3.NewCShake256([]byte{}, salt)
+	if _, err := cshake.Write([]byte(str)); err != nil {
+		return e, err
+	}
+	if _, err := cshake.Read(h); err != nil {
+		return e, err
+	}
+
+	if me.domain != "0123456789abcdef" {
+		return baseconv.Convert(fmt.Sprintf("%x", h), "0123456789abcdef", me.domain)
+	} else {
+		return fmt.Sprintf("%x", h), nil
+	}
 }
 
 func Factory(conf model.MaskFactoryConfiguration) (model.MaskEngine, bool, error) {

@@ -14,6 +14,11 @@ Types of changes
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [1.25.0]
+
+- `Added` mask `sha3` to generate collision resistant identifiers
+- `Added` option `identifier` to mask `hashInCSV` to include a collision resistant identifier in the result
+
 ## [1.24.1]
 
 - `Fixed` template function `MaskSequence` does not increment correctly

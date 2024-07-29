@@ -222,6 +222,7 @@ testcases:
   - script: |-
       cat > masking.yml <<EOF
       version: "1"
+      seed: 42
       masking:
         - selector:
             jsonpath: "person"
@@ -239,6 +240,6 @@ testcases:
       echo -e '{"person":1}\n{"person":2}\n{"person":3}\n{"person":2}\n{"person":1}\n{"person":3}' | pimo | head -c -1 | tr '\n' ' '
     assertions:
     - result.code ShouldEqual 0
-    - result.systemout ShouldEqual {"person":"Gérard"} {"person":"Wilfried"} {"person":"Patricia"} {"person":"Wilfried"} {"person":"Gérard"} {"person":"Patricia"}
+    - result.systemout ShouldEqual {"person":"4687448"} {"person":"6918459"} {"person":"815901"} {"person":"6918459"} {"person":"4687448"} {"person":"815901"}
     - result.systemerr ShouldBeEmpty
 
