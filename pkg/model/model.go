@@ -158,13 +158,19 @@ type TranscodeType struct {
 	Classes []Class `yaml:"classes,omitempty" json:"classes,omitempty" jsonschema_description:"Each class will define a rule to replace a set of characters by another"`
 }
 
+type EmbeddedSha3Type struct {
+	Sha3Type `yaml:",inline"`
+	Field    string `yaml:"field" json:"field" jsonschema_description:"Name of the identifier"`
+}
+
 type ChoiceInCSVType struct {
-	URI             string `yaml:"uri" json:"uri" jsonschema_description:"URI of the CSV resource"`
-	Header          bool   `yaml:"header,omitempty" json:"header,omitempty" jsonschema_description:"Does the CSV resource contains a header line"`
-	Separator       string `yaml:"separator,omitempty" json:"separator,omitempty" jsonschema_description:"Separator character"`
-	Comment         string `yaml:"comment,omitempty" json:"comment,omitempty" jsonschema_description:"Lines beginning with the comment character without preceding whitespace are ignored"`
-	FieldsPerRecord int    `yaml:"fieldsPerRecord,omitempty" json:"fieldsPerRecord,omitempty" jsonschema_description:"FieldsPerRecord is the number of expected fields per record, 0 means the number of fields in the first record"`
-	TrimSpace       bool   `yaml:"trim,omitempty" json:"trim,omitempty" jsonschema_description:"If true leading white space in a field is ignored"`
+	URI             string           `yaml:"uri" json:"uri" jsonschema_description:"URI of the CSV resource"`
+	Header          bool             `yaml:"header,omitempty" json:"header,omitempty" jsonschema_description:"Does the CSV resource contains a header line"`
+	Separator       string           `yaml:"separator,omitempty" json:"separator,omitempty" jsonschema_description:"Separator character"`
+	Comment         string           `yaml:"comment,omitempty" json:"comment,omitempty" jsonschema_description:"Lines beginning with the comment character without preceding whitespace are ignored"`
+	FieldsPerRecord int              `yaml:"fieldsPerRecord,omitempty" json:"fieldsPerRecord,omitempty" jsonschema_description:"FieldsPerRecord is the number of expected fields per record, 0 means the number of fields in the first record"`
+	TrimSpace       bool             `yaml:"trim,omitempty" json:"trim,omitempty" jsonschema_description:"If true leading white space in a field is ignored"`
+	Identifier      EmbeddedSha3Type `yaml:"identifier,omitempty" json:"identifier,omitempty" jsonschema_description:"Configure a collision resistant ID generator"`
 }
 
 type ExactMatchType struct {
@@ -225,8 +231,9 @@ type SequenceType struct {
 }
 
 type Sha3Type struct {
-	Length int    `yaml:"length" json:"length" jsonschema_description:"Length of the produced output in bytes"`
-	Domain string `yaml:"domain,omitempty" json:"domain,omitempty" jsonschema_description:"allowed characters domain in the output, default to hexadecimal (0123456789abcdef)"`
+	Length     int    `yaml:"length" json:"length" jsonschema_description:"Length of the produced output in bytes" jsonschema:"oneof_required=Length"`
+	Resistance int    `yaml:"resistance" json:"resistance" jsonschema_description:"Collision resistance of the produced hash" jsonschema:"oneof_required=Resistance"`
+	Domain     string `yaml:"domain,omitempty" json:"domain,omitempty" jsonschema_description:"allowed characters domain in the output, default to hexadecimal (0123456789abcdef)"`
 }
 
 type MaskType struct {

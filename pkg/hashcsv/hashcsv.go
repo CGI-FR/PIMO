@@ -28,6 +28,7 @@ import (
 	"unicode/utf8"
 
 	"github.com/cgi-fr/pimo/pkg/model"
+	"github.com/cgi-fr/pimo/pkg/sha3"
 	"github.com/cgi-fr/pimo/pkg/uri"
 	"github.com/rs/zerolog/log"
 )
@@ -43,6 +44,8 @@ type MaskEngine struct {
 	comment         rune
 	fieldsPerRecord int
 	trimSpaces      bool
+	identifierField string
+	identifierGen   sha3.MaskEngine
 }
 
 // NewMask create a MaskRandomChoiceInCSV with a seed
@@ -57,7 +60,19 @@ func NewMask(conf model.ChoiceInCSVType, seed int64, seeder model.Seeder) (MaskE
 		comment, _ = utf8.DecodeRune([]byte(conf.Comment))
 	}
 	// nolint: gosec
-	return MaskEngine{rand.New(rand.NewSource(seed)), seeder, template, map[string][][]string{}, conf.Header, sep, comment, conf.FieldsPerRecord, conf.TrimSpace}, err
+	return MaskEngine{
+		rand:            rand.New(rand.NewSource(seed)),
+		seeder:          seeder,
+		template:        template,
+		cache:           map[string][][]string{},
+		header:          conf.Header,
+		sep:             sep,
+		comment:         comment,
+		fieldsPerRecord: conf.FieldsPerRecord,
+		trimSpaces:      conf.TrimSpace,
+		identifierField: conf.Identifier.Field,
+		identifierGen:   sha3.NewMask(conf.Identifier.Length, conf.Identifier.Resistance, conf.Identifier.Domain, seed, seeder),
+	}, err
 }
 
 // Mask choose a mask value randomly
@@ -118,7 +133,7 @@ func (mrl MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.En
 				obj.Set(header, record[i])
 			}
 		}
-		return obj, nil
+		return mrl.GenIdentifierIfNeeded(obj, e, context...)
 	} else {
 		if len(records) < 1 {
 			log.Warn().Msg("empty CSV ressource")
@@ -137,8 +152,19 @@ func (mrl MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.En
 				obj.Set(strconv.Itoa(i), value)
 			}
 		}
-		return obj, nil
+		return mrl.GenIdentifierIfNeeded(obj, e, context...)
 	}
+}
+
+func (mrl MaskEngine) GenIdentifierIfNeeded(obj model.Dictionary, e model.Entry, context ...model.Dictionary) (model.Entry, error) {
+	if len(mrl.identifierField) > 0 {
+		result, err := mrl.identifierGen.Mask(e, context...)
+		if err != nil {
+			return obj, err
+		}
+		obj.Set(mrl.identifierField, result)
+	}
+	return obj, nil
 }
 
 // Factory create a mask from a yaml config

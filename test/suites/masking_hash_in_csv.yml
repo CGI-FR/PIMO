@@ -216,3 +216,30 @@ testcases:
     - result.systemout ShouldBeEmpty
     - result.systemerr ShouldNotBeEmpty
 
+- name: generate unique identifier
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      seed: 42
+      masking:
+        - selector:
+            jsonpath: "person"
+          masks:
+            - hashInCSV:
+                uri: "file://../persons.csv"
+                header: true
+                identifier:
+                  field: "id"
+                  domain: "0123456789"
+                  resistance: 1000
+            - template: "{{ .person.id }}"
+      EOF
+  - script: |-
+      echo -e '{"person":1}\n{"person":2}\n{"person":3}\n{"person":2}\n{"person":1}\n{"person":3}' | pimo | head -c -1 | tr '\n' ' '
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemout ShouldEqual {"person":"4687448"} {"person":"6918459"} {"person":"815901"} {"person":"6918459"} {"person":"4687448"} {"person":"815901"}
+    - result.systemerr ShouldBeEmpty
+
