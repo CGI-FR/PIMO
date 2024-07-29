@@ -42,6 +42,10 @@
         "trim": {
           "type": "boolean",
           "description": "If true leading white space in a field is ignored"
+        },
+        "identifier": {
+          "$ref": "#/$defs/EmbeddedSha3Type",
+          "description": "Configure a collision resistant ID generator"
         }
       },
       "additionalProperties": false,
@@ -119,6 +123,47 @@
       "required": [
         "version",
         "masking"
+      ]
+    },
+    "EmbeddedSha3Type": {
+      "oneOf": [
+        {
+          "required": [
+            "length"
+          ],
+          "title": "Length"
+        },
+        {
+          "required": [
+            "resistance"
+          ],
+          "title": "Resistance"
+        }
+      ],
+      "properties": {
+        "length": {
+          "type": "integer",
+          "description": "Length of the produced output in bytes"
+        },
+        "resistance": {
+          "type": "integer",
+          "description": "Collision resistance of the produced hash"
+        },
+        "domain": {
+          "type": "string",
+          "description": "allowed characters domain in the output, default to hexadecimal (0123456789abcdef)"
+        },
+        "field": {
+          "type": "string",
+          "description": "Name of the identifier"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "length",
+        "resistance",
+        "field"
       ]
     },
     "ExactMatchType": {
