@@ -7,7 +7,7 @@ require (
 	github.com/Masterminds/sprig/v3 v3.2.3
 	github.com/adrienaury/zeromdc v0.1.1
 	github.com/capitalone/fpe v1.2.1
-	github.com/goccy/go-yaml v1.11.3
+	github.com/goccy/go-yaml v1.12.0
 	github.com/invopop/jsonschema v0.12.0
 	github.com/kenshaw/baseconv v0.1.1
 	github.com/labstack/echo/v4 v4.12.0
