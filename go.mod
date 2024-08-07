@@ -22,7 +22,7 @@ require (
 	gitlab.com/c0b/go-ordered-json v0.0.0-20201030195603-febf46534d5a
 	golang.org/x/crypto v0.25.0
 	golang.org/x/exp v0.0.0-20240707233637-46b078467d37
-	golang.org/x/text v0.16.0
+	golang.org/x/text v0.17.0
 )
 
 require (
