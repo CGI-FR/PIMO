@@ -122,6 +122,7 @@ func BuildPipeline(pipeline Pipeline, conf Definition, caches map[string]Cache, 
 					Masks:     nil,
 					Cache:     masking.Cache,
 					Preserve:  masking.Preserve,
+					PreserveL: masking.PreserveL,
 					Seed:      masking.Seed,
 				}
 
@@ -154,7 +155,7 @@ func BuildPipeline(pipeline Pipeline, conf Definition, caches map[string]Cache, 
 								mask = NewMaskCacheEngine(typedCache, mask)
 							}
 						}
-						pipeline = pipeline.Process(NewMaskEngineProcess(NewPackedPathSelector(virtualMask.Selector.Jsonpath), mask, virtualMask.Preserve, skipLogFile))
+						pipeline = pipeline.Process(NewMaskEngineProcess(NewPackedPathSelector(virtualMask.Selector.Jsonpath), mask, virtualMask.Preserve, virtualMask.PreserveL, skipLogFile))
 						nbArg++
 					}
 				}

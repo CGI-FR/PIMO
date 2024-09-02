@@ -21,21 +21,23 @@ import (
 	over "github.com/adrienaury/zeromdc"
 	"github.com/cgi-fr/pimo/pkg/statistics"
 	"github.com/rs/zerolog/log"
+	"golang.org/x/exp/slices"
 )
 
-func NewMaskEngineProcess(selector Selector, mask MaskEngine, preserve string, skipLogFile string) Processor {
+func NewMaskEngineProcess(selector Selector, mask MaskEngine, preserve string, preserveList []Entry, skipLogFile string) Processor {
 	var errlogger *MsgLogger
 	if len(skipLogFile) > 0 {
 		errlogger = NewMsgLogger(skipLogFile)
 	}
-	return &MaskEngineProcess{selector, mask, preserve, errlogger}
+	return &MaskEngineProcess{selector, mask, preserve, preserveList, errlogger}
 }
 
 type MaskEngineProcess struct {
-	selector  Selector
-	mask      MaskEngine
-	preserve  string
-	errlogger *MsgLogger
+	selector     Selector
+	mask         MaskEngine
+	preserve     string
+	preserveList []Entry
+	errlogger    *MsgLogger
 }
 
 func (mep *MaskEngineProcess) Open() error {
@@ -48,7 +50,11 @@ func (mep *MaskEngineProcess) ProcessDictionary(dictionary Dictionary, out Colle
 	defer func() { over.MDC().Remove("path") }()
 	result := dictionary
 	applied := mep.selector.Apply(result, func(rootContext, parentContext Dictionary, key string, value Entry) (Action, Entry) {
+		log.Info().Msgf("%v %v", value, mep.preserveList)
 		switch {
+		case slices.Contains(mep.preserveList, value):
+			log.Trace().Msgf("Preserve specific value, skip masking", mep.preserve)
+			return NOTHING, nil
 		case value == nil && (mep.preserve == "null" || mep.preserve == "blank"):
 			log.Trace().Msgf("Preserve %s value, skip masking", mep.preserve)
 			return NOTHING, nil

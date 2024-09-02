@@ -288,6 +288,7 @@ type Masking struct {
 	Masks     []MaskType     `yaml:"masks,omitempty" json:"masks,omitempty" jsonschema:"oneof_required=case2,oneof_required=case4" jsonschema_description:"Defines how the selected value(s) will be masked"`
 	Cache     string         `yaml:"cache,omitempty" json:"cache,omitempty" jsonschema_description:"Use an in-memory cache to preserve coherence between original/masked values"`
 	Preserve  string         `yaml:"preserve,omitempty" json:"preserve,omitempty" jsonschema:"enum=null,enum=empty,enum=blank,enum=notInCache" jsonschema_description:"Preserve (do not mask) some values : null = preserve null value, empty = preserve empty strings, blank = preserve both null and empty values, notInCache = preserve value even if not present in cache (fromCache mask)"`
+	PreserveL []Entry        `yaml:"preserve-list,omitempty" json:"preserve-list,omitempty" jsonschema_description:"Preserve (do not mask) given values"`
 	Seed      SeedType       `yaml:"seed,omitempty" json:"seed,omitempty" jsonschema_description:"Initialize the Pseaudo-Random-Generator with the value given field"`
 }
 
