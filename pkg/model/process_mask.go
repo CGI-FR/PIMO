@@ -50,10 +50,9 @@ func (mep *MaskEngineProcess) ProcessDictionary(dictionary Dictionary, out Colle
 	defer func() { over.MDC().Remove("path") }()
 	result := dictionary
 	applied := mep.selector.Apply(result, func(rootContext, parentContext Dictionary, key string, value Entry) (Action, Entry) {
-		log.Info().Msgf("%v %v", value, mep.preserveList)
 		switch {
 		case slices.Contains(mep.preserveList, value):
-			log.Trace().Msgf("Preserve specific value, skip masking", mep.preserve)
+			log.Trace().Msgf("Preserve specific value, skip masking")
 			return NOTHING, nil
 		case value == nil && (mep.preserve == "null" || mep.preserve == "blank"):
 			log.Trace().Msgf("Preserve %s value, skip masking", mep.preserve)
