@@ -123,6 +123,38 @@ testcases:
   - script: rm -f expected.txt
   - script: rm -f output.txt
 
+- name: preserve specific values
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > expected.txt <<EOF
+      {"name":"maskedName"}
+      {"name":"toPreserve"}
+      {"name":""}
+      {"name":null}
+      EOF
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "name"
+          preserve-list: ["toPreserve", "", null]
+          mask:
+            constant: "maskedName"
+      EOF
+  - script: |-
+      echo -e '{"name":"paul"}\n{"name":"toPreserve"}\n{"name":""}\n{"name":null}' | pimo > output.txt
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemerr ShouldBeEmpty
+  - script: |-
+      diff expected.txt output.txt
+    assertions:
+    - result.systemout ShouldBeEmpty
+  - script: rm -f expected.txt
+  - script: rm -f output.txt
+
 - name: preserve notInCache values
   steps:
   - script: rm -f masking.yml
