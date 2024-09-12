@@ -75,6 +75,7 @@ var (
 	serve                 string
 	maxBufferCapacity     int
 	profiling             string
+	parquet               string
 )
 
 func main() {
@@ -119,6 +120,7 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 	rootCmd.Flags().StringVar(&serve, "serve", "", "listen/respond to HTTP interface and port instead of stdin/stdout, <ip>:<port> or :<port> to listen to all local networks")
 	rootCmd.Flags().IntVar(&maxBufferCapacity, "buffer-size", 64, "buffer size in kB to load data from uri for each line")
 	rootCmd.Flags().StringVar(&profiling, "pprof", "", "create a pprof file - use 'cpu' to create a CPU pprof file or 'mem' to create an memory pprof file")
+	rootCmd.PersistentFlags().StringVar(&parquet, "parquet", "", "parquet file")
 
 	rootCmd.AddCommand(&cobra.Command{
 		Use: "jsonschema",
@@ -253,6 +255,7 @@ func run(cmd *cobra.Command) {
 		CachesToDump:     cachesToDump,
 		CachesToLoad:     cachesToLoad,
 		XMLCallback:      len(serve) > 0,
+		Parquet:          parquet,
 	}
 
 	var pdef model.Definition

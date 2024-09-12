@@ -412,6 +412,7 @@ type RepeaterUntilProcess struct {
 }
 
 func (p RepeaterUntilProcess) Open() error {
+	log.Trace().Msg("Open RepeaterUntilProcess")
 	return nil
 }
 
@@ -470,7 +471,11 @@ type TempSource struct {
 	source Source
 }
 
-func (s *TempSource) Open() error { return s.source.Open() }
+func (s *TempSource) Open() error {
+	log.Trace().Msg("Open TempSource")
+
+	return s.source.Open()
+}
 
 func (s *TempSource) Next() bool {
 	if s.repeat {
@@ -498,6 +503,8 @@ type RepeaterProcess struct {
 }
 
 func (p RepeaterProcess) Open() error {
+	log.Trace().Msg("Open RepeaterProcess")
+
 	return nil
 }
 
@@ -516,7 +523,11 @@ func NewMapProcess(mapper Mapper) Processor {
 	return MapProcess{mapper: mapper}
 }
 
-func (mp MapProcess) Open() error { return nil }
+func (mp MapProcess) Open() error {
+	log.Trace().Msg("Open MapProcess")
+
+	return nil
+}
 
 func (mp MapProcess) ProcessDictionary(dictionary Dictionary, out Collector) error {
 	mappedValue, err := mp.mapper(dictionary)
@@ -605,6 +616,8 @@ func (pipeline SimplePipeline) Err() error {
 }
 
 func (pipeline SimplePipeline) Open() error {
+	log.Trace().Msg("Open SimplePipeline")
+
 	return pipeline.source.Open()
 }
 
@@ -622,6 +635,7 @@ func (c *QueueCollector) Err() error {
 }
 
 func (c *QueueCollector) Open() error {
+	log.Trace().Msg("Open QueueCollector")
 	return nil
 }
 
@@ -651,6 +665,15 @@ type ProcessPipeline struct {
 	source    Source
 	Processor
 	err error
+}
+
+func (p *ProcessPipeline) Open() error {
+	err := p.Processor.Open()
+	if err != nil {
+		return err
+	}
+
+	return p.source.Open()
 }
 
 func (p *ProcessPipeline) Next() bool {
@@ -701,10 +724,13 @@ func (pipeline SimpleSinkedPipeline) Run() (err error) {
 	log.Trace().Msg("Enter SimpleSinkedPipeline.Run")
 	defer log.Trace().Err(err).Msg("Exit SimpleSinkedPipeline.Run")
 
+	log.Trace().Any("source", pipeline.source).Msg("Open Source")
 	err = pipeline.source.Open()
 	if err != nil {
 		return err
 	}
+
+	log.Trace().Any("sink", pipeline.sink).Msg("Open Sink")
 	err = pipeline.sink.Open()
 	if err != nil {
 		return err
@@ -754,6 +780,8 @@ type CallableMapSource struct {
 }
 
 func (source *CallableMapSource) Open() error {
+	log.Trace().Msg("Open CallableMapSource")
+
 	return nil
 }
 

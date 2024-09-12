@@ -43,6 +43,7 @@ import (
 	"github.com/cgi-fr/pimo/pkg/luhn"
 	"github.com/cgi-fr/pimo/pkg/markov"
 	"github.com/cgi-fr/pimo/pkg/model"
+	"github.com/cgi-fr/pimo/pkg/parquet"
 	"github.com/cgi-fr/pimo/pkg/pipe"
 	"github.com/cgi-fr/pimo/pkg/randdate"
 	"github.com/cgi-fr/pimo/pkg/randdura"
@@ -83,6 +84,7 @@ type Config struct {
 	CachesToDump     map[string]string
 	CachesToLoad     map[string]string
 	XMLCallback      bool
+	Parquet          string
 }
 
 type Context struct {
@@ -122,6 +124,9 @@ func (ctx *Context) Configure(cfg Config) error {
 	case cfg.SingleInput != nil:
 		over.MDC().Set("context", "single-input")
 		ctx.source = model.NewSourceFromSlice([]model.Dictionary{cfg.SingleInput.Pack()})
+	case cfg.Parquet != "":
+		over.MDC().Set("context", "stdin/parquet")
+		ctx.source = parquet.NewPackedSource(cfg.Parquet)
 	default:
 		over.MDC().Set("context", "stdin")
 		ctx.source = jsonline.NewPackedSource(os.Stdin)

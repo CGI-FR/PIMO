@@ -48,6 +48,7 @@ func (mep *MaskEngineProcess) ProcessDictionary(dictionary Dictionary, out Colle
 	over.AddGlobalFields("path")
 	over.MDC().Set("path", mep.selector)
 	defer func() { over.MDC().Remove("path") }()
+
 	result := dictionary
 	applied := mep.selector.Apply(result, func(rootContext, parentContext Dictionary, key string, value Entry) (Action, Entry) {
 		switch {
