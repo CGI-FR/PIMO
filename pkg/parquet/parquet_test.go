@@ -30,7 +30,7 @@ func TestSourceReturnDictionary(t *testing.T) {
 	err := pipeline.AddSink(model.NewSinkToSlice(&result)).Run()
 	assert.Nil(t, err)
 
-	assert.GreaterOrEqual(t, 1, len(result))
+	assert.Equal(t, 8, len(result))
 	document := result[0].(model.Dictionary)
 
 	assert.Equal(t, true, document.Get("bool_col"))
