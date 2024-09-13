@@ -14,6 +14,10 @@ Types of changes
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [1.26.1]
+
+- `Fixed` performance issues on JSON serialization
+
 ## [1.26.0]
 
 - `Added` property `preserve-list` to masking definition to be able to ignore masking specific values

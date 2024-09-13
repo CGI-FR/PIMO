@@ -131,14 +131,8 @@ func (me MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Ent
 
 	initialState := map[string]*int64{}
 	if dict, ok := e.(model.Dictionary); ok {
-		iter := dict.EntriesIter()
-		for {
-			pair, ok := iter()
-			if !ok {
-				break
-			}
-
-			initialState[pair.Key] = me.formatTimestamp(pair.Value)
+		for _, key := range dict.Keys() {
+			initialState[key] = me.formatTimestamp(dict.Get(key))
 		}
 	}
 

@@ -1,13 +1,17 @@
 module github.com/cgi-fr/pimo
 
-go 1.20
+go 1.21
+
+toolchain go1.22.2
 
 require (
 	github.com/CGI-FR/xixo v0.1.8
 	github.com/Masterminds/sprig/v3 v3.3.0
 	github.com/adrienaury/zeromdc v0.1.1
 	github.com/capitalone/fpe v1.2.1
+	github.com/goccy/go-json v0.10.3
 	github.com/goccy/go-yaml v1.12.0
+	github.com/iancoleman/orderedmap v0.3.0
 	github.com/invopop/jsonschema v0.12.0
 	github.com/kenshaw/baseconv v0.1.1
 	github.com/labstack/echo/v4 v4.12.0
@@ -19,7 +23,6 @@ require (
 	github.com/spf13/cobra v1.8.1
 	github.com/stretchr/testify v1.9.0
 	github.com/zach-klippenstein/goregen v0.0.0-20160303162051-795b5e3961ea
-	gitlab.com/c0b/go-ordered-json v0.0.0-20201030195603-febf46534d5a
 	golang.org/x/crypto v0.27.0
 	golang.org/x/exp v0.0.0-20240707233637-46b078467d37
 	golang.org/x/text v0.18.0
