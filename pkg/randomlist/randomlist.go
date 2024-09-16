@@ -35,7 +35,7 @@ type MaskEngine struct {
 // NewMaskSeeded create a MaskRandomList with a seed
 func NewMask(list []model.Entry, seed int64, seeder model.Seeder) MaskEngine {
 	// nolint: gosec
-	return MaskEngine{rand.New(rand.NewSource(seed)), seeder, list}
+	return MaskEngine{rand.New(rand.NewSource(seed)), seeder, model.CleanTypes(list).([]model.Entry)}
 }
 
 // Mask choose a mask value randomly

@@ -96,15 +96,18 @@ func CleanTypes(inter interface{}) interface{} {
 			dict.Set(key, CleanTypes(value))
 		}
 		return dict
-	case []interface{}:
-		tab := []Entry{}
-
+	case []Entry:
+		tab := make([]Entry, 0, len(typedInter))
 		for _, item := range typedInter {
 			tab = append(tab, CleanTypes(item))
 		}
-
 		return tab
-
+	case []interface{}:
+		tab := make([]Entry, 0, len(typedInter))
+		for _, item := range typedInter {
+			tab = append(tab, CleanTypes(item))
+		}
+		return tab
 	case json.Number:
 
 		resFloat64, err := typedInter.Float64()
