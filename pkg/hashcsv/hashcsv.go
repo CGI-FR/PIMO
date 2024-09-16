@@ -51,6 +51,9 @@ type MaskEngine struct {
 // NewMask create a MaskRandomChoiceInCSV with a seed
 func NewMask(conf model.ChoiceInCSVType, seed int64, seeder model.Seeder) (MaskEngine, error) {
 	template, err := template.New("template-randomInCsv").Parse(conf.URI)
+	if err != nil {
+		return MaskEngine{}, err
+	}
 	sep := ','
 	if len(conf.Separator) > 0 {
 		sep, _ = utf8.DecodeRune([]byte(conf.Separator))
@@ -59,6 +62,7 @@ func NewMask(conf model.ChoiceInCSVType, seed int64, seeder model.Seeder) (MaskE
 	if len(conf.Comment) > 0 {
 		comment, _ = utf8.DecodeRune([]byte(conf.Comment))
 	}
+	genIdentifier, err := sha3.NewMask(conf.Identifier.Length, conf.Identifier.Resistance, conf.Identifier.Domain, conf.Identifier.MaxStrLen, seed, seeder)
 	// nolint: gosec
 	return MaskEngine{
 		rand:            rand.New(rand.NewSource(seed)),
@@ -71,7 +75,7 @@ func NewMask(conf model.ChoiceInCSVType, seed int64, seeder model.Seeder) (MaskE
 		fieldsPerRecord: conf.FieldsPerRecord,
 		trimSpaces:      conf.TrimSpace,
 		identifierField: conf.Identifier.Field,
-		identifierGen:   sha3.NewMask(conf.Identifier.Length, conf.Identifier.Resistance, conf.Identifier.Domain, seed, seeder),
+		identifierGen:   genIdentifier,
 	}, err
 }
 
