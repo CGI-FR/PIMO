@@ -38,7 +38,7 @@ func NewMask(value model.Entry, tmpl tmpl.FuncMap, seed int64, seedField string)
 		temp, err := template.NewEngine(tmplstr, tmpl, seed, seedField)
 		return MaskEngine{value, temp}, err
 	}
-	return MaskEngine{value, nil}, nil
+	return MaskEngine{model.CleanTypes(value), nil}, nil
 }
 
 // MaskContext add the field
