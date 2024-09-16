@@ -62,7 +62,7 @@ testcases:
       echo '{"email": "name.surname@domain.com"}' | pimo -s 123
     assertions:
     - result.code ShouldEqual 1
-    - result.systemerr ShouldContainSubstring "identifier will exceed the maximum authorized length of 10 characters (longest identifiers will be 13 characters long)"
+    - result.systemerr ShouldContainSubstring "identifiers will exceed the maximum authorized length of 10 characters (longest identifiers will be 13 characters long)"
   - script: rm -f masking.yml
   - script: |-
       cat > masking.yml <<EOF
