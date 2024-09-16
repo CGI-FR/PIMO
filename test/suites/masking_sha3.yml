@@ -43,3 +43,40 @@ testcases:
     - result.systemoutjson.email ShouldEqual 458539540885
     - result.systemerr ShouldBeEmpty
 
+- name: control maximum identifier length
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "email"
+          mask:
+            sha3:
+              resistance: 1000000 # up to 1M values with collision resistance
+              domain: "0123456789" # convert to base 10 with digits 0-9
+              maxstrlen: 10 # identifiers should be at most 10 characters long
+      EOF
+  - script: |-
+      echo '{"email": "name.surname@domain.com"}' | pimo -s 123
+    assertions:
+    - result.code ShouldEqual 1
+    - result.systemerr ShouldContainSubstring "identifier will exceed the maximum authorized length of 10 characters (longest identifiers will be 13 characters long)"
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "email"
+          mask:
+            sha3:
+              resistance: 1000000 # up to 1M values with collision resistance
+              domain: "0123456789" # convert to base 10 with digits 0-9
+              maxstrlen: 13 # identifiers should be at most 10 characters long
+      EOF
+  - script: |-
+      echo '{"email": "name.surname@domain.com"}' | pimo -s 123
+    assertions:
+    - result.code ShouldEqual 0
