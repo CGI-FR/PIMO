@@ -14,6 +14,10 @@ Types of changes
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [1.27.0]
+
+- `Added` parameter `maxstrlen` to `sha3` and `haqhInCSV` masks
+
 ## [1.26.1]
 
 - `Fixed` performance issues on JSON serialization
