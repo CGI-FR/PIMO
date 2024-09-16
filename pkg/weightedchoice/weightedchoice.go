@@ -75,7 +75,7 @@ func NewMask(list []model.WeightedChoiceType, seed int64, seeder model.Seeder) M
 	rand.Seed(seed) //nolint:staticcheck
 	cs := []Choice{}
 	for k := range list {
-		cs = append(cs, Choice{Item: list[k].Choice, Weight: list[k].Weight})
+		cs = append(cs, Choice{Item: model.CleanTypes(list[k].Choice), Weight: list[k].Weight})
 	}
 	return MaskEngine{NewChooser(seed, cs...), seeder}
 }
