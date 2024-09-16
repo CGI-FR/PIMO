@@ -18,6 +18,10 @@ Types of changes
 
 - `Added` parameter `maxstrlen` to `sha3` and `haqhInCSV` masks
 
+## [1.26.2]
+
+- `Fixed` regression in pimo play WASM (web version)
+
 ## [1.26.1]
 
 - `Fixed` performance issues on JSON serialization
