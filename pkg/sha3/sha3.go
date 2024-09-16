@@ -122,14 +122,14 @@ func lengthWithResistance(resistance int) int {
 }
 
 func checkMaximumStringLen(maxstrlen, length int, domain string) error {
-	maxVal := math.Pow(BASE2, float64(length*BASE8))
+	maxVal := int(math.Pow(BASE2, float64(length*BASE8))) - 1
 	result, err := baseconv.Convert(fmt.Sprintf("%d", maxVal), "0123456789", domain)
 	if err != nil {
 		return err
 	}
+	log.Info().Int("maxstrlen", maxstrlen).Msgf("Identifiers will be up to %d characters long", len(result))
 	if len(result) > maxstrlen {
-		log.Error().Int("maxstrlen", maxstrlen).Int("strlen", len(result)).Msg("identifier will surpass the maximum length")
-		return errors.New(fmt.Sprintf("identifier will surpass the maximum length of %d", maxstrlen))
+		return errors.New(fmt.Sprintf("identifiers will exceed the maximum authorized length of %d characters (longest identifiers will be %d characters long)", maxstrlen, len(result)))
 	}
 	return nil
 }
