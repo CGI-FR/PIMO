@@ -813,6 +813,8 @@ masking:
 
 Here the length parameter is not given, but with the `resistance` parameter set to 10M, the mask will calculate the minimum length required (6 bytes in this example because 2^(6*8/2) > 10M).
 
+It can be difficult to anticipate what will be the maximum identifier string length (in characters) because it depends to the `domain` and the value of the `length` parameter (which can be invisible in the masking configuration because it is deduced from the `resistance` parameter). Therefore an optional parameter named `maxstrlen` was created, it's only purpose is to inform with an error if the maximum length (in characters) of identifier that can be produced is greater than a threshold.
+
 [Return to list of masks](#possible-masks)
 
 ### Range
