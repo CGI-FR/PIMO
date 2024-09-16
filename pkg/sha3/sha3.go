@@ -19,7 +19,6 @@ package sha3
 
 import (
 	"encoding/binary"
-	"errors"
 	"fmt"
 	"math"
 
@@ -129,7 +128,7 @@ func checkMaximumStringLen(maxstrlen, length int, domain string) error {
 	}
 	log.Info().Int("maxstrlen", maxstrlen).Msgf("Identifiers will be up to %d characters long", len(result))
 	if len(result) > maxstrlen {
-		return errors.New(fmt.Sprintf("identifiers will exceed the maximum authorized length of %d characters (longest identifiers will be %d characters long)", maxstrlen, len(result)))
+		return fmt.Errorf("identifiers will exceed the maximum authorized length of %d characters (longest identifiers will be %d characters long)", maxstrlen, len(result))
 	}
 	return nil
 }
