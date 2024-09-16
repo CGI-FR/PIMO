@@ -14,6 +14,10 @@ Types of changes
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [1.26.2]
+
+- `Fixed` regression in pimo play WASM (web version)
+
 ## [1.26.1]
 
 - `Fixed` performance issues on JSON serialization
