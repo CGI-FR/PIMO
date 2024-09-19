@@ -97,18 +97,15 @@ func (s selector) applySub(root Dictionary, current Dictionary, appliers ...Appl
 		return false
 	}
 
-	v := reflect.ValueOf(entry)
-	kind := v.Kind()
-
 	if s.sub != nil {
 		if entry == nil {
 			return false
 		}
 
-		switch kind {
-		case reflect.Slice:
-			for i := 0; i < v.Len(); i++ {
-				switch typedV := v.Index(i).Interface().(type) {
+		switch typedEntry := entry.(type) {
+		case []Entry:
+			for i := 0; i < len(typedEntry); i++ {
+				switch typedV := typedEntry[i].(type) {
 				case Dictionary:
 					s.sub.applySub(root, typedV, appliers...)
 				default:
@@ -121,8 +118,8 @@ func (s selector) applySub(root Dictionary, current Dictionary, appliers ...Appl
 				}
 			}
 			return true
-		case reflect.Struct:
-			return s.sub.applySub(root, entry.(Dictionary), appliers...)
+		case Dictionary:
+			return s.sub.applySub(root, typedEntry, appliers...)
 		default:
 			// this handle the case where an intermediate path is a scalar or a null, instead of a dictionary
 			// e.g. :
@@ -132,13 +129,9 @@ func (s selector) applySub(root Dictionary, current Dictionary, appliers ...Appl
 			return false
 		}
 	}
-	switch kind {
-	case reflect.Slice:
-		actualSlice := []Entry{}
-		for i := 0; i < v.Len(); i++ {
-			actualSlice = append(actualSlice, v.Index(i).Interface())
-		}
-		s.applySlice(root, current, actualSlice, appliers)
+	switch typedEntry := entry.(type) {
+	case []Entry:
+		s.applySlice(root, current, typedEntry, appliers)
 	default:
 		s.apply(root, current, entry, appliers)
 	}
@@ -186,13 +179,12 @@ func (s selector) applySubContext(root Dictionary, current Dictionary, appliers 
 		}
 		return true
 	}
-	v := reflect.ValueOf(entry)
-	kind := v.Kind()
+
 	if s.sub != nil {
-		switch kind {
-		case reflect.Slice:
-			for i := 0; i < v.Len(); i++ {
-				s.sub.applySubContext(root, v.Index(i).Interface().(Dictionary), appliers...)
+		switch typedEntry := entry.(type) {
+		case []Entry:
+			for i := 0; i < len(typedEntry); i++ {
+				s.sub.applySubContext(root, typedEntry[i].(Dictionary), appliers...)
 			}
 			return true
 		default:

@@ -188,29 +188,23 @@ func Untyped(inter interface{}) interface{} {
 		return cleanmap
 	case []interface{}:
 		tab := []Entry{}
-
 		for _, item := range typedInter {
 			tab = append(tab, Untyped(item))
 		}
-
 		return tab
 
 	case []Dictionary:
 		tab := []interface{}{}
-
 		for _, item := range typedInter {
 			tab = append(tab, Untyped(item))
 		}
-
 		return tab
 
 	case []Entry:
 		tab := []interface{}{}
-
 		for _, item := range typedInter {
 			tab = append(tab, Untyped(item))
 		}
-
 		return tab
 
 	default:
