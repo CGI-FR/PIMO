@@ -406,3 +406,36 @@ testcases:
     - result.code ShouldEqual 0
     - result.systemoutjson.timeline.birth ShouldEqual "1985-06-09"
     - result.systemerr ShouldBeEmpty
+
+- name: should not overwrite existing data
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      masking:
+        - selector:
+            jsonpath: "timeline"
+          masks:
+            - add:
+                departure: ""
+                arrival: ""
+                status: "COMPLETED"
+            - timeline:
+                format: "2006-01-02T15:04"
+                start:
+                  name: "now"
+                points:
+                  - name: "departure"
+                    min: "-P1Y"
+                    max: "P0"
+                  - name: "arrival"
+                    from: "departure"
+                    min: "P0"
+                    max: "PT10H"
+      EOF
+  - script: pimo --empty-input
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemoutjson.timeline.status ShouldEqual "COMPLETED"
+    - result.systemerr ShouldBeEmpty

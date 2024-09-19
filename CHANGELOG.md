@@ -21,6 +21,7 @@ Types of changes
 - `Fixed` performance issue with `pipe` mask
 - `Fixed` performance issue with selectors
 - `Fixed` URI resources will be loaded in-memory only once instead of once per mask
+- `Fixed` `timeline` should not overwrite existing data
 
 ## [1.26.2]
 
