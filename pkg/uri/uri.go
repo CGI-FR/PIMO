@@ -120,6 +120,8 @@ func ReadCsv(uri string, sep rune, comment rune, fieldsPerRecord int, trimLeadin
 		result = records[[]string]{r}
 	}
 
+	cacheCSV[uri] = result
+
 	return result, nil
 }
 
@@ -153,7 +155,8 @@ func Read(uri string) (EntryRecords, error) {
 		if errors.Is(scanner.Err(), bufio.ErrTooLong) {
 			return records[model.Entry]{result}, errors.New("error reading " + uri + ": line is too long, use --buffer-size parameter to increase buffer size")
 		}
-		return records[model.Entry]{result}, scanner.Err()
+		cacheEntry[uri] = records[model.Entry]{result}
+		return cacheEntry[uri], scanner.Err()
 	}
 	if u.Scheme == "http" || u.Scheme == "https" {
 		/* #nosec */
@@ -176,7 +179,8 @@ func Read(uri string) (EntryRecords, error) {
 		if errors.Is(scanner.Err(), bufio.ErrTooLong) {
 			return records[model.Entry]{result}, errors.New("error reading " + uri + ": line is too long, use --buffer-size parameter to increase buffer size")
 		}
-		return records[model.Entry]{result}, scanner.Err()
+		cacheEntry[uri] = records[model.Entry]{result}
+		return cacheEntry[uri], scanner.Err()
 	}
 	if u.Scheme == "pimo" {
 		list, ok := maskingdata.MapData[u.Host]
@@ -187,7 +191,8 @@ func Read(uri string) (EntryRecords, error) {
 		for i, v := range list {
 			result[i] = v
 		}
-		return records[model.Entry]{result}, nil
+		cacheEntry[uri] = records[model.Entry]{result}
+		return cacheEntry[uri], nil
 	}
 
 	return nil, fmt.Errorf(u.Scheme + " is not a valid scheme")
