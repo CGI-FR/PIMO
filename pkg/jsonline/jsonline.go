@@ -19,8 +19,9 @@ package jsonline
 
 import (
 	"bufio"
-	"encoding/json"
 	"io"
+
+	json "github.com/goccy/go-json"
 
 	over "github.com/adrienaury/zeromdc"
 	"github.com/cgi-fr/pimo/pkg/model"
@@ -126,26 +127,11 @@ func (s Sink) ProcessDictionary(dictionary model.Entry) error {
 // JSONToDictionary return a model.Dictionary from a jsonline
 func JSONToDictionary(jsonline []byte) (model.Dictionary, error) {
 	dict := model.NewDictionary()
-
-	err := json.Unmarshal(jsonline, &dict)
-	if err != nil {
-		return model.NewDictionary(), err
-	}
-
-	return model.CleanDictionary(dict), nil
+	return dict, dict.UnmarshalJSON(jsonline)
 }
 
 // JSONToPackedDictionary return a packed model.Dictionary from a jsonline
 func JSONToPackedDictionary(jsonline []byte) (model.Dictionary, error) {
-	dict := model.NewDictionary()
-
-	err := json.Unmarshal(jsonline, &dict)
-	if err != nil {
-		return model.NewDictionary(), err
-	}
-
-	// packer
-	root := dict.Pack().With("original", string(jsonline))
-
-	return model.CleanDictionary(root), nil
+	dict, err := JSONToDictionary(jsonline)
+	return dict.Pack().With("original", string(jsonline)), err
 }
