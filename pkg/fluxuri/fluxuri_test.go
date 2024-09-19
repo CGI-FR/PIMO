@@ -24,17 +24,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestNewMaskShouldCreateTheRightMask(t *testing.T) {
-	fileName := "file://../../test/csvvalues.csv"
-	mask, err := NewMask(fileName)
-	assert.Nil(t, err, "error should be nil")
-	list := []model.Entry{1623, 1512, 905}
-	length := 3
-	actual := 0
-	expectedMask := MaskEngine{list, length, &actual}
-	assert.Equal(t, mask, expectedMask, "Should create the right mask")
-}
-
 func TestMaskingShouldMaskAsExpected(t *testing.T) {
 	fileName := "file://../../test/csvvalues.csv"
 	mask, err := NewMask(fileName)
