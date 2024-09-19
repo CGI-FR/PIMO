@@ -21,10 +21,9 @@ import (
 	"bufio"
 	"io"
 
-	json "github.com/goccy/go-json"
-
 	over "github.com/adrienaury/zeromdc"
 	"github.com/cgi-fr/pimo/pkg/model"
+	"github.com/goccy/go-json"
 )
 
 // NewSource creates a new Source.
@@ -127,7 +126,10 @@ func (s Sink) ProcessDictionary(dictionary model.Entry) error {
 // JSONToDictionary return a model.Dictionary from a jsonline
 func JSONToDictionary(jsonline []byte) (model.Dictionary, error) {
 	dict := model.NewDictionary()
-	return dict, dict.UnmarshalJSON(jsonline)
+
+	err := dict.UnmarshalJSON(jsonline)
+
+	return model.CleanDictionary(dict), err
 }
 
 // JSONToPackedDictionary return a packed model.Dictionary from a jsonline
