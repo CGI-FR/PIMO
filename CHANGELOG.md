@@ -16,8 +16,10 @@ Types of changes
 
 ## [1.27.0]
 
-- `Added` parameter `maxstrlen` to `sha3` and `haqhInCSV` masks
-- `Fixed` type casting issues when using `add`, `add-transient`, `choice` or `hash` to create complex structures
+- `Added` parameter `maxstrlen` to `sha3` and `hashInCSV` masks
+- `Fixed` type casting issues when using `add`, `add-transient`, `choice`, `weightedChoice` or `hash` to create complex structures
+- `Fixed` performance issue with `pipe` mask
+- `Fixed` performance issue with selectors
 
 ## [1.26.2]
 
