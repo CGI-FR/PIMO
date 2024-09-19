@@ -36,7 +36,6 @@ type MaskEngine struct {
 	rand            *rand.Rand
 	seeder          model.Seeder
 	template        *template.Template
-	cache           map[string][][]string
 	header          bool
 	sep             rune
 	comment         rune
@@ -56,7 +55,7 @@ func NewMask(conf model.ChoiceInCSVType, seed int64, seeder model.Seeder) (MaskE
 		comment, _ = utf8.DecodeRune([]byte(conf.Comment))
 	}
 	// nolint: gosec
-	return MaskEngine{rand.New(rand.NewSource(seed)), seeder, template, map[string][][]string{}, conf.Header, sep, comment, conf.FieldsPerRecord, conf.TrimSpace}, err
+	return MaskEngine{rand.New(rand.NewSource(seed)), seeder, template, conf.Header, sep, comment, conf.FieldsPerRecord, conf.TrimSpace}, err
 }
 
 // Mask choose a mask value randomly
@@ -82,22 +81,15 @@ func (mrl MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.En
 	}
 	filename := output.String()
 
-	var records [][]string
-	if recordsFromCache, ok := mrl.cache[filename]; ok {
-		records = recordsFromCache
-	} else {
-		recordsFromFile, err := uri.ReadCsv(filename, mrl.sep, mrl.comment, mrl.fieldsPerRecord, mrl.trimSpaces)
-		if err != nil {
-			return nil, err
-		}
-		mrl.cache[filename] = recordsFromFile
-		records = recordsFromFile
+	records, err := uri.ReadCsv(filename, mrl.sep, mrl.comment, mrl.fieldsPerRecord, mrl.trimSpaces)
+	if err != nil {
+		return nil, err
 	}
 
 	if mrl.header {
-		record := records[1:][mrl.rand.Intn(len(records)-1)]
+		record := records.Get(mrl.rand.Intn(records.Len()-1) + 1)
 		obj := model.NewDictionary()
-		headers := records[0]
+		headers := records.Get(0)
 		for i, header := range headers {
 			if mrl.trimSpaces {
 				obj.Set(strings.TrimSpace(header), strings.TrimSpace(record[i]))
@@ -107,7 +99,7 @@ func (mrl MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.En
 		}
 		return obj, nil
 	} else {
-		record := records[mrl.rand.Intn(len(records))]
+		record := records.Get(mrl.rand.Intn(records.Len()))
 		obj := model.NewDictionary()
 		for i, value := range record {
 			if mrl.trimSpaces {

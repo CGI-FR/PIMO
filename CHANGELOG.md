@@ -20,6 +20,7 @@ Types of changes
 - `Fixed` type casting issues when using `add`, `add-transient`, `choice`, `weightedChoice` or `hash` to create complex structures
 - `Fixed` performance issue with `pipe` mask
 - `Fixed` performance issue with selectors
+- `Fixed` CSV resources will be loaded in memory only once instead of once per mask
 
 ## [1.26.2]
 

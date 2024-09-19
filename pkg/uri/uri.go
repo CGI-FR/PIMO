@@ -33,11 +33,38 @@ import (
 
 var MaxCapacityForEachLine = bufio.MaxScanTokenSize
 
-func ReadCsv(uri string, sep rune, comment rune, fieldsPerRecord int, trimLeadingSpaces bool) ([][]string, error) {
+type Records[T string | []string] interface {
+	Len() int
+	Get(idx int) T
+}
+
+type CSVRecords Records[[]string]
+
+type records[T string | []string] struct {
+	cache []T
+}
+
+func (r records[T]) Len() int {
+	return len(r.cache)
+}
+
+func (r records[T]) Get(idx int) T {
+	return r.cache[idx]
+}
+
+var cacheCSV map[string]records[[]string] = map[string]records[[]string]{}
+
+func ReadCsv(uri string, sep rune, comment rune, fieldsPerRecord int, trimLeadingSpaces bool) (CSVRecords, error) {
+	if records, present := cacheCSV[uri]; present {
+		return records, nil
+	}
+
 	u, err := url.Parse(uri)
 	if err != nil {
 		return nil, err
 	}
+
+	var result records[[]string]
 
 	switch u.Scheme {
 	case "file":
@@ -53,12 +80,12 @@ func ReadCsv(uri string, sep rune, comment rune, fieldsPerRecord int, trimLeadin
 		csvReader.FieldsPerRecord = fieldsPerRecord
 		csvReader.TrimLeadingSpace = trimLeadingSpaces
 
-		records, err := csvReader.ReadAll()
+		r, err := csvReader.ReadAll()
 		if err != nil {
 			return nil, err
 		}
 
-		return records, nil
+		result = records[[]string]{r}
 	case "http", "https":
 		rep, err := http.Get(uri) //nolint:gosec
 		if err != nil {
@@ -72,15 +99,15 @@ func ReadCsv(uri string, sep rune, comment rune, fieldsPerRecord int, trimLeadin
 		csvReader.FieldsPerRecord = fieldsPerRecord
 		csvReader.TrimLeadingSpace = trimLeadingSpaces
 
-		records, err := csvReader.ReadAll()
+		r, err := csvReader.ReadAll()
 		if err != nil {
 			return nil, err
 		}
 
-		return records, nil
+		result = records[[]string]{r}
 	}
 
-	return nil, nil
+	return result, nil
 }
 
 func Read(uri string) ([]model.Entry, error) {
