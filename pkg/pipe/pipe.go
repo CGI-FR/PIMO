@@ -55,25 +55,22 @@ func NewMask(seed int64, injectParent string, injectRoot string, caches map[stri
 	return MaskEngine{"", pipeline, injectParent, injectRoot}, err
 }
 
-func (me MaskEngine) MaskContext(e model.Dictionary, key string, context ...model.Dictionary) (model.Dictionary, error) {
+func (me MaskEngine) MaskContext(entry model.Dictionary, key string, context ...model.Dictionary) (model.Dictionary, error) {
 	log.Info().Msg("Mask pipe")
 	var result []model.Entry
 	input := []model.Dictionary{}
 
-	copy := model.CopyDictionary(e)
-
-	value, ok := e.GetValue(key)
+	value, ok := entry.GetValue(key)
 	if !ok || value == nil {
-		return copy, nil
+		return entry, nil
 	}
 
-	for _, elemInput := range model.CleanDictionarySlice(e.Get(key)) {
+	for _, elemInput := range model.CleanDictionarySlice(entry.Get(key)) {
 		if len(me.injectParent) > 0 {
-			elemInput.Set(me.injectParent, copy)
+			elemInput.Set(me.injectParent, entry)
 		}
 		if len(me.injectRoot) > 0 {
-			rootcopy := model.CopyDictionary(context[0])
-			elemInput.Set(me.injectRoot, rootcopy)
+			elemInput.Set(me.injectRoot, model.CopyDictionary(context[0]))
 		}
 		input = append(input, elemInput)
 	}
@@ -84,7 +81,7 @@ func (me MaskEngine) MaskContext(e model.Dictionary, key string, context ...mode
 	if len(me.source) > 0 {
 		over.MDC().Set("config", me.source)
 	}
-	// TODO: possible refactoring
+	// possible refactoring
 	// model.NewSourceFromSlice(input).
 	//			Process(model.NewCounterProcessWithCallback("input-line", 1, updateContext)).
 	//			Process(me.pipeline).
@@ -99,7 +96,7 @@ func (me MaskEngine) MaskContext(e model.Dictionary, key string, context ...mode
 	over.MDC().Set("path", savePath)
 	over.MDC().Set("context", saveContext)
 	if err != nil {
-		return model.NewDictionary(), err
+		return entry, err
 	}
 	for _, dict := range result {
 		if len(me.injectParent) > 0 {
@@ -109,8 +106,8 @@ func (me MaskEngine) MaskContext(e model.Dictionary, key string, context ...mode
 			dict.(model.Dictionary).Delete(me.injectRoot)
 		}
 	}
-	copy.Set(key, result)
-	return copy, nil
+	entry.Set(key, result)
+	return entry, nil
 }
 
 // Factory create a mask from a configuration
