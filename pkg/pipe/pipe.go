@@ -60,7 +60,8 @@ func (me MaskEngine) MaskContext(e model.Dictionary, key string, context ...mode
 	var result []model.Entry
 	input := []model.Dictionary{}
 
-	copy := model.CopyDictionary(e)
+	// copy := model.CopyDictionary(e)
+	copy := e
 
 	value, ok := e.GetValue(key)
 	if !ok || value == nil {
@@ -99,7 +100,7 @@ func (me MaskEngine) MaskContext(e model.Dictionary, key string, context ...mode
 	over.MDC().Set("path", savePath)
 	over.MDC().Set("context", saveContext)
 	if err != nil {
-		return model.NewDictionary(), err
+		return copy, err
 	}
 	for _, dict := range result {
 		if len(me.injectParent) > 0 {

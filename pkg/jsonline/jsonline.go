@@ -126,9 +126,7 @@ func (s Sink) ProcessDictionary(dictionary model.Entry) error {
 // JSONToDictionary return a model.Dictionary from a jsonline
 func JSONToDictionary(jsonline []byte) (model.Dictionary, error) {
 	dict := model.NewDictionary()
-
 	err := dict.UnmarshalJSON(jsonline)
-
 	return model.CleanDictionary(dict), err
 }
 
