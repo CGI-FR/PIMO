@@ -74,7 +74,6 @@ func NewMask(conf model.FindInCSVType, seed int64, seeder model.Seeder) (MaskEng
 			tmpl.FuncMap{},
 			seed,
 			"")
-
 		if err != nil {
 			return MaskEngine{}, err
 		}
@@ -98,7 +97,6 @@ func NewMask(conf model.FindInCSVType, seed int64, seeder model.Seeder) (MaskEng
 			tmpl.FuncMap{},
 			seed,
 			"")
-
 		if err != nil {
 			return MaskEngine{}, err
 		}
@@ -283,13 +281,14 @@ func (me *MaskEngine) getExactMatchCsvResult(filename string, csvList []model.Di
 	return nil
 }
 
-func (me *MaskEngine) createEntriesFromCSVLines(records [][]string) []model.Dictionary {
+func (me *MaskEngine) createEntriesFromCSVLines(records uri.CSVRecords) []model.Dictionary {
 	results := []model.Dictionary{}
 
-	for _, record := range records {
+	for i := 0; i < records.Len(); i++ {
+		record := records.Get(i)
 		if me.header {
 			obj := model.NewDictionary()
-			headers := records[0]
+			headers := records.Get(0)
 			for i, header := range headers {
 				if me.trimSpaces {
 					obj.Set(strings.TrimSpace(header), strings.TrimSpace(record[i]))

@@ -60,7 +60,7 @@ func Factory(conf model.MaskFactoryConfiguration) (model.MaskEngine, bool, error
 	}
 	if len(conf.Masking.Mask.HashInURI) != 0 {
 		list, err := uri.Read(conf.Masking.Mask.HashInURI)
-		return MaskEngine{list}, true, err
+		return MaskEngine{list.Collect()}, true, err
 	}
 	return nil, false, nil
 }
@@ -83,7 +83,7 @@ func FuncInUri(seed int64, seedField string) interface{} {
 		if err != nil {
 			return nil, err
 		}
-		mask := NewMask(list)
+		mask := NewMask(list.Collect())
 		return mask.Mask(input)
 	}
 }

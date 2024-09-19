@@ -25,9 +25,8 @@ import (
 
 // MaskEngine is a list of value to mask in order from a list
 type MaskEngine struct {
-	List    []model.Entry
-	LenList int
-	Actual  *int
+	List   uri.EntryRecords
+	Actual *int
 }
 
 // NewMask returns a MaskEngine from a file
@@ -36,16 +35,15 @@ func NewMask(name string) (MaskEngine, error) {
 	if err != nil {
 		return MaskEngine{}, err
 	}
-	length := len(list)
 	actual := 0
-	return MaskEngine{list, length, &actual}, nil
+	return MaskEngine{list, &actual}, nil
 }
 
 // MaskContext add the field if not existing or replace the value if existing
 func (me MaskEngine) MaskContext(context model.Dictionary, key string, contexts ...model.Dictionary) (model.Dictionary, error) {
 	log.Info().Msg("Mask fluxuri")
-	if *me.Actual < me.LenList {
-		context.Set(key, me.List[*me.Actual])
+	if *me.Actual < me.List.Len() {
+		context.Set(key, me.List.Get(*me.Actual))
 		*me.Actual++
 	}
 	return context, nil

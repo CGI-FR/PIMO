@@ -31,7 +31,7 @@ func TestUriReaderShouldCreateListFromDoc(t *testing.T) {
 		assert.Fail(t, err.Error())
 	}
 	waitedList := []model.Entry{"Mickael", "Marc", "Benjamin"}
-	assert.Equal(t, waitedList, nameList, "Should return the right list")
+	assert.Equal(t, waitedList, nameList.Collect(), "Should return the right list")
 }
 
 func TestUriReaderShouldCreateListFromLink(t *testing.T) {
@@ -41,7 +41,7 @@ func TestUriReaderShouldCreateListFromLink(t *testing.T) {
 		assert.Fail(t, err.Error())
 	}
 	waitedList := []model.Entry{"Mickael", "Marc", "Benjamin"}
-	assert.Equal(t, waitedList, nameList, "Should return the right list")
+	assert.Equal(t, waitedList, nameList.Collect(), "Should return the right list")
 }
 
 func TestUriReaderShouldCreateListFromInsideFiles(t *testing.T) {
@@ -52,6 +52,6 @@ func TestUriReaderShouldCreateListFromInsideFiles(t *testing.T) {
 	// nolint: gocritic
 	waitedList := append(maskingdata.NameFRM, maskingdata.NameFRF...)
 	for i := range waitedList {
-		assert.Equal(t, waitedList[i], nameList[i], "Should return the right list")
+		assert.Equal(t, waitedList[i], nameList.Get(i), "Should return the right list")
 	}
 }

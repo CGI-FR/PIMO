@@ -45,7 +45,8 @@ func NewMask(seed int64, seeder model.Seeder, name, separator string, maxSize, o
 	}
 	//nolint: gosec
 	chain := NewChain(order, rand.New(rand.NewSource(seed)), separator)
-	for _, el := range list {
+	for i := 0; i < list.Len(); i++ {
+		el := list.Get(i)
 		s := strings.Split(el.(string), separator)
 		chain.Add(s)
 	}
