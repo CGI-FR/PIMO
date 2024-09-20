@@ -18,9 +18,8 @@
 package parquet
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
+	"os"
 	"testing"
 
 	"github.com/cgi-fr/pimo/pkg/model"
@@ -50,23 +49,37 @@ func TestSourceReturnDictionary(t *testing.T) {
 }
 
 func TestSinkWriteDictionary(t *testing.T) {
-	source := model.NewDictionary().With("name", "Benjamin").With("age", json.Number("35"))
+	pathIn := "testdata/alltypes_plain.parquet"
+	pathOut := "/tmp/test.parquet"
 
-	result := bytes.Buffer{}
+	source := NewSource(pathIn)
+	source.Open()
+	schema := source.file.Schema()
 
-	schema := parquet.Group{
-		"name": parquet.String(),
-		"age":  parquet.Int(16),
-	}
+	source = NewSource(pathIn)
 
-	err := model.NewPipelineFromSlice([]model.Dictionary{source}).AddSink(NewSink(&result, schema)).Run()
+	fileWriter, _ := os.Create(pathOut)
 
-	file := bytes.NewReader(result.Bytes())
-
-	rows, err := parquet.Read[any](file, file.Size())
+	err := model.
+		NewPipeline(source).
+		AddSink(NewSink(fileWriter, schema)).
+		Run()
 	assert.Nil(t, err)
 
+	fileWriter.Close()
+
+	file, err := os.Open(pathOut)
+	assert.Nil(t, err)
+
+	stat, err := os.Stat(pathOut)
+	assert.Nil(t, err)
+
+	rows, err := parquet.Read[any](file, stat.Size(), schema)
+	assert.Nil(t, err)
+
+	assert.Len(t, rows, 1)
+
 	for _, row := range rows {
-		fmt.Printf("%q\n", row)
+		fmt.Printf("%v\n", row)
 	}
 }

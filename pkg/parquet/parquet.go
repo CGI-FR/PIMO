@@ -19,19 +19,21 @@ package parquet
 
 import (
 	"errors"
+	"fmt"
 	"io"
 	"os"
 
 	over "github.com/adrienaury/zeromdc"
 	"github.com/cgi-fr/pimo/pkg/model"
 	"github.com/parquet-go/parquet-go"
+	"github.com/parquet-go/parquet-go/deprecated"
 	"github.com/rs/zerolog/log"
 )
 
 const BufferSize = 4
 
 // NewSource creates a new Source.
-func NewSource(path string) model.Source {
+func NewSource(path string) *Source {
 	return &Source{path, nil, make([]parquet.Row, BufferSize), nil, 0, 0, false, model.NewDictionary(), nil, false, 0}
 }
 
@@ -195,15 +197,46 @@ func (s Sink) Open() error {
 
 func (s Sink) ProcessDictionary(dictionary model.Entry) error {
 	log.Trace().Msg("write to parquet")
+
+	dico, ok := dictionary.(model.Dictionary)
+
+	if !ok {
+		return errors.New("Can't write entry that not dictonary")
+	}
+
 	rowBuilder := parquet.NewRowBuilder(s.schema)
-	rowBuilder.Add(0, parquet.ByteArrayValue([]byte("test")))
-	rowBuilder.Add(0, parquet.Int32Value(2))
+
+	for columnIndex, field := range s.schema.Fields() {
+		entry, ok := dico.GetValue(field.Name())
+
+		if !ok {
+			return fmt.Errorf("Can't find %s in dictionary", field.Name())
+		}
+
+		switch field.Type() {
+		case parquet.ByteArrayType:
+			rowBuilder.Add(columnIndex, parquet.ByteArrayValue([]byte(entry.(string))))
+		case parquet.DoubleType:
+			rowBuilder.Add(columnIndex, parquet.DoubleValue(entry.(float64)))
+		case parquet.FloatType:
+			rowBuilder.Add(columnIndex, parquet.FloatValue(entry.(float32)))
+		case parquet.Int96Type:
+			rowBuilder.Add(columnIndex, parquet.Int96Value(deprecated.Int64ToInt96(int64(entry.(float64)))))
+		case parquet.Int64Type:
+			rowBuilder.Add(columnIndex, parquet.Int64Value(int64(entry.(float64))))
+		case parquet.Int32Type:
+			rowBuilder.Add(columnIndex, parquet.Int32Value(entry.(int32)))
+		case parquet.BooleanType:
+			rowBuilder.Add(columnIndex, parquet.BooleanValue(entry.(bool)))
+		default:
+			return fmt.Errorf("can't find how to tranform %s", field.Type())
+		}
+
+	}
 
 	writer := parquet.NewWriter(s.file, parquet.NewSchema("test", s.schema))
 	row := rowBuilder.Row()
 	_, err := writer.WriteRows([]parquet.Row{row})
 
-	writer.Flush()
-	writer.Close()
 	return err
 }
