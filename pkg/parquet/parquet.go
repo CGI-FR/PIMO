@@ -166,53 +166,44 @@ func (s *Source) Err() error {
 }
 
 // NewSink creates a new Sink.
-func NewSink(file io.Writer) model.SinkProcess {
-	return Sink{file, ""}
+func NewSink(file io.Writer, schema parquet.Node) model.SinkProcess {
+	return Sink{file, parquet.Writer{}, "", schema}
 }
 
 // NewSinkWithContext creates a new Sink.
-func NewSinkWithContext(file io.Writer, counter string) model.SinkProcess {
+func NewSinkWithContext(file io.Writer, counter string, schema parquet.Node) model.SinkProcess {
 	over.MDC().Set(counter, 1)
-	return Sink{file, counter}
+	return Sink{file, parquet.Writer{}, counter, schema}
 }
 
 type Sink struct {
 	file    io.Writer
+	writer  parquet.Writer
 	counter string
+	schema  parquet.Node
 }
 
 func (s Sink) Open() error {
+	config, err := parquet.NewWriterConfig()
+	if err != nil {
+		return err
+	}
+
+	s.writer = *parquet.NewWriter(s.file, config)
 	return nil
 }
 
 func (s Sink) ProcessDictionary(dictionary model.Entry) error {
-	if len(s.counter) > 0 {
-		value, exists := over.MDC().Get(s.counter)
-		if !exists {
-			return nil
-		}
+	log.Trace().Msg("write to parquet")
+	rowBuilder := parquet.NewRowBuilder(s.schema)
+	rowBuilder.Add(0, parquet.ByteArrayValue([]byte("test")))
+	rowBuilder.Add(0, parquet.Int32Value(2))
 
-		if counter, ok := value.(int); ok {
-			over.MDC().Set(s.counter, counter+1)
-		}
-	}
+	writer := parquet.NewWriter(s.file, parquet.NewSchema("test", s.schema))
+	row := rowBuilder.Row()
+	_, err := writer.WriteRows([]parquet.Row{row})
 
-	return nil
-}
-
-// JSONToDictionary return a model.Dictionary from a jsonline
-func JSONToDictionary(jsonline []byte) (model.Dictionary, error) {
-	dict := model.NewDictionary()
-
-	return model.CleanDictionary(dict), nil
-}
-
-// JSONToPackedDictionary return a packed model.Dictionary from a jsonline
-func JSONToPackedDictionary(jsonline []byte) (model.Dictionary, error) {
-	dict := model.NewDictionary()
-
-	// packer
-	root := dict.Pack().With("original", string(jsonline))
-
-	return model.CleanDictionary(root), nil
+	writer.Flush()
+	writer.Close()
+	return err
 }

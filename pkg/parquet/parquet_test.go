@@ -18,9 +18,13 @@
 package parquet
 
 import (
+	"bytes"
+	"encoding/json"
+	"fmt"
 	"testing"
 
 	"github.com/cgi-fr/pimo/pkg/model"
+	"github.com/parquet-go/parquet-go"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -43,4 +47,26 @@ func TestSourceReturnDictionary(t *testing.T) {
 	assert.Equal(t, "03/01/09", document.Get("date_string_col"))
 	assert.Equal(t, "0", document.Get("string_col"))
 	// assert.Equal(t, int64(0), document.Get("timestamp_col"))
+}
+
+func TestSinkWriteDictionary(t *testing.T) {
+	source := model.NewDictionary().With("name", "Benjamin").With("age", json.Number("35"))
+
+	result := bytes.Buffer{}
+
+	schema := parquet.Group{
+		"name": parquet.String(),
+		"age":  parquet.Int(16),
+	}
+
+	err := model.NewPipelineFromSlice([]model.Dictionary{source}).AddSink(NewSink(&result, schema)).Run()
+
+	file := bytes.NewReader(result.Bytes())
+
+	rows, err := parquet.Read[any](file, file.Size())
+	assert.Nil(t, err)
+
+	for _, row := range rows {
+		fmt.Printf("%q\n", row)
+	}
 }
