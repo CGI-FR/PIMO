@@ -126,7 +126,11 @@ func (ctx *Context) Configure(cfg Config) error {
 		ctx.source = model.NewSourceFromSlice([]model.Dictionary{cfg.SingleInput.Pack()})
 	case cfg.Parquet != "":
 		over.MDC().Set("context", "stdin/parquet")
-		ctx.source = parquet.NewPackedSource(cfg.Parquet)
+		source, err := parquet.NewPackedSource(cfg.Parquet)
+		if err != nil {
+			return err
+		}
+		ctx.source = source
 	default:
 		over.MDC().Set("context", "stdin")
 		ctx.source = jsonline.NewPackedSource(os.Stdin)

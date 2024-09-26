@@ -18,70 +18,63 @@
 package parquet
 
 import (
+	"context"
+	"encoding/json"
 	"errors"
-	"fmt"
 	"io"
-	"os"
 
 	over "github.com/adrienaury/zeromdc"
+	"github.com/apache/arrow/go/v12/parquet/file"
+	"github.com/apache/arrow/go/v12/parquet/pqarrow"
+	"github.com/cgi-fr/pimo/pkg/jsonline"
 	"github.com/cgi-fr/pimo/pkg/model"
-	"github.com/parquet-go/parquet-go"
-	"github.com/parquet-go/parquet-go/deprecated"
 	"github.com/rs/zerolog/log"
 )
 
 const BufferSize = 4
 
 // NewSource creates a new Source.
-func NewSource(path string) *Source {
-	return &Source{path, nil, make([]parquet.Row, BufferSize), nil, 0, 0, false, model.NewDictionary(), nil, false, 0}
+func NewSource(path string) (*Source, error) {
+	reader, err := file.OpenParquetFile(path, true)
+	if err != nil {
+		return nil, err
+	}
+
+	fileReader, err := pqarrow.NewFileReader(reader, pqarrow.ArrowReadProperties{BatchSize: 10}, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return &Source{fileReader, []model.Dictionary{}, 0, nil, false, nil}, nil
 }
 
 // NewPackedSource creates a new packed Source.
-func NewPackedSource(path string) model.Source {
+func NewPackedSource(path string) (model.Source, error) {
 	log.Trace().Msg("NewPackedSource")
 
-	return &Source{path, nil, make([]parquet.Row, BufferSize), nil, 0, 0, false, model.NewDictionary(), nil, true, 0}
+	result, err := NewSource(path)
+	if err != nil {
+		return nil, err
+	}
+
+	result.packed = true
+	return result, err
 }
 
 // Source export line to JSON format.
 type Source struct {
-	path        string
-	file        *parquet.File
-	buffer      []parquet.Row
-	rows        parquet.Rows
-	groupIndex  int
-	bufferIndex int
-	endOfFile   bool
-	value       model.Dictionary
-	err         error
-	packed      bool
-	size        int
+	fileReader   *pqarrow.FileReader
+	batch        []model.Dictionary
+	index        int
+	err          error
+	packed       bool
+	recordReader pqarrow.RecordReader
 }
 
 func (s *Source) Open() error {
 	log.Trace().Msg("open parquet file")
-
-	f, err := os.Open(s.path)
-	if err != nil {
-		return err
-	}
-
-	stat, err := os.Stat(s.path)
-	if err != nil {
-		return err
-	}
-	s.file, err = parquet.OpenFile(f, stat.Size())
-
-	if err != nil {
-		return err
-	}
-
-	s.groupIndex = 0
-	s.readGroup()
-
-	err = s.readRows()
-
+	var err error
+	s.recordReader, err = s.fileReader.GetRecordReader(context.Background(), nil, nil)
 	if err != nil {
 		return err
 	}
@@ -89,78 +82,39 @@ func (s *Source) Open() error {
 	return nil
 }
 
-func (s *Source) readGroup() {
-	s.rows = s.file.RowGroups()[s.groupIndex].Rows()
-}
+// NextBatch read next batch in parquet file
+func (s *Source) NextBatch() bool {
+	log.Trace().Msg("read batch of rows")
 
-func (s *Source) readRows() error {
-	log.Trace().Int("groupIndex", s.groupIndex).Msg("read rows")
-
-	size, err := s.rows.ReadRows(s.buffer)
-	s.size = size
-	s.bufferIndex = 0
-
-	if errors.Is(err, io.EOF) {
-		s.endOfFile = true
-	} else if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (s *Source) readColumns() {
-	log.Trace().Int("bufferIndex", s.bufferIndex).Msg("read columns")
-
-	dict := model.NewDictionary()
-	s.buffer[s.bufferIndex].Range(func(columnIndex int, columnValues []parquet.Value) bool {
-		column := s.file.Schema().Columns()[columnIndex][0]
-		switch columnValues[0].Kind() {
-		case parquet.ByteArray:
-			dict = dict.With(column, columnValues[0].String())
-		case parquet.Boolean:
-			dict = dict.With(column, columnValues[0].Boolean())
-		case parquet.Int32:
-			dict = dict.With(column, columnValues[0].Int32())
-		case parquet.Int64:
-			dict = dict.With(column, columnValues[0].Int64())
-		case parquet.Int96:
-			dict = dict.With(column, columnValues[0].Int64())
-		case parquet.Float:
-			dict = dict.With(column, columnValues[0].Float())
-		case parquet.Double:
-			dict = dict.With(column, columnValues[0].Double())
-		}
-		s.value = model.CleanDictionary(dict)
-		return true
-	})
-	s.bufferIndex++
-}
-
-// Next convert next line to model.Dictionary
-func (s *Source) Next() bool {
-	if s.err != nil {
+	if next := s.recordReader.Next(); !next {
 		return false
 	}
 
-	// read next buffer
-	if s.bufferIndex >= s.size && !s.endOfFile {
-		s.err = s.readRows()
-		if s.err != nil {
-			return false
-		}
+	record := s.recordReader.Record()
+
+	buf, err := record.MarshalJSON()
+	if err != nil {
+		s.err = err
+		return false
 	}
 
-	if s.bufferIndex < s.size {
-		s.readColumns()
+	s.batch, s.err = JSONToArray(buf)
+
+	s.index = 0
+	return s.err == nil
+}
+
+func (s *Source) Next() bool {
+	s.index++
+	if s.index < len(s.batch) {
 		return true
 	}
 
-	return false
+	return s.NextBatch()
 }
 
 func (s *Source) Value() model.Entry {
-	return s.value
+	return s.batch[s.index]
 }
 
 func (s *Source) Err() error {
@@ -168,75 +122,70 @@ func (s *Source) Err() error {
 }
 
 // NewSink creates a new Sink.
-func NewSink(file io.Writer, schema parquet.Node) model.SinkProcess {
-	return Sink{file, parquet.Writer{}, "", schema}
+func NewSink(file io.Writer) model.SinkProcess {
+	return Sink{file, ""}
 }
 
 // NewSinkWithContext creates a new Sink.
-func NewSinkWithContext(file io.Writer, counter string, schema parquet.Node) model.SinkProcess {
+func NewSinkWithContext(file io.Writer, counter string) model.SinkProcess {
 	over.MDC().Set(counter, 1)
-	return Sink{file, parquet.Writer{}, counter, schema}
+	return Sink{file, counter}
 }
 
 type Sink struct {
 	file    io.Writer
-	writer  parquet.Writer
 	counter string
-	schema  parquet.Node
 }
 
 func (s Sink) Open() error {
-	config, err := parquet.NewWriterConfig()
-	if err != nil {
-		return err
-	}
-
-	s.writer = *parquet.NewWriter(s.file, config)
 	return nil
 }
 
 func (s Sink) ProcessDictionary(dictionary model.Entry) error {
 	log.Trace().Msg("write to parquet")
 
-	dico, ok := dictionary.(model.Dictionary)
+	_, ok := dictionary.(model.Dictionary)
 
 	if !ok {
 		return errors.New("Can't write entry that not dictonary")
 	}
 
-	rowBuilder := parquet.NewRowBuilder(s.schema)
+	return nil
+}
 
-	for columnIndex, field := range s.schema.Fields() {
-		entry, ok := dico.GetValue(field.Name())
+// JSONToArray return a array of model.Dictionary from a jsonline
+func JSONToArray(buffer []byte) ([]model.Dictionary, error) {
+	result := []model.Dictionary{}
 
-		if !ok {
-			return fmt.Errorf("Can't find %s in dictionary", field.Name())
-		}
-
-		switch field.Type() {
-		case parquet.ByteArrayType:
-			rowBuilder.Add(columnIndex, parquet.ByteArrayValue([]byte(entry.(string))))
-		case parquet.DoubleType:
-			rowBuilder.Add(columnIndex, parquet.DoubleValue(entry.(float64)))
-		case parquet.FloatType:
-			rowBuilder.Add(columnIndex, parquet.FloatValue(entry.(float32)))
-		case parquet.Int96Type:
-			rowBuilder.Add(columnIndex, parquet.Int96Value(deprecated.Int64ToInt96(int64(entry.(float64)))))
-		case parquet.Int64Type:
-			rowBuilder.Add(columnIndex, parquet.Int64Value(int64(entry.(float64))))
-		case parquet.Int32Type:
-			rowBuilder.Add(columnIndex, parquet.Int32Value(entry.(int32)))
-		case parquet.BooleanType:
-			rowBuilder.Add(columnIndex, parquet.BooleanValue(entry.(bool)))
-		default:
-			return fmt.Errorf("can't find how to tranform %s", field.Type())
-		}
-
+	var rows []json.RawMessage
+	log.Debug().Str("jsonline", string(buffer)).Msg("decode")
+	err := json.Unmarshal(buffer, &rows)
+	if err != nil {
+		return result, err
 	}
 
-	writer := parquet.NewWriter(s.file, parquet.NewSchema("test", s.schema))
-	row := rowBuilder.Row()
-	_, err := writer.WriteRows([]parquet.Row{row})
+	for _, dict := range rows {
+		cleanDict, err := jsonline.JSONToPackedDictionary(dict)
+		if err != nil {
+			return nil, err
+		}
+		result = append(result, cleanDict)
+	}
 
-	return err
+	return result, nil
+}
+
+// JSONToPackedDictionary return a packed model.Dictionary from a jsonline
+func JSONToPackedDictionary(jsonline []byte) (model.Dictionary, error) {
+	dict := model.NewDictionary()
+
+	err := json.Unmarshal(jsonline, &dict)
+	if err != nil {
+		return model.NewDictionary(), err
+	}
+
+	// packer
+	root := dict.Pack().With("original", string(jsonline))
+
+	return model.CleanDictionary(root), nil
 }

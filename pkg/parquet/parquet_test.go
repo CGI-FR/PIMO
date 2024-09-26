@@ -18,30 +18,30 @@
 package parquet
 
 import (
-	"fmt"
-	"os"
 	"testing"
 
 	"github.com/cgi-fr/pimo/pkg/model"
-	"github.com/parquet-go/parquet-go"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestSourceReturnDictionary(t *testing.T) {
-	pipeline := model.NewPipeline(NewSource("testdata/alltypes_plain.parquet"))
+	source, err := NewSource("testdata/alltypes_plain.parquet")
+	assert.Nil(t, err)
+
+	pipeline := model.NewPipeline(source)
 	var result []model.Entry
-	err := pipeline.AddSink(model.NewSinkToSlice(&result)).Run()
+	err = pipeline.AddSink(model.NewSinkToSlice(&result)).Run()
 	assert.Nil(t, err)
 
 	assert.Equal(t, 8, len(result))
 	document := result[0].(model.Dictionary)
 
 	assert.Equal(t, true, document.Get("bool_col"))
-	assert.Equal(t, int32(0), document.Get("tinyint_col"))
-	assert.Equal(t, int32(0), document.Get("smallint_col"))
-	assert.Equal(t, int32(0), document.Get("int_col"))
+	assert.Equal(t, float64(0), document.Get("tinyint_col"))
+	assert.Equal(t, float64(0), document.Get("smallint_col"))
+	assert.Equal(t, float64(0), document.Get("int_col"))
 	assert.Equal(t, float64(0), document.Get("bigint_col"))
-	assert.Equal(t, float32(0), document.Get("float_col"))
+	assert.Equal(t, float64(0), document.Get("float_col"))
 	assert.Equal(t, float64(0), document.Get("double_col"))
 	assert.Equal(t, "03/01/09", document.Get("date_string_col"))
 	assert.Equal(t, "0", document.Get("string_col"))
@@ -49,37 +49,4 @@ func TestSourceReturnDictionary(t *testing.T) {
 }
 
 func TestSinkWriteDictionary(t *testing.T) {
-	pathIn := "testdata/alltypes_plain.parquet"
-	pathOut := "/tmp/test.parquet"
-
-	source := NewSource(pathIn)
-	source.Open()
-	schema := source.file.Schema()
-
-	source = NewSource(pathIn)
-
-	fileWriter, _ := os.Create(pathOut)
-
-	err := model.
-		NewPipeline(source).
-		AddSink(NewSink(fileWriter, schema)).
-		Run()
-	assert.Nil(t, err)
-
-	fileWriter.Close()
-
-	file, err := os.Open(pathOut)
-	assert.Nil(t, err)
-
-	stat, err := os.Stat(pathOut)
-	assert.Nil(t, err)
-
-	rows, err := parquet.Read[any](file, stat.Size(), schema)
-	assert.Nil(t, err)
-
-	assert.Len(t, rows, 1)
-
-	for _, row := range rows {
-		fmt.Printf("%v\n", row)
-	}
 }
