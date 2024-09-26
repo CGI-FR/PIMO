@@ -93,7 +93,6 @@ type Context struct {
 	pdef                model.Definition
 	pipeline            model.Pipeline
 	source              model.Source
-	sink                model.SinkProcess
 	repeatCondition     string
 	repeatConditionMode string
 	caches              map[string]model.Cache
