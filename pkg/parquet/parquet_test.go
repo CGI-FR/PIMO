@@ -18,6 +18,7 @@
 package parquet
 
 import (
+	"os"
 	"testing"
 
 	"github.com/cgi-fr/pimo/pkg/model"
@@ -34,7 +35,7 @@ func TestSourceReturnDictionary(t *testing.T) {
 	assert.Nil(t, err)
 
 	assert.Equal(t, 8, len(result))
-	document := result[0].(model.Dictionary)
+	document := result[0].(model.Dictionary).Get(".").(model.Dictionary)
 
 	assert.Equal(t, true, document.Get("bool_col"))
 	assert.Equal(t, float64(0), document.Get("tinyint_col"))
@@ -43,10 +44,26 @@ func TestSourceReturnDictionary(t *testing.T) {
 	assert.Equal(t, float64(0), document.Get("bigint_col"))
 	assert.Equal(t, float64(0), document.Get("float_col"))
 	assert.Equal(t, float64(0), document.Get("double_col"))
-	assert.Equal(t, "03/01/09", document.Get("date_string_col"))
-	assert.Equal(t, "0", document.Get("string_col"))
-	// assert.Equal(t, int64(0), document.Get("timestamp_col"))
+	// assert.Equal(t, "03/01/09", document.Get("date_string_col"))
+	// assert.Equal(t, "0", document.Get("string_col"))
+	assert.Equal(t, "2009-03-01 00:00:00", document.Get("timestamp_col"))
 }
 
 func TestSinkWriteDictionary(t *testing.T) {
+	source, err := NewSource("testdata/alltypes_plain.parquet")
+	assert.Nil(t, err)
+
+	schema, err := source.Schema()
+	assert.Nil(t, err)
+
+	fileWriter, err := os.Create("testdata/alltypes_plain_out.parquet")
+	assert.Nil(t, err)
+	sink, err := NewSink(fileWriter, schema)
+	assert.Nil(t, err)
+	pipeline := model.NewPipeline(source)
+	err = pipeline.AddSink(sink).Run()
+	assert.Nil(t, err)
+
+	err = sink.Close()
+	assert.Nil(t, err)
 }

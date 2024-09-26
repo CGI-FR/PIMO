@@ -18,12 +18,16 @@
 package parquet
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
-	"errors"
+	"fmt"
 	"io"
 
 	over "github.com/adrienaury/zeromdc"
+	"github.com/apache/arrow/go/v12/arrow"
+	"github.com/apache/arrow/go/v12/arrow/array"
+	"github.com/apache/arrow/go/v12/arrow/memory"
 	"github.com/apache/arrow/go/v12/parquet/file"
 	"github.com/apache/arrow/go/v12/parquet/pqarrow"
 	"github.com/cgi-fr/pimo/pkg/jsonline"
@@ -49,7 +53,7 @@ func NewSource(path string) (*Source, error) {
 }
 
 // NewPackedSource creates a new packed Source.
-func NewPackedSource(path string) (model.Source, error) {
+func NewPackedSource(path string) (*Source, error) {
 	log.Trace().Msg("NewPackedSource")
 
 	result, err := NewSource(path)
@@ -69,6 +73,10 @@ type Source struct {
 	err          error
 	packed       bool
 	recordReader pqarrow.RecordReader
+}
+
+func (s *Source) Schema() (*arrow.Schema, error) {
+	return s.fileReader.Schema()
 }
 
 func (s *Source) Open() error {
@@ -122,18 +130,31 @@ func (s *Source) Err() error {
 }
 
 // NewSink creates a new Sink.
-func NewSink(file io.Writer) model.SinkProcess {
-	return Sink{file, ""}
+func NewSink(file io.Writer, schema *arrow.Schema) (Sink, error) {
+	mem := memory.NewCheckedAllocator(memory.DefaultAllocator)
+	writer, err := pqarrow.NewFileWriter(schema, file, nil, pqarrow.NewArrowWriterProperties(pqarrow.WithAllocator(mem)))
+	if err != nil {
+		return Sink{}, err
+	}
+
+	return Sink{writer, schema, ""}, nil
 }
 
 // NewSinkWithContext creates a new Sink.
-func NewSinkWithContext(file io.Writer, counter string) model.SinkProcess {
+func NewSinkWithContext(file io.Writer, schema *arrow.Schema, counter string) (Sink, error) {
 	over.MDC().Set(counter, 1)
-	return Sink{file, counter}
+	result, err := NewSink(file, schema)
+	if err != nil {
+		return result, err
+	}
+
+	result.counter = counter
+	return result, nil
 }
 
 type Sink struct {
-	file    io.Writer
+	file    *pqarrow.FileWriter
+	schema  *arrow.Schema
 	counter string
 }
 
@@ -141,13 +162,35 @@ func (s Sink) Open() error {
 	return nil
 }
 
+func (s Sink) Close() error {
+	return s.file.Close()
+}
+
 func (s Sink) ProcessDictionary(dictionary model.Entry) error {
 	log.Trace().Msg("write to parquet")
 
-	_, ok := dictionary.(model.Dictionary)
+	dico, ok := dictionary.(model.Dictionary)
 
 	if !ok {
-		return errors.New("Can't write entry that not dictonary")
+		return fmt.Errorf("Can't write entry that not dictonary %v", dictionary)
+	}
+
+	jsonline, err := json.Marshal(dico)
+	if err != nil {
+		return err
+	}
+
+	jsonReader := bytes.NewReader(jsonline)
+
+	reader := array.NewJSONReader(jsonReader, s.schema)
+
+	if !reader.Next() {
+		return fmt.Errorf("can't convert row to arrow schema")
+	}
+
+	err = s.file.WriteBuffered(reader.Record())
+	if err != nil {
+		return err
 	}
 
 	return nil

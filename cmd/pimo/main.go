@@ -75,7 +75,8 @@ var (
 	serve                 string
 	maxBufferCapacity     int
 	profiling             string
-	parquet               string
+	parquetInput          string
+	parquetOutput         string
 )
 
 func main() {
@@ -200,7 +201,9 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 				skipLineOnError = true
 				skipLogFile = catchErrors
 			}
-			parquet = args[0]
+			parquetInput = args[0]
+			parquetOutput = args[1]
+
 			run(cmd)
 		},
 	}
@@ -272,7 +275,8 @@ func run(cmd *cobra.Command) {
 		CachesToDump:     cachesToDump,
 		CachesToLoad:     cachesToLoad,
 		XMLCallback:      len(serve) > 0,
-		Parquet:          parquet,
+		ParquetInput:     parquetInput,
+		ParquetOutput:    parquetOutput,
 	}
 
 	var pdef model.Definition

@@ -84,7 +84,8 @@ type Config struct {
 	CachesToDump     map[string]string
 	CachesToLoad     map[string]string
 	XMLCallback      bool
-	Parquet          string
+	ParquetInput     string
+	ParquetOutput    string
 }
 
 type Context struct {
@@ -92,6 +93,7 @@ type Context struct {
 	pdef                model.Definition
 	pipeline            model.Pipeline
 	source              model.Source
+	sink                model.SinkProcess
 	repeatCondition     string
 	repeatConditionMode string
 	caches              map[string]model.Cache
@@ -124,9 +126,9 @@ func (ctx *Context) Configure(cfg Config) error {
 	case cfg.SingleInput != nil:
 		over.MDC().Set("context", "single-input")
 		ctx.source = model.NewSourceFromSlice([]model.Dictionary{cfg.SingleInput.Pack()})
-	case cfg.Parquet != "":
-		over.MDC().Set("context", "stdin/parquet")
-		source, err := parquet.NewPackedSource(cfg.Parquet)
+	case cfg.ParquetInput != "":
+		over.MDC().Set("context", "parquet")
+		source, err := parquet.NewPackedSource(cfg.ParquetInput)
 		if err != nil {
 			return err
 		}
@@ -182,8 +184,34 @@ func (ctx *Context) Execute(out io.Writer) (statistics.ExecutionStats, error) {
 	startTime := time.Now()
 
 	over.AddGlobalFields("output-line")
-	err := ctx.pipeline.AddSink(jsonline.NewSinkWithContext(out, "output-line")).Run()
 
+	var sink model.SinkProcess
+
+	switch {
+	case ctx.cfg.ParquetOutput != "":
+		parquetSource, ok := ctx.source.(*parquet.Source)
+		if !ok {
+			return statistics.WithErrorCode(5), fmt.Errorf("Source must be parquet")
+		}
+		schema, err := parquetSource.Schema()
+		if err != nil {
+			return statistics.WithErrorCode(6), fmt.Errorf("Can't read shema from source")
+		}
+		fileWriter, err := os.Create(ctx.cfg.ParquetOutput)
+		if err != nil {
+			return statistics.WithErrorCode(7), fmt.Errorf("Can't write file %s", ctx.cfg.ParquetOutput)
+		}
+		sink, err = parquet.NewSinkWithContext(fileWriter, schema, "output-line")
+		if err != nil {
+			return statistics.WithErrorCode(8), fmt.Errorf("Can't create parquet file %s : %v", ctx.cfg.ParquetOutput, err)
+		}
+	default:
+		sink = jsonline.NewSinkWithContext(out, "output-line")
+	}
+	err := ctx.pipeline.AddSink(sink).Run()
+	if ctx.cfg.ParquetOutput != "" {
+		sink.(parquet.Sink).Close()
+	}
 	// include duration info and stats in log output
 	duration := time.Since(startTime)
 	over.MDC().Set("duration", duration)
