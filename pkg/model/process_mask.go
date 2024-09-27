@@ -77,8 +77,7 @@ func (mep *MaskEngineProcess) ProcessDictionary(dictionary Dictionary, out Colle
 
 	if ret == nil {
 		out.Collect(result)
-		//nolint: nakedret
-		return
+		return nil
 	}
 
 	if ret != nil && skipLineOnError {

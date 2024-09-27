@@ -38,7 +38,6 @@ type MaskEngine struct {
 	rand            *rand.Rand
 	seeder          model.Seeder
 	template        *template.Template
-	cache           map[string][][]string
 	header          bool
 	sep             rune
 	comment         rune
@@ -51,6 +50,9 @@ type MaskEngine struct {
 // NewMask create a MaskRandomChoiceInCSV with a seed
 func NewMask(conf model.ChoiceInCSVType, seed int64, seeder model.Seeder) (MaskEngine, error) {
 	template, err := template.New("template-randomInCsv").Parse(conf.URI)
+	if err != nil {
+		return MaskEngine{}, err
+	}
 	sep := ','
 	if len(conf.Separator) > 0 {
 		sep, _ = utf8.DecodeRune([]byte(conf.Separator))
@@ -59,19 +61,19 @@ func NewMask(conf model.ChoiceInCSVType, seed int64, seeder model.Seeder) (MaskE
 	if len(conf.Comment) > 0 {
 		comment, _ = utf8.DecodeRune([]byte(conf.Comment))
 	}
+	genIdentifier, err := sha3.NewMask(conf.Identifier.Length, conf.Identifier.Resistance, conf.Identifier.Domain, conf.Identifier.MaxStrLen, seed, seeder)
 	// nolint: gosec
 	return MaskEngine{
 		rand:            rand.New(rand.NewSource(seed)),
 		seeder:          seeder,
 		template:        template,
-		cache:           map[string][][]string{},
 		header:          conf.Header,
 		sep:             sep,
 		comment:         comment,
 		fieldsPerRecord: conf.FieldsPerRecord,
 		trimSpaces:      conf.TrimSpace,
 		identifierField: conf.Identifier.Field,
-		identifierGen:   sha3.NewMask(conf.Identifier.Length, conf.Identifier.Resistance, conf.Identifier.Domain, seed, seeder),
+		identifierGen:   genIdentifier,
 	}, err
 }
 
@@ -102,20 +104,13 @@ func (mrl MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.En
 	}
 	filename := output.String()
 
-	var records [][]string
-	if recordsFromCache, ok := mrl.cache[filename]; ok {
-		records = recordsFromCache
-	} else {
-		recordsFromFile, err := uri.ReadCsv(filename, mrl.sep, mrl.comment, mrl.fieldsPerRecord, mrl.trimSpaces)
-		if err != nil {
-			return nil, err
-		}
-		mrl.cache[filename] = recordsFromFile
-		records = recordsFromFile
+	records, err := uri.ReadCsv(filename, mrl.sep, mrl.comment, mrl.fieldsPerRecord, mrl.trimSpaces)
+	if err != nil {
+		return nil, err
 	}
 
 	if mrl.header {
-		if len(records) < 2 {
+		if records.Len() < 2 {
 			log.Warn().Msg("empty CSV ressource")
 			return nil, fmt.Errorf("cannot mask with hashInCSV from empty CSV")
 		}
@@ -123,9 +118,9 @@ func (mrl MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.En
 		if _, err := h.Write([]byte(fmt.Sprintf("%v", e))); err != nil {
 			return nil, err
 		}
-		record := records[1:][int(h.Sum32())%(len(records)-1)]
+		record := records.Get(int(h.Sum32())%(records.Len()-1) + 1)
 		obj := model.NewDictionary()
-		headers := records[0]
+		headers := records.Get(0)
 		for i, header := range headers {
 			if mrl.trimSpaces {
 				obj.Set(strings.TrimSpace(header), strings.TrimSpace(record[i]))
@@ -135,7 +130,7 @@ func (mrl MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.En
 		}
 		return mrl.GenIdentifierIfNeeded(obj, e, context...)
 	} else {
-		if len(records) < 1 {
+		if records.Len() < 1 {
 			log.Warn().Msg("empty CSV ressource")
 			return nil, fmt.Errorf("cannot mask with hashInCSV from empty CSV")
 		}
@@ -143,7 +138,7 @@ func (mrl MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.En
 		if _, err := h.Write([]byte(fmt.Sprintf("%v", e))); err != nil {
 			return nil, err
 		}
-		record := records[int(h.Sum32())%len(records)]
+		record := records.Get(int(h.Sum32()) % records.Len())
 		obj := model.NewDictionary()
 		for i, value := range record {
 			if mrl.trimSpaces {

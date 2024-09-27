@@ -33,14 +33,13 @@ type MaskEngine struct {
 	rand     *rand.Rand
 	seeder   model.Seeder
 	template *template.Template
-	cache    map[string][]model.Entry
 }
 
 // NewMaskSeeded create a MaskRandomList with a seed
 func NewMask(templateSource string, seed int64, seeder model.Seeder) (MaskEngine, error) {
 	template, err := template.New("template-randomInUri").Parse(templateSource)
 	// nolint: gosec
-	return MaskEngine{rand.New(rand.NewSource(seed)), seeder, template, map[string][]model.Entry{}}, err
+	return MaskEngine{rand.New(rand.NewSource(seed)), seeder, template}, err
 }
 
 // Mask choose a mask value randomly
@@ -65,19 +64,12 @@ func (mrl MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.En
 		return nil, err
 	}
 	filename := output.String()
-	var list []model.Entry
-	if listFromCache, ok := mrl.cache[filename]; ok {
-		list = listFromCache
-	} else {
-		listFromFile, err := uri.Read(filename)
-		if err != nil {
-			return nil, err
-		}
-		mrl.cache[filename] = listFromFile
-		list = listFromFile
+	list, err := uri.Read(filename)
+	if err != nil {
+		return nil, err
 	}
 
-	return list[mrl.rand.Intn(len(list))], nil
+	return list.Get(mrl.rand.Intn(list.Len())), nil
 }
 
 // Factory create a mask from a yaml config

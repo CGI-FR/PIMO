@@ -35,12 +35,16 @@ type MaskEngine struct {
 	seeder model.Seeder
 }
 
-func NewMask(length int, resistance int, domain string, seed int64, seeder model.Seeder) MaskEngine {
+func NewMask(length int, resistance int, domain string, maxstrlen int, seed int64, seeder model.Seeder) (MaskEngine, error) {
 	if len(domain) < 2 {
 		domain = "0123456789abcdef"
 	}
 	if resistance > 0 {
 		length = lengthWithResistance(resistance)
+	}
+	var err error
+	if maxstrlen > 0 {
+		err = checkMaximumStringLen(maxstrlen, length, domain)
 	}
 	salt := make([]byte, 0, 16)
 	salt = binary.LittleEndian.AppendUint64(salt, uint64(seed))
@@ -49,7 +53,7 @@ func NewMask(length int, resistance int, domain string, seed int64, seeder model
 		domain: domain,
 		salt:   salt,
 		seeder: seeder,
-	}
+	}, err
 }
 
 func (me MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Entry, error) {
@@ -91,8 +95,9 @@ func (me MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Ent
 func Factory(conf model.MaskFactoryConfiguration) (model.MaskEngine, bool, error) {
 	if conf.Masking.Mask.Sha3.Length > 0 || conf.Masking.Mask.Sha3.Resistance > 0 {
 		seeder := model.NewSeeder(conf.Masking.Seed.Field, conf.Seed)
+		mask, err := NewMask(conf.Masking.Mask.Sha3.Length, conf.Masking.Mask.Sha3.Resistance, conf.Masking.Mask.Sha3.Domain, conf.Masking.Mask.Sha3.MaxStrLen, conf.Seed, seeder)
 
-		return NewMask(conf.Masking.Mask.Sha3.Length, conf.Masking.Mask.Sha3.Resistance, conf.Masking.Mask.Sha3.Domain, conf.Seed, seeder), true, nil
+		return mask, true, err
 	}
 	return nil, false, nil
 }
@@ -113,4 +118,17 @@ func lengthWithResistance(resistance int) int {
 	}
 
 	return int(math.Ceil(float64(power) * BASE2 / BASE8))
+}
+
+func checkMaximumStringLen(maxstrlen, length int, domain string) error {
+	maxVal := int(math.Pow(BASE2, float64(length*BASE8))) - 1
+	result, err := baseconv.Convert(fmt.Sprintf("%d", maxVal), "0123456789", domain)
+	if err != nil {
+		return err
+	}
+	log.Info().Int("maxstrlen", maxstrlen).Msgf("Identifiers will be up to %d characters long", len(result))
+	if len(result) > maxstrlen {
+		return fmt.Errorf("identifiers will exceed the maximum authorized length of %d characters (longest identifiers will be %d characters long)", maxstrlen, len(result))
+	}
+	return nil
 }

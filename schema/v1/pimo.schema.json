@@ -155,6 +155,10 @@
           "type": "string",
           "description": "allowed characters domain in the output, default to hexadecimal (0123456789abcdef)"
         },
+        "maxstrlen": {
+          "type": "integer",
+          "description": "an error will occur if the identifier can grow longer than the specified length"
+        },
         "field": {
           "type": "string",
           "description": "Name of the identifier"
@@ -1022,6 +1026,10 @@
         "domain": {
           "type": "string",
           "description": "allowed characters domain in the output, default to hexadecimal (0123456789abcdef)"
+        },
+        "maxstrlen": {
+          "type": "integer",
+          "description": "an error will occur if the identifier can grow longer than the specified length"
         }
       },
       "additionalProperties": false,

@@ -14,6 +14,23 @@ Types of changes
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [1.27.0]
+
+- `Added` parameter `maxstrlen` to `sha3` and `hashInCSV` masks
+- `Fixed` type casting issues when using `add`, `add-transient`, `choice`, `weightedChoice` or `hash` to create complex structures
+- `Fixed` performance issue with `pipe` mask
+- `Fixed` performance issue with selectors
+- `Fixed` URI resources will be loaded in-memory only once instead of once per mask
+- `Fixed` `timeline` should not overwrite existing data
+
+## [1.26.2]
+
+- `Fixed` regression in pimo play WASM (web version)
+
+## [1.26.1]
+
+- `Fixed` performance issues on JSON serialization
+
 ## [1.26.0]
 
 - `Added` property `preserve-list` to masking definition to be able to ignore masking specific values

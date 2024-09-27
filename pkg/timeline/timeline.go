@@ -129,17 +129,16 @@ func (me MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Ent
 		}
 	}
 
+	var result model.Dictionary
+
 	initialState := map[string]*int64{}
 	if dict, ok := e.(model.Dictionary); ok {
-		iter := dict.EntriesIter()
-		for {
-			pair, ok := iter()
-			if !ok {
-				break
-			}
-
-			initialState[pair.Key] = me.formatTimestamp(pair.Value)
+		result = dict
+		for _, key := range dict.Keys() {
+			initialState[key] = me.formatTimestamp(dict.Get(key))
 		}
+	} else {
+		result = model.NewDictionary()
 	}
 
 	timestamps, err := me.Generate(me.rand, initialState)
@@ -147,7 +146,6 @@ func (me MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Ent
 		return nil, err
 	}
 
-	result := model.NewDictionary()
 	result.Set(me.Generator.Origin(), me.formatDate(*(timestamps[me.Generator.Origin()])))
 	for _, point := range me.points {
 		value := timestamps[point]
