@@ -53,7 +53,7 @@ properties:
       "gocritic",
       "whitespace",
     ]
-  lintersno: ["scopelint", "interfacer", "maligned", "forbidigo", "gci"] # List of linters to exclude on running the lint target
+  lintersno: [ "forbidigo", "gci"] # List of linters to exclude on running the lint target
 
   # test suites to execute on test-int target
   testsuites: "*.yml"

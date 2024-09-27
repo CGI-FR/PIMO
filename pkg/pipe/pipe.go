@@ -116,6 +116,7 @@ func Factory(conf model.MaskFactoryConfiguration) (model.MaskContextEngine, bool
 		// set differents seeds for differents jsonpath
 		h := fnv.New64a()
 		h.Write([]byte(conf.Masking.Selector.Jsonpath))
+		//nolint: gosec
 		conf.Seed += int64(h.Sum64())
 		mask, err := NewMask(conf.Seed, conf.Masking.Mask.Pipe.InjectParent, conf.Masking.Mask.Pipe.InjectRoot, conf.Cache, conf.Functions, conf.Masking.Mask.Pipe.DefinitionFile, conf.Masking.Mask.Pipe.Masking...)
 		if err != nil {

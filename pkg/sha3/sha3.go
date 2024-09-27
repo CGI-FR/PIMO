@@ -47,6 +47,7 @@ func NewMask(length int, resistance int, domain string, maxstrlen int, seed int6
 		err = checkMaximumStringLen(maxstrlen, length, domain)
 	}
 	salt := make([]byte, 0, 16)
+	//nolint: gosec
 	salt = binary.LittleEndian.AppendUint64(salt, uint64(seed))
 	return MaskEngine{
 		length: length,
@@ -72,6 +73,7 @@ func (me MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Ent
 			return nil, err
 		}
 		if ok {
+			//nolint: gosec
 			salt = binary.LittleEndian.AppendUint64(me.salt, uint64(seed))
 		}
 	}

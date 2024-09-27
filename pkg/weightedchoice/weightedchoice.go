@@ -50,6 +50,7 @@ func NewChooser(seed int64, cs ...Choice) Chooser {
 	totals := make([]int, len(cs))
 	runningTotal := 0
 	for i, c := range cs {
+		//nolint: gosec
 		runningTotal += int(c.Weight)
 		totals[i] = runningTotal
 	}
@@ -110,6 +111,7 @@ func Factory(conf model.MaskFactoryConfiguration) (model.MaskEngine, bool, error
 		// set differents seeds for differents jsonpath
 		h := fnv.New64a()
 		h.Write([]byte(conf.Masking.Selector.Jsonpath))
+		//nolint: gosec
 		conf.Seed += int64(h.Sum64())
 		return NewMask(maskWeight, conf.Seed, seeder), true, nil
 	}
@@ -121,6 +123,7 @@ func Func(seed int64, seedField string) interface{} {
 	return func(choices_ map[string]interface{}) (model.Entry, error) {
 		choices := make([]model.WeightedChoiceType, len(choices_))
 		for k, v := range choices_ {
+			//nolint: gosec
 			choices = append(choices, model.WeightedChoiceType{Choice: k, Weight: uint(v.(int))})
 		}
 		mask := NewMask(choices, seed+callnumber, model.NewSeeder(seedField, seed+callnumber))

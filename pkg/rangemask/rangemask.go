@@ -85,6 +85,7 @@ func Func(seed int64, seedField string) interface{} {
 		case int8:
 			scale = int(typedscale)
 		case uint:
+			//nolint: gosec
 			scale = int(typedscale)
 		case uint64:
 			if typedscale > math.MaxInt {

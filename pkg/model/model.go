@@ -761,6 +761,7 @@ func NewSeeder(sourceField string, seed int64) Seeder {
 			}
 			hash.Reset()
 			_, err := hash.Write([]byte(fmt.Sprintf("%v", e)))
+			//nolint: gosec
 			return int64(hash.Sum64()) + seed, true, err
 		}
 	} else {
