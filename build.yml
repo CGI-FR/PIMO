@@ -280,10 +280,10 @@ targets:
       - $: 'killall golangci-lint || :'
       - if: len(linters) == 0
         then:
-          - $: golangci-lint run --enable-all ={replace(join(appendpath("--disable", lintersno), " "), "/", " ")}
+          - $: golangci-lint run --timeout 10m --enable-all ={replace(join(appendpath("--disable", lintersno), " "), "/", " ")}
             :: true
         else:
-          - $: golangci-lint run ={replace(join(appendpath("--enable", linters), " "), "/", " ")} ={replace(join(appendpath("--disable", lintersno), " "), "/", " ")}
+          - $: golangci-lint run --timeout 10m ={replace(join(appendpath("--enable", linters), " "), "/", " ")} ={replace(join(appendpath("--disable", lintersno), " "), "/", " ")}
             :: true
 
   test:

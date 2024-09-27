@@ -16,7 +16,7 @@ Types of changes
 
 ## [1.28.0]
 
-- `Added` New action for parquet file.
+- `Added` new action for parquet files
 
 ## [1.27.0]
 
