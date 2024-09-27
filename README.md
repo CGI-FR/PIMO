@@ -1439,6 +1439,75 @@ After executing the command with the correct configuration, here is the expected
 
 [Return to list of masks](#possible-masks)
 
+### Parsing Parquet files
+
+To mask data in a Parquet file using PIMO with the correct configuration option, follow this updated approach:
+
+```bash
+  pimo parquet data.parquet maskedData.parquet --config masking.yml
+```
+
+### Example
+
+Assume the Parquet file `data.parquet` has the following table structure:
+
+| agency       | agency_number | name   | account_type | account_number | annual_income |
+|--------------|---------------|--------|--------------|----------------|---------------|
+| NewYork      | 0032          | Doe    | classic      | 12345          | 50000         |
+| SanFrancisco | 7894          | Smith  | saving       | 67890          | 60000         |
+
+### Masking Configuration (`masking.yml`)
+
+```yaml
+version: "1"
+seed: 42
+
+masking:
+  - selector:
+      jsonpath: "agency_number"  # mask agency_number column
+    mask:
+      template: '{{MaskRegex "[0-9]{4}$"}}'
+
+  - selector:
+      jsonpath: "name"  # mask name column
+    mask:
+      randomChoiceInUri: "pimo://nameFR"
+
+  - selector:
+      jsonpath: "account_type"  # mask account_type column
+    mask:
+      randomChoice:
+         - "classic"
+         - "saving"
+         - "securitie"
+
+  - selector:
+      jsonpath: "account_number"  # mask account_number column
+    masks:
+      - incremental:
+          start: 1
+          increment: 1
+      - template: "{{.account_number}}"
+```
+
+### Resulting Masked Parquet File
+
+After executing the command:
+
+```bash
+  pimo parquet data.parquet maskedData.parquet --config masking.yml
+```
+
+The `maskedData.parquet` file will contain the following masked data:
+
+| agency       | agency_number | name     | account_type | account_number | annual_income |
+|--------------|---------------|----------|--------------|----------------|---------------|
+| NewYork      | 2308          | Rolande  | saving       | 1              | 50000         |
+| SanFrancisco | 9724          | Matéo    | securitie    | 2              | 60000         |
+
+This example demonstrates how to mask specific columns using PIMO, applying random choices, regular expressions, and incremental masking.
+
+[Return to list of masks](#possible-masks)
 
 ## `pimo://` scheme
 

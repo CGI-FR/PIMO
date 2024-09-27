@@ -192,8 +192,8 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 
 	// Add command for parquet transformer
 	parquetCmd := &cobra.Command{
-		Use:   "parquet input_parquet file output_parquet_file",
-		Short: "Parsing and masking Parquet file",
+		Use:   "parquet input_parquet_file output_parquet_file",
+		Short: "Parsing and masking a parquet file",
 		Args:  cobra.ExactArgs(2),
 		Run: func(cmd *cobra.Command, args []string) {
 			initLog()

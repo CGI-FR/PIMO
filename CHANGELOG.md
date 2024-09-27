@@ -14,6 +14,10 @@ Types of changes
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [1.28.0]
+
+- `Added` New action for parquet file.
+
 ## [1.27.0]
 
 - `Added` parameter `maxstrlen` to `sha3` and `hashInCSV` masks
