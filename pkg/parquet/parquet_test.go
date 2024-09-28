@@ -15,6 +15,9 @@
 // You should have received a copy of the GNU General Public License
 // along with PIMO.  If not, see <http://www.gnu.org/licenses/>.
 
+//go:build !wasi && !wasm
+// +build !wasi,!wasm
+
 package parquet
 
 import (
