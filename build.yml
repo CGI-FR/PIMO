@@ -351,9 +351,9 @@ targets:
       - $: git reset --hard
       - if: snapshot
         then:
-          - $: goreleaser release -f ={BUILD_DIR}/.goreleaser.yml --rm-dist --snapshot
+          - $: goreleaser release -f ={BUILD_DIR}/.goreleaser.yml --clean --snapshot
         else:
-          - $: (export GITHUB_TOKEN=={GITHUB_TOKEN}; goreleaser release -f ={BUILD_DIR}/.goreleaser.yml --rm-dist)
+          - $: (export GITHUB_TOKEN=={GITHUB_TOKEN}; goreleaser release -f ={BUILD_DIR}/.goreleaser.yml --clean)
       - $: go mod tidy
 
   # run "neon -props '{dockerfiles: {"path/to/Dockerfile1": "path/to/root/build/context"}}' docker" to build specific Dockerfiles
