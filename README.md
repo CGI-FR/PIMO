@@ -1447,7 +1447,7 @@ To mask data in a Parquet file using PIMO with the correct configuration option,
   pimo parquet data.parquet maskedData.parquet --config masking.yml
 ```
 
-### Example
+#### Example
 
 Assume the Parquet file `data.parquet` has the following table structure:
 
@@ -1456,7 +1456,7 @@ Assume the Parquet file `data.parquet` has the following table structure:
 | NewYork      | 0032          | Doe    | classic      | 12345          | 50000         |
 | SanFrancisco | 7894          | Smith  | saving       | 67890          | 60000         |
 
-### Masking Configuration (`masking.yml`)
+#### Masking Configuration (`masking.yml`)
 
 ```yaml
 version: "1"
@@ -1490,7 +1490,7 @@ masking:
       - template: "{{.account_number}}"
 ```
 
-### Resulting Masked Parquet File
+#### Resulting Masked Parquet File
 
 After executing the command:
 
