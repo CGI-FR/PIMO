@@ -15,8 +15,8 @@
 // You should have received a copy of the GNU General Public License
 // along with PIMO.  If not, see <http://www.gnu.org/licenses/>.
 
-//go:build wasi || wasm
-// +build wasi wasm
+//go:build wasm || wasi || (linux && 386) || (windows && 386)
+// +build wasm wasi linux,386 windows,386
 
 package parquet
 
