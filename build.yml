@@ -53,7 +53,7 @@ properties:
       "gocritic",
       "whitespace",
     ]
-  lintersno: ["scopelint", "interfacer", "maligned", "forbidigo", "gci"] # List of linters to exclude on running the lint target
+  lintersno: [ "forbidigo", "gci"] # List of linters to exclude on running the lint target
 
   # test suites to execute on test-int target
   testsuites: "*.yml"
@@ -280,10 +280,10 @@ targets:
       - $: 'killall golangci-lint || :'
       - if: len(linters) == 0
         then:
-          - $: golangci-lint run --enable-all ={replace(join(appendpath("--disable", lintersno), " "), "/", " ")}
+          - $: golangci-lint run --timeout 10m --enable-all ={replace(join(appendpath("--disable", lintersno), " "), "/", " ")}
             :: true
         else:
-          - $: golangci-lint run ={replace(join(appendpath("--enable", linters), " "), "/", " ")} ={replace(join(appendpath("--disable", lintersno), " "), "/", " ")}
+          - $: golangci-lint run --timeout 10m ={replace(join(appendpath("--enable", linters), " "), "/", " ")} ={replace(join(appendpath("--disable", lintersno), " "), "/", " ")}
             :: true
 
   test:
@@ -351,9 +351,9 @@ targets:
       - $: git reset --hard
       - if: snapshot
         then:
-          - $: goreleaser release -f ={BUILD_DIR}/.goreleaser.yml --rm-dist --snapshot
+          - $: goreleaser release -f ={BUILD_DIR}/.goreleaser.yml --clean --snapshot
         else:
-          - $: (export GITHUB_TOKEN=={GITHUB_TOKEN}; goreleaser release -f ={BUILD_DIR}/.goreleaser.yml --rm-dist)
+          - $: (export GITHUB_TOKEN=={GITHUB_TOKEN}; goreleaser release -f ={BUILD_DIR}/.goreleaser.yml --clean)
       - $: go mod tidy
 
   # run "neon -props '{dockerfiles: {"path/to/Dockerfile1": "path/to/root/build/context"}}' docker" to build specific Dockerfiles

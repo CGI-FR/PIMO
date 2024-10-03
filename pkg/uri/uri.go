@@ -195,5 +195,5 @@ func Read(uri string) (EntryRecords, error) {
 		return cacheEntry[uri], nil
 	}
 
-	return nil, fmt.Errorf(u.Scheme + " is not a valid scheme")
+	return nil, fmt.Errorf("%s is not a valid scheme", u.Scheme)
 }

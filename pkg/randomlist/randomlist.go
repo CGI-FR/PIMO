@@ -62,7 +62,7 @@ func Factory(conf model.MaskFactoryConfiguration) (model.MaskEngine, bool, error
 	// set differents seeds for differents jsonpath
 	h := fnv.New64a()
 	h.Write([]byte(conf.Masking.Selector.Jsonpath))
-	conf.Seed += int64(h.Sum64())
+	conf.Seed += int64(h.Sum64()) //nolint:gosec
 
 	if len(conf.Masking.Mask.RandomChoice) != 0 {
 		return NewMask(conf.Masking.Mask.RandomChoice, conf.Seed, seeder), true, nil

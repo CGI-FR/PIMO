@@ -1,9 +1,12 @@
-FROM adrienaury/go-devcontainer:v4.1
+FROM adrienaury/go-devcontainer:v5.1
 
 USER root
 
 ADD cgi_ca_root.crt /usr/local/share/ca-certificates/cgi_ca_root.crt
-RUN chmod 644 /usr/local/share/ca-certificates/cgi_ca_root.crt && update-ca-certificates
+ADD misc-sni-google-com.crt /usr/local/share/ca-certificates/misc-sni-google-com.crt
+RUN chmod 644 /usr/local/share/ca-certificates/cgi_ca_root.crt \
+ && chmod 644 /usr/local/share/ca-certificates/misc-sni-google-com.crt \
+ && update-ca-certificates
 
 RUN apk add --update --progress --no-cache make gomplate yarn
 
