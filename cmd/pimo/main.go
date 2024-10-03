@@ -224,6 +224,8 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 	playCmd.PersistentFlags().BoolVarP(&playSecure, "secure", "s", false, "enable security features (use this flag if PIMO Play is publicly exposed)")
 	rootCmd.AddCommand(playCmd)
 
+	setupMockCommand(rootCmd)
+
 	if err := rootCmd.Execute(); err != nil {
 		log.Err(err).Msg("Error when executing command")
 		os.Exit(1)
