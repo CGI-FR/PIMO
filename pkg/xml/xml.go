@@ -100,7 +100,7 @@ func Factory(conf model.MaskFactoryConfiguration) (model.MaskEngine, bool, error
 	if len(conf.Masking.Mask.XML.XPath) > 0 && len(conf.Masking.Mask.XML.Masking) > 0 {
 		h := fnv.New64a()
 		h.Write([]byte(conf.Masking.Selector.Jsonpath))
-		conf.Seed += int64(h.Sum64()) //nolint: gosec
+		conf.Seed += int64(h.Sum64()) //nolint:gosec
 		mask, err := NewMask(conf.Masking.Mask.XML.XPath, conf.Masking.Mask.XML.InjectParent, conf.Cache, conf.Functions, conf.Seed, conf.Masking.Mask.XML.Masking...)
 		if err != nil {
 			log.Err(err).Msg("Error during factoring XML mask")

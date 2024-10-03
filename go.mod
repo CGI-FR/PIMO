@@ -1,8 +1,6 @@
 module github.com/cgi-fr/pimo
 
-go 1.22
-
-toolchain go1.22.2
+go 1.23
 
 require (
 	github.com/CGI-FR/xixo v0.1.8

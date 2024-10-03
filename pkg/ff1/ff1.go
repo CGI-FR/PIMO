@@ -75,8 +75,7 @@ func (ff1m MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.E
 		return nil, err
 	}
 
-	//nolint: gosec
-	radix := int(ff1m.radix)
+	radix := int(ff1m.radix) //nolint:gosec
 	value := e.(string)
 	var preserved map[int]rune
 	if len(ff1m.domain) > 0 {

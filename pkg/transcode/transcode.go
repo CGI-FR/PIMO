@@ -77,8 +77,7 @@ func Factory(conf model.MaskFactoryConfiguration) (model.MaskEngine, bool, error
 	if conf.Masking.Mask.Transcode != nil {
 		h := fnv.New64a()
 		h.Write([]byte(conf.Masking.Selector.Jsonpath))
-		//nolint: gosec
-		conf.Seed += int64(h.Sum64())
+		conf.Seed += int64(h.Sum64()) //nolint:gosec
 		if classes := conf.Masking.Mask.Transcode.Classes; len(classes) > 0 {
 			return NewMask(classes, conf.Seed, seeder), true, nil
 		}
