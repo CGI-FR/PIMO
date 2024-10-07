@@ -25,8 +25,6 @@ const (
 	keyURLHostPort     = "port"
 	keyURLPath         = "path"
 	keyURLQuery        = "query"
-	keyURLQuerykey     = "key"
-	keyURLQueryValue   = "value"
 	keyURLFragment     = "fragment"
 	keyProtocol        = "protocol"
 	keyHeaders         = "headers"
@@ -91,9 +89,16 @@ func NewRequestDict(request *http.Request) (RequestDict, error) {
 		headers.Set(key, entries)
 	}
 	dict.Set(keyHeaders, headers)
-	b, err := io.ReadAll(request.Body)
-	dict.Set(keyBody, string(b))
-	return RequestDict{dict.Pack()}, err
+
+	if request.Body != nil {
+		b, err := io.ReadAll(request.Body)
+		if err != nil {
+			return RequestDict{dict.Pack()}, err
+		}
+		dict.Set(keyBody, string(b))
+	}
+
+	return RequestDict{dict.Pack()}, nil
 }
 
 func urlToDict(url *url.URL) model.Dictionary {
@@ -117,20 +122,32 @@ func urlToDict(url *url.URL) model.Dictionary {
 	dict.Set(keyURLHost, host)
 	dict.Set(keyURLPath, url.EscapedPath())
 	if url.RawQuery != "" {
-		query := []model.Entry{}
-		for _, pair := range strings.Split(url.RawQuery, "&") {
-			if key, value, found := strings.Cut(pair, "="); found {
-				query = append(query, model.NewDictionary().With(keyURLQuerykey, key).With(keyURLQueryValue, value))
-			} else {
-				query = append(query, model.NewDictionary().With(keyURLQuerykey, key).With(keyURLQueryValue, nil))
-			}
-		}
-		dict.Set(keyURLQuery, query)
+		dict.Set(keyURLQuery, queryToDict(url.RawQuery))
 	}
 	if url.RawFragment != "" {
 		dict.Set(keyURLFragment, url.EscapedFragment())
 	}
 	return dict
+}
+
+func queryToDict(rawquery string) model.Dictionary {
+	query := model.NewDictionary()
+	for _, pair := range strings.Split(rawquery, "&") {
+		if key, value, found := strings.Cut(pair, "="); found {
+			if values, exists := query.GetValue(key); exists {
+				query.Set(key, append(values.([]model.Entry), value))
+			} else {
+				query.Set(key, []model.Entry{value})
+			}
+		} else {
+			if values, exists := query.GetValue(key); exists {
+				query.Set(key, append(values.([]model.Entry), nil))
+			} else {
+				query.Set(key, []model.Entry{nil})
+			}
+		}
+	}
+	return query
 }
 
 func ToRequest(dict model.Dictionary) (*http.Request, error) {
@@ -208,6 +225,12 @@ func dictToURL(dict model.Dictionary) (string, error) {
 		return "", err
 	}
 
+	queryDict, ok := dict.GetValue(keyURLQuery)
+	queryRaw := ""
+	if ok {
+		queryRaw = dictToRawQuery(queryDict.(model.Dictionary))
+	}
+
 	fragmentDict, ok := dict.GetValue(keyURLFragment)
 	fragmentRaw := ""
 	fragment := ""
@@ -228,10 +251,23 @@ func dictToURL(dict model.Dictionary) (string, error) {
 		RawPath:     rawpath,
 		OmitHost:    false,
 		ForceQuery:  false,
-		RawQuery:    "",
+		RawQuery:    queryRaw,
 		Fragment:    fragment,
 		RawFragment: fragmentRaw,
 	}
 
 	return url.String(), nil
+}
+
+func dictToRawQuery(dict model.Dictionary) string {
+	query := url.Values{}
+
+	for _, key := range dict.Keys() {
+		values := dict.Get(key).([]model.Entry)
+		for _, value := range values {
+			query.Add(key, value.(string))
+		}
+	}
+
+	return query.Encode()
 }
