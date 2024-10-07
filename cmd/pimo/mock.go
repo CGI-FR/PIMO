@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"net/url"
 
+	over "github.com/adrienaury/zeromdc"
 	"github.com/cgi-fr/pimo/internal/app/pimo"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
@@ -21,6 +22,7 @@ func setupMockCommand(rootCmd *cobra.Command) {
 		Use: "mock",
 		Run: func(cmd *cobra.Command, args []string) {
 			initLog()
+			over.MDC().Set("config", mockConfigFile)
 			backendURL := args[0]
 			runMockCommand(backendURL, mockAddr, mockConfigFile)
 		},

@@ -21,7 +21,6 @@ import (
 	"bytes"
 	"fmt"
 	"net/http"
-	netHttp "net/http"
 	"os"
 	"runtime"
 	"strings"
@@ -435,7 +434,7 @@ func writeMetricsToFile(statsFile string, statsByte []byte) {
 func sendMetrics(statsDestination string, statsByte []byte) {
 	requestBody := bytes.NewBuffer(statsByte)
 	// nolint: gosec
-	_, err := netHttp.Post(statsDestination, "application/json", requestBody)
+	_, err := http.Post(statsDestination, "application/json", requestBody)
 	if err != nil {
 		log.Error().Err(err).Msgf("An error occurred trying to send metrics to %s", statsDestination)
 	}
