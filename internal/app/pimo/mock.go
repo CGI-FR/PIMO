@@ -14,49 +14,50 @@ type RequestDict struct {
 }
 
 const (
-	keyMethod          = "method"
-	keyURL             = "url"
-	keyURLScheme       = "scheme"
-	keyURLUser         = "user"
-	keyURLUserName     = "name"
-	keyURLUserPassword = "pass"
-	keyURLHost         = "host"
-	keyURLHostName     = "name"
-	keyURLHostPort     = "port"
-	keyURLPath         = "path"
-	keyURLQuery        = "query"
-	keyURLFragment     = "fragment"
-	keyProtocol        = "protocol"
-	keyHeaders         = "headers"
-	keyBody            = "body"
+	keyMethod = "method"
+	keyURL    = "url"
+	// following properties are always empty
+	// keyURLScheme       = "scheme"
+	// keyURLUser         = "user"
+	// keyURLUserName     = "name"
+	// keyURLUserPassword = "pass"
+	// keyURLHost         = "host"
+	// keyURLHostName     = "name"
+	// keyURLHostPort     = "port"
+	keyURLPath     = "path"
+	keyURLQuery    = "query"
+	keyURLFragment = "fragment"
+	keyProtocol    = "protocol"
+	keyHeaders     = "headers"
+	keyBody        = "body"
 )
 
 func (r RequestDict) Method() string {
 	return r.UnpackAsDict().Get(keyMethod).(string)
 }
 
-func (r RequestDict) URLScheme() string {
-	return r.UnpackAsDict().Get(keyURL).(model.Dictionary).Get(keyURLScheme).(string)
-}
+// func (r RequestDict) URLScheme() string {
+// 	return r.UnpackAsDict().Get(keyURL).(model.Dictionary).Get(keyURLScheme).(string)
+// }
 
-func (r RequestDict) URLUser() (string, bool) {
-	s, ok := r.UnpackAsDict().Get(keyURL).(model.Dictionary).Get(keyURLUser).(model.Dictionary).Get(keyURLUserName).(string)
-	return s, ok
-}
+// func (r RequestDict) URLUser() (string, bool) {
+// 	s, ok := r.UnpackAsDict().Get(keyURL).(model.Dictionary).Get(keyURLUser).(model.Dictionary).Get(keyURLUserName).(string)
+// 	return s, ok
+// }
 
-func (r RequestDict) URLPassword() (string, bool) {
-	s, ok := r.UnpackAsDict().Get(keyURL).(model.Dictionary).Get(keyURLUser).(model.Dictionary).Get(keyURLUserPassword).(string)
-	return s, ok
-}
+// func (r RequestDict) URLPassword() (string, bool) {
+// 	s, ok := r.UnpackAsDict().Get(keyURL).(model.Dictionary).Get(keyURLUser).(model.Dictionary).Get(keyURLUserPassword).(string)
+// 	return s, ok
+// }
 
-func (r RequestDict) URLHostName() string {
-	return r.UnpackAsDict().Get(keyURL).(model.Dictionary).Get(keyURLHost).(model.Dictionary).Get(keyURLHostName).(string)
-}
+// func (r RequestDict) URLHostName() string {
+// 	return r.UnpackAsDict().Get(keyURL).(model.Dictionary).Get(keyURLHost).(model.Dictionary).Get(keyURLHostName).(string)
+// }
 
-func (r RequestDict) URLHostPort() (string, bool) {
-	s, ok := r.UnpackAsDict().Get(keyURL).(model.Dictionary).Get(keyURLHost).(model.Dictionary).Get(keyURLHostPort).(string)
-	return s, ok
-}
+// func (r RequestDict) URLHostPort() (string, bool) {
+// 	s, ok := r.UnpackAsDict().Get(keyURL).(model.Dictionary).Get(keyURLHost).(model.Dictionary).Get(keyURLHostPort).(string)
+// 	return s, ok
+// }
 
 func (r RequestDict) URLPath() string {
 	return r.UnpackAsDict().Get(keyURL).(model.Dictionary).Get(keyURLPath).(string)
@@ -107,26 +108,31 @@ func urlToDict(url *url.URL) model.Dictionary {
 		return dict
 	}
 
-	dict.Set(keyURLScheme, url.Scheme)
-	if url.User != nil {
-		user := model.NewDictionary().With(keyURLUserName, url.User.Username())
-		if password, set := url.User.Password(); set {
-			user.Set(keyURLUserPassword, password)
-		}
-		dict.Set(keyURLUser, user)
-	}
-	host := model.NewDictionary().With(keyURLHostName, url.Hostname())
-	if url.Port() != "" {
-		host.Set(keyURLHostPort, url.Port())
-	}
-	dict.Set(keyURLHost, host)
+	// dict.Set(keyURLScheme, url.Scheme)
+
+	// if url.User != nil {
+	// 	user := model.NewDictionary().With(keyURLUserName, url.User.Username())
+	// 	if password, set := url.User.Password(); set {
+	// 		user.Set(keyURLUserPassword, password)
+	// 	}
+	// 	dict.Set(keyURLUser, user)
+	// }
+
+	// host := model.NewDictionary().With(keyURLHostName, url.Hostname())
+	// if url.Port() != "" {
+	// 	host.Set(keyURLHostPort, url.Port())
+	// }
+	// dict.Set(keyURLHost, host)
+
 	dict.Set(keyURLPath, url.EscapedPath())
 	if url.RawQuery != "" {
 		dict.Set(keyURLQuery, queryToDict(url.RawQuery))
 	}
+
 	if url.RawFragment != "" {
 		dict.Set(keyURLFragment, url.EscapedFragment())
 	}
+
 	return dict
 }
 
@@ -207,17 +213,17 @@ func ToRequest(dict model.Dictionary) (*http.Request, error) {
 }
 
 func dictToURL(dict model.Dictionary) (string, error) {
-	var user *url.Userinfo
-	if userinfo, ok := dict.Get(keyURLUser).(model.Dictionary); ok {
-		if pass, ok := userinfo.Get(keyURLUserPassword).(string); ok {
-			user = url.UserPassword(userinfo.Get(keyURLUserName).(string), pass)
-		}
-	}
+	// var user *url.Userinfo
+	// if userinfo, ok := dict.Get(keyURLUser).(model.Dictionary); ok {
+	// 	if pass, ok := userinfo.Get(keyURLUserPassword).(string); ok {
+	// 		user = url.UserPassword(userinfo.Get(keyURLUserName).(string), pass)
+	// 	}
+	// }
 
-	hostport := dict.Get(keyURLHost).(model.Dictionary).Get(keyURLHostName).(string)
-	if port, ok := dict.Get(keyURLHost).(model.Dictionary).Get(keyURLHostPort).(string); ok {
-		hostport = hostport + ":" + port
-	}
+	// hostport := dict.Get(keyURLHost).(model.Dictionary).Get(keyURLHostName).(string)
+	// if port, ok := dict.Get(keyURLHost).(model.Dictionary).Get(keyURLHostPort).(string); ok {
+	// 	hostport = hostport + ":" + port
+	// }
 
 	rawpath := dict.Get(keyURLPath).(string)
 	path, err := url.PathUnescape(rawpath)
@@ -243,10 +249,10 @@ func dictToURL(dict model.Dictionary) (string, error) {
 	}
 
 	url := &url.URL{
-		Scheme:      dict.Get(keyURLScheme).(string),
+		Scheme:      "", // dict.Get(keyURLScheme).(string),
 		Opaque:      "",
-		User:        user,
-		Host:        hostport,
+		User:        nil, // user,
+		Host:        "",  // hostport,
 		Path:        path,
 		RawPath:     rawpath,
 		OmitHost:    false,
