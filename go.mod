@@ -23,7 +23,7 @@ require (
 	github.com/zach-klippenstein/goregen v0.0.0-20160303162051-795b5e3961ea
 	golang.org/x/crypto v0.27.0
 	golang.org/x/exp v0.0.0-20240707233637-46b078467d37
-	golang.org/x/text v0.18.0
+	golang.org/x/text v0.19.0
 )
 
 require (
