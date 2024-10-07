@@ -10,6 +10,9 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// pimo --serve ":8080" --mask 'name=[{add: true}, {randomChoiceInUri: "pimo://nameFR"}]'
+// pimo -v5 mock -p :8081 http://localhost:8080
+
 func setupMockCommand(rootCmd *cobra.Command) {
 	mockAddr := ":8080"
 	mockConfigFile := "routes.yaml"
@@ -34,6 +37,10 @@ func runMockCommand(backendURL, mockAddr, configFile string) {
 	log.Info().Str("config", configFile).Msgf("Started mock for %s", backendURL)
 
 	client := http.DefaultClient
+	backend, err := url.Parse(backendURL)
+	if err != nil {
+		log.Fatal().Err(err).Msg("")
+	}
 
 	http.HandleFunc("/{path...}", func(w http.ResponseWriter, r *http.Request) {
 		request, err := pimo.NewRequestDict(r)
@@ -52,12 +59,9 @@ func runMockCommand(backendURL, mockAddr, configFile string) {
 			log.Fatal().Err(err).Msg("")
 		}
 
-		req.URL, err = url.Parse(backendURL)
-		if err != nil {
-			log.Fatal().Err(err).Msg("")
-		}
-
-		req.URL.Path = request.URLPath()
+		req.URL.Scheme = backend.Scheme
+		req.URL.User = backend.User
+		req.URL.Host = backend.Host
 
 		resp, err := client.Do(req)
 		if err != nil {
