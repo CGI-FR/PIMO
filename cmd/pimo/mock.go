@@ -1,10 +1,11 @@
 package main
 
 import (
-	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 
+	"github.com/cgi-fr/pimo/internal/app/pimo"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 )
@@ -16,6 +17,7 @@ func setupMockCommand(rootCmd *cobra.Command) {
 	mockCmd := &cobra.Command{
 		Use: "mock",
 		Run: func(cmd *cobra.Command, args []string) {
+			initLog()
 			backendURL := args[0]
 			runMockCommand(backendURL, mockAddr, mockConfigFile)
 		},
@@ -29,15 +31,34 @@ func setupMockCommand(rootCmd *cobra.Command) {
 }
 
 func runMockCommand(backendURL, mockAddr, configFile string) {
-	log.Info().Msgf("started mock for %s", backendURL)
+	log.Info().Msgf("Started mock for %s", backendURL)
 
 	client := http.DefaultClient
 
 	http.HandleFunc("/{path...}", func(w http.ResponseWriter, r *http.Request) {
-		req, err := http.NewRequest(r.Method, fmt.Sprintf("%s%s", backendURL, r.URL.Path), r.Body)
+		request, err := pimo.NewRequestDict(r)
 		if err != nil {
 			log.Fatal().Err(err).Msg("")
 		}
+
+		log.Info().
+			Str("method", request.Method()).
+			Str("path", request.Path()).
+			Str("protocol", request.Protocol()).
+			Msg("Request intercepted")
+
+		req, err := pimo.ToRequest(request.Dictionary)
+		if err != nil {
+			log.Fatal().Err(err).Msg("")
+		}
+
+		req.URL, err = url.Parse(backendURL)
+		if err != nil {
+			log.Fatal().Err(err).Msg("")
+		}
+
+		req.URL.Path = request.Path()
+
 		resp, err := client.Do(req)
 		if err != nil {
 			log.Fatal().Err(err).Msg("")
@@ -62,5 +83,5 @@ func runMockCommand(backendURL, mockAddr, configFile string) {
 		}
 	})
 
-	log.Err(http.ListenAndServe(mockAddr, nil)).Msgf("end mock for %s", backendURL)
+	log.Err(http.ListenAndServe(mockAddr, nil)).Msgf("End mock for %s", backendURL) //nolint:gosec
 }
