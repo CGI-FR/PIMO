@@ -31,7 +31,7 @@ func setupMockCommand(rootCmd *cobra.Command) {
 }
 
 func runMockCommand(backendURL, mockAddr, configFile string) {
-	log.Info().Msgf("Started mock for %s", backendURL)
+	log.Info().Str("config", configFile).Msgf("Started mock for %s", backendURL)
 
 	client := http.DefaultClient
 
@@ -43,7 +43,7 @@ func runMockCommand(backendURL, mockAddr, configFile string) {
 
 		log.Info().
 			Str("method", request.Method()).
-			Str("path", request.Path()).
+			Str("path", request.URLPath()).
 			Str("protocol", request.Protocol()).
 			Msg("Request intercepted")
 
@@ -57,7 +57,7 @@ func runMockCommand(backendURL, mockAddr, configFile string) {
 			log.Fatal().Err(err).Msg("")
 		}
 
-		req.URL.Path = request.Path()
+		req.URL.Path = request.URLPath()
 
 		resp, err := client.Do(req)
 		if err != nil {
