@@ -6,6 +6,7 @@ import (
 	"net/url"
 	"strings"
 
+	"github.com/cgi-fr/pimo/pkg/jsonline"
 	"github.com/cgi-fr/pimo/pkg/model"
 )
 
@@ -96,7 +97,11 @@ func NewRequestDict(request *http.Request) (RequestDict, error) {
 		if err != nil {
 			return RequestDict{dict.Pack()}, err
 		}
-		dict.Set(keyBody, string(b))
+		if bodydict, err := jsonline.JSONToDictionary(b); err != nil {
+			dict.Set(keyBody, string(b))
+		} else {
+			dict.Set(keyBody, bodydict)
+		}
 	}
 
 	return RequestDict{dict.Pack()}, nil
@@ -181,6 +186,12 @@ func ToRequest(dict model.Dictionary) (*http.Request, error) {
 	if b, ok := dict.GetValue(keyBody); ok {
 		if s, ok := b.(string); ok {
 			body = s
+		} else if d, ok := b.(model.Dictionary); ok {
+			bytes, err := d.MarshalJSON()
+			if err != nil {
+				return nil, err
+			}
+			body = string(bytes)
 		}
 	}
 
