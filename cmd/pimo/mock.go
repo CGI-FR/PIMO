@@ -50,6 +50,8 @@ func runMockCommand(backendURL, mockAddr, configFile string) {
 			log.Fatal().Err(err).Msg("")
 		}
 
+		println(request.UnpackAsDict().String())
+
 		log.Info().
 			Str("method", request.Method()).
 			Str("path", request.URLPath()).
@@ -66,6 +68,18 @@ func runMockCommand(backendURL, mockAddr, configFile string) {
 		req.URL.Host = backend.Host
 
 		resp, err := client.Do(req)
+		if err != nil {
+			log.Fatal().Err(err).Msg("")
+		}
+
+		response, err := pimo.NewResponseDict(resp)
+		if err != nil {
+			log.Fatal().Err(err).Msg("")
+		}
+
+		println(response.UnpackAsDict().String())
+
+		resp, err = pimo.ToResponse(response.Dictionary)
 		if err != nil {
 			log.Fatal().Err(err).Msg("")
 		}
@@ -87,6 +101,8 @@ func runMockCommand(backendURL, mockAddr, configFile string) {
 		if _, err := w.Write(body); err != nil {
 			log.Fatal().Err(err).Msg("")
 		}
+
+		// trailers ?
 	})
 
 	log.Err(http.ListenAndServe(mockAddr, nil)).Msgf("End mock for %s", backendURL) //nolint:gosec
