@@ -18,8 +18,8 @@ type Context struct {
 
 type ContextRoute struct {
 	route    Route
-	request  model.SinkedPipeline
-	response model.SinkedPipeline
+	request  Processor
+	response Processor
 }
 
 func (ctx Context) Process(w http.ResponseWriter, r *http.Request) (*http.Response, error) {
@@ -41,9 +41,12 @@ func (ctx Context) Process(w http.ResponseWriter, r *http.Request) (*http.Respon
 			Str("protocol", request.Protocol()).
 			Msg("Request intercepted")
 
-		// TODO : call pipeline
+		dict, err := requestPipeline.Process(request.Dictionary)
+		if err != nil {
+			return nil, err
+		}
 
-		r, err = ToRequest(request.Dictionary)
+		r, err = ToRequest(dict)
 		if err != nil {
 			return nil, err
 		}
@@ -71,9 +74,12 @@ func (ctx Context) Process(w http.ResponseWriter, r *http.Request) (*http.Respon
 			Str("protocol", response.Protocol()).
 			Msg("Response intercepted")
 
-		// TODO : call pipeline
+		dict, err := responsePipeline.Process(response.Dictionary)
+		if err != nil {
+			return nil, err
+		}
 
-		resp, err = ToResponse(response.Dictionary)
+		resp, err = ToResponse(dict)
 		if err != nil {
 			return resp, err
 		}
@@ -102,6 +108,6 @@ func (ctx Context) Process(w http.ResponseWriter, r *http.Request) (*http.Respon
 	return resp, nil
 }
 
-func (ctx Context) match(r *http.Request) (model.Pipeline, model.Pipeline, model.Dictionary) {
+func (ctx Context) match(r *http.Request) (*Processor, *Processor, model.Dictionary) {
 	return nil, nil, model.NewDictionary()
 }
