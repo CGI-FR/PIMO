@@ -18,8 +18,8 @@ type Context struct {
 
 type ContextRoute struct {
 	route    Route
-	request  Processor
-	response Processor
+	request  *Processor
+	response *Processor
 }
 
 func (ctx Context) Process(w http.ResponseWriter, r *http.Request) (*http.Response, error) {

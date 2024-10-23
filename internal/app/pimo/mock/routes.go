@@ -1,6 +1,8 @@
 package mock
 
 import (
+	"net/http"
+	"net/url"
 	"os"
 
 	"github.com/cgi-fr/pimo/pkg/model"
@@ -18,8 +20,8 @@ type Route struct {
 }
 
 type Masking struct {
-	Request  model.Masking `yaml:"request,omitempty"`
-	Response model.Masking `yaml:"response,omitempty"`
+	Request  string `yaml:"request,omitempty"`
+	Response string `yaml:"response,omitempty"`
 }
 
 func LoadConfigFromFile(filename string) (*Config, error) {
@@ -37,6 +39,31 @@ func LoadConfigFromFile(filename string) (*Config, error) {
 	return config, nil
 }
 
-func (cfg *Config) Build() {
-	
+func (cfg *Config) Build(backend *url.URL) (Context, error) {
+	ctx := Context{
+		client:  http.DefaultClient,
+		backend: backend,
+		routes:  []ContextRoute{},
+		caches:  map[string]model.Cache{},
+	}
+
+	for _, route := range cfg.Routes {
+		request, err := NewProcessor(route.Masking.Request)
+		if err != nil {
+			return ctx, err
+		}
+
+		response, err := NewProcessor(route.Masking.Response)
+		if err != nil {
+			return ctx, err
+		}
+
+		ctx.routes = append(ctx.routes, ContextRoute{
+			route:    route,
+			request:  request,
+			response: response,
+		})
+	}
+
+	return ctx, nil
 }
