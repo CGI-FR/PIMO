@@ -1,12 +1,12 @@
 package main
 
 import (
-	"io"
 	"net/http"
 	"net/url"
 
 	over "github.com/adrienaury/zeromdc"
 	"github.com/cgi-fr/pimo/internal/app/pimo"
+	"github.com/cgi-fr/pimo/internal/app/pimo/mock"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 )
@@ -36,73 +36,30 @@ func setupMockCommand(rootCmd *cobra.Command) {
 }
 
 func runMockCommand(backendURL, mockAddr, configFile string) {
+	pimo.InjectMasks()
+
 	log.Info().Str("config", configFile).Msgf("Started mock for %s", backendURL)
 
-	client := http.DefaultClient
+	cfg, err := mock.LoadConfigFromFile(configFile)
+	if err != nil {
+		log.Fatal().Err(err).Msgf("Failed to load config from %s", configFile)
+	}
+
 	backend, err := url.Parse(backendURL)
 	if err != nil {
-		log.Fatal().Err(err).Msg("")
+		log.Fatal().Err(err).Msg("Failed to parse backend URL")
+	}
+
+	ctx, err := cfg.Build(backend)
+	if err != nil {
+		log.Fatal().Err(err).Msgf("Failed to build routes from %s", configFile)
 	}
 
 	http.HandleFunc("/{path...}", func(w http.ResponseWriter, r *http.Request) {
-		request, err := pimo.NewRequestDict(r)
+		_, err := ctx.Process(w, r)
 		if err != nil {
-			log.Fatal().Err(err).Msg("")
+			log.Error().AnErr("error", err).Msg("")
 		}
-
-		println(request.UnpackAsDict().String())
-
-		log.Info().
-			Str("method", request.Method()).
-			Str("path", request.URLPath()).
-			Str("protocol", request.Protocol()).
-			Msg("Request intercepted")
-
-		req, err := pimo.ToRequest(request.Dictionary)
-		if err != nil {
-			log.Fatal().Err(err).Msg("")
-		}
-
-		req.URL.Scheme = backend.Scheme
-		req.URL.User = backend.User
-		req.URL.Host = backend.Host
-
-		resp, err := client.Do(req)
-		if err != nil {
-			log.Fatal().Err(err).Msg("")
-		}
-
-		response, err := pimo.NewResponseDict(resp)
-		if err != nil {
-			log.Fatal().Err(err).Msg("")
-		}
-
-		println(response.UnpackAsDict().String())
-
-		resp, err = pimo.ToResponse(response.Dictionary)
-		if err != nil {
-			log.Fatal().Err(err).Msg("")
-		}
-
-		// copy headers
-		for name, values := range resp.Header {
-			for _, value := range values {
-				w.Header().Add(name, value)
-			}
-		}
-
-		w.WriteHeader(resp.StatusCode)
-
-		body, err := io.ReadAll(resp.Body)
-		if err != nil {
-			log.Fatal().Err(err).Msg("")
-		}
-
-		if _, err := w.Write(body); err != nil {
-			log.Fatal().Err(err).Msg("")
-		}
-
-		// trailers ?
 	})
 
 	log.Err(http.ListenAndServe(mockAddr, nil)).Msgf("End mock for %s", backendURL) //nolint:gosec

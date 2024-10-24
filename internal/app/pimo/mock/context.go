@@ -27,14 +27,14 @@ func (ctx Context) Process(w http.ResponseWriter, r *http.Request) (*http.Respon
 
 	log.Warn().Interface("captures", captures).Msg("Captures not implemented yet")
 
+	request, err := NewRequestDict(r)
+	if err != nil {
+		return nil, err
+	}
+
+	println(request.UnpackAsDict().String())
+
 	if requestPipeline != nil {
-		request, err := NewRequestDict(r)
-		if err != nil {
-			return nil, err
-		}
-
-		println(request.UnpackAsDict().String())
-
 		log.Info().
 			Str("method", request.Method()).
 			Str("path", request.URLPath()).
@@ -50,11 +50,16 @@ func (ctx Context) Process(w http.ResponseWriter, r *http.Request) (*http.Respon
 		if err != nil {
 			return nil, err
 		}
-
-		r.URL.Scheme = ctx.backend.Scheme
-		r.URL.User = ctx.backend.User
-		r.URL.Host = ctx.backend.Host
+	} else {
+		r, err = ToRequest(request.Dictionary)
+		if err != nil {
+			return nil, err
+		}
 	}
+
+	r.URL.Scheme = ctx.backend.Scheme
+	r.URL.User = ctx.backend.User
+	r.URL.Host = ctx.backend.Host
 
 	resp, err := ctx.client.Do(r)
 	if err != nil {
@@ -83,27 +88,27 @@ func (ctx Context) Process(w http.ResponseWriter, r *http.Request) (*http.Respon
 		if err != nil {
 			return resp, err
 		}
-
-		// copy headers
-		for name, values := range resp.Header {
-			for _, value := range values {
-				w.Header().Add(name, value)
-			}
-		}
-
-		w.WriteHeader(resp.StatusCode)
-
-		body, err := io.ReadAll(resp.Body)
-		if err != nil {
-			log.Fatal().Err(err).Msg("")
-		}
-
-		if _, err := w.Write(body); err != nil {
-			log.Fatal().Err(err).Msg("")
-		}
-
-		// trailers ?
 	}
+
+	// copy headers
+	for name, values := range resp.Header {
+		for _, value := range values {
+			w.Header().Add(name, value)
+		}
+	}
+
+	w.WriteHeader(resp.StatusCode)
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		log.Fatal().Err(err).Msg("")
+	}
+
+	if _, err := w.Write(body); err != nil {
+		log.Fatal().Err(err).Msg("")
+	}
+
+	// trailers ?
 
 	return resp, nil
 }

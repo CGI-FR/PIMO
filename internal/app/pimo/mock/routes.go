@@ -30,7 +30,7 @@ func LoadConfigFromFile(filename string) (*Config, error) {
 		return nil, err
 	}
 
-	var config *Config
+	config := &Config{}
 
 	if err := yaml.Unmarshal(source, config); err != nil {
 		return config, err
@@ -48,14 +48,21 @@ func (cfg *Config) Build(backend *url.URL) (Context, error) {
 	}
 
 	for _, route := range cfg.Routes {
-		request, err := NewProcessor(route.Masking.Request)
-		if err != nil {
-			return ctx, err
+		var request, response *Processor
+		var err error
+
+		if route.Masking.Request != "" {
+			request, err = NewProcessor(route.Masking.Request)
+			if err != nil {
+				return ctx, err
+			}
 		}
 
-		response, err := NewProcessor(route.Masking.Response)
-		if err != nil {
-			return ctx, err
+		if route.Masking.Response != "" {
+			response, err = NewProcessor(route.Masking.Response)
+			if err != nil {
+				return ctx, err
+			}
 		}
 
 		ctx.routes = append(ctx.routes, ContextRoute{
