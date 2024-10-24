@@ -4,7 +4,6 @@ import (
 	"io"
 	"net/http"
 	"net/url"
-	"regexp"
 	"strings"
 
 	"github.com/cgi-fr/pimo/pkg/model"
@@ -20,31 +19,27 @@ type Context struct {
 
 type ContextRoute struct {
 	route    Route
-	regex    *regexp.Regexp
+	matcher  *Matcher
 	request  *Processor
 	response *Processor
 }
 
 func NewContextRoute(route Route, request, response *Processor) ContextRoute {
-	pre := regexp.MustCompile(`\{([^\}]+)\}`)
-
 	return ContextRoute{
 		route:    route,
-		regex:    regexp.MustCompile("^" + pre.ReplaceAllString(route.Path, `(?P<$1>[^/]*)`) + "$"),
+		matcher:  NewMatcher(route.Path),
 		request:  request,
 		response: response,
 	}
 }
 
 func (ctx Context) Process(w http.ResponseWriter, r *http.Request) (*http.Response, error) {
-	requestPipeline, responsePipeline, captures := ctx.match(r)
+	requestPipeline, responsePipeline, match := ctx.match(r)
 
 	request, err := NewRequestDict(r)
 	if err != nil {
 		return nil, err
 	}
-
-	request.SetCaptures(captures)
 
 	if requestPipeline != nil {
 		log.Info().
@@ -53,6 +48,10 @@ func (ctx Context) Process(w http.ResponseWriter, r *http.Request) (*http.Respon
 			Str("protocol", request.Protocol()).
 			Msg("Request intercepted")
 
+		if match != nil && match.matched {
+			request.SetCaptures(match.Dictionary)
+		}
+
 		var origin model.Dictionary
 		if log.Trace().Enabled() {
 			origin = request.Copy()
@@ -60,6 +59,10 @@ func (ctx Context) Process(w http.ResponseWriter, r *http.Request) (*http.Respon
 
 		if err := requestPipeline.Process(request.Dictionary); err != nil {
 			return nil, err
+		}
+
+		if match != nil && match.matched {
+			request.SetURLPath(match.Build(request.Captures()))
 		}
 
 		log.Trace().RawJSON("request", []byte(origin.UnpackAsDict().String())).Msg("Origin")
@@ -132,30 +135,20 @@ func (ctx Context) Process(w http.ResponseWriter, r *http.Request) (*http.Respon
 	return resp, nil
 }
 
-func (ctx Context) match(r *http.Request) (*Processor, *Processor, model.Dictionary) {
+func (ctx Context) match(r *http.Request) (*Processor, *Processor, *MatchResult) {
 	for _, route := range ctx.routes {
-		if match, captures := route.match(r); match {
-			return route.request, route.response, captures
+		if match := route.match(r); match != nil && match.matched {
+			return route.request, route.response, match
 		}
 	}
 
-	return nil, nil, model.NewDictionary()
+	return nil, nil, nil
 }
 
-func (ctxr ContextRoute) match(r *http.Request) (bool, model.Dictionary) {
+func (ctxr ContextRoute) match(r *http.Request) *MatchResult {
 	if strings.TrimSpace(ctxr.route.Method) != "" && strings.TrimSpace(ctxr.route.Method) != r.Method {
-		return false, model.NewDictionary()
+		return nil
 	}
 
-	if submatches := ctxr.regex.FindStringSubmatch(r.URL.Path); submatches != nil {
-		captures := model.NewDictionary()
-		names := ctxr.regex.SubexpNames()
-		for i, submatch := range submatches {
-			captures.Set(names[i], submatch)
-		}
-		captures.Delete("")
-		return true, captures
-	}
-
-	return false, model.NewDictionary()
+	return ctxr.matcher.Match(r.URL.Path)
 }

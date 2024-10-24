@@ -133,6 +133,14 @@ func (r RequestDict) SetCaptures(captures model.Dictionary) {
 	r.UnpackAsDict().Set("captures", captures)
 }
 
+func (r RequestDict) Captures() model.Dictionary {
+	return r.UnpackAsDict().Get("captures").(model.Dictionary)
+}
+
+func (r RequestDict) SetURLPath(path string) {
+	r.UnpackAsDict().Get(keyURL).(model.Dictionary).Set(keyURLPath, path)
+}
+
 func urlToDict(url *url.URL) model.Dictionary {
 	dict := model.NewDictionary()
 	if url == nil {

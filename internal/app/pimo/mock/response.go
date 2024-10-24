@@ -26,6 +26,9 @@ func (r ResponseDict) ToResponse() (*http.Response, error) {
 		if s, ok := m.(int); ok {
 			status = s
 		}
+		if s, ok := m.(float64); ok {
+			status = int(s)
+		}
 	}
 
 	var protocol string
