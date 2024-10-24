@@ -129,6 +129,10 @@ func (r RequestDict) Body() string {
 	return r.UnpackAsDict().Get(keyBody).(string)
 }
 
+func (r RequestDict) SetCaptures(captures model.Dictionary) {
+	r.UnpackAsDict().Set("captures", captures)
+}
+
 func urlToDict(url *url.URL) model.Dictionary {
 	dict := model.NewDictionary()
 	if url == nil {

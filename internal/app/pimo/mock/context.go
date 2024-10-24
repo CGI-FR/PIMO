@@ -4,6 +4,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"regexp"
 	"strings"
 
 	"github.com/cgi-fr/pimo/pkg/model"
@@ -19,19 +20,31 @@ type Context struct {
 
 type ContextRoute struct {
 	route    Route
+	regex    *regexp.Regexp
 	request  *Processor
 	response *Processor
+}
+
+func NewContextRoute(route Route, request, response *Processor) ContextRoute {
+	pre := regexp.MustCompile(`\{([^\}]+)\}`)
+
+	return ContextRoute{
+		route:    route,
+		regex:    regexp.MustCompile("^" + pre.ReplaceAllString(route.Path, `(?P<$1>[^/]*)`) + "$"),
+		request:  request,
+		response: response,
+	}
 }
 
 func (ctx Context) Process(w http.ResponseWriter, r *http.Request) (*http.Response, error) {
 	requestPipeline, responsePipeline, captures := ctx.match(r)
 
-	log.Warn().Interface("captures", captures).Msg("Captures not implemented yet")
-
 	request, err := NewRequestDict(r)
 	if err != nil {
 		return nil, err
 	}
+
+	request.SetCaptures(captures)
 
 	if requestPipeline != nil {
 		log.Info().
@@ -121,18 +134,28 @@ func (ctx Context) Process(w http.ResponseWriter, r *http.Request) (*http.Respon
 
 func (ctx Context) match(r *http.Request) (*Processor, *Processor, model.Dictionary) {
 	for _, route := range ctx.routes {
-		if route.match(r) {
-			return route.request, route.response, model.NewDictionary()
+		if match, captures := route.match(r); match {
+			return route.request, route.response, captures
 		}
 	}
 
 	return nil, nil, model.NewDictionary()
 }
 
-func (ctxr ContextRoute) match(r *http.Request) bool {
+func (ctxr ContextRoute) match(r *http.Request) (bool, model.Dictionary) {
 	if strings.TrimSpace(ctxr.route.Method) != "" && strings.TrimSpace(ctxr.route.Method) != r.Method {
-		return false
+		return false, model.NewDictionary()
 	}
 
-	return ctxr.route.Path == r.URL.Path
+	if submatches := ctxr.regex.FindStringSubmatch(r.URL.Path); submatches != nil {
+		captures := model.NewDictionary()
+		names := ctxr.regex.SubexpNames()
+		for i, submatch := range submatches {
+			captures.Set(names[i], submatch)
+		}
+		captures.Delete("")
+		return true, captures
+	}
+
+	return false, model.NewDictionary()
 }

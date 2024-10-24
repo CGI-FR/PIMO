@@ -65,11 +65,7 @@ func (cfg *Config) Build(backend *url.URL) (Context, error) {
 			}
 		}
 
-		ctx.routes = append(ctx.routes, ContextRoute{
-			route:    route,
-			request:  request,
-			response: response,
-		})
+		ctx.routes = append(ctx.routes, NewContextRoute(route, request, response))
 	}
 
 	return ctx, nil
