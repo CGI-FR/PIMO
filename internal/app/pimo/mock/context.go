@@ -4,6 +4,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"strings"
 
 	"github.com/cgi-fr/pimo/pkg/model"
 	"github.com/rs/zerolog/log"
@@ -112,6 +113,20 @@ func (ctx Context) Process(w http.ResponseWriter, r *http.Request) (*http.Respon
 	return resp, nil
 }
 
-func (ctx Context) match(_ *http.Request) (*Processor, *Processor, model.Dictionary) {
-	return ctx.routes[0].request, ctx.routes[0].response, model.NewDictionary()
+func (ctx Context) match(r *http.Request) (*Processor, *Processor, model.Dictionary) {
+	for _, route := range ctx.routes {
+		if route.match(r) {
+			return route.request, route.response, model.NewDictionary()
+		}
+	}
+
+	return nil, nil, model.NewDictionary()
+}
+
+func (ctxr ContextRoute) match(r *http.Request) bool {
+	if strings.TrimSpace(ctxr.route.Method) != "" && strings.TrimSpace(ctxr.route.Method) != r.Method {
+		return false
+	}
+
+	return ctxr.route.Path == r.URL.Path
 }
