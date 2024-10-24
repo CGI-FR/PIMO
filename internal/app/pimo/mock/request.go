@@ -14,7 +14,8 @@ type RequestDict struct {
 	model.Dictionary
 }
 
-func ToRequest(dict model.Dictionary) (*http.Request, error) {
+func (r RequestDict) ToRequest() (*http.Request, error) {
+	dict := r.Dictionary
 	if d, ok := dict.TryUnpackAsDict(); ok {
 		dict = d
 	}
@@ -48,7 +49,7 @@ func ToRequest(dict model.Dictionary) (*http.Request, error) {
 		}
 	}
 
-	r, err := http.NewRequest(method, url, strings.NewReader(body))
+	req, err := http.NewRequest(method, url, strings.NewReader(body))
 
 	var headers model.Dictionary
 	if h, ok := dict.GetValue(keyHeaders); ok {
@@ -61,7 +62,7 @@ func ToRequest(dict model.Dictionary) (*http.Request, error) {
 		if values, ok := headers.Get(key).([]model.Entry); ok {
 			for _, value := range values {
 				if s, ok := value.(string); ok {
-					r.Header.Add(key, s)
+					req.Header.Add(key, s)
 				}
 			}
 		}
@@ -69,11 +70,11 @@ func ToRequest(dict model.Dictionary) (*http.Request, error) {
 
 	if p, ok := dict.GetValue(keyProtocol); ok {
 		if s, ok := p.(string); ok {
-			r.Proto = s
+			req.Proto = s
 		}
 	}
 
-	return r, err
+	return req, err
 }
 
 func NewRequestDict(request *http.Request) (RequestDict, error) {

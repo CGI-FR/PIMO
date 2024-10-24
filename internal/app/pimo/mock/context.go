@@ -33,8 +33,6 @@ func (ctx Context) Process(w http.ResponseWriter, r *http.Request) (*http.Respon
 		return nil, err
 	}
 
-	println(request.UnpackAsDict().String())
-
 	if requestPipeline != nil {
 		log.Info().
 			Str("method", request.Method()).
@@ -42,15 +40,20 @@ func (ctx Context) Process(w http.ResponseWriter, r *http.Request) (*http.Respon
 			Str("protocol", request.Protocol()).
 			Msg("Request intercepted")
 
-		request.Dictionary, err = requestPipeline.Process(request.Dictionary)
-		if err != nil {
+		var origin model.Dictionary
+		if log.Trace().Enabled() {
+			origin = request.Copy()
+		}
+
+		if err := requestPipeline.Process(request.Dictionary); err != nil {
 			return nil, err
 		}
 
-		println(request.String())
+		log.Trace().RawJSON("request", []byte(origin.UnpackAsDict().String())).Msg("Origin")
+		log.Trace().RawJSON("request", []byte(request.UnpackAsDict().String())).Msg("Masked")
 	}
 
-	r, err = ToRequest(request.Dictionary)
+	r, err = request.ToRequest()
 	if err != nil {
 		return nil, err
 	}
@@ -70,21 +73,24 @@ func (ctx Context) Process(w http.ResponseWriter, r *http.Request) (*http.Respon
 			return resp, err
 		}
 
-		println(response.UnpackAsDict().String())
-
 		log.Info().
 			Int("status", response.Status()).
 			Str("protocol", response.Protocol()).
 			Msg("Response intercepted")
 
-		dict, err := responsePipeline.Process(response.Dictionary)
-		if err != nil {
+		var origin model.Dictionary
+		if log.Trace().Enabled() {
+			origin = response.Copy()
+		}
+
+		if err := responsePipeline.Process(response.Dictionary); err != nil {
 			return nil, err
 		}
 
-		println(dict.String())
+		log.Trace().RawJSON("response", []byte(origin.UnpackAsDict().String())).Msg("Origin")
+		log.Trace().RawJSON("response", []byte(response.UnpackAsDict().String())).Msg("Masked")
 
-		resp, err = ToResponse(dict)
+		resp, err = response.ToResponse()
 		if err != nil {
 			return resp, err
 		}

@@ -7,6 +7,7 @@ import (
 	over "github.com/adrienaury/zeromdc"
 	"github.com/cgi-fr/pimo/internal/app/pimo"
 	"github.com/cgi-fr/pimo/internal/app/pimo/mock"
+	"github.com/cgi-fr/pimo/pkg/statistics"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 )
@@ -37,6 +38,7 @@ func setupMockCommand(rootCmd *cobra.Command) {
 
 func runMockCommand(backendURL, mockAddr, configFile string) {
 	pimo.InjectMasks()
+	statistics.Reset()
 
 	log.Info().Str("config", configFile).Msgf("Started mock for %s", backendURL)
 

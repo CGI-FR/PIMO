@@ -3,30 +3,23 @@ package mock
 import (
 	"sync"
 
+	"github.com/adrienaury/zeromdc"
 	"github.com/cgi-fr/pimo/pkg/model"
 )
 
-type SynchonizedSink struct {
-	value model.Entry
-}
+type BlackHoleSink struct{}
 
-func (s *SynchonizedSink) Open() error {
+func (s BlackHoleSink) Open() error {
 	return nil
 }
 
-func (s *SynchonizedSink) ProcessDictionary(value model.Entry) error {
-	s.value = value
+func (s BlackHoleSink) ProcessDictionary(value model.Entry) error {
 	return nil
-}
-
-func (s *SynchonizedSink) Dict() model.Dictionary {
-	return s.value.(model.Dictionary)
 }
 
 type Processor struct {
 	mutex    *sync.Mutex
 	source   *model.CallableMapSource
-	sink     *SynchonizedSink
 	pipeline model.SinkedPipeline
 }
 
@@ -43,19 +36,14 @@ func NewProcessor(maskingFile string) (*Processor, error) {
 		return nil, err
 	}
 
-	sink := &SynchonizedSink{}
-
-	pipeline.AddSink(sink)
-
 	return &Processor{
 		mutex:    &sync.Mutex{},
 		source:   source,
-		sink:     sink,
-		pipeline: pipeline.AddSink(sink),
+		pipeline: pipeline.AddSink(BlackHoleSink{}),
 	}, nil
 }
 
-func (p *Processor) Process(dict model.Dictionary) (model.Dictionary, error) {
+func (p *Processor) Process(dict model.Dictionary) error {
 	p.mutex.Lock()
 	defer p.mutex.Unlock()
 
@@ -63,5 +51,7 @@ func (p *Processor) Process(dict model.Dictionary) (model.Dictionary, error) {
 
 	err := p.pipeline.Run()
 
-	return p.sink.Dict(), err
+	zeromdc.ClearGlobalFields()
+
+	return err
 }

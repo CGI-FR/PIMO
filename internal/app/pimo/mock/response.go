@@ -15,7 +15,8 @@ type ResponseDict struct {
 	model.Dictionary
 }
 
-func ToResponse(dict model.Dictionary) (*http.Response, error) {
+func (r ResponseDict) ToResponse() (*http.Response, error) {
+	dict := r.Dictionary
 	if d, ok := dict.TryUnpackAsDict(); ok {
 		dict = d
 	}
