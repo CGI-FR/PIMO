@@ -112,6 +112,6 @@ func (ctx Context) Process(w http.ResponseWriter, r *http.Request) (*http.Respon
 	return resp, nil
 }
 
-func (ctx Context) match(r *http.Request) (*Processor, *Processor, model.Dictionary) {
+func (ctx Context) match(_ *http.Request) (*Processor, *Processor, model.Dictionary) {
 	return ctx.routes[0].request, ctx.routes[0].response, model.NewDictionary()
 }
