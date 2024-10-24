@@ -21,7 +21,6 @@ import (
 	"bytes"
 	"fmt"
 	"net/http"
-	netHttp "net/http"
 	"os"
 	"runtime"
 	"strings"
@@ -223,6 +222,8 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 	playCmd.PersistentFlags().IntVarP(&playPort, "port", "p", 3010, "port number")
 	playCmd.PersistentFlags().BoolVarP(&playSecure, "secure", "s", false, "enable security features (use this flag if PIMO Play is publicly exposed)")
 	rootCmd.AddCommand(playCmd)
+
+	setupMockCommand(rootCmd)
 
 	if err := rootCmd.Execute(); err != nil {
 		log.Err(err).Msg("Error when executing command")
@@ -433,7 +434,7 @@ func writeMetricsToFile(statsFile string, statsByte []byte) {
 func sendMetrics(statsDestination string, statsByte []byte) {
 	requestBody := bytes.NewBuffer(statsByte)
 	// nolint: gosec
-	_, err := netHttp.Post(statsDestination, "application/json", requestBody)
+	_, err := http.Post(statsDestination, "application/json", requestBody)
 	if err != nil {
 		log.Error().Err(err).Msgf("An error occurred trying to send metrics to %s", statsDestination)
 	}
