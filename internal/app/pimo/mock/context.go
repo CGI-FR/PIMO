@@ -41,20 +41,17 @@ func (ctx Context) Process(w http.ResponseWriter, r *http.Request) (*http.Respon
 			Str("protocol", request.Protocol()).
 			Msg("Request intercepted")
 
-		dict, err := requestPipeline.Process(request.Dictionary)
+		request.Dictionary, err = requestPipeline.Process(request.Dictionary)
 		if err != nil {
 			return nil, err
 		}
 
-		r, err = ToRequest(dict)
-		if err != nil {
-			return nil, err
-		}
-	} else {
-		r, err = ToRequest(request.Dictionary)
-		if err != nil {
-			return nil, err
-		}
+		println(request.String())
+	}
+
+	r, err = ToRequest(request.Dictionary)
+	if err != nil {
+		return nil, err
 	}
 
 	r.URL.Scheme = ctx.backend.Scheme
@@ -75,7 +72,7 @@ func (ctx Context) Process(w http.ResponseWriter, r *http.Request) (*http.Respon
 		println(response.UnpackAsDict().String())
 
 		log.Info().
-			Str("status", response.Status()).
+			Int("status", response.Status()).
 			Str("protocol", response.Protocol()).
 			Msg("Response intercepted")
 
@@ -83,6 +80,8 @@ func (ctx Context) Process(w http.ResponseWriter, r *http.Request) (*http.Respon
 		if err != nil {
 			return nil, err
 		}
+
+		println(dict.String())
 
 		resp, err = ToResponse(dict)
 		if err != nil {
@@ -114,5 +113,5 @@ func (ctx Context) Process(w http.ResponseWriter, r *http.Request) (*http.Respon
 }
 
 func (ctx Context) match(r *http.Request) (*Processor, *Processor, model.Dictionary) {
-	return nil, nil, model.NewDictionary()
+	return ctx.routes[0].request, ctx.routes[0].response, model.NewDictionary()
 }

@@ -145,8 +145,8 @@ func NewResponseDict(response *http.Response) (ResponseDict, error) {
 	return ResponseDict{dict.Pack()}, nil
 }
 
-func (r ResponseDict) Status() string {
-	return r.UnpackAsDict().Get(keyStatus).(string)
+func (r ResponseDict) Status() int {
+	return r.UnpackAsDict().Get(keyStatus).(int)
 }
 
 func (r ResponseDict) Protocol() string {
