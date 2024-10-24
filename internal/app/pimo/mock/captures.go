@@ -88,7 +88,7 @@ func entryToString(e model.Entry) string {
 	case int:
 		return strconv.FormatInt(int64(typed), 10)
 	case int64:
-		return strconv.FormatInt(int64(typed), 10)
+		return strconv.FormatInt(typed, 10)
 	case int32:
 		return strconv.FormatInt(int64(typed), 10)
 	case int16:
@@ -96,9 +96,9 @@ func entryToString(e model.Entry) string {
 	case int8:
 		return strconv.FormatInt(int64(typed), 10)
 	case uint:
-		return strconv.FormatInt(int64(typed), 10)
+		return strconv.FormatInt(int64(typed), 10) //nolint:gosec
 	case uint64:
-		return strconv.FormatInt(int64(typed), 10)
+		return strconv.FormatInt(int64(typed), 10) //nolint:gosec
 	case uint32:
 		return strconv.FormatInt(int64(typed), 10)
 	case uint16:
