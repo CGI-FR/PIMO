@@ -257,7 +257,6 @@ func dumpCache(name string, cache model.Cache, path string, reverse bool) error 
 	}
 
 	err = pipe.AddSink(jsonline.NewSink(file)).Run()
-
 	if err != nil {
 		return fmt.Errorf("Cache %s not dump : %s", name, err.Error())
 	}
@@ -286,7 +285,6 @@ func loadCache(name string, cache model.Cache, path string, reverse bool) error 
 	}
 
 	err = pipe.AddSink(model.NewSinkToCache(cache)).Run()
-
 	if err != nil {
 		return fmt.Errorf("Cache %s not loaded : %s", name, err.Error())
 	}
@@ -438,4 +436,10 @@ func XMLCallback(ctx Context, xmlList map[string]string) (map[string]string, err
 		result[k] = stringValue
 	}
 	return result, nil
+}
+
+func InjectMasks() {
+	injectTemplateFuncs()
+	model.InjectMaskContextFactories(injectMaskContextFactories())
+	model.InjectMaskFactories(injectMaskFactories())
 }

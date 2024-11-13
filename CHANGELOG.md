@@ -17,6 +17,7 @@ Types of changes
 ## [1.28.0]
 
 - `Added` new action for parquet files
+- `Added` mock command to intercept HTTP requests/responses to a web service and apply maskings
 
 ## [1.27.0]
 
