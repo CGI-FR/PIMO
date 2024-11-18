@@ -359,7 +359,7 @@ func initLog() {
 
 	var logger zerolog.Logger
 	if jsonlog {
-		logger = zerolog.New(os.Stderr) // .With().Caller().Logger()
+		logger = zerolog.New(os.Stderr).With().Timestamp().Logger() // .With().Caller().Logger()
 	} else {
 		logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr, NoColor: !color}) // .With().Caller().Logger()
 	}
