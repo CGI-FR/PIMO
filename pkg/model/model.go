@@ -471,7 +471,9 @@ type TempSource struct {
 	source Source
 }
 
-func (s *TempSource) Open() error { return s.source.Open() }
+func (s *TempSource) Open() error {
+	return s.source.Open()
+}
 
 func (s *TempSource) Next() bool {
 	if s.repeat {
@@ -517,7 +519,9 @@ func NewMapProcess(mapper Mapper) Processor {
 	return MapProcess{mapper: mapper}
 }
 
-func (mp MapProcess) Open() error { return nil }
+func (mp MapProcess) Open() error {
+	return nil
+}
 
 func (mp MapProcess) ProcessDictionary(dictionary Dictionary, out Collector) error {
 	mappedValue, err := mp.mapper(dictionary)
@@ -654,6 +658,15 @@ type ProcessPipeline struct {
 	err error
 }
 
+func (p *ProcessPipeline) Open() error {
+	err := p.Processor.Open()
+	if err != nil {
+		return err
+	}
+
+	return p.source.Open()
+}
+
 func (p *ProcessPipeline) Next() bool {
 	if p.collector.Next() {
 		return true
@@ -703,6 +716,7 @@ func (pipeline SimpleSinkedPipeline) Run() (err error) {
 	if err != nil {
 		return err
 	}
+
 	err = pipeline.sink.Open()
 	if err != nil {
 		return err

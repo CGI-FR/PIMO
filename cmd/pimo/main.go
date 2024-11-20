@@ -74,6 +74,8 @@ var (
 	serve                 string
 	maxBufferCapacity     int
 	profiling             string
+	parquetInput          string
+	parquetOutput         string
 )
 
 func main() {
@@ -187,6 +189,26 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 	xmlCmd.Flags().Int64VarP(&seedValue, "seed", "s", 0, "set seed")
 	rootCmd.AddCommand(xmlCmd)
 
+	// Add command for parquet transformer
+	parquetCmd := &cobra.Command{
+		Use:   "parquet input_parquet_file output_parquet_file",
+		Short: "Parsing and masking a parquet file",
+		Args:  cobra.ExactArgs(2),
+		Run: func(cmd *cobra.Command, args []string) {
+			initLog()
+			if len(catchErrors) > 0 {
+				skipLineOnError = true
+				skipLogFile = catchErrors
+			}
+			parquetInput = args[0]
+			parquetOutput = args[1]
+
+			run(cmd)
+		},
+	}
+	parquetCmd.Flags().Int64VarP(&seedValue, "seed", "s", 0, "set seed")
+	rootCmd.AddCommand(parquetCmd)
+
 	rootCmd.AddCommand(&cobra.Command{
 		Use: "flow",
 		Run: func(cmd *cobra.Command, args []string) {
@@ -254,6 +276,8 @@ func run(cmd *cobra.Command) {
 		CachesToDump:     cachesToDump,
 		CachesToLoad:     cachesToLoad,
 		XMLCallback:      len(serve) > 0,
+		ParquetInput:     parquetInput,
+		ParquetOutput:    parquetOutput,
 	}
 
 	var pdef model.Definition
