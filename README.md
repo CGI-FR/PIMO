@@ -1441,6 +1441,8 @@ After executing the command with the correct configuration, here is the expected
 
 ### Parsing Parquet files
 
+Warning: parquet support is still an experimental feature, we are currently considering to migrate this feature to a new dataconnector type in LINO (might be dropped from PIMO in future releases)
+
 To mask data in a Parquet file using PIMO with the correct configuration option, follow this updated approach:
 
 ```bash

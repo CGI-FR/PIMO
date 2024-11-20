@@ -413,7 +413,6 @@ type RepeaterUntilProcess struct {
 }
 
 func (p RepeaterUntilProcess) Open() error {
-	log.Trace().Msg("Open RepeaterUntilProcess")
 	return nil
 }
 
@@ -473,8 +472,6 @@ type TempSource struct {
 }
 
 func (s *TempSource) Open() error {
-	log.Trace().Msg("Open TempSource")
-
 	return s.source.Open()
 }
 
@@ -504,8 +501,6 @@ type RepeaterProcess struct {
 }
 
 func (p RepeaterProcess) Open() error {
-	log.Trace().Msg("Open RepeaterProcess")
-
 	return nil
 }
 
@@ -525,8 +520,6 @@ func NewMapProcess(mapper Mapper) Processor {
 }
 
 func (mp MapProcess) Open() error {
-	log.Trace().Msg("Open MapProcess")
-
 	return nil
 }
 
@@ -617,8 +610,6 @@ func (pipeline SimplePipeline) Err() error {
 }
 
 func (pipeline SimplePipeline) Open() error {
-	log.Trace().Msg("Open SimplePipeline")
-
 	return pipeline.source.Open()
 }
 
@@ -636,7 +627,6 @@ func (c *QueueCollector) Err() error {
 }
 
 func (c *QueueCollector) Open() error {
-	log.Trace().Msg("Open QueueCollector")
 	return nil
 }
 
@@ -727,7 +717,6 @@ func (pipeline SimpleSinkedPipeline) Run() (err error) {
 		return err
 	}
 
-	log.Trace().Any("sink", pipeline.sink).Msg("Open Sink")
 	err = pipeline.sink.Open()
 	if err != nil {
 		return err
@@ -777,8 +766,6 @@ type CallableMapSource struct {
 }
 
 func (source *CallableMapSource) Open() error {
-	log.Trace().Msg("Open CallableMapSource")
-
 	return nil
 }
 
