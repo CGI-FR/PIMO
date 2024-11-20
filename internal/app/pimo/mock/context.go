@@ -65,8 +65,10 @@ func (ctx Context) Process(w http.ResponseWriter, r *http.Request) (*http.Respon
 			request.SetURLPath(match.Build(request.Captures()))
 		}
 
-		log.Trace().RawJSON("request", []byte(origin.UnpackAsDict().String())).Msg("Origin")
-		log.Trace().RawJSON("request", []byte(request.UnpackAsDict().String())).Msg("Masked")
+		if log.Trace().Enabled() {
+			log.Trace().RawJSON("request", []byte(origin.UnpackAsDict().String())).Msg("Origin")
+			log.Trace().RawJSON("request", []byte(request.UnpackAsDict().String())).Msg("Masked")
+		}
 	}
 
 	r, err = request.ToRequest()
@@ -103,8 +105,10 @@ func (ctx Context) Process(w http.ResponseWriter, r *http.Request) (*http.Respon
 			return nil, err
 		}
 
-		log.Trace().RawJSON("response", []byte(origin.UnpackAsDict().String())).Msg("Origin")
-		log.Trace().RawJSON("response", []byte(response.UnpackAsDict().String())).Msg("Masked")
+		if log.Trace().Enabled() {
+			log.Trace().RawJSON("response", []byte(origin.UnpackAsDict().String())).Msg("Origin")
+			log.Trace().RawJSON("response", []byte(response.UnpackAsDict().String())).Msg("Masked")
+		}
 
 		resp, err = response.ToResponse()
 		if err != nil {
