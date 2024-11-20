@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1731946291376,
+  "lastUpdate": 1732096653523,
   "repoUrl": "https://github.com/CGI-FR/PIMO",
   "entries": {
     "Benchmark": [
@@ -10458,6 +10458,126 @@ window.BENCHMARK_DATA = {
             "value": 261,
             "unit": "allocs/op",
             "extra": "359253 times\n4 procs"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "youen.peron@cgi.com",
+            "name": "Youen Péron",
+            "username": "youen"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "b1becd4f6b0690257f7b724ed3d485736c87c332",
+          "message": "feat: parquet support (#334)\n\n* feat: read parquet file\r\n\r\n* feat: read all lines\r\n\r\n* feat: new parquet verb\r\n\r\n* Pending changes exported from your codespace\r\n\r\n* feat: parquet sink\r\n\r\n* feat: parquet reader with arrow\r\n\r\n* feat: parquet writer\r\n\r\n* fix: linter error\r\n\r\n* chore: fix devcontainer\r\n\r\n* docs: changelog and readme for parquet\r\n\r\n* fix: gosec exception\r\n\r\n* chore: fix lint timeout\r\n\r\n* fix: update wasm_exec.js\r\n\r\n* fix: pimo wasm\r\n\r\n* chore: goreleaser deprecated flag\r\n\r\n* fix: unsupported targets for parquet\r\n\r\n* docs: fix readme chapters\r\n\r\n* docs: mark parquet support as experimental feature\r\n\r\n---------\r\n\r\nCo-authored-by: Adrien Aury <44274230+adrienaury@users.noreply.github.com>",
+          "timestamp": "2024-11-20T10:46:23+01:00",
+          "tree_id": "9f9341817cc6a1999b2590cd0b0eb87850806302",
+          "url": "https://github.com/CGI-FR/PIMO/commit/b1becd4f6b0690257f7b724ed3d485736c87c332"
+        },
+        "date": 1732096653260,
+        "tool": "go",
+        "benches": [
+          {
+            "name": "BenchmarkPimoRun",
+            "value": 21235,
+            "unit": "ns/op\t   16392 B/op\t     141 allocs/op",
+            "extra": "558471 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkPimoRun - ns/op",
+            "value": 21235,
+            "unit": "ns/op",
+            "extra": "558471 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkPimoRun - B/op",
+            "value": 16392,
+            "unit": "B/op",
+            "extra": "558471 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkPimoRun - allocs/op",
+            "value": 141,
+            "unit": "allocs/op",
+            "extra": "558471 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge",
+            "value": 1226366,
+            "unit": "ns/op\t  532127 B/op\t    1775 allocs/op",
+            "extra": "9360 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge - ns/op",
+            "value": 1226366,
+            "unit": "ns/op",
+            "extra": "9360 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge - B/op",
+            "value": 532127,
+            "unit": "B/op",
+            "extra": "9360 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge - allocs/op",
+            "value": 1775,
+            "unit": "allocs/op",
+            "extra": "9360 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkFindInCSVIteration",
+            "value": 98306862,
+            "unit": "ns/op\t42681774 B/op\t  532096 allocs/op",
+            "extra": "602 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkFindInCSVIteration - ns/op",
+            "value": 98306862,
+            "unit": "ns/op",
+            "extra": "602 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkFindInCSVIteration - B/op",
+            "value": 42681774,
+            "unit": "B/op",
+            "extra": "602 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkFindInCSVIteration - allocs/op",
+            "value": 532096,
+            "unit": "allocs/op",
+            "extra": "602 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkFindInCSVLargeVolume",
+            "value": 33695,
+            "unit": "ns/op\t   21432 B/op\t     261 allocs/op",
+            "extra": "358774 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkFindInCSVLargeVolume - ns/op",
+            "value": 33695,
+            "unit": "ns/op",
+            "extra": "358774 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkFindInCSVLargeVolume - B/op",
+            "value": 21432,
+            "unit": "B/op",
+            "extra": "358774 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkFindInCSVLargeVolume - allocs/op",
+            "value": 261,
+            "unit": "allocs/op",
+            "extra": "358774 times\n4 procs"
           }
         ]
       }
