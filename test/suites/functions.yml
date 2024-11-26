@@ -43,7 +43,7 @@ testcases:
       cat > masking.yml <<EOF
       version: "1"
       functions:
-        "isEmpty":
+        isEmpty:
           params:
             - name: "empty"
           body: |-
@@ -56,7 +56,7 @@ testcases:
             jsonpath: "value"
           mask:
             template: '{{isEmpty false}}'
-            EOF
+      EOF
   - script: |-
       echo '{"value": "1"}' | pimo
     assertions:
