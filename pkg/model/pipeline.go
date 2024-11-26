@@ -26,7 +26,7 @@ import (
 	"time"
 
 	"github.com/cgi-fr/pimo/pkg/functions"
-	"github.com/goccy/go-yaml"
+	"gopkg.in/yaml.v3"
 )
 
 // nolint: gochecknoglobals

@@ -6,7 +6,7 @@ import (
 	"os"
 
 	"github.com/cgi-fr/pimo/pkg/model"
-	"github.com/goccy/go-yaml"
+	"gopkg.in/yaml.v3"
 )
 
 type Config struct {
