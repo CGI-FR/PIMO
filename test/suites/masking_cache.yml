@@ -566,11 +566,10 @@ testcases:
           masks:
             - constant: 2
             - fromCache: "cacheSex"
-
       caches:
-        cacheSex :
+        cacheSex:
           unique: true
-          reverse:  true
+          reverse: true
       EOF
   - script: |-
       cat > cacheSex.jsonl <<EOF

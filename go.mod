@@ -9,7 +9,7 @@ require (
 	github.com/apache/arrow/go/v12 v12.0.1
 	github.com/capitalone/fpe v1.2.1
 	github.com/goccy/go-json v0.10.3
-	github.com/goccy/go-yaml v1.12.0
+	github.com/goccy/go-yaml v1.14.3
 	github.com/iancoleman/orderedmap v0.3.0
 	github.com/invopop/jsonschema v0.12.0
 	github.com/kenshaw/baseconv v0.1.1
@@ -37,7 +37,6 @@ require (
 	github.com/bahlo/generic-list-go v0.2.0 // indirect
 	github.com/buger/jsonparser v1.1.1 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
-	github.com/fatih/color v1.13.0 // indirect
 	github.com/felixge/fgprof v0.9.3 // indirect
 	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
