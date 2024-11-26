@@ -9,6 +9,7 @@ require (
 	github.com/apache/arrow/go/v12 v12.0.1
 	github.com/capitalone/fpe v1.2.1
 	github.com/goccy/go-json v0.10.3
+	github.com/goccy/go-yaml v1.14.3
 	github.com/iancoleman/orderedmap v0.3.0
 	github.com/invopop/jsonschema v0.12.0
 	github.com/kenshaw/baseconv v0.1.1
@@ -24,7 +25,6 @@ require (
 	golang.org/x/crypto v0.29.0
 	golang.org/x/exp v0.0.0-20240707233637-46b078467d37
 	golang.org/x/text v0.20.0
-	gopkg.in/yaml.v3 v3.0.1
 )
 
 require (
@@ -76,4 +76,5 @@ require (
 	google.golang.org/genproto v0.0.0-20230410155749-daa745c078e1 // indirect
 	google.golang.org/grpc v1.56.3 // indirect
 	google.golang.org/protobuf v1.34.2 // indirect
+	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
