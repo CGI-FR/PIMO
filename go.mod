@@ -20,7 +20,7 @@ require (
 	github.com/rs/zerolog v1.33.0
 	github.com/spf13/cast v1.7.0
 	github.com/spf13/cobra v1.8.1
-	github.com/stretchr/testify v1.9.0
+	github.com/stretchr/testify v1.10.0
 	github.com/zach-klippenstein/goregen v0.0.0-20160303162051-795b5e3961ea
 	golang.org/x/crypto v0.29.0
 	golang.org/x/exp v0.0.0-20240707233637-46b078467d37
