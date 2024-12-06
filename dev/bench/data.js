@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1733391857309,
+  "lastUpdate": 1733525530065,
   "repoUrl": "https://github.com/CGI-FR/PIMO",
   "entries": {
     "Benchmark": [
@@ -11898,6 +11898,126 @@ window.BENCHMARK_DATA = {
             "value": 261,
             "unit": "allocs/op",
             "extra": "373647 times\n4 procs"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "49699333+dependabot[bot]@users.noreply.github.com",
+            "name": "dependabot[bot]",
+            "username": "dependabot[bot]"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "23e9514fd367581e6df1a61338ddd2ed1dced0cb",
+          "message": "chore(deps): bump github.com/goccy/go-yaml from 1.15.6 to 1.15.7 (#364)\n\nBumps [github.com/goccy/go-yaml](https://github.com/goccy/go-yaml) from 1.15.6 to 1.15.7.\n- [Release notes](https://github.com/goccy/go-yaml/releases)\n- [Changelog](https://github.com/goccy/go-yaml/blob/master/CHANGELOG.md)\n- [Commits](https://github.com/goccy/go-yaml/compare/v1.15.6...v1.15.7)\n\n---\nupdated-dependencies:\n- dependency-name: github.com/goccy/go-yaml\n  dependency-type: direct:production\n  update-type: version-update:semver-patch\n...\n\nSigned-off-by: dependabot[bot] <support@github.com>\nCo-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>",
+          "timestamp": "2024-12-06T23:40:49+01:00",
+          "tree_id": "1546df48af6bbeef0801c80a8265ca13c0c7d5f8",
+          "url": "https://github.com/CGI-FR/PIMO/commit/23e9514fd367581e6df1a61338ddd2ed1dced0cb"
+        },
+        "date": 1733525529408,
+        "tool": "go",
+        "benches": [
+          {
+            "name": "BenchmarkPimoRun",
+            "value": 21345,
+            "unit": "ns/op\t   16391 B/op\t     141 allocs/op",
+            "extra": "564898 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkPimoRun - ns/op",
+            "value": 21345,
+            "unit": "ns/op",
+            "extra": "564898 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkPimoRun - B/op",
+            "value": 16391,
+            "unit": "B/op",
+            "extra": "564898 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkPimoRun - allocs/op",
+            "value": 141,
+            "unit": "allocs/op",
+            "extra": "564898 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge",
+            "value": 1233304,
+            "unit": "ns/op\t  531985 B/op\t    1775 allocs/op",
+            "extra": "9238 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge - ns/op",
+            "value": 1233304,
+            "unit": "ns/op",
+            "extra": "9238 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge - B/op",
+            "value": 531985,
+            "unit": "B/op",
+            "extra": "9238 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge - allocs/op",
+            "value": 1775,
+            "unit": "allocs/op",
+            "extra": "9238 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkFindInCSVIteration",
+            "value": 98417922,
+            "unit": "ns/op\t42201473 B/op\t  526338 allocs/op",
+            "extra": "595 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkFindInCSVIteration - ns/op",
+            "value": 98417922,
+            "unit": "ns/op",
+            "extra": "595 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkFindInCSVIteration - B/op",
+            "value": 42201473,
+            "unit": "B/op",
+            "extra": "595 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkFindInCSVIteration - allocs/op",
+            "value": 526338,
+            "unit": "allocs/op",
+            "extra": "595 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkFindInCSVLargeVolume",
+            "value": 33146,
+            "unit": "ns/op\t   21595 B/op\t     261 allocs/op",
+            "extra": "365101 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkFindInCSVLargeVolume - ns/op",
+            "value": 33146,
+            "unit": "ns/op",
+            "extra": "365101 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkFindInCSVLargeVolume - B/op",
+            "value": 21595,
+            "unit": "B/op",
+            "extra": "365101 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkFindInCSVLargeVolume - allocs/op",
+            "value": 261,
+            "unit": "allocs/op",
+            "extra": "365101 times\n4 procs"
           }
         ]
       }
