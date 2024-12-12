@@ -13,7 +13,7 @@ require (
 	github.com/iancoleman/orderedmap v0.3.0
 	github.com/invopop/jsonschema v0.12.0
 	github.com/kenshaw/baseconv v0.1.1
-	github.com/labstack/echo/v4 v4.13.0
+	github.com/labstack/echo/v4 v4.13.1
 	github.com/mattn/anko v0.1.9
 	github.com/mattn/go-isatty v0.0.20
 	github.com/pkg/profile v1.7.0
