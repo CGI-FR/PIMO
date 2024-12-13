@@ -8,7 +8,7 @@ require (
 	github.com/adrienaury/zeromdc v0.1.1
 	github.com/apache/arrow/go/v12 v12.0.1
 	github.com/capitalone/fpe v1.2.1
-	github.com/goccy/go-json v0.10.3
+	github.com/goccy/go-json v0.10.4
 	github.com/goccy/go-yaml v1.15.9
 	github.com/iancoleman/orderedmap v0.3.0
 	github.com/invopop/jsonschema v0.12.0
