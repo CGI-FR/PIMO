@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1734164807831,
+  "lastUpdate": 1734339432444,
   "repoUrl": "https://github.com/CGI-FR/PIMO",
   "entries": {
     "Benchmark": [
@@ -12378,6 +12378,126 @@ window.BENCHMARK_DATA = {
             "value": 261,
             "unit": "allocs/op",
             "extra": "358261 times\n4 procs"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "49699333+dependabot[bot]@users.noreply.github.com",
+            "name": "dependabot[bot]",
+            "username": "dependabot[bot]"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "be140a374c657518adeaa58c23de6f7f38ae06cb",
+          "message": "chore(deps): bump github.com/labstack/echo/v4 from 4.13.0 to 4.13.2 (#370)\n\nBumps [github.com/labstack/echo/v4](https://github.com/labstack/echo) from 4.13.0 to 4.13.2.\n- [Release notes](https://github.com/labstack/echo/releases)\n- [Changelog](https://github.com/labstack/echo/blob/master/CHANGELOG.md)\n- [Commits](https://github.com/labstack/echo/compare/v4.13.0...v4.13.2)\n\n---\nupdated-dependencies:\n- dependency-name: github.com/labstack/echo/v4\n  dependency-type: direct:production\n  update-type: version-update:semver-patch\n...\n\nSigned-off-by: dependabot[bot] <support@github.com>\nCo-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>",
+          "timestamp": "2024-12-16T09:45:47+01:00",
+          "tree_id": "ad3ef71cdd2dd21a94ea06bc00e7d637769e3bee",
+          "url": "https://github.com/CGI-FR/PIMO/commit/be140a374c657518adeaa58c23de6f7f38ae06cb"
+        },
+        "date": 1734339431821,
+        "tool": "go",
+        "benches": [
+          {
+            "name": "BenchmarkPimoRun",
+            "value": 21565,
+            "unit": "ns/op\t   16391 B/op\t     141 allocs/op",
+            "extra": "563138 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkPimoRun - ns/op",
+            "value": 21565,
+            "unit": "ns/op",
+            "extra": "563138 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkPimoRun - B/op",
+            "value": 16391,
+            "unit": "B/op",
+            "extra": "563138 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkPimoRun - allocs/op",
+            "value": 141,
+            "unit": "allocs/op",
+            "extra": "563138 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge",
+            "value": 1235910,
+            "unit": "ns/op\t  532102 B/op\t    1776 allocs/op",
+            "extra": "8802 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge - ns/op",
+            "value": 1235910,
+            "unit": "ns/op",
+            "extra": "8802 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge - B/op",
+            "value": 532102,
+            "unit": "B/op",
+            "extra": "8802 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge - allocs/op",
+            "value": 1776,
+            "unit": "allocs/op",
+            "extra": "8802 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkFindInCSVIteration",
+            "value": 98451318,
+            "unit": "ns/op\t41854585 B/op\t  522215 allocs/op",
+            "extra": "590 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkFindInCSVIteration - ns/op",
+            "value": 98451318,
+            "unit": "ns/op",
+            "extra": "590 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkFindInCSVIteration - B/op",
+            "value": 41854585,
+            "unit": "B/op",
+            "extra": "590 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkFindInCSVIteration - allocs/op",
+            "value": 522215,
+            "unit": "allocs/op",
+            "extra": "590 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkFindInCSVLargeVolume",
+            "value": 34232,
+            "unit": "ns/op\t   21601 B/op\t     261 allocs/op",
+            "extra": "364500 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkFindInCSVLargeVolume - ns/op",
+            "value": 34232,
+            "unit": "ns/op",
+            "extra": "364500 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkFindInCSVLargeVolume - B/op",
+            "value": 21601,
+            "unit": "B/op",
+            "extra": "364500 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkFindInCSVLargeVolume - allocs/op",
+            "value": 261,
+            "unit": "allocs/op",
+            "extra": "364500 times\n4 procs"
           }
         ]
       }
