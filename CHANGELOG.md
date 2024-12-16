@@ -14,6 +14,10 @@ Types of changes
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [1.28.2]
+
+- `Fixed` mock command fails to parse JSON body when root is an array
+
 ## [1.28.1]
 
 - `Fixed` mock command fails when log level is not TRACE
