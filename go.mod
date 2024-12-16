@@ -13,7 +13,7 @@ require (
 	github.com/iancoleman/orderedmap v0.3.0
 	github.com/invopop/jsonschema v0.12.0
 	github.com/kenshaw/baseconv v0.1.1
-	github.com/labstack/echo/v4 v4.13.0
+	github.com/labstack/echo/v4 v4.13.2
 	github.com/mattn/anko v0.1.9
 	github.com/mattn/go-isatty v0.0.20
 	github.com/pkg/profile v1.7.0
@@ -66,10 +66,10 @@ require (
 	github.com/wk8/go-ordered-map/v2 v2.1.8 // indirect
 	github.com/zeebo/xxh3 v1.0.2 // indirect
 	golang.org/x/mod v0.19.0 // indirect
-	golang.org/x/net v0.27.0 // indirect
+	golang.org/x/net v0.32.0 // indirect
 	golang.org/x/sync v0.10.0 // indirect
 	golang.org/x/sys v0.28.0 // indirect
-	golang.org/x/time v0.5.0 // indirect
+	golang.org/x/time v0.8.0 // indirect
 	golang.org/x/tools v0.23.0 // indirect
 	golang.org/x/xerrors v0.0.0-20220609144429-65e65417b02f // indirect
 	google.golang.org/genproto v0.0.0-20230410155749-daa745c078e1 // indirect
