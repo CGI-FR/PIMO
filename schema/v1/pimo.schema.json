@@ -3,6 +3,19 @@
   "$id": "https://github.com/cgi-fr/pimo/pkg/model/definition",
   "$ref": "#/$defs/Definition",
   "$defs": {
+    "ApplyType": {
+      "properties": {
+        "uri": {
+          "type": "string",
+          "description": "URI of the mask resource"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "uri"
+      ]
+    },
     "CacheDefinition": {
       "properties": {
         "unique": {
@@ -754,6 +767,9 @@
           "$ref": "#/$defs/Sha3Type",
           "title": "Sha3 Mask",
           "description": "Generate a variable-length crytographic hash (collision resistant)"
+        },
+        "apply": {
+          "$ref": "#/$defs/ApplyType"
         }
       },
       "additionalProperties": false,

@@ -14,8 +14,9 @@ Types of changes
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
-## [1.28.2]
+## [1.29.0]
 
+- `Added` mask `apply` to externalize masks
 - `Fixed` mock command fails to parse JSON body when root is an array
 
 ## [1.28.1]
