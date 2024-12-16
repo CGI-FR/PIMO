@@ -6,8 +6,9 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/cgi-fr/pimo/pkg/jsonline"
 	"github.com/cgi-fr/pimo/pkg/model"
+	"github.com/goccy/go-json"
+	"github.com/rs/zerolog/log"
 )
 
 type RequestDict struct {
@@ -40,12 +41,10 @@ func (r RequestDict) ToRequest() (*http.Request, error) {
 	if b, ok := dict.GetValue(keyBody); ok {
 		if s, ok := b.(string); ok {
 			body = s
-		} else if d, ok := b.(model.Dictionary); ok {
-			bytes, err := d.MarshalJSON()
-			if err != nil {
-				return nil, err
-			}
-			body = string(bytes)
+		} else if bytes, err := json.Marshal(b); err == nil {
+			body = string(bytes) + "\n"
+		} else {
+			log.Err(err).Msg("Failed to read body")
 		}
 	}
 
@@ -98,10 +97,12 @@ func NewRequestDict(request *http.Request) (RequestDict, error) {
 		if err != nil {
 			return RequestDict{dict.Pack()}, err
 		}
-		if bodydict, err := jsonline.JSONToDictionary(b); err != nil {
+
+		var bodydict interface{}
+		if err := json.Unmarshal(b, &bodydict); err != nil {
 			dict.Set(keyBody, string(b))
 		} else {
-			dict.Set(keyBody, bodydict)
+			dict.Set(keyBody, model.CleanTypes(bodydict))
 		}
 	}
 

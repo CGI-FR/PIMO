@@ -28,6 +28,7 @@ import (
 	over "github.com/adrienaury/zeromdc"
 	"github.com/cgi-fr/pimo/pkg/add"
 	"github.com/cgi-fr/pimo/pkg/addtransient"
+	"github.com/cgi-fr/pimo/pkg/apply"
 	"github.com/cgi-fr/pimo/pkg/command"
 	"github.com/cgi-fr/pimo/pkg/constant"
 	"github.com/cgi-fr/pimo/pkg/dateparser"
@@ -341,6 +342,7 @@ func injectMaskFactories() []model.MaskFactory {
 		timeline.Factory,
 		sequence.Factory,
 		sha3.Factory,
+		apply.Factory,
 	}
 }
 

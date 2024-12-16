@@ -237,6 +237,10 @@ type Sha3Type struct {
 	MaxStrLen  int    `yaml:"maxstrlen,omitempty" json:"maxstrlen,omitempty" jsonschema_description:"an error will occur if the identifier can grow longer than the specified length"`
 }
 
+type ApplyType struct {
+	URI string `yaml:"uri" json:"uri" jsonschema_description:"URI of the mask resource"`
+}
+
 type MaskType struct {
 	Add               Entry                `yaml:"add,omitempty" json:"add,omitempty" jsonschema:"oneof_required=Add,title=Add Mask,description=Add a new field in the JSON stream"`
 	AddTransient      Entry                `yaml:"add-transient,omitempty" json:"add-transient,omitempty" jsonschema:"oneof_required=AddTransient,title=Add Transient Mask" jsonschema_description:"Add a new temporary field, that will not show in the JSON output"`
@@ -275,6 +279,7 @@ type MaskType struct {
 	TimeLine          TimeLineType         `yaml:"timeline,omitempty" json:"timeline,omitempty" jsonschema:"oneof_required=TimeLine,title=TimeLine Mask" jsonschema_description:"Generate a timeline under constraints and rules"`
 	Sequence          SequenceType         `yaml:"sequence,omitempty" json:"sequence,omitempty" jsonschema:"oneof_required=Sequence,title=Sequence Mask" jsonschema_description:"Generate a sequenced ID that follows specified format"`
 	Sha3              Sha3Type             `yaml:"sha3,omitempty" json:"sha3,omitempty" jsonschema:"oneof_required=Sha3,title=Sha3 Mask" jsonschema_description:"Generate a variable-length crytographic hash (collision resistant)"`
+	Apply             ApplyType            `yaml:"apply,omitempty" json:"apply,omitempty" jsonschema:""`
 }
 
 type Masking struct {
