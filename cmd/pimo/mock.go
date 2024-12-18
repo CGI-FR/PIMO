@@ -42,7 +42,7 @@ func setupMockCommand(rootCmd *cobra.Command) {
 	mockCmd.PersistentFlags().StringVarP(&mockAddr, "port", "p", mockAddr, "address and port number")
 	mockCmd.PersistentFlags().StringVarP(&mockConfigFile, "config", "c", mockConfigFile, "name and location of the routes config file")
 	mockCmd.Flags().Int64VarP(&seedValue, "seed", "s", 0, "set seed")
-	mockCmd.Flags().IntVar(&maxBufferCapacity, "buffer-size", defaultBufferCapacity, "buffer size in kB to load data from uri for each line")
+	addFlag(mockCmd, flagBufferSize)
 
 	rootCmd.AddCommand(mockCmd)
 }
