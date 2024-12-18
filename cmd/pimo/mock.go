@@ -43,7 +43,7 @@ func setupMockCommand(rootCmd *cobra.Command) {
 	addFlag(mockCmd, flagBufferSize)
 	// addFlag(mockCmd, flagCatchErrors) // could use
 	addFlag(mockCmd, flagConfigRoute)
-	addFlag(mockCmd, flagCachesToDump)
+	// addFlag(mockCmd, flagCachesToDump) // could use
 	addFlag(mockCmd, flagCachesToLoad)
 	// addFlag(mockCmd, flagProfiling) // could use
 	addFlag(mockCmd, flagSeed)
@@ -72,7 +72,7 @@ func runMockCommand(backendURL, mockAddr, configFile string, globalSeed *int64) 
 		log.Fatal().Err(err).Msg("Failed to parse backend URL")
 	}
 
-	ctx, err := cfg.Build(backend, globalSeed)
+	ctx, err := cfg.Build(backend, globalSeed, cachesToLoad)
 	if err != nil {
 		log.Fatal().Err(err).Msgf("Failed to build routes from %s", configFile)
 	}

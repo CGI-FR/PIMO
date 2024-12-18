@@ -64,6 +64,10 @@ func (me MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Ent
 		return nil, err
 	}
 
+	if len(result) == 0 {
+		return nil, nil
+	}
+
 	return result[0], nil
 }
 

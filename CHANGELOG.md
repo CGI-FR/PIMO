@@ -17,7 +17,9 @@ Types of changes
 ## [1.29.1]
 
 - `Fixed` mock command ignores global seed flag
-- `Fixed` missing flag `buffer-size` in commands `mock`, `xml` and `play`
+- `Fixed` missing flag `buffer-size` in `mock`, `xml` and `play` commands
+- `Fixed` missing flag `load-cache` in `mock` command
+- `Fixed` remove unused flags from `mock`, `xml`, `parquet`, `jsonschema`, `flow` and `play` commands
 
 ## [1.29.0]
 
