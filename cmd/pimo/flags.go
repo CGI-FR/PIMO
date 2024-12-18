@@ -64,42 +64,42 @@ var (
 )
 
 func addFlag[T any](cmd *cobra.Command, flag flag[T]) {
-	switch typedVar := any(*flag.variable).(type) {
-	case int:
+	switch variable := any(flag.variable).(type) {
+	case *int:
 		if len(flag.shorthand) > 0 {
-			cmd.Flags().IntVarP(&typedVar, flag.name, flag.shorthand, typedVar, flag.usage)
+			cmd.Flags().IntVarP(variable, flag.name, flag.shorthand, *variable, flag.usage)
 		} else {
-			cmd.Flags().IntVar(&typedVar, flag.name, typedVar, flag.usage)
+			cmd.Flags().IntVar(variable, flag.name, *variable, flag.usage)
 		}
-	case bool:
+	case *bool:
 		if len(flag.shorthand) > 0 {
-			cmd.Flags().BoolVarP(&typedVar, flag.name, flag.shorthand, typedVar, flag.usage)
+			cmd.Flags().BoolVarP(variable, flag.name, flag.shorthand, *variable, flag.usage)
 		} else {
-			cmd.Flags().BoolVar(&typedVar, flag.name, typedVar, flag.usage)
+			cmd.Flags().BoolVar(variable, flag.name, *variable, flag.usage)
 		}
-	case string:
+	case *string:
 		if len(flag.shorthand) > 0 {
-			cmd.Flags().StringVarP(&typedVar, flag.name, flag.shorthand, typedVar, flag.usage)
+			cmd.Flags().StringVarP(variable, flag.name, flag.shorthand, *variable, flag.usage)
 		} else {
-			cmd.Flags().StringVar(&typedVar, flag.name, typedVar, flag.usage)
+			cmd.Flags().StringVar(variable, flag.name, *variable, flag.usage)
 		}
-	case int64:
+	case *int64:
 		if len(flag.shorthand) > 0 {
-			cmd.Flags().Int64VarP(&typedVar, flag.name, flag.shorthand, typedVar, flag.usage)
+			cmd.Flags().Int64VarP(variable, flag.name, flag.shorthand, *variable, flag.usage)
 		} else {
-			cmd.Flags().Int64Var(&typedVar, flag.name, typedVar, flag.usage)
+			cmd.Flags().Int64Var(variable, flag.name, *variable, flag.usage)
 		}
-	case map[string]string:
+	case *map[string]string:
 		if len(flag.shorthand) > 0 {
-			cmd.Flags().StringToStringVarP(&typedVar, flag.name, flag.shorthand, typedVar, flag.usage)
+			cmd.Flags().StringToStringVarP(variable, flag.name, flag.shorthand, *variable, flag.usage)
 		} else {
-			cmd.Flags().StringToStringVar(&typedVar, flag.name, typedVar, flag.usage)
+			cmd.Flags().StringToStringVar(variable, flag.name, *variable, flag.usage)
 		}
-	case []string:
+	case *[]string:
 		if len(flag.shorthand) > 0 {
-			cmd.Flags().StringArrayVarP(&typedVar, flag.name, flag.shorthand, typedVar, flag.usage)
+			cmd.Flags().StringArrayVarP(variable, flag.name, flag.shorthand, *variable, flag.usage)
 		} else {
-			cmd.Flags().StringArrayVar(&typedVar, flag.name, typedVar, flag.usage)
+			cmd.Flags().StringArrayVar(variable, flag.name, *variable, flag.usage)
 		}
 	}
 }
