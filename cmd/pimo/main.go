@@ -78,6 +78,8 @@ var (
 	parquetOutput         string
 )
 
+const defaultBufferCapacity = 64
+
 func main() {
 	rootCmd := &cobra.Command{
 		Use:   "pimo",
@@ -118,7 +120,7 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 	rootCmd.PersistentFlags().StringVar(&statisticsDestination, "stats", statsDestinationEnv, "generate execution statistics in the specified dump file")
 	rootCmd.PersistentFlags().StringVar(&statsTemplate, "statsTemplate", statsTemplateEnv, "template string to format stats (to include them you have to specify them as `{{ .Stats }}` like `{\"software\":\"PIMO\",\"stats\":{{ .Stats }}}`)")
 	rootCmd.Flags().StringVar(&serve, "serve", "", "listen/respond to HTTP interface and port instead of stdin/stdout, <ip>:<port> or :<port> to listen to all local networks")
-	rootCmd.Flags().IntVar(&maxBufferCapacity, "buffer-size", 64, "buffer size in kB to load data from uri for each line")
+	rootCmd.Flags().IntVar(&maxBufferCapacity, "buffer-size", defaultBufferCapacity, "buffer size in kB to load data from uri for each line")
 	rootCmd.Flags().StringVar(&profiling, "pprof", "", "create a pprof file - use 'cpu' to create a CPU pprof file or 'mem' to create an memory pprof file")
 
 	rootCmd.AddCommand(&cobra.Command{
@@ -135,8 +137,11 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 	xmlCmd := &cobra.Command{
 		Use:   "xml",
 		Short: "Parsing and masking XML file",
-		Run: func(cmd *cobra.Command, args []string) {
+		Run: func(cmd *cobra.Command, _ []string) {
 			initLog()
+			if maxBufferCapacity > 0 {
+				uri.MaxCapacityForEachLine = maxBufferCapacity * 1024
+			}
 			if len(catchErrors) > 0 {
 				skipLineOnError = true
 				skipLogFile = catchErrors
@@ -187,6 +192,7 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 	}
 	xmlCmd.Flags().StringToStringVar(&xmlSubscriberName, "subscriber", map[string]string{}, "name of element to mask")
 	xmlCmd.Flags().Int64VarP(&seedValue, "seed", "s", 0, "set seed")
+	xmlCmd.Flags().IntVar(&maxBufferCapacity, "buffer-size", defaultBufferCapacity, "buffer size in kB to load data from uri for each line")
 	rootCmd.AddCommand(xmlCmd)
 
 	// Add command for parquet transformer
@@ -233,6 +239,10 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 		Run: func(cmd *cobra.Command, args []string) {
 			initLog()
 
+			if maxBufferCapacity > 0 {
+				uri.MaxCapacityForEachLine = maxBufferCapacity * 1024
+			}
+
 			router := pimo.Play(playSecure)
 			port := fmt.Sprintf("0.0.0.0:%d", playPort)
 
@@ -243,6 +253,7 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 	}
 	playCmd.PersistentFlags().IntVarP(&playPort, "port", "p", 3010, "port number")
 	playCmd.PersistentFlags().BoolVarP(&playSecure, "secure", "s", false, "enable security features (use this flag if PIMO Play is publicly exposed)")
+	playCmd.Flags().IntVar(&maxBufferCapacity, "buffer-size", defaultBufferCapacity, "buffer size in kB to load data from uri for each line")
 	rootCmd.AddCommand(playCmd)
 
 	setupMockCommand(rootCmd)

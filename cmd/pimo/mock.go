@@ -8,6 +8,7 @@ import (
 	"github.com/cgi-fr/pimo/internal/app/pimo"
 	"github.com/cgi-fr/pimo/internal/app/pimo/mock"
 	"github.com/cgi-fr/pimo/pkg/statistics"
+	"github.com/cgi-fr/pimo/pkg/uri"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 )
@@ -23,6 +24,10 @@ func setupMockCommand(rootCmd *cobra.Command) {
 		Use: "mock",
 		Run: func(cmd *cobra.Command, args []string) {
 			initLog()
+			if maxBufferCapacity > 0 {
+				uri.MaxCapacityForEachLine = maxBufferCapacity * 1024
+			}
+
 			over.MDC().Set("config", mockConfigFile)
 			backendURL := args[0]
 			var globalSeed *int64
@@ -37,6 +42,7 @@ func setupMockCommand(rootCmd *cobra.Command) {
 	mockCmd.PersistentFlags().StringVarP(&mockAddr, "port", "p", mockAddr, "address and port number")
 	mockCmd.PersistentFlags().StringVarP(&mockConfigFile, "config", "c", mockConfigFile, "name and location of the routes config file")
 	mockCmd.Flags().Int64VarP(&seedValue, "seed", "s", 0, "set seed")
+	mockCmd.Flags().IntVar(&maxBufferCapacity, "buffer-size", defaultBufferCapacity, "buffer size in kB to load data from uri for each line")
 
 	rootCmd.AddCommand(mockCmd)
 }

@@ -17,6 +17,7 @@ Types of changes
 ## [1.29.1]
 
 - `Fixed` mock command ignores global seed flag
+- `Fixed` missing flag `buffer-size` in commands `mock`, `xml` and `play`
 
 ## [1.29.0]
 
