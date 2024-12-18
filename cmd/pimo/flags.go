@@ -39,6 +39,9 @@ var (
 	emptyInput        = false
 	maskingOneLiner   = []string{}
 	profiling         = ""
+	iteration         = 1
+	repeatUntil       = ""
+	repeatWhile       = ""
 )
 
 var (
@@ -51,6 +54,9 @@ var (
 	flagEmptyInput    = flag[bool]{name: "empty-input", variable: &emptyInput, usage: "generate data without any input, to use with repeat flag"}
 	flagMaskOneLiner  = flag[[]string]{name: "mask", shorthand: "m", variable: &maskingOneLiner, usage: "one liner masking"}
 	flagProfiling     = flag[string]{name: "pprof", variable: &profiling, usage: "create a pprof file - use 'cpu' to create a CPU pprof file or 'mem' to create an memory pprof file"}
+	flagRepeat        = flag[int]{name: "repeat", shorthand: "r", variable: &iteration, usage: "number of iteration to mask each input"}
+	flagRepeatUntil   = flag[string]{name: "repeat-until", variable: &repeatUntil, usage: "mask each input repeatedly until the given condition is met"}
+	flagRepeatWhile   = flag[string]{name: "repeat-while", variable: &repeatWhile, usage: "mask each input repeatedly while the given condition is met"}
 )
 
 func addFlag[T any](cmd *cobra.Command, flag flag[T]) {

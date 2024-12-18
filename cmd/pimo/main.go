@@ -53,13 +53,10 @@ var (
 	debug                 bool
 	jsonlog               bool
 	colormode             string
-	iteration             int
 	skipLineOnError       bool
 	skipFieldOnError      bool
 	skipLogFile           string
 	seedValue             int64
-	repeatUntil           string
-	repeatWhile           string
 	statisticsDestination string
 	statsTemplate         string
 	statsDestinationEnv   = os.Getenv("PIMO_STATS_URL")
@@ -94,13 +91,10 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 	rootCmd.PersistentFlags().BoolVar(&debug, "debug", false, "add debug information to logs (very slow)")
 	rootCmd.PersistentFlags().BoolVar(&jsonlog, "log-json", false, "output logs in JSON format")
 	rootCmd.PersistentFlags().StringVar(&colormode, "color", "auto", "use colors in log outputs : yes, no or auto")
-	rootCmd.PersistentFlags().IntVarP(&iteration, "repeat", "r", 1, "number of iteration to mask each input")
 	rootCmd.PersistentFlags().BoolVar(&skipLineOnError, "skip-line-on-error", false, "skip a line if an error occurs while masking a field")
 	rootCmd.PersistentFlags().BoolVar(&skipFieldOnError, "skip-field-on-error", false, "remove a field if an error occurs while masking this field")
 	rootCmd.PersistentFlags().StringVar(&skipLogFile, "skip-log-file", "", "skipped lines will be written to this log file")
 	rootCmd.Flags().Int64VarP(&seedValue, "seed", "s", 0, "set seed")
-	rootCmd.PersistentFlags().StringVar(&repeatUntil, "repeat-until", "", "mask each input repeatedly until the given condition is met")
-	rootCmd.PersistentFlags().StringVar(&repeatWhile, "repeat-while", "", "mask each input repeatedly while the given condition is met")
 	rootCmd.PersistentFlags().StringVar(&statisticsDestination, "stats", statsDestinationEnv, "generate execution statistics in the specified dump file")
 	rootCmd.PersistentFlags().StringVar(&statsTemplate, "statsTemplate", statsTemplateEnv, "template string to format stats (to include them you have to specify them as `{{ .Stats }}` like `{\"software\":\"PIMO\",\"stats\":{{ .Stats }}}`)")
 	rootCmd.Flags().StringVar(&serve, "serve", "", "listen/respond to HTTP interface and port instead of stdin/stdout, <ip>:<port> or :<port> to listen to all local networks")
@@ -113,6 +107,9 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 	addFlag(rootCmd, flagEmptyInput)
 	addFlag(rootCmd, flagMaskOneLiner)
 	addFlag(rootCmd, flagProfiling)
+	addFlag(rootCmd, flagRepeat)
+	addFlag(rootCmd, flagRepeatUntil)
+	addFlag(rootCmd, flagRepeatWhile)
 
 	rootCmd.AddCommand(&cobra.Command{
 		Use: "jsonschema",
