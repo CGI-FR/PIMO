@@ -16,6 +16,7 @@ You can use [LINO](https://github.com/CGI-FR/LINO) to extract sample data from a
 You can also generate data with a simple yaml configuration file.
 
 **Capabilities**
+
 - credibility : generated data is not distinguishable from real data
 - data synthesis : generate data from nothing
 - data masking, including
@@ -163,6 +164,7 @@ The following types of masks can be used :
   * [`fluxUri`](#fluxuri) is to replace by a sequence of values defined in an external resource.
   * [`replacement`](#replacement) is to mask a data with another data from the jsonline.
   * [`pipe`](#pipe) is a mask to handle complex nested array structures, it can read an array as an object stream and process it with a sub-pipeline.
+  * [`apply`](#apply) process selected data with a sub-pipeline.
   * [`luhn`](#luhn) can generate valid numbers using the Luhn algorithm (e.g. french SIRET or SIREN).
   * [`markov`](#markov) can generate pseudo text based on a sample text.
   * [`findInCSV`](#findincsv) get one or multiple csv lines which matched with Json entry value from CSV files.
@@ -925,6 +927,24 @@ masking:
 ```
 
 Be sure to check [demo](demo/demo8) to get more details about this mask.
+
+[Return to list of masks](#possible-masks)
+
+### Apply
+
+[![Try it](https://img.shields.io/badge/-Try%20it%20in%20PIMO%20Play-brightgreen)](https://cgi-fr.github.io/pimo-play/#c=G4UwTgzglg9gdgLgAQCICMKBQBbAhhAayjgHMFMkkBaJCEAGxAGMAXGMcyrpAKwngAOuFgAtkKKACNccLNzyFO3JLgED6ATyXKkAVzBRxAOgD09KWFxgNJhUVJUpMoxuz0sQA&i=N4KABGBECWBGCGA7SAuKkQF8g)
+
+This mask helps you organize your masking configuration in different files, enablig reuse and mutualisation of masks.
+
+```yaml
+version: "1"
+masking:
+  - selector:
+      jsonpath: "iban"
+    mask:
+      apply:
+        uri: "./library/masking-iban.yml" # list of mask to apply on iban is declared in an external masking file
+```
 
 [Return to list of masks](#possible-masks)
 
