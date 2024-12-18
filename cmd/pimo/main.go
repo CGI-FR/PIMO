@@ -53,9 +53,6 @@ var (
 	debug                 bool
 	jsonlog               bool
 	colormode             string
-	skipLineOnError       bool
-	skipFieldOnError      bool
-	skipLogFile           string
 	statisticsDestination string
 	statsTemplate         string
 	statsDestinationEnv   = os.Getenv("PIMO_STATS_URL")
@@ -89,9 +86,6 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 	rootCmd.PersistentFlags().BoolVar(&debug, "debug", false, "add debug information to logs (very slow)")
 	rootCmd.PersistentFlags().BoolVar(&jsonlog, "log-json", false, "output logs in JSON format")
 	rootCmd.PersistentFlags().StringVar(&colormode, "color", "auto", "use colors in log outputs : yes, no or auto")
-	rootCmd.PersistentFlags().BoolVar(&skipLineOnError, "skip-line-on-error", false, "skip a line if an error occurs while masking a field")
-	rootCmd.PersistentFlags().BoolVar(&skipFieldOnError, "skip-field-on-error", false, "remove a field if an error occurs while masking this field")
-	rootCmd.PersistentFlags().StringVar(&skipLogFile, "skip-log-file", "", "skipped lines will be written to this log file")
 	rootCmd.PersistentFlags().StringVar(&statisticsDestination, "stats", statsDestinationEnv, "generate execution statistics in the specified dump file")
 	rootCmd.PersistentFlags().StringVar(&statsTemplate, "statsTemplate", statsTemplateEnv, "template string to format stats (to include them you have to specify them as `{{ .Stats }}` like `{\"software\":\"PIMO\",\"stats\":{{ .Stats }}}`)")
 
@@ -108,6 +102,9 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 	addFlag(rootCmd, flagRepeatWhile)
 	addFlag(rootCmd, flagSeed)
 	addFlag(rootCmd, flagServe)
+	addFlag(rootCmd, flagSkipFieldOnError)
+	addFlag(rootCmd, flagSkipLineOnError)
+	addFlag(rootCmd, flagSkipLogFile)
 
 	rootCmd.AddCommand(&cobra.Command{
 		Use: "jsonschema",
@@ -184,6 +181,9 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 	addFlag(xmlCmd, flagCachesToLoad)
 	// addFlag(xmlCmd, flagProfiling) //could use
 	addFlag(xmlCmd, flagSeed)
+	addFlag(xmlCmd, flagSkipFieldOnError)
+	addFlag(xmlCmd, flagSkipLineOnError)
+	addFlag(xmlCmd, flagSkipLogFile)
 	rootCmd.AddCommand(xmlCmd)
 
 	// Add command for parquet transformer
@@ -211,6 +211,9 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 	addFlag(parquetCmd, flagMaskOneLiner)
 	addFlag(parquetCmd, flagProfiling)
 	addFlag(parquetCmd, flagSeed)
+	addFlag(parquetCmd, flagSkipFieldOnError)
+	addFlag(parquetCmd, flagSkipLineOnError)
+	addFlag(parquetCmd, flagSkipLogFile)
 	rootCmd.AddCommand(parquetCmd)
 
 	flowCmd := &cobra.Command{
