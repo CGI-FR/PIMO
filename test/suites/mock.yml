@@ -72,3 +72,42 @@ testcases:
           - result.code ShouldEqual 0
           - result.systemerr ShouldContainSubstring Origin request={"body":"","captures":{"name":"hello"},"headers":{"Accept":["*/*"],"User-Agent":["curl/8.9.1"]},"method":"GET","protocol":"HTTP/1.1","url":{"path":"/hello"}}
           - result.systemerr ShouldContainSubstring Masked request={"body":"","captures":{"name":"intercepted"},"headers":{"Accept":["*/*"],"User-Agent":["curl/8.9.1"]},"method":"GET","protocol":"HTTP/1.1","url":{"path":"/intercepted"}}
+
+  - name: set global seed
+    steps:
+      - script: |-
+          cat > routes.yaml <<EOF
+          routes:
+          - method: "GET"
+            path: "/{name}"
+            masking:
+              response: "response.yaml"
+          EOF
+      - script: |-
+          cat > response.yaml <<EOF
+          version: "1"
+          masking:
+            - selector:
+                jsonpath: "body.name"
+              mask:
+                randomChoice: ["one", "two", "three"]
+              seed:
+                field: "body.name"
+          EOF
+      - script: |
+          pimo --serve ":8080" --seed 1 --mask 'name=[{add: true}, {randomChoiceInUri: "pimo://nameFR"}]' --mask 'origin=[{add: "{{.name}}"}]' &
+          pimo --seed 2 -v5 mock -p :8081 http://localhost:8080 &
+          sleep 1
+          curl -s http://localhost:8081/
+          curl -s http://localhost:8081/
+          curl -s http://localhost:8081/
+          curl -s http://localhost:8081/
+          curl -s http://localhost:8081/
+          kill %1 %2
+        assertions:
+          - result.code ShouldEqual 0
+          - result.systemerr ShouldContainSubstring Masked response={"body":{"name":"three","origin":"Gwenaëlle"},"headers":{"Content-Length":["44"],"Content-Type":["application/json"]
+          - result.systemerr ShouldContainSubstring Masked response={"body":{"name":"one","origin":"Éléonore"},"headers":{"Content-Length":["44"],"Content-Type":["application/json"]
+          - result.systemerr ShouldContainSubstring Masked response={"body":{"name":"three","origin":"Marie-Noëlle"},"headers":{"Content-Length":["50"],"Content-Type":["application/json"]
+          - result.systemerr ShouldContainSubstring Masked response={"body":{"name":"one","origin":"Hugo"},"headers":{"Content-Length":["32"],"Content-Type":["application/json"]
+          - result.systemerr ShouldContainSubstring Masked response={"body":{"name":"three","origin":"Mathurin"},"headers":{"Content-Length":["40"],"Content-Type":["application/json"]

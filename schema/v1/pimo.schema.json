@@ -578,6 +578,12 @@
             "sha3"
           ],
           "title": "Sha3"
+        },
+        {
+          "required": [
+            "apply"
+          ],
+          "title": "Apply"
         }
       ],
       "properties": {
@@ -769,7 +775,9 @@
           "description": "Generate a variable-length crytographic hash (collision resistant)"
         },
         "apply": {
-          "$ref": "#/$defs/ApplyType"
+          "$ref": "#/$defs/ApplyType",
+          "title": "Apply Mask",
+          "description": "Call external masking file"
         }
       },
       "additionalProperties": false,

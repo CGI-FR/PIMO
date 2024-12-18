@@ -8,6 +8,7 @@ import (
 	"github.com/cgi-fr/pimo/internal/app/pimo"
 	"github.com/cgi-fr/pimo/internal/app/pimo/mock"
 	"github.com/cgi-fr/pimo/pkg/statistics"
+	"github.com/cgi-fr/pimo/pkg/uri"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 )
@@ -17,26 +18,45 @@ import (
 
 func setupMockCommand(rootCmd *cobra.Command) {
 	mockAddr := ":8080"
-	mockConfigFile := "routes.yaml"
 
 	mockCmd := &cobra.Command{
-		Use: "mock",
+		Use:   "mock",
+		Short: "Use masking configurations to proxyfy remote HTTP service",
 		Run: func(cmd *cobra.Command, args []string) {
 			initLog()
+			if maxBufferCapacity > 0 {
+				uri.MaxCapacityForEachLine = maxBufferCapacity * 1024
+			}
+
 			over.MDC().Set("config", mockConfigFile)
 			backendURL := args[0]
-			runMockCommand(backendURL, mockAddr, mockConfigFile)
+			var globalSeed *int64
+			if cmd.Flags().Changed("seed") {
+				globalSeed = &seedValue
+			}
+			runMockCommand(backendURL, mockAddr, mockConfigFile, globalSeed)
 		},
 		Args: cobra.ExactArgs(1),
 	}
 
 	mockCmd.PersistentFlags().StringVarP(&mockAddr, "port", "p", mockAddr, "address and port number")
-	mockCmd.PersistentFlags().StringVarP(&mockConfigFile, "config", "c", mockConfigFile, "name and location of the routes config file")
+	addFlag(mockCmd, flagBufferSize)
+	// addFlag(mockCmd, flagCatchErrors) // could use
+	addFlag(mockCmd, flagConfigRoute)
+	// addFlag(mockCmd, flagCachesToDump) // could use
+	addFlag(mockCmd, flagCachesToLoad)
+	// addFlag(mockCmd, flagProfiling) // could use
+	addFlag(mockCmd, flagSeed)
+	// addFlag(mockCmd, flagSkipFieldOnError) // could use
+	// addFlag(mockCmd, flagSkipLineOnError)  // could use
+	// addFlag(mockCmd, flagSkipLogFile)      // could use
+	// addFlag(mockCmd, flagStatsDestination) // could use
+	// addFlag(mockCmd, flagStatsTemplate)    // could use
 
 	rootCmd.AddCommand(mockCmd)
 }
 
-func runMockCommand(backendURL, mockAddr, configFile string) {
+func runMockCommand(backendURL, mockAddr, configFile string, globalSeed *int64) {
 	pimo.InjectMasks()
 	statistics.Reset()
 
@@ -52,7 +72,7 @@ func runMockCommand(backendURL, mockAddr, configFile string) {
 		log.Fatal().Err(err).Msg("Failed to parse backend URL")
 	}
 
-	ctx, err := cfg.Build(backend)
+	ctx, err := cfg.Build(backend, globalSeed, cachesToLoad)
 	if err != nil {
 		log.Fatal().Err(err).Msgf("Failed to build routes from %s", configFile)
 	}

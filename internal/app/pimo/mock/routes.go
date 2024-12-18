@@ -39,7 +39,7 @@ func LoadConfigFromFile(filename string) (*Config, error) {
 	return config, nil
 }
 
-func (cfg *Config) Build(backend *url.URL) (Context, error) {
+func (cfg *Config) Build(backend *url.URL, globalSeed *int64, cachesToLoad map[string]string) (Context, error) {
 	ctx := Context{
 		client:  http.DefaultClient,
 		backend: backend,
@@ -52,14 +52,14 @@ func (cfg *Config) Build(backend *url.URL) (Context, error) {
 		var err error
 
 		if route.Masking.Request != "" {
-			request, err = NewProcessor(route.Masking.Request)
+			request, ctx.caches, err = NewProcessor(route.Masking.Request, globalSeed, ctx.caches, cachesToLoad)
 			if err != nil {
 				return ctx, err
 			}
 		}
 
 		if route.Masking.Response != "" {
-			response, err = NewProcessor(route.Masking.Response)
+			response, ctx.caches, err = NewProcessor(route.Masking.Response, globalSeed, ctx.caches, cachesToLoad)
 			if err != nil {
 				return ctx, err
 			}

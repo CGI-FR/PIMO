@@ -42,40 +42,21 @@ import (
 )
 
 // Provisioned by ldflags
-// nolint: gochecknoglobals
+//
+//nolint:gochecknoglobals
 var (
 	version   string
 	commit    string
 	buildDate string
 	builtBy   string
 
-	verbosity             string
-	debug                 bool
-	jsonlog               bool
-	colormode             string
-	iteration             int
-	emptyInput            bool
-	maskingFile           string
-	cachesToDump          map[string]string
-	cachesToLoad          map[string]string
-	skipLineOnError       bool
-	skipFieldOnError      bool
-	skipLogFile           string
-	catchErrors           string
-	seedValue             int64
-	maskingOneLiner       []string
-	repeatUntil           string
-	repeatWhile           string
-	statisticsDestination string
-	statsTemplate         string
-	statsDestinationEnv   = os.Getenv("PIMO_STATS_URL")
-	statsTemplateEnv      = os.Getenv("PIMO_STATS_TEMPLATE")
-	xmlSubscriberName     map[string]string
-	serve                 string
-	maxBufferCapacity     int
-	profiling             string
-	parquetInput          string
-	parquetOutput         string
+	verbosity string
+	debug     bool
+	jsonlog   bool
+	colormode string
+
+	parquetInput  string
+	parquetOutput string
 )
 
 func main() {
@@ -102,28 +83,31 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 	rootCmd.PersistentFlags().BoolVar(&debug, "debug", false, "add debug information to logs (very slow)")
 	rootCmd.PersistentFlags().BoolVar(&jsonlog, "log-json", false, "output logs in JSON format")
 	rootCmd.PersistentFlags().StringVar(&colormode, "color", "auto", "use colors in log outputs : yes, no or auto")
-	rootCmd.PersistentFlags().IntVarP(&iteration, "repeat", "r", 1, "number of iteration to mask each input")
-	rootCmd.PersistentFlags().BoolVar(&emptyInput, "empty-input", false, "generate data without any input, to use with repeat flag")
-	rootCmd.PersistentFlags().StringVarP(&maskingFile, "config", "c", "masking.yml", "name and location of the masking-config file")
-	rootCmd.PersistentFlags().StringToStringVar(&cachesToDump, "dump-cache", map[string]string{}, "path for dumping cache into file")
-	rootCmd.PersistentFlags().StringToStringVar(&cachesToLoad, "load-cache", map[string]string{}, "path for loading cache from file")
-	rootCmd.PersistentFlags().BoolVar(&skipLineOnError, "skip-line-on-error", false, "skip a line if an error occurs while masking a field")
-	rootCmd.PersistentFlags().BoolVar(&skipFieldOnError, "skip-field-on-error", false, "remove a field if an error occurs while masking this field")
-	rootCmd.PersistentFlags().StringVar(&skipLogFile, "skip-log-file", "", "skipped lines will be written to this log file")
-	rootCmd.PersistentFlags().StringVarP(&catchErrors, "catch-errors", "e", "", "catch errors and write line in file, same as using skip-field-on-error + skip-log-file")
-	rootCmd.Flags().Int64VarP(&seedValue, "seed", "s", 0, "set seed")
-	rootCmd.PersistentFlags().StringArrayVarP(&maskingOneLiner, "mask", "m", []string{}, "one liner masking")
-	rootCmd.PersistentFlags().StringVar(&repeatUntil, "repeat-until", "", "mask each input repeatedly until the given condition is met")
-	rootCmd.PersistentFlags().StringVar(&repeatWhile, "repeat-while", "", "mask each input repeatedly while the given condition is met")
-	rootCmd.PersistentFlags().StringVar(&statisticsDestination, "stats", statsDestinationEnv, "generate execution statistics in the specified dump file")
-	rootCmd.PersistentFlags().StringVar(&statsTemplate, "statsTemplate", statsTemplateEnv, "template string to format stats (to include them you have to specify them as `{{ .Stats }}` like `{\"software\":\"PIMO\",\"stats\":{{ .Stats }}}`)")
-	rootCmd.Flags().StringVar(&serve, "serve", "", "listen/respond to HTTP interface and port instead of stdin/stdout, <ip>:<port> or :<port> to listen to all local networks")
-	rootCmd.Flags().IntVar(&maxBufferCapacity, "buffer-size", 64, "buffer size in kB to load data from uri for each line")
-	rootCmd.Flags().StringVar(&profiling, "pprof", "", "create a pprof file - use 'cpu' to create a CPU pprof file or 'mem' to create an memory pprof file")
+
+	addFlag(rootCmd, flagBufferSize)
+	addFlag(rootCmd, flagCatchErrors)
+	addFlag(rootCmd, flagConfigMasking)
+	addFlag(rootCmd, flagCachesToDump)
+	addFlag(rootCmd, flagCachesToLoad)
+	addFlag(rootCmd, flagEmptyInput)
+	addFlag(rootCmd, flagMaskOneLiner)
+	addFlag(rootCmd, flagProfiling)
+	addFlag(rootCmd, flagRepeat)
+	addFlag(rootCmd, flagRepeatUntil)
+	addFlag(rootCmd, flagRepeatWhile)
+	addFlag(rootCmd, flagSeed)
+	addFlag(rootCmd, flagServe)
+	addFlag(rootCmd, flagSkipFieldOnError)
+	addFlag(rootCmd, flagSkipLineOnError)
+	addFlag(rootCmd, flagSkipLogFile)
+	addFlag(rootCmd, flagStatsDestination)
+	addFlag(rootCmd, flagStatsTemplate)
 
 	rootCmd.AddCommand(&cobra.Command{
-		Use: "jsonschema",
+		Use:   "jsonschema",
+		Short: "Export schema of masking configuration",
 		Run: func(cmd *cobra.Command, args []string) {
+			initLog()
 			jsonschema, err := pimo.GetJsonSchema()
 			if err != nil {
 				os.Exit(8)
@@ -135,8 +119,11 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 	xmlCmd := &cobra.Command{
 		Use:   "xml",
 		Short: "Parsing and masking XML file",
-		Run: func(cmd *cobra.Command, args []string) {
+		Run: func(cmd *cobra.Command, _ []string) {
 			initLog()
+			if maxBufferCapacity > 0 {
+				uri.MaxCapacityForEachLine = maxBufferCapacity * 1024
+			}
 			if len(catchErrors) > 0 {
 				skipLineOnError = true
 				skipLogFile = catchErrors
@@ -185,8 +172,18 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 			}
 		},
 	}
-	xmlCmd.Flags().StringToStringVar(&xmlSubscriberName, "subscriber", map[string]string{}, "name of element to mask")
-	xmlCmd.Flags().Int64VarP(&seedValue, "seed", "s", 0, "set seed")
+	addFlag(xmlCmd, flagBufferSize)
+	addFlag(xmlCmd, flagCatchErrors)
+	addFlag(xmlCmd, flagCachesToDump)
+	addFlag(xmlCmd, flagCachesToLoad)
+	// addFlag(xmlCmd, flagProfiling) //could use
+	addFlag(xmlCmd, flagSeed)
+	addFlag(xmlCmd, flagSkipFieldOnError)
+	addFlag(xmlCmd, flagSkipLineOnError)
+	addFlag(xmlCmd, flagSkipLogFile)
+	// addFlag(xmlCmd, flagStatsDestination) // could use
+	// addFlag(xmlCmd, flagStatsTemplate)    // could use
+	addFlag(xmlCmd, flagXMLSubscriberName)
 	rootCmd.AddCommand(xmlCmd)
 
 	// Add command for parquet transformer
@@ -206,12 +203,26 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 			run(cmd)
 		},
 	}
-	parquetCmd.Flags().Int64VarP(&seedValue, "seed", "s", 0, "set seed")
+	addFlag(parquetCmd, flagBufferSize)
+	addFlag(parquetCmd, flagCatchErrors)
+	addFlag(parquetCmd, flagConfigMasking)
+	addFlag(parquetCmd, flagCachesToDump)
+	addFlag(parquetCmd, flagCachesToLoad)
+	addFlag(parquetCmd, flagMaskOneLiner)
+	addFlag(parquetCmd, flagProfiling)
+	addFlag(parquetCmd, flagSeed)
+	addFlag(parquetCmd, flagSkipFieldOnError)
+	addFlag(parquetCmd, flagSkipLineOnError)
+	addFlag(parquetCmd, flagSkipLogFile)
+	addFlag(parquetCmd, flagStatsDestination)
+	addFlag(parquetCmd, flagStatsTemplate)
 	rootCmd.AddCommand(parquetCmd)
 
-	rootCmd.AddCommand(&cobra.Command{
-		Use: "flow",
+	flowCmd := &cobra.Command{
+		Use:   "flow",
+		Short: "Export masking configuration as graphviz diagram",
 		Run: func(cmd *cobra.Command, args []string) {
+			initLog()
 			pdef, err := model.LoadPipelineDefinitionFromFile(maskingFile)
 			if err != nil {
 				log.Err(err).Msg("Cannot load pipeline definition from file")
@@ -224,14 +235,20 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 			}
 			fmt.Println(flow)
 		},
-	})
+	}
+	rootCmd.AddCommand(flowCmd)
 
 	playPort := 3010
 	playSecure := false
 	playCmd := &cobra.Command{
-		Use: "play",
+		Use:   "play",
+		Short: "Start local website to play with PIMO",
 		Run: func(cmd *cobra.Command, args []string) {
 			initLog()
+
+			if maxBufferCapacity > 0 {
+				uri.MaxCapacityForEachLine = maxBufferCapacity * 1024
+			}
 
 			router := pimo.Play(playSecure)
 			port := fmt.Sprintf("0.0.0.0:%d", playPort)
@@ -243,6 +260,7 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 	}
 	playCmd.PersistentFlags().IntVarP(&playPort, "port", "p", 3010, "port number")
 	playCmd.PersistentFlags().BoolVarP(&playSecure, "secure", "s", false, "enable security features (use this flag if PIMO Play is publicly exposed)")
+	addFlag(playCmd, flagBufferSize)
 	rootCmd.AddCommand(playCmd)
 
 	setupMockCommand(rootCmd)

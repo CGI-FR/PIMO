@@ -14,6 +14,13 @@ Types of changes
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [1.29.1]
+
+- `Fixed` mock command ignores global seed flag
+- `Fixed` missing flag `buffer-size` in `mock`, `xml` and `play` commands
+- `Fixed` missing flag `load-cache` in `mock` command
+- `Fixed` remove unused flags from `mock`, `xml`, `parquet`, `jsonschema`, `flow` and `play` commands
+
 ## [1.29.0]
 
 - `Added` mask `apply` to externalize masks
