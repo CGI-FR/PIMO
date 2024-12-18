@@ -29,9 +29,19 @@ type flag[T any] struct {
 // flags
 //
 //nolint:gochecknoglobals
-var maxBufferCapacity int
+var (
+	maxBufferCapacity int
+	catchErrors       string
+	maskingFile       = "masking.yml"
+	mockConfigFile    = "routes.yaml"
+)
 
-var flagBufferSize = flag[int]{name: "buffer-size", variable: &maxBufferCapacity, usage: "buffer size in kB to load data from uri for each line"}
+var (
+	flagBufferSize    = flag[int]{name: "buffer-size", variable: &maxBufferCapacity, usage: "buffer size in kB to load data from uri for each line"}
+	flagCatchErrors   = flag[string]{name: "catch-errors", variable: &catchErrors, usage: "catch errors and write line in file, same as using skip-field-on-error + skip-log-file"}
+	flagConfigMasking = flag[string]{name: "config", variable: &maskingFile, usage: "name and location of the masking config file"}
+	flagConfigRoute   = flag[string]{name: "config", variable: &mockConfigFile, usage: "name and location of the routes config file"}
+)
 
 func addFlag[T any](cmd *cobra.Command, flag flag[T]) {
 	switch typedVar := any(*flag.variable).(type) {

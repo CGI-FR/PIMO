@@ -55,13 +55,11 @@ var (
 	colormode             string
 	iteration             int
 	emptyInput            bool
-	maskingFile           string
 	cachesToDump          map[string]string
 	cachesToLoad          map[string]string
 	skipLineOnError       bool
 	skipFieldOnError      bool
 	skipLogFile           string
-	catchErrors           string
 	seedValue             int64
 	maskingOneLiner       []string
 	repeatUntil           string
@@ -103,13 +101,11 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 	rootCmd.PersistentFlags().StringVar(&colormode, "color", "auto", "use colors in log outputs : yes, no or auto")
 	rootCmd.PersistentFlags().IntVarP(&iteration, "repeat", "r", 1, "number of iteration to mask each input")
 	rootCmd.PersistentFlags().BoolVar(&emptyInput, "empty-input", false, "generate data without any input, to use with repeat flag")
-	rootCmd.PersistentFlags().StringVarP(&maskingFile, "config", "c", "masking.yml", "name and location of the masking-config file")
 	rootCmd.PersistentFlags().StringToStringVar(&cachesToDump, "dump-cache", map[string]string{}, "path for dumping cache into file")
 	rootCmd.PersistentFlags().StringToStringVar(&cachesToLoad, "load-cache", map[string]string{}, "path for loading cache from file")
 	rootCmd.PersistentFlags().BoolVar(&skipLineOnError, "skip-line-on-error", false, "skip a line if an error occurs while masking a field")
 	rootCmd.PersistentFlags().BoolVar(&skipFieldOnError, "skip-field-on-error", false, "remove a field if an error occurs while masking this field")
 	rootCmd.PersistentFlags().StringVar(&skipLogFile, "skip-log-file", "", "skipped lines will be written to this log file")
-	rootCmd.PersistentFlags().StringVarP(&catchErrors, "catch-errors", "e", "", "catch errors and write line in file, same as using skip-field-on-error + skip-log-file")
 	rootCmd.Flags().Int64VarP(&seedValue, "seed", "s", 0, "set seed")
 	rootCmd.PersistentFlags().StringArrayVarP(&maskingOneLiner, "mask", "m", []string{}, "one liner masking")
 	rootCmd.PersistentFlags().StringVar(&repeatUntil, "repeat-until", "", "mask each input repeatedly until the given condition is met")
@@ -120,6 +116,8 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 	rootCmd.Flags().StringVar(&profiling, "pprof", "", "create a pprof file - use 'cpu' to create a CPU pprof file or 'mem' to create an memory pprof file")
 
 	addFlag(rootCmd, flagBufferSize)
+	addFlag(rootCmd, flagCatchErrors)
+	addFlag(rootCmd, flagConfigMasking)
 
 	rootCmd.AddCommand(&cobra.Command{
 		Use: "jsonschema",
@@ -192,6 +190,7 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 	xmlCmd.Flags().StringToStringVar(&xmlSubscriberName, "subscriber", map[string]string{}, "name of element to mask")
 	xmlCmd.Flags().Int64VarP(&seedValue, "seed", "s", 0, "set seed")
 	addFlag(xmlCmd, flagBufferSize)
+	addFlag(xmlCmd, flagCatchErrors)
 	rootCmd.AddCommand(xmlCmd)
 
 	// Add command for parquet transformer
@@ -213,6 +212,8 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 	}
 	parquetCmd.Flags().Int64VarP(&seedValue, "seed", "s", 0, "set seed")
 	addFlag(parquetCmd, flagBufferSize)
+	addFlag(parquetCmd, flagCatchErrors)
+	addFlag(parquetCmd, flagConfigMasking)
 	rootCmd.AddCommand(parquetCmd)
 
 	flowCmd := &cobra.Command{

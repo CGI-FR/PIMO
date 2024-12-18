@@ -18,7 +18,6 @@ import (
 
 func setupMockCommand(rootCmd *cobra.Command) {
 	mockAddr := ":8080"
-	mockConfigFile := "routes.yaml"
 
 	mockCmd := &cobra.Command{
 		Use: "mock",
@@ -43,6 +42,7 @@ func setupMockCommand(rootCmd *cobra.Command) {
 	mockCmd.PersistentFlags().StringVarP(&mockConfigFile, "config", "c", mockConfigFile, "name and location of the routes config file")
 	mockCmd.Flags().Int64VarP(&seedValue, "seed", "s", 0, "set seed")
 	addFlag(mockCmd, flagBufferSize)
+	addFlag(mockCmd, flagConfigRoute)
 
 	rootCmd.AddCommand(mockCmd)
 }
