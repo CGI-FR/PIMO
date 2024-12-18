@@ -26,21 +26,27 @@ type flag[T any] struct {
 	usage     string // Description of the flag
 }
 
-// flags
+// flags with default values
 //
 //nolint:gochecknoglobals
 var (
-	maxBufferCapacity int
-	catchErrors       string
+	maxBufferCapacity = 64
+	catchErrors       = ""
 	maskingFile       = "masking.yml"
 	mockConfigFile    = "routes.yaml"
+	cachesToDump      = map[string]string{}
+	cachesToLoad      = map[string]string{}
+	emptyInput        = false
 )
 
 var (
 	flagBufferSize    = flag[int]{name: "buffer-size", variable: &maxBufferCapacity, usage: "buffer size in kB to load data from uri for each line"}
-	flagCatchErrors   = flag[string]{name: "catch-errors", variable: &catchErrors, usage: "catch errors and write line in file, same as using skip-field-on-error + skip-log-file"}
-	flagConfigMasking = flag[string]{name: "config", variable: &maskingFile, usage: "name and location of the masking config file"}
-	flagConfigRoute   = flag[string]{name: "config", variable: &mockConfigFile, usage: "name and location of the routes config file"}
+	flagCatchErrors   = flag[string]{name: "catch-errors", shorthand: "e", variable: &catchErrors, usage: "catch errors and write line in file, same as using skip-field-on-error + skip-log-file"}
+	flagConfigMasking = flag[string]{name: "config", shorthand: "c", variable: &maskingFile, usage: "name and location of the masking config file"}
+	flagConfigRoute   = flag[string]{name: "config", shorthand: "c", variable: &mockConfigFile, usage: "name and location of the routes config file"}
+	flagCachesToDump  = flag[map[string]string]{name: "dump-cache", variable: &cachesToDump, usage: "path for dumping cache into file"}
+	flagCachesToLoad  = flag[map[string]string]{name: "load-cache", variable: &cachesToLoad, usage: "path for loading cache from file"}
+	flagEmptyInput    = flag[bool]{name: "empty-input", variable: &emptyInput, usage: "generate data without any input, to use with repeat flag"}
 )
 
 func addFlag[T any](cmd *cobra.Command, flag flag[T]) {

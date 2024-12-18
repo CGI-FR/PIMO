@@ -54,9 +54,6 @@ var (
 	jsonlog               bool
 	colormode             string
 	iteration             int
-	emptyInput            bool
-	cachesToDump          map[string]string
-	cachesToLoad          map[string]string
 	skipLineOnError       bool
 	skipFieldOnError      bool
 	skipLogFile           string
@@ -100,9 +97,6 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 	rootCmd.PersistentFlags().BoolVar(&jsonlog, "log-json", false, "output logs in JSON format")
 	rootCmd.PersistentFlags().StringVar(&colormode, "color", "auto", "use colors in log outputs : yes, no or auto")
 	rootCmd.PersistentFlags().IntVarP(&iteration, "repeat", "r", 1, "number of iteration to mask each input")
-	rootCmd.PersistentFlags().BoolVar(&emptyInput, "empty-input", false, "generate data without any input, to use with repeat flag")
-	rootCmd.PersistentFlags().StringToStringVar(&cachesToDump, "dump-cache", map[string]string{}, "path for dumping cache into file")
-	rootCmd.PersistentFlags().StringToStringVar(&cachesToLoad, "load-cache", map[string]string{}, "path for loading cache from file")
 	rootCmd.PersistentFlags().BoolVar(&skipLineOnError, "skip-line-on-error", false, "skip a line if an error occurs while masking a field")
 	rootCmd.PersistentFlags().BoolVar(&skipFieldOnError, "skip-field-on-error", false, "remove a field if an error occurs while masking this field")
 	rootCmd.PersistentFlags().StringVar(&skipLogFile, "skip-log-file", "", "skipped lines will be written to this log file")
@@ -118,6 +112,9 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 	addFlag(rootCmd, flagBufferSize)
 	addFlag(rootCmd, flagCatchErrors)
 	addFlag(rootCmd, flagConfigMasking)
+	addFlag(rootCmd, flagCachesToDump)
+	addFlag(rootCmd, flagCachesToLoad)
+	addFlag(rootCmd, flagEmptyInput)
 
 	rootCmd.AddCommand(&cobra.Command{
 		Use: "jsonschema",
@@ -191,6 +188,8 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 	xmlCmd.Flags().Int64VarP(&seedValue, "seed", "s", 0, "set seed")
 	addFlag(xmlCmd, flagBufferSize)
 	addFlag(xmlCmd, flagCatchErrors)
+	addFlag(xmlCmd, flagCachesToDump)
+	addFlag(xmlCmd, flagCachesToLoad)
 	rootCmd.AddCommand(xmlCmd)
 
 	// Add command for parquet transformer
@@ -214,6 +213,8 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 	addFlag(parquetCmd, flagBufferSize)
 	addFlag(parquetCmd, flagCatchErrors)
 	addFlag(parquetCmd, flagConfigMasking)
+	addFlag(parquetCmd, flagCachesToDump)
+	addFlag(parquetCmd, flagCachesToLoad)
 	rootCmd.AddCommand(parquetCmd)
 
 	flowCmd := &cobra.Command{

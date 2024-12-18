@@ -43,6 +43,8 @@ func setupMockCommand(rootCmd *cobra.Command) {
 	mockCmd.Flags().Int64VarP(&seedValue, "seed", "s", 0, "set seed")
 	addFlag(mockCmd, flagBufferSize)
 	addFlag(mockCmd, flagConfigRoute)
+	addFlag(mockCmd, flagCachesToDump)
+	addFlag(mockCmd, flagCachesToLoad)
 
 	rootCmd.AddCommand(mockCmd)
 }
