@@ -20,7 +20,8 @@ func setupMockCommand(rootCmd *cobra.Command) {
 	mockAddr := ":8080"
 
 	mockCmd := &cobra.Command{
-		Use: "mock",
+		Use:   "mock",
+		Short: "Use masking configurations to proxyfy remote HTTP service",
 		Run: func(cmd *cobra.Command, args []string) {
 			initLog()
 			if maxBufferCapacity > 0 {

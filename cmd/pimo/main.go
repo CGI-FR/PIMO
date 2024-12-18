@@ -104,7 +104,8 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 	addFlag(rootCmd, flagStatsTemplate)
 
 	rootCmd.AddCommand(&cobra.Command{
-		Use: "jsonschema",
+		Use:   "jsonschema",
+		Short: "Export schema of masking configuration",
 		Run: func(cmd *cobra.Command, args []string) {
 			initLog()
 			jsonschema, err := pimo.GetJsonSchema()
@@ -218,7 +219,8 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 	rootCmd.AddCommand(parquetCmd)
 
 	flowCmd := &cobra.Command{
-		Use: "flow",
+		Use:   "flow",
+		Short: "Export masking configuration as graphviz diagram",
 		Run: func(cmd *cobra.Command, args []string) {
 			initLog()
 			pdef, err := model.LoadPipelineDefinitionFromFile(maskingFile)
@@ -239,7 +241,8 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 	playPort := 3010
 	playSecure := false
 	playCmd := &cobra.Command{
-		Use: "play",
+		Use:   "play",
+		Short: "Start local website to play with PIMO",
 		Run: func(cmd *cobra.Command, args []string) {
 			initLog()
 
