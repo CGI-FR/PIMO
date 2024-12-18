@@ -49,6 +49,8 @@ func setupMockCommand(rootCmd *cobra.Command) {
 	// addFlag(mockCmd, flagSkipFieldOnError) // could use
 	// addFlag(mockCmd, flagSkipLineOnError)  // could use
 	// addFlag(mockCmd, flagSkipLogFile)      // could use
+	// addFlag(mockCmd, flagStatsDestination) // could use
+	// addFlag(mockCmd, flagStatsTemplate)    // could use
 
 	rootCmd.AddCommand(mockCmd)
 }

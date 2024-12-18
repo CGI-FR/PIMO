@@ -42,24 +42,21 @@ import (
 )
 
 // Provisioned by ldflags
-// nolint: gochecknoglobals
+//
+//nolint:gochecknoglobals
 var (
 	version   string
 	commit    string
 	buildDate string
 	builtBy   string
 
-	verbosity             string
-	debug                 bool
-	jsonlog               bool
-	colormode             string
-	statisticsDestination string
-	statsTemplate         string
-	statsDestinationEnv   = os.Getenv("PIMO_STATS_URL")
-	statsTemplateEnv      = os.Getenv("PIMO_STATS_TEMPLATE")
-	xmlSubscriberName     map[string]string
-	parquetInput          string
-	parquetOutput         string
+	verbosity string
+	debug     bool
+	jsonlog   bool
+	colormode string
+
+	parquetInput  string
+	parquetOutput string
 )
 
 func main() {
@@ -86,8 +83,6 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 	rootCmd.PersistentFlags().BoolVar(&debug, "debug", false, "add debug information to logs (very slow)")
 	rootCmd.PersistentFlags().BoolVar(&jsonlog, "log-json", false, "output logs in JSON format")
 	rootCmd.PersistentFlags().StringVar(&colormode, "color", "auto", "use colors in log outputs : yes, no or auto")
-	rootCmd.PersistentFlags().StringVar(&statisticsDestination, "stats", statsDestinationEnv, "generate execution statistics in the specified dump file")
-	rootCmd.PersistentFlags().StringVar(&statsTemplate, "statsTemplate", statsTemplateEnv, "template string to format stats (to include them you have to specify them as `{{ .Stats }}` like `{\"software\":\"PIMO\",\"stats\":{{ .Stats }}}`)")
 
 	addFlag(rootCmd, flagBufferSize)
 	addFlag(rootCmd, flagCatchErrors)
@@ -105,6 +100,8 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 	addFlag(rootCmd, flagSkipFieldOnError)
 	addFlag(rootCmd, flagSkipLineOnError)
 	addFlag(rootCmd, flagSkipLogFile)
+	addFlag(rootCmd, flagStatsDestination)
+	addFlag(rootCmd, flagStatsTemplate)
 
 	rootCmd.AddCommand(&cobra.Command{
 		Use: "jsonschema",
@@ -174,7 +171,6 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 			}
 		},
 	}
-	xmlCmd.Flags().StringToStringVar(&xmlSubscriberName, "subscriber", map[string]string{}, "name of element to mask")
 	addFlag(xmlCmd, flagBufferSize)
 	addFlag(xmlCmd, flagCatchErrors)
 	addFlag(xmlCmd, flagCachesToDump)
@@ -184,6 +180,9 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 	addFlag(xmlCmd, flagSkipFieldOnError)
 	addFlag(xmlCmd, flagSkipLineOnError)
 	addFlag(xmlCmd, flagSkipLogFile)
+	// addFlag(xmlCmd, flagStatsDestination) // could use
+	// addFlag(xmlCmd, flagStatsTemplate)    // could use
+	addFlag(xmlCmd, flagXMLSubscriberName)
 	rootCmd.AddCommand(xmlCmd)
 
 	// Add command for parquet transformer
@@ -214,6 +213,8 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 	addFlag(parquetCmd, flagSkipFieldOnError)
 	addFlag(parquetCmd, flagSkipLineOnError)
 	addFlag(parquetCmd, flagSkipLogFile)
+	addFlag(parquetCmd, flagStatsDestination)
+	addFlag(parquetCmd, flagStatsTemplate)
 	rootCmd.AddCommand(parquetCmd)
 
 	flowCmd := &cobra.Command{
