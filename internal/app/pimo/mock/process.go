@@ -23,10 +23,14 @@ type Processor struct {
 	pipeline model.SinkedPipeline
 }
 
-func NewProcessor(maskingFile string) (*Processor, error) {
+func NewProcessor(maskingFile string, globalSeed *int64) (*Processor, error) {
 	pdef, err := model.LoadPipelineDefinitionFromFile(maskingFile)
 	if err != nil {
 		return nil, err
+	}
+
+	if globalSeed != nil {
+		pdef.SetSeed(*globalSeed)
 	}
 
 	source := model.NewCallableMapSource()

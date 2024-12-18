@@ -14,6 +14,10 @@ Types of changes
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [1.29.1]
+
+- `Fixed` mock command ignores global seed flag
+
 ## [1.29.0]
 
 - `Added` mask `apply` to externalize masks

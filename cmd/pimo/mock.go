@@ -25,18 +25,23 @@ func setupMockCommand(rootCmd *cobra.Command) {
 			initLog()
 			over.MDC().Set("config", mockConfigFile)
 			backendURL := args[0]
-			runMockCommand(backendURL, mockAddr, mockConfigFile)
+			var globalSeed *int64
+			if cmd.Flags().Changed("seed") {
+				globalSeed = &seedValue
+			}
+			runMockCommand(backendURL, mockAddr, mockConfigFile, globalSeed)
 		},
 		Args: cobra.ExactArgs(1),
 	}
 
 	mockCmd.PersistentFlags().StringVarP(&mockAddr, "port", "p", mockAddr, "address and port number")
 	mockCmd.PersistentFlags().StringVarP(&mockConfigFile, "config", "c", mockConfigFile, "name and location of the routes config file")
+	mockCmd.Flags().Int64VarP(&seedValue, "seed", "s", 0, "set seed")
 
 	rootCmd.AddCommand(mockCmd)
 }
 
-func runMockCommand(backendURL, mockAddr, configFile string) {
+func runMockCommand(backendURL, mockAddr, configFile string, globalSeed *int64) {
 	pimo.InjectMasks()
 	statistics.Reset()
 
@@ -52,7 +57,7 @@ func runMockCommand(backendURL, mockAddr, configFile string) {
 		log.Fatal().Err(err).Msg("Failed to parse backend URL")
 	}
 
-	ctx, err := cfg.Build(backend)
+	ctx, err := cfg.Build(backend, globalSeed)
 	if err != nil {
 		log.Fatal().Err(err).Msgf("Failed to build routes from %s", configFile)
 	}
