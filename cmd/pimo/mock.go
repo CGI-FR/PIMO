@@ -39,14 +39,13 @@ func setupMockCommand(rootCmd *cobra.Command) {
 	}
 
 	mockCmd.PersistentFlags().StringVarP(&mockAddr, "port", "p", mockAddr, "address and port number")
-	mockCmd.PersistentFlags().StringVarP(&mockConfigFile, "config", "c", mockConfigFile, "name and location of the routes config file")
-	mockCmd.Flags().Int64VarP(&seedValue, "seed", "s", 0, "set seed")
 	addFlag(mockCmd, flagBufferSize)
 	// addFlag(mockCmd, flagCatchErrors) // could use
 	addFlag(mockCmd, flagConfigRoute)
 	addFlag(mockCmd, flagCachesToDump)
 	addFlag(mockCmd, flagCachesToLoad)
 	// addFlag(mockCmd, flagProfiling) // could use
+	addFlag(mockCmd, flagSeed)
 
 	rootCmd.AddCommand(mockCmd)
 }
