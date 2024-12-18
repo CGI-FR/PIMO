@@ -58,7 +58,6 @@ var (
 	skipFieldOnError      bool
 	skipLogFile           string
 	seedValue             int64
-	maskingOneLiner       []string
 	repeatUntil           string
 	repeatWhile           string
 	statisticsDestination string
@@ -67,7 +66,6 @@ var (
 	statsTemplateEnv      = os.Getenv("PIMO_STATS_TEMPLATE")
 	xmlSubscriberName     map[string]string
 	serve                 string
-	profiling             string
 	parquetInput          string
 	parquetOutput         string
 )
@@ -101,13 +99,11 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 	rootCmd.PersistentFlags().BoolVar(&skipFieldOnError, "skip-field-on-error", false, "remove a field if an error occurs while masking this field")
 	rootCmd.PersistentFlags().StringVar(&skipLogFile, "skip-log-file", "", "skipped lines will be written to this log file")
 	rootCmd.Flags().Int64VarP(&seedValue, "seed", "s", 0, "set seed")
-	rootCmd.PersistentFlags().StringArrayVarP(&maskingOneLiner, "mask", "m", []string{}, "one liner masking")
 	rootCmd.PersistentFlags().StringVar(&repeatUntil, "repeat-until", "", "mask each input repeatedly until the given condition is met")
 	rootCmd.PersistentFlags().StringVar(&repeatWhile, "repeat-while", "", "mask each input repeatedly while the given condition is met")
 	rootCmd.PersistentFlags().StringVar(&statisticsDestination, "stats", statsDestinationEnv, "generate execution statistics in the specified dump file")
 	rootCmd.PersistentFlags().StringVar(&statsTemplate, "statsTemplate", statsTemplateEnv, "template string to format stats (to include them you have to specify them as `{{ .Stats }}` like `{\"software\":\"PIMO\",\"stats\":{{ .Stats }}}`)")
 	rootCmd.Flags().StringVar(&serve, "serve", "", "listen/respond to HTTP interface and port instead of stdin/stdout, <ip>:<port> or :<port> to listen to all local networks")
-	rootCmd.Flags().StringVar(&profiling, "pprof", "", "create a pprof file - use 'cpu' to create a CPU pprof file or 'mem' to create an memory pprof file")
 
 	addFlag(rootCmd, flagBufferSize)
 	addFlag(rootCmd, flagCatchErrors)
@@ -115,6 +111,8 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 	addFlag(rootCmd, flagCachesToDump)
 	addFlag(rootCmd, flagCachesToLoad)
 	addFlag(rootCmd, flagEmptyInput)
+	addFlag(rootCmd, flagMaskOneLiner)
+	addFlag(rootCmd, flagProfiling)
 
 	rootCmd.AddCommand(&cobra.Command{
 		Use: "jsonschema",
@@ -190,6 +188,7 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 	addFlag(xmlCmd, flagCatchErrors)
 	addFlag(xmlCmd, flagCachesToDump)
 	addFlag(xmlCmd, flagCachesToLoad)
+	// addFlag(xmlCmd, flagProfiling) //could use
 	rootCmd.AddCommand(xmlCmd)
 
 	// Add command for parquet transformer
@@ -215,6 +214,8 @@ There is NO WARRANTY, to the extent permitted by law.`, version, commit, buildDa
 	addFlag(parquetCmd, flagConfigMasking)
 	addFlag(parquetCmd, flagCachesToDump)
 	addFlag(parquetCmd, flagCachesToLoad)
+	addFlag(parquetCmd, flagMaskOneLiner)
+	addFlag(parquetCmd, flagProfiling)
 	rootCmd.AddCommand(parquetCmd)
 
 	flowCmd := &cobra.Command{

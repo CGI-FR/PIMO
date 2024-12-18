@@ -37,6 +37,8 @@ var (
 	cachesToDump      = map[string]string{}
 	cachesToLoad      = map[string]string{}
 	emptyInput        = false
+	maskingOneLiner   = []string{}
+	profiling         = ""
 )
 
 var (
@@ -47,6 +49,8 @@ var (
 	flagCachesToDump  = flag[map[string]string]{name: "dump-cache", variable: &cachesToDump, usage: "path for dumping cache into file"}
 	flagCachesToLoad  = flag[map[string]string]{name: "load-cache", variable: &cachesToLoad, usage: "path for loading cache from file"}
 	flagEmptyInput    = flag[bool]{name: "empty-input", variable: &emptyInput, usage: "generate data without any input, to use with repeat flag"}
+	flagMaskOneLiner  = flag[[]string]{name: "mask", shorthand: "m", variable: &maskingOneLiner, usage: "one liner masking"}
+	flagProfiling     = flag[string]{name: "pprof", variable: &profiling, usage: "create a pprof file - use 'cpu' to create a CPU pprof file or 'mem' to create an memory pprof file"}
 )
 
 func addFlag[T any](cmd *cobra.Command, flag flag[T]) {
