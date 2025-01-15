@@ -241,8 +241,8 @@ type ApplyType struct {
 	URI string `yaml:"uri" json:"uri" jsonschema_description:"URI of the mask resource"`
 }
 
-type PartitionType struct{
-	When string `yaml:"when,omitempty" json:"when,omitempty" jsonschema_description:"template to execute, if true the condition is active"`
+type PartitionType struct {
+	When string     `yaml:"when,omitempty" json:"when,omitempty" jsonschema_description:"template to execute, if true the condition is active"`
 	Then []MaskType `yaml:"then" json:"then" jsonschema_description:"list of masks to execute if the condition is active"`
 }
 

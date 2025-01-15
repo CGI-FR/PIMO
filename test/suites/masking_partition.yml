@@ -12,11 +12,11 @@ testcases:
           mask:
             partition:
               idrh:
-                when: '[[ regexMatch "P[A-Z]{3}[0-9]{3}" .id ]]'
+                when: '[[ .id | default "" | mustRegexMatch "P[A-Z]{3}[0-9]{3}" ]]'
                 then:
                   - constant: "IDRH"
               digits:
-                when: '[[ regexMatch "[0-9]*" .id ]]'
+                when: '[[ .id | default "" | mustRegexMatch "[0-9]+" ]]'
                 then:
                   - constant: "DIGITS"
               other:
