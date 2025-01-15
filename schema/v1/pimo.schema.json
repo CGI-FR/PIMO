@@ -590,6 +590,12 @@
             "partitions"
           ],
           "title": "Partition"
+        },
+        {
+          "required": [
+            "segments"
+          ],
+          "title": "Segment"
         }
       ],
       "properties": {
@@ -790,8 +796,13 @@
             "$ref": "#/$defs/PartitionType"
           },
           "type": "array",
-          "title": "Partition Mask",
+          "title": "Partitions Mask",
           "description": "Identify specific cases and apply a defined list of masks for each case"
+        },
+        "segments": {
+          "$ref": "#/$defs/SegmentType",
+          "title": "Segments Mask",
+          "description": "Allow transformations on specific parts of a field's value"
         }
       },
       "additionalProperties": false,
@@ -1029,6 +1040,30 @@
       },
       "additionalProperties": false,
       "type": "object"
+    },
+    "SegmentType": {
+      "properties": {
+        "regex": {
+          "type": "string",
+          "description": "regex used to create segments using group captures, groups must be named"
+        },
+        "replace": {
+          "additionalProperties": {
+            "items": {
+              "$ref": "#/$defs/MaskType"
+            },
+            "type": "array"
+          },
+          "type": "object",
+          "description": "list of masks to execute for each group"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "regex",
+        "replace"
+      ]
     },
     "SelectorType": {
       "properties": {

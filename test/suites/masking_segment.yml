@@ -1,0 +1,30 @@
+name: segment mask
+testcases:
+- name: simple segmentation test
+  steps:
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      seed: 42
+      masking:
+        - selector:
+            jsonpath: "id"
+          mask:
+            segments:
+              regex: "^P(?P<letters>[A-Z]{3})(?P<digits>[0-9]{3})$"
+              replace:
+                letters:
+                  - ff1:
+                      keyFromEnv: "FF1_ENCRYPTION_KEY"
+                      domain: "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                digits:
+                  - ff1:
+                      keyFromEnv: "FF1_ENCRYPTION_KEY"
+                      domain: "0123456789"
+      EOF
+  - script: |-
+      echo '{"id": "PABC123"}' | FF1_ENCRYPTION_KEY="70NZ2NWAqk9/A21vBPxqlA==" pimo
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemoutjson.id ShouldEqual P
+    - result.systemerr ShouldBeEmpty
