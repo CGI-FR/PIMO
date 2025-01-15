@@ -74,6 +74,25 @@ func NewMask(partitions map[string]model.PartitionType, caches map[string]model.
 	return MaskEngine{parts, seed, seeder}, nil
 }
 
+func execPipeline(pipeline model.Pipeline, e model.Entry) (model.Entry, error) {
+	var result []model.Entry
+
+	err := pipeline.
+		WithSource(model.NewSourceFromSlice([]model.Dictionary{model.NewDictionary().With(".", e)})).
+		// Process(model.NewCounterProcessWithCallback("internal", 1, updateContext)).
+		AddSink(model.NewSinkToSlice(&result)).
+		Run()
+	if err != nil {
+		return nil, err
+	}
+
+	if len(result) == 0 {
+		return nil, nil
+	}
+
+	return result[0], nil
+}
+
 func (me MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Entry, error) {
 	log.Info().Msg("Mask partition")
 
@@ -92,7 +111,12 @@ func (me MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Ent
 		if output.String() == "true" {
 			log.Info().Msgf("Mask partition - executing partition %s", partition.name)
 
-			break
+			result, err := execPipeline(partition.exec, e)
+			if err != nil {
+				return e, err
+			}
+
+			return result, nil
 		}
 	}
 

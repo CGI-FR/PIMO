@@ -12,11 +12,11 @@ testcases:
           mask:
             partition:
               idrh:
-                when: '[[ .id | default "" | mustRegexMatch "P[A-Z]{3}[0-9]{3}" ]]'
+                when: '[[ .id | default "" | mustRegexMatch "^P[A-Z]{3}[0-9]{3}$" ]]'
                 then:
                   - constant: "IDRH"
               digits:
-                when: '[[ .id | default "" | mustRegexMatch "[0-9]+" ]]'
+                when: '[[ .id | default "" | mustRegexMatch "^[0-9]+$" ]]'
                 then:
                   - constant: "DIGITS"
               other:
@@ -27,19 +27,19 @@ testcases:
   - script: sed -i  "s/\]\]/\}\}/g"  masking.yml
   - script: |-
       pimo <<EOF
-      {"case": 1, "id": "PZZZ1234"}
+      {"case": 1, "id": "PZZZ123"}
       {"case": 2, "id": "12345"}
-      {"case": 3, "id": "PABC0000"}
+      {"case": 3, "id": "PABC000"}
       {"case": 4, "id": "PABCD000"}
       {"case": 5, "id": ""}
       {"case": 6, "id": null}
       EOF
     assertions:
     - result.code ShouldEqual 0
-    - 'result.systemout ShouldContainSubstring {"case": 1, "id": "IDRH"}'
-    - 'result.systemout ShouldContainSubstring {"case": 2, "id": "DIGITS"}'
-    - 'result.systemout ShouldContainSubstring {"case": 3, "id": "IDRH"}'
-    - 'result.systemout ShouldContainSubstring {"case": 4, "id": "OTHER"}'
-    - 'result.systemout ShouldContainSubstring {"case": 5, "id": "OTHER"}'
-    - 'result.systemout ShouldContainSubstring {"case": 6, "id": "OTHER"}'
+    - 'result.systemout ShouldContainSubstring {"case":1,"id":"IDRH"}'
+    - 'result.systemout ShouldContainSubstring {"case":2,"id":"DIGITS"}'
+    - 'result.systemout ShouldContainSubstring {"case":3,"id":"IDRH"}'
+    - 'result.systemout ShouldContainSubstring {"case":4,"id":"OTHER"}'
+    - 'result.systemout ShouldContainSubstring {"case":5,"id":"OTHER"}'
+    - 'result.systemout ShouldContainSubstring {"case":6,"id":"OTHER"}'
     - result.systemerr ShouldBeEmpty
