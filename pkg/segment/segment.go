@@ -2,6 +2,8 @@ package segment
 
 import (
 	"hash/fnv"
+	"regexp"
+	"strings"
 	tmpl "text/template"
 
 	"github.com/cgi-fr/pimo/pkg/model"
@@ -9,6 +11,7 @@ import (
 )
 
 type MaskEngine struct {
+	re        *regexp.Regexp
 	pipelines map[string]model.Pipeline
 	seed      int64
 	seeder    model.Seeder
@@ -50,13 +53,70 @@ func NewMask(segment model.SegmentType, caches map[string]model.Cache, fns tmpl.
 		pipelines[groupname] = pipeline
 	}
 
-	return MaskEngine{pipelines, seed, seeder}, nil
+	return MaskEngine{
+		re:        regexp.MustCompile(segment.Regex),
+		pipelines: pipelines,
+		seed:      seed,
+		seeder:    seeder,
+	}, nil
+}
+
+// replace captured groups named in the `value` string using the values ​​calculated by the `replacements` map
+func replace(value string, re *regexp.Regexp, replacements map[string]func(string) (string, error)) (string, error) {
+	result := &strings.Builder{}
+
+	matchIndexes := re.FindStringSubmatchIndex(value)
+	groupNames := re.SubexpNames()
+
+	writeCount := 0
+	for i := 2; i < len(matchIndexes); i += 2 {
+		groupNumber := i / 2
+		groupName := groupNames[groupNumber]
+		startIndex := matchIndexes[i]
+		endIndex := matchIndexes[i+1]
+		capturedValue := value[startIndex:endIndex]
+
+		result.WriteString(value[writeCount:startIndex])
+		writeCount = endIndex
+
+		if replacement, exists := replacements[groupName]; exists {
+			if masked, err := replacement(capturedValue); err != nil {
+				return value, err
+			} else {
+				result.WriteString(masked)
+			}
+		}
+	}
+	result.WriteString(value[writeCount:])
+
+	return result.String(), nil
 }
 
 func (me MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Entry, error) {
 	log.Info().Msg("Mask segments")
 
-	return e, nil
+	replacements := map[string]func(string) (string, error){}
+
+	for groupname, pipeline := range me.pipelines {
+		replacements[groupname] = func(match string) (string, error) {
+			var result []model.Entry
+			err := pipeline.
+				WithSource(model.NewSourceFromSlice([]model.Dictionary{model.NewDictionary().With(".", match)})).
+				AddSink(model.NewSinkToSlice(&result)).
+				Run()
+			if err != nil {
+				return match, err
+			}
+			return result[0].(string), nil
+		}
+	}
+
+	result, err := replace(e.(string), me.re, replacements)
+	if err != nil {
+		return e, err
+	}
+
+	return result, nil
 }
 
 // Factory create a mask from a configuration

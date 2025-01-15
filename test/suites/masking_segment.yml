@@ -26,5 +26,5 @@ testcases:
       echo '{"id": "PABC123"}' | FF1_ENCRYPTION_KEY="70NZ2NWAqk9/A21vBPxqlA==" pimo
     assertions:
     - result.code ShouldEqual 0
-    - result.systemoutjson.id ShouldEqual P
+    - result.systemoutjson.id ShouldEqual PVBR675
     - result.systemerr ShouldBeEmpty
