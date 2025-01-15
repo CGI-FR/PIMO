@@ -16,7 +16,8 @@ Types of changes
 
 ## [1.30.0]
 
-- `Added` mask `partition` to handle fields containing different types of values by applying distinct transformations
+- `Added` mask `partitions` to handle fields containing different types of values by applying distinct transformations
+- `Added` mask `segments` to allow transformations on specific parts of a field's value using regular expressions to capture subgroups
 
 ## [1.29.1]
 
