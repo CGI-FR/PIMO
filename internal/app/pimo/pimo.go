@@ -45,6 +45,7 @@ import (
 	"github.com/cgi-fr/pimo/pkg/markov"
 	"github.com/cgi-fr/pimo/pkg/model"
 	"github.com/cgi-fr/pimo/pkg/parquet"
+	"github.com/cgi-fr/pimo/pkg/partition"
 	"github.com/cgi-fr/pimo/pkg/pipe"
 	"github.com/cgi-fr/pimo/pkg/randdate"
 	"github.com/cgi-fr/pimo/pkg/randdura"
@@ -343,6 +344,7 @@ func injectMaskFactories() []model.MaskFactory {
 		sequence.Factory,
 		sha3.Factory,
 		apply.Factory,
+		partition.Factory,
 	}
 }
 
