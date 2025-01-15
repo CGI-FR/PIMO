@@ -94,7 +94,7 @@ func execPipeline(pipeline model.Pipeline, e model.Entry) (model.Entry, error) {
 }
 
 func (me MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Entry, error) {
-	log.Info().Msg("Mask partition")
+	log.Info().Msg("Mask partitions")
 
 	// exec all partitions
 	for _, partition := range me.partitions {

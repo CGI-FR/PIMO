@@ -166,6 +166,7 @@ The following types of masks can be used :
   * [`pipe`](#pipe) is a mask to handle complex nested array structures, it can read an array as an object stream and process it with a sub-pipeline.
   * [`apply`](#apply) process selected data with a sub-pipeline.
   * [`partitions`](#partitions) will rely on conditions to identify specific cases.
+  * [`segments`](#segments) allow transformations on specific parts of a field's value using regular expressions subgroups captures.
   * [`luhn`](#luhn) can generate valid numbers using the Luhn algorithm (e.g. french SIRET or SIREN).
   * [`markov`](#markov) can generate pseudo text based on a sample text.
   * [`findInCSV`](#findincsv) get one or multiple csv lines which matched with Json entry value from CSV files.
@@ -1095,6 +1096,31 @@ The partition mask will rely on conditions to identify specific cases and apply 
         then:
           # List of masks for unrecognized cases
           - constant: "this is another case"
+```
+
+[Return to list of masks](#possible-masks)
+
+### Segments
+
+[![Try it](https://img.shields.io/badge/-Try%20it%20in%20PIMO%20Play-brightgreen)](https://cgi-fr.github.io/pimo-play/#c=G4UwTgzglg9gdgLgAQCICMKBQBbAhhAayjgHMFNMkkBaJCEAGxAGMAXGMcq7pAKwngAHXKwAWyFFAAmWHnkJcedECWwg4rCIqVIwKkAA8JAPQAKACgD8pgDxNWrcBAB8AbQCC1AFoBdAN4AzAC+AJRWtlJQJFCabgAM1ACc-sEhACSyOrogggy4zCDaWfaOkEVZNEgAZlVo5RXcBCAAngBiYDDYAKJwwBKtrWgA+l0AcgDCAEoAmqYAKgCSAPKjQwDSXdOZDUpSnbjEEu4AQuMAIl2tAOIAEgsAUmsAMgCyo0umAIqTAMpzAKoANQA6gANaZebZZSLRTT1HS0Gp1Sg7JRNNodbq9fqDEYTGbzZarDZbFGo7h7PCHVBxNAAJgCABYAKwANgA7AAORJYIA&i=N4KABGBECWAmkC4oAUCCAhAwgRgEwGZIQBfIA)
+
+The segments mask allow transformations on specific parts of a field's value. This mask will use regular expressions to capture subgroups and apply transformations to them individually. Example configuration:
+
+```yaml
+- selector:
+    jsonpath: "id"
+  mask:
+    segments:
+      regex: "^P(?P<letters>[A-Z]{3})(?P<digits>[0-9]{3})$"
+      replace:
+        letters:
+          - ff1:
+              keyFromEnv: "FF1_ENCRYPTION_KEY"
+              domain: "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        digits:
+          - ff1:
+              keyFromEnv: "FF1_ENCRYPTION_KEY"
+              domain: "0123456789"
 ```
 
 [Return to list of masks](#possible-masks)

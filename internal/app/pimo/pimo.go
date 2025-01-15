@@ -58,6 +58,7 @@ import (
 	"github.com/cgi-fr/pimo/pkg/regex"
 	"github.com/cgi-fr/pimo/pkg/remove"
 	"github.com/cgi-fr/pimo/pkg/replacement"
+	"github.com/cgi-fr/pimo/pkg/segment"
 	"github.com/cgi-fr/pimo/pkg/sequence"
 	"github.com/cgi-fr/pimo/pkg/sha3"
 	"github.com/cgi-fr/pimo/pkg/statistics"
@@ -345,6 +346,7 @@ func injectMaskFactories() []model.MaskFactory {
 		sha3.Factory,
 		apply.Factory,
 		partition.Factory,
+		segment.Factory,
 	}
 }
 
