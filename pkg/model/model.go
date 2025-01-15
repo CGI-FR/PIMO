@@ -241,6 +241,12 @@ type ApplyType struct {
 	URI string `yaml:"uri" json:"uri" jsonschema_description:"URI of the mask resource"`
 }
 
+type PartitionType struct {
+	Name string     `yaml:"name" json:"name" jsonschema_description:"name of the partition"`
+	When string     `yaml:"when,omitempty" json:"when,omitempty" jsonschema_description:"template to execute, if true the condition is active"`
+	Then []MaskType `yaml:"then" json:"then" jsonschema_description:"list of masks to execute if the condition is active"`
+}
+
 type MaskType struct {
 	Add               Entry                `yaml:"add,omitempty" json:"add,omitempty" jsonschema:"oneof_required=Add,title=Add Mask,description=Add a new field in the JSON stream"`
 	AddTransient      Entry                `yaml:"add-transient,omitempty" json:"add-transient,omitempty" jsonschema:"oneof_required=AddTransient,title=Add Transient Mask" jsonschema_description:"Add a new temporary field, that will not show in the JSON output"`
@@ -280,6 +286,7 @@ type MaskType struct {
 	Sequence          SequenceType         `yaml:"sequence,omitempty" json:"sequence,omitempty" jsonschema:"oneof_required=Sequence,title=Sequence Mask" jsonschema_description:"Generate a sequenced ID that follows specified format"`
 	Sha3              Sha3Type             `yaml:"sha3,omitempty" json:"sha3,omitempty" jsonschema:"oneof_required=Sha3,title=Sha3 Mask" jsonschema_description:"Generate a variable-length crytographic hash (collision resistant)"`
 	Apply             ApplyType            `yaml:"apply,omitempty" json:"apply,omitempty" jsonschema:"oneof_required=Apply,title=Apply Mask" jsonschema_description:"Call external masking file"`
+	Partition         []PartitionType      `yaml:"partitions,omitempty" json:"partitions,omitempty" jsonschema:"oneof_required=Partition,title=Partition Mask" jsonschema_description:"Identify specific cases and apply a defined list of masks for each case"`
 }
 
 type Masking struct {

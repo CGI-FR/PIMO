@@ -584,6 +584,12 @@
             "apply"
           ],
           "title": "Apply"
+        },
+        {
+          "required": [
+            "partitions"
+          ],
+          "title": "Partition"
         }
       ],
       "properties": {
@@ -778,6 +784,14 @@
           "$ref": "#/$defs/ApplyType",
           "title": "Apply Mask",
           "description": "Call external masking file"
+        },
+        "partitions": {
+          "items": {
+            "$ref": "#/$defs/PartitionType"
+          },
+          "type": "array",
+          "title": "Partition Mask",
+          "description": "Identify specific cases and apply a defined list of masks for each case"
         }
       },
       "additionalProperties": false,
@@ -875,6 +889,31 @@
       "type": "object",
       "required": [
         "name"
+      ]
+    },
+    "PartitionType": {
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "name of the partition"
+        },
+        "when": {
+          "type": "string",
+          "description": "template to execute, if true the condition is active"
+        },
+        "then": {
+          "items": {
+            "$ref": "#/$defs/MaskType"
+          },
+          "type": "array",
+          "description": "list of masks to execute if the condition is active"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "name",
+        "then"
       ]
     },
     "PipeType": {
