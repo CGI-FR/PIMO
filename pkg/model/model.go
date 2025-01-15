@@ -286,7 +286,7 @@ type MaskType struct {
 	Sequence          SequenceType         `yaml:"sequence,omitempty" json:"sequence,omitempty" jsonschema:"oneof_required=Sequence,title=Sequence Mask" jsonschema_description:"Generate a sequenced ID that follows specified format"`
 	Sha3              Sha3Type             `yaml:"sha3,omitempty" json:"sha3,omitempty" jsonschema:"oneof_required=Sha3,title=Sha3 Mask" jsonschema_description:"Generate a variable-length crytographic hash (collision resistant)"`
 	Apply             ApplyType            `yaml:"apply,omitempty" json:"apply,omitempty" jsonschema:"oneof_required=Apply,title=Apply Mask" jsonschema_description:"Call external masking file"`
-	Partition         []PartitionType      `yaml:"partition,omitempty" json:"partition,omitempty" jsonschema:"oneof_required=Partition,title=Partition Mask" jsonschema_description:"Identify specific cases and apply a defined list of masks for each case"`
+	Partition         []PartitionType      `yaml:"partitions,omitempty" json:"partitions,omitempty" jsonschema:"oneof_required=Partition,title=Partition Mask" jsonschema_description:"Identify specific cases and apply a defined list of masks for each case"`
 }
 
 type Masking struct {

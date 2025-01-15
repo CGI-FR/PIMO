@@ -10,7 +10,7 @@ testcases:
         - selector:
             jsonpath: "id"
           mask:
-            partition:
+            partitions:
               - name: idrh
                 when: '[[ .id | default "" | mustRegexMatch "^P[A-Z]{3}[0-9]{3}$" ]]'
                 then:

@@ -165,6 +165,7 @@ The following types of masks can be used :
   * [`replacement`](#replacement) is to mask a data with another data from the jsonline.
   * [`pipe`](#pipe) is a mask to handle complex nested array structures, it can read an array as an object stream and process it with a sub-pipeline.
   * [`apply`](#apply) process selected data with a sub-pipeline.
+  * [`partitions`](#partitions) will rely on conditions to identify specific cases.
   * [`luhn`](#luhn) can generate valid numbers using the Luhn algorithm (e.g. french SIRET or SIREN).
   * [`markov`](#markov) can generate pseudo text based on a sample text.
   * [`findInCSV`](#findincsv) get one or multiple csv lines which matched with Json entry value from CSV files.
@@ -1065,6 +1066,35 @@ By default, if not specified otherwise, these classes will be used (input -> out
           output: "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
         - input: "0123456789"
           output: "0123456789"
+```
+
+[Return to list of masks](#possible-masks)
+
+### Partitions
+
+[![Try it](https://img.shields.io/badge/-Try%20it%20in%20PIMO%20Play-brightgreen)](https://cgi-fr.github.io/pimo-play/#c=G4UwTgzglg9gdgLgAQCICMKBQBbAhhAayjgHMFNMkkBaJCEAGxAGMAXGMcq7pAKwngAHXKwAWyFLgCuYjlh55CXHkmFhWUDfAjKVNJHFzYQEkHigN5e7gHdRIREgDkAbxcA6abLBIAPkgATEAAzaQZWVBQ-JGwpCFYAJRASEAAPAFkRZlFUAD0AbVxqAC8AXQBqAAFCkoqAHTr3GrLygBIogF8Op0prKjEHXT79Zm1WXDhWCQn4AE9sSoCYczh3UewrPVpDYwkoAM3rO0HnN08ZUQ5ooNCpcMjo2PiklIysnJQCgAZqAE4K9pILo9YZIAaIXqg2ijODxCZTVBfJHIlGHHjbIwmVAwAZgNEqcFDPrQsbw6ZwOYbTBAA&i=N4KABGBECGCuAuALA9gJ0gLjAbXBKApgLbQCWANgAIAmyJpAdgHQDGdkANHhJAIwBMAZgAsAVgBsnblABSyRAzAARZAUh4AuiAC+QA)
+
+The partition mask will rely on conditions to identify specific cases and apply a defined list of masks for each case. Example configuration:
+
+```yaml
+- selector:
+    jsonpath: "ID"
+  mask:
+    partitions: # only the fist active condition will execute
+      - name: case1
+        when: '{{ regexMatch "P[A-Z]{3}[0-9]{3}" .ID }}'
+        then:
+          # List of masks for case 1
+          - constant: "this is case 1"
+      - name: case2
+        when: '{{ regexMatch "G[0-9]{11}" .ID }}'
+        then:
+          # List of masks for case 2
+          - constant: "this is case 2"
+      - name: default # case with no "when" condition will always execute
+        then:
+          # List of masks for unrecognized cases
+          - constant: "this is another case"
 ```
 
 [Return to list of masks](#possible-masks)
