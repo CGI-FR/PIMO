@@ -43,11 +43,11 @@ func buildDefinition(masks []model.MaskType, globalSeed int64) model.Definition 
 }
 
 // NewMask return a MaskEngine from a value
-func NewMask(partitions map[string]model.PartitionType, caches map[string]model.Cache, fns tmpl.FuncMap, seed int64, seeder model.Seeder, seedField string) (MaskEngine, error) {
+func NewMask(partitions []model.PartitionType, caches map[string]model.Cache, fns tmpl.FuncMap, seed int64, seeder model.Seeder, seedField string) (MaskEngine, error) {
 	parts := []Partition{}
 
 	// Build partitions pipelines
-	for name, partition := range partitions {
+	for _, partition := range partitions {
 		template, err := template.NewEngine(partition.When, fns, seed, seedField)
 		if err != nil {
 			return MaskEngine{}, err
@@ -65,7 +65,7 @@ func NewMask(partitions map[string]model.PartitionType, caches map[string]model.
 		}
 
 		parts = append(parts, Partition{
-			name: name,
+			name: partition.Name,
 			when: template,
 			exec: pipeline,
 		})
@@ -125,7 +125,7 @@ func (me MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Ent
 
 // Factory create a mask from a configuration
 func Factory(conf model.MaskFactoryConfiguration) (model.MaskEngine, bool, error) {
-	if conf.Masking.Mask.Partition != nil {
+	if len(conf.Masking.Mask.Partition) > 0 {
 		seeder := model.NewSeeder(conf.Masking.Seed.Field, conf.Seed)
 
 		// set differents seeds for differents jsonpath

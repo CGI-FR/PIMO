@@ -11,15 +11,15 @@ testcases:
             jsonpath: "id"
           mask:
             partition:
-              idrh:
+              - name: idrh
                 when: '[[ .id | default "" | mustRegexMatch "^P[A-Z]{3}[0-9]{3}$" ]]'
                 then:
                   - constant: "IDRH"
-              digits:
+              - name: digits
                 when: '[[ .id | default "" | mustRegexMatch "^[0-9]+$" ]]'
                 then:
                   - constant: "DIGITS"
-              other:
+              - name: others
                 then:
                   - constant: "OTHER"
       EOF
