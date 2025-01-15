@@ -1,0 +1,45 @@
+name: partition mask
+testcases:
+- name: simple partition with default case
+  steps:
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      seed: 42
+      masking:
+        - selector:
+            jsonpath: "id"
+          mask:
+            partition:
+              idrh:
+                when: '[[ regexMatch "P[A-Z]{3}[0-9]{3}" .id ]]'
+                then:
+                  - constant: "IDRH"
+              digits:
+                when: '[[ regexMatch "[0-9]*" .id ]]'
+                then:
+                  - constant: "DIGITS"
+              other:
+                then:
+                  - constant: "OTHER"
+      EOF
+  - script: sed -i  "s/\[\[/\{\{/g"  masking.yml
+  - script: sed -i  "s/\]\]/\}\}/g"  masking.yml
+  - script: |-
+      pimo <<EOF
+      {"case": 1, "id": "PZZZ1234"}
+      {"case": 2, "id": "12345"}
+      {"case": 3, "id": "PABC0000"}
+      {"case": 4, "id": "PABCD000"}
+      {"case": 5, "id": ""}
+      {"case": 6, "id": null}
+      EOF
+    assertions:
+    - result.code ShouldEqual 0
+    - 'result.systemout ShouldContainSubstring {"case": 1, "id": "IDRH"}'
+    - 'result.systemout ShouldContainSubstring {"case": 2, "id": "DIGITS"}'
+    - 'result.systemout ShouldContainSubstring {"case": 3, "id": "IDRH"}'
+    - 'result.systemout ShouldContainSubstring {"case": 4, "id": "OTHER"}'
+    - 'result.systemout ShouldContainSubstring {"case": 5, "id": "OTHER"}'
+    - 'result.systemout ShouldContainSubstring {"case": 6, "id": "OTHER"}'
+    - result.systemerr ShouldBeEmpty
