@@ -1073,7 +1073,7 @@ By default, if not specified otherwise, these classes will be used (input -> out
 
 ### Partitions
 
-[![Try it](https://img.shields.io/badge/-Try%20it%20in%20PIMO%20Play-brightgreen)](https://cgi-fr.github.io/pimo-play/#c=G4UwTgzglg9gdgLgAQCICMKBQBbAhhAayjgHMFNMkkBaJCEAGxAGMAXGMcq7pAKwngAHXKwAWyFLgCuYjlh55CXHkmFhWUDfAjKVNJHFzYQEkHigN5e7gHdRIREgDkAbxcA6abLBIAPkgATEAAzaQZWVBQ-JGwpCFYAJRASEAAPAFkRZlFUAD0AbVxqAC8AXQBqAAFCkoqAHTr3GrLygBIogF8Op0prKjEHXT79Zm1WXDhWCQn4AE9sSoCYczh3UewrPVpDYwkoAM3rO0HnN08ZUQ5ooNCpcMjo2PiklIysnJQCgAZqAE4K9pILo9YZIAaIXqg2ijODxCZTVBfJHIlGHHjbIwmVAwAZgNEqcFDPrQsbw6ZwOYbTBAA&i=N4KABGBECGCuAuALA9gJ0gLjAbXBKApgLbQCWANgAIAmyJpAdgHQDGdkANHhJAIwBMAZgAsAVgBsnblABSyRAzAARZAUh4AuiAC+QA)
+[![Try it](https://img.shields.io/badge/-Try%20it%20in%20PIMO%20Play-brightgreen)](https://cgi-fr.github.io/pimo-play/#c=G4UwTgzglg9gdgLgAQCICMKBQBbAhhAayjgHMFNMkkBaJCEAGxAGMAXGMcq7pAKwngAHXKwAWyFLgCuYjlh55CXHkmFhWUDfAjKVSAMRJWYXHAgAzDni1mklsEhB4oDJMFwMpICJT00kcLjYIBJOuC7yflQA7qIgiEgA5ADeyUgAdNKyDgA+SAAmIObSDKyoKEh52FIQrABKICQgAB4AsiLMoqgAegDauNQAXgC6ANQAAv1DYwA6M+lTI6MAJBUAvmuJvlFi8bpR-szarKasEqbwAJ7Y4-kwznDpR9iReobGphZWIrC29gVQEiaCBuDxeHxRWiBYISKD5V5+WJ7JKpDJZUQcSoFIolMooCpVGr1RotdqsTo9XoABmoAE4xqskBstgcjHFENsDrQjmYTnAzqgqULhSKETx3iYzPZrL8Qf8YLsHO5PN5OTwoUEQqgFXEwGKVLsOayqNzjqdznAri9MEA&i=N4KABGBECGCuAuALA9gJ0gLigUwLbQEsAbAAQBNl8CA7AOgGNLIQBfIA)
 
 The partition mask will rely on conditions to identify specific cases and apply a defined list of masks for each case. Example configuration:
 
