@@ -249,7 +249,13 @@ type PartitionType struct {
 
 type SegmentType struct {
 	Regex   string                `yaml:"regex" json:"regex" jsonschema_description:"regex used to create segments using group captures, groups must be named"`
-	Replace map[string][]MaskType `yaml:"replace" json:"replace" jsonschema_description:"list of masks to execute for each group"`
+	Match   map[string][]MaskType `yaml:"match" json:"match" jsonschema_description:"list of masks to execute for each group if the regex matched"`
+	NoMatch []MaskType            `yaml:"nomatch" json:"nomatch" jsonschema_description:"list of masks to execute for each group if the regex did not match"`
+}
+
+type LogType struct {
+	Message string `yaml:"message,omitempty" json:"message,omitempty" jsonschema_description:"log message (this field is a template), if not set log the current selected value"`
+	Level   string `yaml:"level,omitempty" json:"level,omitempty" jsonschema:"enum=trace,enum=debug,enum=info,enum=warn,enum=error" jsonschema_description:"log level, default to info"`
 }
 
 type MaskType struct {
@@ -293,6 +299,7 @@ type MaskType struct {
 	Apply             ApplyType            `yaml:"apply,omitempty" json:"apply,omitempty" jsonschema:"oneof_required=Apply,title=Apply Mask" jsonschema_description:"Call external masking file"`
 	Partition         []PartitionType      `yaml:"partitions,omitempty" json:"partitions,omitempty" jsonschema:"oneof_required=Partition,title=Partitions Mask" jsonschema_description:"Identify specific cases and apply a defined list of masks for each case"`
 	Segment           SegmentType          `yaml:"segments,omitempty" json:"segments,omitempty" jsonschema:"oneof_required=Segment,title=Segments Mask" jsonschema_description:"Allow transformations on specific parts of a field's value"`
+	Log               *LogType             `yaml:"log,omitempty" json:"log,omitempty" jsonschema:"oneof_required=Log,title=Log Mask" jsonschema_description:"Output a log message"`
 }
 
 type Masking struct {
