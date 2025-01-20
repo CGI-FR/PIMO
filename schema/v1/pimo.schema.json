@@ -323,6 +323,27 @@
         "increment"
       ]
     },
+    "LogType": {
+      "properties": {
+        "message": {
+          "type": "string",
+          "description": "log message (this field is a template), if not set log the current selected value"
+        },
+        "level": {
+          "type": "string",
+          "enum": [
+            "trace",
+            "debug",
+            "info",
+            "warn",
+            "error"
+          ],
+          "description": "log level, default to info"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
     "LuhnType": {
       "properties": {
         "universe": {
@@ -596,6 +617,12 @@
             "segments"
           ],
           "title": "Segment"
+        },
+        {
+          "required": [
+            "log"
+          ],
+          "title": "Log"
         }
       ],
       "properties": {
@@ -803,6 +830,11 @@
           "$ref": "#/$defs/SegmentType",
           "title": "Segments Mask",
           "description": "Allow transformations on specific parts of a field's value"
+        },
+        "log": {
+          "$ref": "#/$defs/LogType",
+          "title": "Log Mask",
+          "description": "Output a log message"
         }
       },
       "additionalProperties": false,

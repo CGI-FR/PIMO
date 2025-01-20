@@ -1,0 +1,141 @@
+name: log mask
+testcases:
+
+- name: by default only log field value
+  steps:
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      seed: 42
+      masking:
+        - selector:
+            jsonpath: "id"
+          mask:
+            log: {}
+      EOF
+  - script: |-
+      pimo -vinfo <<EOF
+      {"case": 1, "id": "PZZZ123"}
+      {"case": 2, "id": "12345"}
+      {"case": 3, "id": "PABC000"}
+      {"case": 4, "id": "PABCD000"}
+      {"case": 5, "id": ""}
+      {"case": 6, "id": null}
+      EOF
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemerr ShouldContainSubstring INF PZZZ123
+    - result.systemerr ShouldContainSubstring INF 12345
+    - result.systemerr ShouldContainSubstring INF PABC000
+    - result.systemerr ShouldContainSubstring INF PABCD000
+    - result.systemerr ShouldContainSubstring INF 
+    - result.systemerr ShouldContainSubstring INF <nil>
+
+- name: customize message
+  steps:
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      seed: 42
+      masking:
+        - selector:
+            jsonpath: "id"
+          mask:
+            log:
+              message: 'id = {{.id}}'
+      EOF
+  - script: |-
+      pimo -vinfo <<EOF
+      {"case": 1, "id": "PZZZ123"}
+      {"case": 2, "id": "12345"}
+      {"case": 3, "id": "PABC000"}
+      {"case": 4, "id": "PABCD000"}
+      {"case": 5, "id": ""}
+      {"case": 6, "id": null}
+      EOF
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemerr ShouldContainSubstring INF id = PZZZ123
+    - result.systemerr ShouldContainSubstring INF id = 12345
+    - result.systemerr ShouldContainSubstring INF id = PABC000
+    - result.systemerr ShouldContainSubstring INF id = PABCD000
+    - result.systemerr ShouldContainSubstring INF id = 
+    - result.systemerr ShouldContainSubstring INF id = <no value>
+
+- name: customize log level
+  steps:
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      seed: 42
+      masking:
+        - selector:
+            jsonpath: "id"
+          mask:
+            log:
+              message: 'id = {{.id}}'
+              level: "error"
+      EOF
+  - script: |-
+      pimo <<EOF
+      {"case": 1, "id": "PZZZ123"}
+      {"case": 2, "id": "12345"}
+      {"case": 3, "id": "PABC000"}
+      {"case": 4, "id": "PABCD000"}
+      {"case": 5, "id": ""}
+      {"case": 6, "id": null}
+      EOF
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemerr ShouldContainSubstring ERR id = PZZZ123
+    - result.systemerr ShouldContainSubstring ERR id = 12345
+    - result.systemerr ShouldContainSubstring ERR id = PABC000
+    - result.systemerr ShouldContainSubstring ERR id = PABCD000
+    - result.systemerr ShouldContainSubstring ERR id = 
+    - result.systemerr ShouldContainSubstring ERR id = <no value>
+
+- name: example with partition mask
+  steps:
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      seed: 42
+      masking:
+        - selector:
+            jsonpath: "id"
+          mask:
+            partitions:
+              - name: idrh
+                when: '[[ .id | default "" | mustRegexMatch "^P[A-Z]{3}[0-9]{3}$" ]]'
+                then:
+                  - log:
+                      message: 'idrh = {{.}}'
+              - name: digits
+                when: '[[ .id | default "" | mustRegexMatch "^[0-9]+$" ]]'
+                then:
+                  - log:
+                      message: 'digits = {{.}}'
+              - name: others
+                then:
+                  - log:
+                      message: 'invalid value = {{.}}'
+      EOF
+  - script: sed -i  "s/\[\[/\{\{/g"  masking.yml
+  - script: sed -i  "s/\]\]/\}\}/g"  masking.yml
+  - script: |-
+      pimo -vinfo <<EOF
+      {"case": 1, "id": "PZZZ123"}
+      {"case": 2, "id": "12345"}
+      {"case": 3, "id": "PABC000"}
+      {"case": 4, "id": "PABCD000"}
+      {"case": 5, "id": ""}
+      {"case": 6, "id": null}
+      EOF
+    assertions:
+    - result.code ShouldEqual 0
+    - result.systemerr ShouldContainSubstring INF idrh = PZZZ123
+    - result.systemerr ShouldContainSubstring INF digits = 12345
+    - result.systemerr ShouldContainSubstring INF idrh = PABC000
+    - result.systemerr ShouldContainSubstring INF invalid value = PABCD000
+    - result.systemerr ShouldContainSubstring INF invalid value = 
+    - result.systemerr ShouldContainSubstring INF invalid value = <no value>

@@ -41,6 +41,7 @@ import (
 	"github.com/cgi-fr/pimo/pkg/hashcsv"
 	"github.com/cgi-fr/pimo/pkg/increment"
 	"github.com/cgi-fr/pimo/pkg/jsonline"
+	"github.com/cgi-fr/pimo/pkg/logmask"
 	"github.com/cgi-fr/pimo/pkg/luhn"
 	"github.com/cgi-fr/pimo/pkg/markov"
 	"github.com/cgi-fr/pimo/pkg/model"
@@ -347,6 +348,7 @@ func injectMaskFactories() []model.MaskFactory {
 		apply.Factory,
 		partition.Factory,
 		segment.Factory,
+		logmask.Factory,
 	}
 }
 

@@ -171,6 +171,7 @@ The following types of masks can be used :
   * [`markov`](#markov) can generate pseudo text based on a sample text.
   * [`findInCSV`](#findincsv) get one or multiple csv lines which matched with Json entry value from CSV files.
   * [`xml`](#xml) can manipulate XML content within JSON values.
+  * [`log`](#log) will output a log.
 
 A full `masking.yml` file example, using every kind of mask, is given with the source code.
 
@@ -1123,6 +1124,42 @@ The segments mask allow transformations on specific parts of a field's value. Th
               domain: "0123456789"
       nomatch:
         - constant: "invalid value"
+```
+
+[Return to list of masks](#possible-masks)
+
+### Log
+
+The log mask can output a custom log message.
+
+Minimal configuration: this will just output the value of id.
+
+```yaml
+- selector:
+    jsonpath: "id"
+  mask:
+    log: {}
+```
+
+```console
+echo '{"id":"hello"}' | pimo -vinfo
+$ 2:22PM INF hello config=masking.yml context=stdin[1] input-line=1 output-line=1 path=..id
+```
+
+Advanced configuration: you can control the message content and the log level.
+
+```yaml
+- selector:
+    jsonpath: "id"
+  mask:
+    log:
+      message: 'The value of the field id is [{{.id}}]'
+      level: trace
+```
+
+```console
+echo '{"id":"hello"}' | pimo -vtrace
+2:25PM TRC The value of the field id is [hello] config=masking.yml context=stdin[1] input-line=1 output-line=1 path=..id
 ```
 
 [Return to list of masks](#possible-masks)
