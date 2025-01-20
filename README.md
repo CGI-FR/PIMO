@@ -1102,7 +1102,7 @@ The partition mask will rely on conditions to identify specific cases and apply 
 
 ### Segments
 
-[![Try it](https://img.shields.io/badge/-Try%20it%20in%20PIMO%20Play-brightgreen)](https://cgi-fr.github.io/pimo-play/#c=G4UwTgzglg9gdgLgAQCICMKBQBbAhhAayjgHMFNMkkBaJCEAGxAGMAXGMcq7pAKwngAHXKwAWyFFAAmWHnkJcedECWwg4rCIqVIwKkAA8JAPQAKACgD8pgDxNWrcBAB8AbQCC1AFoBdAN4AzAC+AJRWtlJQJFCabgAM1ACc-sEhACSyOrogggy4zCDaWfaOkEVZNEgAZlVo5RXcBCAAngBiYDDYAKJwwBKtrWgA+l0AcgDCAEoAmqYAKgCSAPKjQwDSXdOZDUpSnbjEEu4AQuMAIl2tAOIAEgsAUmsAMgCyo0umAIqTAMpzAKoANQA6gANaZebZZSLRTT1HS0Gp1Sg7JRNNodbq9fqDEYTGbzZarDZbFGo7h7PCHVBxNAAJgCABYAKwANgA7AAORJYIA&i=N4KABGBECWAmkC4oAUCCAhAwgRgEwGZIQBfIA)
+[![Try it](https://img.shields.io/badge/-Try%20it%20in%20PIMO%20Play-brightgreen)](https://cgi-fr.github.io/pimo-play/#c=G4UwTgzglg9gdgLgAQCICMKBQBbAhhAayjgHMFNMkkBaJCEAGxAGMAXGMcq7pAKwngAHXKwAWyFFAAmWHnkJcedECWwg4rCIqVIwKkAA8JAPQAKACgD8pgDxNWrcBAB8AbQCC1AFoBdAN4AzAC+AJRWtlJQJFCabgAM1ACc-sEhACSyOkh4rMzilFlU9o6Q2oU0SABmlWhl5dwEIACeAGJgMNgAonDAEi0taAD6nQByAMIASgCapgAqAJIA8iODANKdU5n1PFIduMQS7gBCYwAinS0A4gAS8wBSqwAyALIji6YAihMAyrMAqgA1ADqAA0pl4tllItFNHUsrRqrUCtsGs02h1ur1UP0hqNJjMFss1htISjdngDqg4mgAEwBAAsAFYAGwAdgAHIlSdw4Htcvl6rRmPAIKxcBoJMRgLgGNIkNKGABXEBYIA&i=N4KABGBECWAmkC4oAUCCAhAwgRgEwGZIQBfIA)
 
 The segments mask allow transformations on specific parts of a field's value. This mask will use regular expressions to capture subgroups and apply transformations to them individually. Example configuration:
 
@@ -1112,7 +1112,7 @@ The segments mask allow transformations on specific parts of a field's value. Th
   mask:
     segments:
       regex: "^P(?P<letters>[A-Z]{3})(?P<digits>[0-9]{3})$"
-      replace:
+      match:
         letters:
           - ff1:
               keyFromEnv: "FF1_ENCRYPTION_KEY"
@@ -1121,6 +1121,8 @@ The segments mask allow transformations on specific parts of a field's value. Th
           - ff1:
               keyFromEnv: "FF1_ENCRYPTION_KEY"
               domain: "0123456789"
+      nomatch:
+        - constant: "invalid value"
 ```
 
 [Return to list of masks](#possible-masks)

@@ -1047,7 +1047,7 @@
           "type": "string",
           "description": "regex used to create segments using group captures, groups must be named"
         },
-        "replace": {
+        "match": {
           "additionalProperties": {
             "items": {
               "$ref": "#/$defs/MaskType"
@@ -1055,14 +1055,22 @@
             "type": "array"
           },
           "type": "object",
-          "description": "list of masks to execute for each group"
+          "description": "list of masks to execute for each group if the regex matched"
+        },
+        "nomatch": {
+          "items": {
+            "$ref": "#/$defs/MaskType"
+          },
+          "type": "array",
+          "description": "list of masks to execute for each group if the regex did not match"
         }
       },
       "additionalProperties": false,
       "type": "object",
       "required": [
         "regex",
-        "replace"
+        "match",
+        "nomatch"
       ]
     },
     "SelectorType": {

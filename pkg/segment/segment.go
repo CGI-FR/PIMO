@@ -13,6 +13,7 @@ import (
 type MaskEngine struct {
 	re        *regexp.Regexp
 	pipelines map[string]model.Pipeline
+	nomatch   model.Pipeline
 	seed      int64
 	seeder    model.Seeder
 }
@@ -42,7 +43,7 @@ func NewMask(segment model.SegmentType, caches map[string]model.Cache, fns tmpl.
 
 	pipelines := map[string]model.Pipeline{}
 
-	for groupname, masks := range segment.Replace {
+	for groupname, masks := range segment.Match {
 		definition := buildDefinition(masks, seed)
 		pipeline := model.NewPipeline(nil)
 		pipeline, _, err = model.BuildPipeline(pipeline, definition, caches, fns, "", "")
@@ -53,21 +54,38 @@ func NewMask(segment model.SegmentType, caches map[string]model.Cache, fns tmpl.
 		pipelines[groupname] = pipeline
 	}
 
+	nomatchdef := buildDefinition(segment.NoMatch, seed)
+	nomatchpip := model.NewPipeline(nil)
+	nomatchpip, _, err = model.BuildPipeline(nomatchpip, nomatchdef, caches, fns, "", "")
+	if err != nil {
+		return MaskEngine{}, err
+	}
+
 	return MaskEngine{
 		re:        regexp.MustCompile(segment.Regex),
 		pipelines: pipelines,
+		nomatch:   nomatchpip,
 		seed:      seed,
 		seeder:    seeder,
 	}, nil
 }
 
 // replace captured groups named in the `value` string using the values ​​calculated by the `replacements` map
-func replace(value string, re *regexp.Regexp, replacements map[string]func(string) (string, error)) (string, error) {
+func replace(value string, re *regexp.Regexp, replacements map[string]func(string) (string, error), nomatch func(string) (string, error)) (string, error) {
 	result := &strings.Builder{}
 
 	matchIndexes := re.FindStringSubmatchIndex(value)
-	groupNames := re.SubexpNames()
 
+	if matchIndexes == nil {
+		// means the regex did not match
+		if masked, err := nomatch(value); err != nil {
+			return value, err
+		} else {
+			return masked, nil
+		}
+	}
+
+	groupNames := re.SubexpNames()
 	writeCount := 0
 	for i := 2; i < len(matchIndexes); i += 2 {
 		groupNumber := i / 2
@@ -111,7 +129,19 @@ func (me MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Ent
 		}
 	}
 
-	result, err := replace(e.(string), me.re, replacements)
+	nomatch := func(value string) (string, error) {
+		var result []model.Entry
+		err := me.nomatch.
+			WithSource(model.NewSourceFromSlice([]model.Dictionary{model.NewDictionary().With(".", value)})).
+			AddSink(model.NewSinkToSlice(&result)).
+			Run()
+		if err != nil {
+			return value, err
+		}
+		return result[0].(string), nil
+	}
+
+	result, err := replace(e.(string), me.re, replacements, nomatch)
 	if err != nil {
 		return e, err
 	}

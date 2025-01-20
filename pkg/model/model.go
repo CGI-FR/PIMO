@@ -249,7 +249,8 @@ type PartitionType struct {
 
 type SegmentType struct {
 	Regex   string                `yaml:"regex" json:"regex" jsonschema_description:"regex used to create segments using group captures, groups must be named"`
-	Replace map[string][]MaskType `yaml:"replace" json:"replace" jsonschema_description:"list of masks to execute for each group"`
+	Match   map[string][]MaskType `yaml:"match" json:"match" jsonschema_description:"list of masks to execute for each group if the regex matched"`
+	NoMatch []MaskType            `yaml:"nomatch" json:"nomatch" jsonschema_description:"list of masks to execute for each group if the regex did not match"`
 }
 
 type MaskType struct {
