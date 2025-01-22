@@ -955,8 +955,7 @@
       "additionalProperties": false,
       "type": "object",
       "required": [
-        "name",
-        "then"
+        "name"
       ]
     },
     "PipeType": {
@@ -1101,8 +1100,7 @@
       "type": "object",
       "required": [
         "regex",
-        "match",
-        "nomatch"
+        "match"
       ]
     },
     "SelectorType": {

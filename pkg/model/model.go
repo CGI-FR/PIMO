@@ -244,13 +244,13 @@ type ApplyType struct {
 type PartitionType struct {
 	Name string     `yaml:"name" json:"name" jsonschema_description:"name of the partition"`
 	When string     `yaml:"when,omitempty" json:"when,omitempty" jsonschema_description:"template to execute, if true the condition is active"`
-	Then []MaskType `yaml:"then" json:"then" jsonschema_description:"list of masks to execute if the condition is active"`
+	Then []MaskType `yaml:"then,omitempty" json:"then,omitempty" jsonschema_description:"list of masks to execute if the condition is active"`
 }
 
 type SegmentType struct {
 	Regex   string                `yaml:"regex" json:"regex" jsonschema_description:"regex used to create segments using group captures, groups must be named"`
 	Match   map[string][]MaskType `yaml:"match" json:"match" jsonschema_description:"list of masks to execute for each group if the regex matched"`
-	NoMatch []MaskType            `yaml:"nomatch" json:"nomatch" jsonschema_description:"list of masks to execute for each group if the regex did not match"`
+	NoMatch []MaskType            `yaml:"nomatch,omitempty" json:"nomatch,omitempty" jsonschema_description:"list of masks to execute for each group if the regex did not match"`
 }
 
 type LogType struct {
