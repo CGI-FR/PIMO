@@ -34,6 +34,16 @@ func TestMaskingShouldReplaceSensitiveValueByCommand(t *testing.T) {
 	assert.Equal(t, waited, result, "should be Toto")
 }
 
+func TestMaskingShouldPreserveSpaceInQuote(t *testing.T) {
+	nameProgramMasking := NewMask("echo \" Toto  \" ")
+	data := "Benjamin"
+	result, err := nameProgramMasking.Mask(data)
+	assert.Equal(t, nil, err, "error should be nil")
+	waited := " Toto  "
+	assert.NotEqual(t, data, result, "should be masked")
+	assert.Equal(t, waited, result, "should be Toto with space")
+}
+
 func TestMaskingShouldReturnAnErrorInCaseOfWrongCommand(t *testing.T) {
 	nameCommandMasking := NewMask("WrongCommand")
 

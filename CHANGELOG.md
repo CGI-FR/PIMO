@@ -14,6 +14,10 @@ Types of changes
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [1.30.1]
+
+- `Fixed` mask `command` split command line on space protected by quote
+
 ## [1.30.0]
 
 - `Added` mask `partitions` to handle fields containing different types of values by applying distinct transformations
