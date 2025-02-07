@@ -18,11 +18,14 @@
 package command
 
 import (
+	"fmt"
 	"os/exec"
 	"strings"
 
 	"github.com/cgi-fr/pimo/pkg/model"
 	"github.com/rs/zerolog/log"
+
+	"github.com/mattn/go-shellwords"
 )
 
 // MaskEngine implements MaskEngine with a console command
@@ -38,7 +41,13 @@ func NewMask(cmd string) MaskEngine {
 // Mask delegate mask algorithm to an external program
 func (cme MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.Entry, error) {
 	log.Info().Msg("Mask command")
-	splitCommand := strings.Split(cme.Cmd, " ")
+	line := cme.Cmd
+	parser := shellwords.NewParser()
+	parser.ParseEnv = true
+	splitCommand, err := parser.Parse(line)
+	if err != nil {
+		return "", fmt.Errorf("failed to parse command %w", err)
+	}
 	/* #nosec */
 	out, err := exec.Command(splitCommand[0], splitCommand[1:]...).Output()
 
