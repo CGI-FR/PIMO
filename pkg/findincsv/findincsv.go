@@ -16,11 +16,6 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-type CSVKey struct {
-	filename string
-	lineKey  string
-}
-
 type JaccardCSV struct {
 	csvLine model.Entry
 	lineKey string
@@ -39,7 +34,7 @@ type MaskEngine struct {
 	temJaccardCSV      *tmlmask.Engine // template to compute key for a csv entry
 	temJaccardEntry    *tmlmask.Engine // template to compute key for json entry
 	expected           string
-	csvEntryByKey      map[fileuri]map[linekey][]model.Dictionary
+	csvEntryByKey      map[fileuri]map[linekey][]model.Entry
 	header             bool
 	sep                rune
 	comment            rune
@@ -117,7 +112,7 @@ func NewMask(conf model.FindInCSVType, seed int64, seeder model.Seeder) (MaskEng
 		temJaccardCSV,
 		temJaccardEntry,
 		expected,
-		map[fileuri]map[linekey][]model.Dictionary{},
+		map[fileuri]map[linekey][]model.Entry{},
 		conf.Header,
 		sep, comment, conf.FieldsPerRecord, conf.TrimSpace,
 	}, err
@@ -205,21 +200,26 @@ func (me *MaskEngine) exactMatch(filename fileuri, context []model.Dictionary) (
 		if err := me.temExactMatchEntry.Execute(&exactEntryBuffer, context[0].UnpackUnordered()); err != nil {
 			return false, nil, err
 		}
-		exactEntryString := exactEntryBuffer.String()
+		exactEntryString := linekey(exactEntryBuffer.String())
 		err = me.getExactMatchCsvResult(filename, csvList)
 		if err != nil {
 			return false, []model.Entry{}, err
 		}
 
-		results := readCsvEntryByKey(filename, exactEntryString)
+		results := me.readCsvEntryByKey(filename, exactEntryString)
 
 		return len(results) > 0, results, nil
 	}
 	return true, []model.Entry{}, nil
 }
 
-func readCsvEntryByKey(filename fileuri, exactEntryString string) []model.Entry {
-	panic("unimplemented")
+func (me *MaskEngine) readCsvEntryByKey(filename fileuri, exactEntryString linekey) []model.Entry {
+	cache, cacheExists := me.csvEntryByKey[filename]
+	if !cacheExists {
+		panic("csv file is not cached, please report the bug on GitHub CGI-FR")
+	}
+
+	return cache[exactEntryString]
 }
 
 func (me *MaskEngine) readCSV(filename fileuri) (uri.DictRecords, error) {
@@ -249,9 +249,9 @@ func (me *MaskEngine) computeCSVLineKey(record model.Dictionary, exactMatch bool
 }
 
 func (me *MaskEngine) getExactMatchCsvResult(filename fileuri, csvList uri.DictRecords) error {
-	cache, cacheExists := me.csvEntryByKey[filename]
+	_, cacheExists := me.csvEntryByKey[filename]
 	if !cacheExists {
-		cache = map[linekey][]model.Dictionary{}
+		cache := map[linekey][]model.Entry{}
 
 		for i := 0; i < csvList.Len(); i++ {
 			record := csvList.Get(i)
@@ -262,10 +262,13 @@ func (me *MaskEngine) getExactMatchCsvResult(filename fileuri, csvList uri.DictR
 
 			if records, ok := cache[linekey(lineKey)]; ok {
 				records = append(records, record)
+				cache[linekey(lineKey)] = records
 			} else {
-				cache[linekey(lineKey)] = []model.Dictionary{record}
+				cache[linekey(lineKey)] = []model.Entry{record}
 			}
 		}
+
+		me.csvEntryByKey[filename] = cache
 	}
 
 	return nil

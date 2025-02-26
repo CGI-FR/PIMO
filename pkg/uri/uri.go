@@ -118,7 +118,11 @@ func ReadCsvAsDicts(uri string, sep rune, comment rune, fieldsPerRecord int, tri
 				}
 			}
 		}
-		results = append(results, obj)
+		results[i] = obj
+	}
+
+	if hasHeaders {
+		results = results[1:]
 	}
 
 	return records[model.Dictionary]{results}, nil
