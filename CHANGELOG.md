@@ -14,6 +14,10 @@ Types of changes
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [1.30.2]
+
+- `Fixed` mask `findInCSV` memory usage
+
 ## [1.30.1]
 
 - `Fixed` mask `command` split command line on space protected by quote
