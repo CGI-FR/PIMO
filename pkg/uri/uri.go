@@ -26,6 +26,7 @@ import (
 	"net/url"
 	"os"
 	"strconv"
+	"strings"
 
 	"github.com/cgi-fr/pimo/pkg/maskingdata"
 	"github.com/cgi-fr/pimo/pkg/model"
@@ -42,6 +43,7 @@ type Records[T model.Entry | []string] interface {
 type (
 	CSVRecords   Records[[]string]
 	EntryRecords Records[model.Entry]
+	DictRecords  Records[model.Dictionary]
 )
 
 type records[T model.Entry | []string] struct {
@@ -63,9 +65,64 @@ func (r records[T]) Collect() []T {
 }
 
 var (
-	cacheCSV   map[string]records[[]string]    = map[string]records[[]string]{}
-	cacheEntry map[string]records[model.Entry] = map[string]records[model.Entry]{}
+	cacheCSV   map[string]records[[]string]         = map[string]records[[]string]{}
+	cacheEntry map[string]records[model.Entry]      = map[string]records[model.Entry]{}
+	cacheDict  map[string]records[model.Dictionary] = map[string]records[model.Dictionary]{}
 )
+
+func ReadCsvAsDicts(uri string, sep rune, comment rune, fieldsPerRecord int, trimLeadingSpaces bool, hasHeaders bool) (DictRecords, error) {
+	if records, present := cacheDict[uri]; present {
+		return records, nil
+	}
+
+	csvRecords, err := ReadCsv(uri, sep, comment, fieldsPerRecord, trimLeadingSpaces)
+	if err != nil {
+		return nil, err
+	}
+
+	headers := []string{}
+	if hasHeaders {
+		headerRecord := csvRecords.Get(0)
+		for _, header := range headerRecord {
+			if trimLeadingSpaces {
+				headers = append(headers, strings.TrimSpace(header))
+			} else {
+				headers = append(headers, header)
+			}
+		}
+	}
+
+	i := 0
+	if hasHeaders {
+		i = 1
+	}
+
+	results := make([]model.Dictionary, csvRecords.Len())
+	for ; i < csvRecords.Len(); i++ {
+		record := csvRecords.Get(i)
+		obj := model.NewDictionary()
+		if hasHeaders {
+			for i, header := range headers {
+				if trimLeadingSpaces {
+					obj.Set(header, strings.TrimSpace(record[i]))
+				} else {
+					obj.Set(header, record[i])
+				}
+			}
+		} else {
+			for i, value := range record {
+				if trimLeadingSpaces {
+					obj.Set(strconv.Itoa(i), strings.TrimSpace(value))
+				} else {
+					obj.Set(strconv.Itoa(i), value)
+				}
+			}
+		}
+		results = append(results, obj)
+	}
+
+	return records[model.Dictionary]{results}, nil
+}
 
 func ReadCsv(uri string, sep rune, comment rune, fieldsPerRecord int, trimLeadingSpaces bool) (CSVRecords, error) {
 	if records, present := cacheCSV[uri]; present {

@@ -6,8 +6,6 @@ import (
 	"hash/fnv"
 	"html/template"
 	"sort"
-	"strconv"
-	"strings"
 	tmpl "text/template"
 	"unicode/utf8"
 
@@ -36,7 +34,6 @@ type MaskEngine struct {
 	temJaccardCSV      *tmlmask.Engine // template to compute key for a csv entry
 	temJaccardEntry    *tmlmask.Engine // template to compute key for json entry
 	expected           string
-	csvAllreadyRead    map[string][]model.Dictionary
 	csvEntryByKey      map[CSVKey][]model.Entry
 	header             bool
 	sep                rune
@@ -115,7 +112,6 @@ func NewMask(conf model.FindInCSVType, seed int64, seeder model.Seeder) (MaskEng
 		temJaccardCSV,
 		temJaccardEntry,
 		expected,
-		map[string][]model.Dictionary{},
 		map[CSVKey][]model.Entry{},
 		conf.Header,
 		sep, comment, conf.FieldsPerRecord, conf.TrimSpace,
@@ -136,7 +132,7 @@ func (me *MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.En
 	filename := filenameBuffer.String()
 
 	// Get ExactMatch results
-	exactMatchFinded, exactMatchResult, err := me.ExactMatch(filename, context)
+	exactMatchFinded, exactMatchResult, err := me.exactMatch(filename, context)
 	if err != nil {
 		return nil, err
 	}
@@ -163,19 +159,14 @@ func (me *MaskEngine) getJaccardMatchResults(filename string, exactMatchResults 
 
 	// If no exactMatch config
 	if len(exactMatchResults) < 1 {
-		var csvList []model.Dictionary
-		if _, ok := me.csvAllreadyRead[filename]; !ok {
-			var err error
-			csvList, err = me.readCSV(filename)
-			if err != nil {
-				return nil, err
-			}
-		} else {
-			csvList = me.csvAllreadyRead[filename]
+		csvList, err := me.readCSV(filename)
+		if err != nil {
+			return nil, err
 		}
 
 		var records []JaccardCSV
-		for _, record := range csvList {
+		for i := 0; i < csvList.Len(); i++ {
+			record := csvList.Get(i)
 			lineKey, err := me.computeCSVLineKey(record, false)
 			if err != nil {
 				return nil, err
@@ -198,15 +189,11 @@ func (me *MaskEngine) getJaccardMatchResults(filename string, exactMatchResults 
 	return sortBySimilarity(jaccardEntryString, records), nil
 }
 
-func (me *MaskEngine) ExactMatch(filename string, context []model.Dictionary) (bool, []model.Entry, error) {
+func (me *MaskEngine) exactMatch(filename string, context []model.Dictionary) (bool, []model.Entry, error) {
 	if me.temExactMatchEntry != nil && me.temExactMatchCSV != nil {
-		var csvList []model.Dictionary
-		if _, ok := me.csvAllreadyRead[filename]; !ok {
-			var err error
-			csvList, err = me.readCSV(filename)
-			if err != nil {
-				return false, nil, err
-			}
+		csvList, err := me.readCSV(filename)
+		if err != nil {
+			return false, nil, err
 		}
 
 		var exactEntryBuffer bytes.Buffer
@@ -214,7 +201,7 @@ func (me *MaskEngine) ExactMatch(filename string, context []model.Dictionary) (b
 			return false, nil, err
 		}
 		exactEntryString := exactEntryBuffer.String()
-		err := me.getExactMatchCsvResult(filename, csvList)
+		err = me.getExactMatchCsvResult(filename, csvList)
 		if err != nil {
 			return false, []model.Entry{}, err
 		}
@@ -231,13 +218,12 @@ func (me *MaskEngine) ExactMatch(filename string, context []model.Dictionary) (b
 	return true, []model.Entry{}, nil
 }
 
-func (me *MaskEngine) readCSV(filename string) ([]model.Dictionary, error) {
-	recordsFromFile, err := uri.ReadCsv(filename, me.sep, me.comment, me.fieldsPerRecord, me.trimSpaces)
+func (me *MaskEngine) readCSV(filename string) (uri.DictRecords, error) {
+	recordsFromFile, err := uri.ReadCsvAsDicts(filename, me.sep, me.comment, me.fieldsPerRecord, me.trimSpaces, me.header)
 	if err != nil {
 		return nil, err
 	}
-	csvList := me.createEntriesFromCSVLines(recordsFromFile)
-	return csvList, nil
+	return recordsFromFile, nil
 }
 
 func (me *MaskEngine) computeCSVLineKey(record model.Dictionary, exactMatch bool) (string, error) {
@@ -258,8 +244,9 @@ func (me *MaskEngine) computeCSVLineKey(record model.Dictionary, exactMatch bool
 	return output.String(), nil
 }
 
-func (me *MaskEngine) getExactMatchCsvResult(filename string, csvList []model.Dictionary) error {
-	for _, record := range csvList {
+func (me *MaskEngine) getExactMatchCsvResult(filename string, csvList uri.DictRecords) error {
+	for i := 0; i < csvList.Len(); i++ {
+		record := csvList.Get(i)
 		lineKey, err := me.computeCSVLineKey(record, true)
 		if err != nil {
 			return err
@@ -279,37 +266,6 @@ func (me *MaskEngine) getExactMatchCsvResult(filename string, csvList []model.Di
 	}
 
 	return nil
-}
-
-func (me *MaskEngine) createEntriesFromCSVLines(records uri.CSVRecords) []model.Dictionary {
-	results := []model.Dictionary{}
-
-	for i := 0; i < records.Len(); i++ {
-		record := records.Get(i)
-		if me.header {
-			obj := model.NewDictionary()
-			headers := records.Get(0)
-			for i, header := range headers {
-				if me.trimSpaces {
-					obj.Set(strings.TrimSpace(header), strings.TrimSpace(record[i]))
-				} else {
-					obj.Set(header, record[i])
-				}
-			}
-			results = append(results, obj)
-		} else {
-			obj := model.NewDictionary()
-			for i, value := range record {
-				if me.trimSpaces {
-					obj.Set(strconv.Itoa(i), strings.TrimSpace(value))
-				} else {
-					obj.Set(strconv.Itoa(i), value)
-				}
-			}
-			results = append(results, obj)
-		}
-	}
-	return results
 }
 
 // Get numbers of result waited in expected config, by default return as at-least-one
@@ -337,7 +293,7 @@ func (me *MaskEngine) getExpectedResult(results []model.Entry) (model.Entry, err
 }
 
 // JaccardSimilarity calculates the Jaccard similarity between two strings.
-func JaccardSimilarity(s1, s2 string) float64 {
+func jaccardSimilarity(s1, s2 string) float64 {
 	if s1 == s2 {
 		return 1.0
 	}
@@ -398,7 +354,7 @@ func sortBySimilarity(jaccardEntryString string, list []JaccardCSV) []model.Entr
 	var entriesWithSimilarity []EntryWithSimilarity
 
 	for _, record := range list {
-		similarity := JaccardSimilarity(jaccardEntryString, record.lineKey)
+		similarity := jaccardSimilarity(jaccardEntryString, record.lineKey)
 		entriesWithSimilarity = append(entriesWithSimilarity, EntryWithSimilarity{Key: record.lineKey, Entry: record.csvLine, Similarity: similarity})
 	}
 
