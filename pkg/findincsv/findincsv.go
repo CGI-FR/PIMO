@@ -26,6 +26,11 @@ type JaccardCSV struct {
 	lineKey string
 }
 
+type (
+	fileuri string
+	linekey string
+)
+
 type MaskEngine struct {
 	seeder             model.Seeder
 	templateURI        *template.Template
@@ -34,7 +39,7 @@ type MaskEngine struct {
 	temJaccardCSV      *tmlmask.Engine // template to compute key for a csv entry
 	temJaccardEntry    *tmlmask.Engine // template to compute key for json entry
 	expected           string
-	csvEntryByKey      map[CSVKey][]model.Entry
+	csvEntryByKey      map[fileuri]map[linekey][]model.Dictionary
 	header             bool
 	sep                rune
 	comment            rune
@@ -112,7 +117,7 @@ func NewMask(conf model.FindInCSVType, seed int64, seeder model.Seeder) (MaskEng
 		temJaccardCSV,
 		temJaccardEntry,
 		expected,
-		map[CSVKey][]model.Entry{},
+		map[fileuri]map[linekey][]model.Dictionary{},
 		conf.Header,
 		sep, comment, conf.FieldsPerRecord, conf.TrimSpace,
 	}, err
@@ -129,7 +134,7 @@ func (me *MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.En
 	if err := me.templateURI.Execute(&filenameBuffer, context[0].UnpackUnordered()); err != nil {
 		return nil, err
 	}
-	filename := filenameBuffer.String()
+	filename := fileuri(filenameBuffer.String())
 
 	// Get ExactMatch results
 	exactMatchFinded, exactMatchResult, err := me.exactMatch(filename, context)
@@ -150,7 +155,7 @@ func (me *MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model.En
 }
 
 // getJaccardMatchResults calculates Jaccard similarity for the given CSV filename and exact match results.
-func (me *MaskEngine) getJaccardMatchResults(filename string, exactMatchResults []model.Entry, context []model.Dictionary) ([]model.Entry, error) {
+func (me *MaskEngine) getJaccardMatchResults(filename fileuri, exactMatchResults []model.Entry, context []model.Dictionary) ([]model.Entry, error) {
 	var jaccardEntryBuffer bytes.Buffer
 	if err := me.temJaccardEntry.Execute(&jaccardEntryBuffer, context[0].UnpackUnordered()); err != nil {
 		return nil, err
@@ -189,7 +194,7 @@ func (me *MaskEngine) getJaccardMatchResults(filename string, exactMatchResults 
 	return sortBySimilarity(jaccardEntryString, records), nil
 }
 
-func (me *MaskEngine) exactMatch(filename string, context []model.Dictionary) (bool, []model.Entry, error) {
+func (me *MaskEngine) exactMatch(filename fileuri, context []model.Dictionary) (bool, []model.Entry, error) {
 	if me.temExactMatchEntry != nil && me.temExactMatchCSV != nil {
 		csvList, err := me.readCSV(filename)
 		if err != nil {
@@ -206,20 +211,19 @@ func (me *MaskEngine) exactMatch(filename string, context []model.Dictionary) (b
 			return false, []model.Entry{}, err
 		}
 
-		results := me.csvEntryByKey[CSVKey{
-			filename: filename,
-			lineKey:  exactEntryString,
-		}]
-		if len(results) < 1 {
-			return false, results, nil
-		}
-		return true, results, nil
+		results := readCsvEntryByKey(filename, exactEntryString)
+
+		return len(results) > 0, results, nil
 	}
 	return true, []model.Entry{}, nil
 }
 
-func (me *MaskEngine) readCSV(filename string) (uri.DictRecords, error) {
-	recordsFromFile, err := uri.ReadCsvAsDicts(filename, me.sep, me.comment, me.fieldsPerRecord, me.trimSpaces, me.header)
+func readCsvEntryByKey(filename fileuri, exactEntryString string) []model.Entry {
+	panic("unimplemented")
+}
+
+func (me *MaskEngine) readCSV(filename fileuri) (uri.DictRecords, error) {
+	recordsFromFile, err := uri.ReadCsvAsDicts(string(filename), me.sep, me.comment, me.fieldsPerRecord, me.trimSpaces, me.header)
 	if err != nil {
 		return nil, err
 	}
@@ -244,24 +248,23 @@ func (me *MaskEngine) computeCSVLineKey(record model.Dictionary, exactMatch bool
 	return output.String(), nil
 }
 
-func (me *MaskEngine) getExactMatchCsvResult(filename string, csvList uri.DictRecords) error {
-	for i := 0; i < csvList.Len(); i++ {
-		record := csvList.Get(i)
-		lineKey, err := me.computeCSVLineKey(record, true)
-		if err != nil {
-			return err
-		}
+func (me *MaskEngine) getExactMatchCsvResult(filename fileuri, csvList uri.DictRecords) error {
+	cache, cacheExists := me.csvEntryByKey[filename]
+	if !cacheExists {
+		cache = map[linekey][]model.Dictionary{}
 
-		key := CSVKey{
-			filename: filename,
-			lineKey:  lineKey,
-		}
+		for i := 0; i < csvList.Len(); i++ {
+			record := csvList.Get(i)
+			lineKey, err := me.computeCSVLineKey(record, true)
+			if err != nil {
+				return err
+			}
 
-		if records, ok := me.csvEntryByKey[key]; ok {
-			records = append(records, record)
-			me.csvEntryByKey[key] = records
-		} else {
-			me.csvEntryByKey[key] = []model.Entry{record}
+			if records, ok := cache[linekey(lineKey)]; ok {
+				records = append(records, record)
+			} else {
+				cache[linekey(lineKey)] = []model.Dictionary{record}
+			}
 		}
 	}
 
