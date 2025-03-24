@@ -39,9 +39,9 @@ func LoadConfigFromFile(filename string) (*Config, error) {
 	return config, nil
 }
 
-func (cfg *Config) Build(backend *url.URL, globalSeed *int64, cachesToLoad map[string]string) (Context, error) {
+func (cfg *Config) Build(backend *url.URL, globalSeed *int64, cachesToLoad map[string]string, client *http.Client) (Context, error) {
 	ctx := Context{
-		client:  http.DefaultClient,
+		client:  client,
 		backend: backend,
 		routes:  []ContextRoute{},
 		caches:  map[string]model.Cache{},
