@@ -9,7 +9,7 @@ require (
 	github.com/apache/arrow/go/v12 v12.0.1
 	github.com/capitalone/fpe v1.2.1
 	github.com/goccy/go-json v0.10.5
-	github.com/goccy/go-yaml v1.15.23
+	github.com/goccy/go-yaml v1.16.0
 	github.com/iancoleman/orderedmap v0.3.0
 	github.com/invopop/jsonschema v0.13.0
 	github.com/kenshaw/baseconv v0.1.1
