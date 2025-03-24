@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/tls"
 	"net/http"
 	"net/url"
 	"os"
@@ -37,6 +38,7 @@ func setupMockCommand(rootCmd *cobra.Command) {
 	proxyURL := ""
 	proxyAuth := ""
 	serverAuth := ""
+	insecure := false
 
 	mockCmd := &cobra.Command{
 		Use:   "mock",
@@ -72,6 +74,16 @@ func setupMockCommand(rootCmd *cobra.Command) {
 				}
 			}
 
+			if insecure {
+				if client.Transport == nil {
+					client.Transport = &http.Transport{
+						TLSClientConfig: &tls.Config{InsecureSkipVerify: true}, //nolint:gosec
+					}
+				} else {
+					client.Transport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true} //nolint:gosec
+				}
+			}
+
 			if serverAuth != "" {
 				if !strings.Contains(serverAuth, ":") {
 					password := askPassword("enter password for server authentication: ")
@@ -93,6 +105,7 @@ func setupMockCommand(rootCmd *cobra.Command) {
 	mockCmd.PersistentFlags().StringVarP(&proxyURL, "proxy", "x", proxyURL, "use the specified proxy to perform backend request")
 	mockCmd.PersistentFlags().StringVarP(&proxyAuth, "proxy-user", "U", proxyAuth, "specify user:password to use for proxy authentication")
 	mockCmd.PersistentFlags().StringVarP(&serverAuth, "user", "u", serverAuth, "specify user:password to use for server authentication")
+	mockCmd.PersistentFlags().BoolVarP(&insecure, "insecure", "k", insecure, "allow insecure server connections when using SSL")
 	addFlag(mockCmd, flagBufferSize)
 	// addFlag(mockCmd, flagCatchErrors) // could use
 	addFlag(mockCmd, flagConfigRoute)

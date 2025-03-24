@@ -14,6 +14,10 @@ Types of changes
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [1.31.0]
+
+- `Added` insecure, proxy, proxy-user and user flags to mock command
+
 ## [1.30.2]
 
 - `Fixed` mask `findInCSV` memory usage
