@@ -5,7 +5,7 @@ testcases:
     steps:
       - script: |
           pimo --serve ":8080" --seed 1 --mask 'name=[{add: true}, {randomChoiceInUri: "pimo://nameFR"}]' &
-          pimo -v5 mock -p :8081 http://localhost:8080 &
+          pimo -v5 mock -p :8081 http://localhost:8080 || : &
           sleep 1
           curl -s http://localhost:8080
           kill %1 %2
@@ -70,8 +70,8 @@ testcases:
           kill %1 %2
         assertions:
           - result.code ShouldEqual 0
-          - result.systemerr ShouldContainSubstring Origin request={"body":"","captures":{"name":"hello"},"headers":{"Accept":["*/*"],"User-Agent":["curl/8.9.1"]},"method":"GET","protocol":"HTTP/1.1","url":{"path":"/hello"}}
-          - result.systemerr ShouldContainSubstring Masked request={"body":"","captures":{"name":"intercepted"},"headers":{"Accept":["*/*"],"User-Agent":["curl/8.9.1"]},"method":"GET","protocol":"HTTP/1.1","url":{"path":"/intercepted"}}
+          - result.systemerr ShouldContainSubstring Origin request={"body":"","captures":{"name":"hello"},"headers":{"Accept":["*/*"],"User-Agent":["curl/8.12.1"]},"method":"GET","protocol":"HTTP/1.1","url":{"path":"/hello"}}
+          - result.systemerr ShouldContainSubstring Masked request={"body":"","captures":{"name":"intercepted"},"headers":{"Accept":["*/*"],"User-Agent":["curl/8.12.1"]},"method":"GET","protocol":"HTTP/1.1","url":{"path":"/intercepted"}}
 
   - name: set global seed
     steps:
