@@ -41,10 +41,10 @@ func TestMemCache_putUnique(t *testing.T) {
 }
 
 func TestNewUniqueMaskCacheEngine(t *testing.T) {
-	rand.Seed(0) //nolint:staticcheck
+	rnd := rand.New(rand.NewSource(0)) //nolint:gosec
 	MyFunc := func(entry Entry, contexts ...Dictionary) (Entry, error) {
 		// nolint:gosec
-		return rand.Int() % 2, nil
+		return rnd.Int() % 2, nil
 	}
 
 	cachedMask := NewUniqueMaskCacheEngine(NewUniqueMemCache(), FunctionMaskEngine{MyFunc})
