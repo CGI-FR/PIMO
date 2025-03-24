@@ -1,0 +1,26 @@
+name: repeat flag
+testcases:
+- name: repeat behavior
+  steps:
+  - script: |-
+      cat > expected.txt <<EOF
+      {"test":"1"}
+      {"test":"1"}
+      {"test":"1"}
+      {"test":"1"}
+      {"test":"1"}
+      {"test":"1"}
+      {"test":"1"}
+      {"test":"1"}
+      {"test":"1"}
+      {"test":"1"}
+      EOF
+  - script: |-
+      pimo --empty-input --repeat 10 --mask 'test={add:""}' --mask 'test={template:"{{.test}}1"}' > result.txt
+    assertions:
+    - result.code ShouldEqual 0
+  - script: diff expected.txt result.txt
+    assertions:
+      - result.systemout ShouldBeEmpty
+  - script: rm -f expected.txt
+  - script: rm -f result.txt
