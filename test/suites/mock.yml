@@ -4,6 +4,7 @@ testcases:
   - name: no routes config
     steps:
       - script: |
+          echo "" > routes.yaml
           pimo --serve ":8080" --seed 1 --mask 'name=[{add: true}, {randomChoiceInUri: "pimo://nameFR"}]' &
           pimo -v5 mock -p :8081 http://localhost:8080 &
           sleep 1
