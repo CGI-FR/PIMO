@@ -20,6 +20,7 @@ package jsonline
 import (
 	"bufio"
 	"io"
+	"iter"
 
 	over "github.com/adrienaury/zeromdc"
 	"github.com/cgi-fr/pimo/pkg/model"
@@ -52,6 +53,32 @@ type Source struct {
 
 func (s *Source) Open() error {
 	return nil
+}
+
+func (s *Source) Close() error {
+	return nil
+}
+
+func (s *Source) Values() iter.Seq2[model.Dictionary, error] {
+	return func(yield func(model.Dictionary, error) bool) {
+		for s.fscanner.Scan() {
+			line := s.fscanner.Bytes()
+
+			dict, err := JSONToDictionary(line)
+			if err != nil {
+				yield(dict, err)
+				return
+			}
+
+			if !yield(dict, nil) {
+				return
+			}
+		}
+
+		if s.fscanner.Err() != nil {
+			yield(model.NewDictionary(), s.fscanner.Err())
+		}
+	}
 }
 
 // Next convert next line to model.Dictionary
