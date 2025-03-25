@@ -64,7 +64,15 @@ func (s *Source) Values() iter.Seq2[model.Dictionary, error] {
 		for s.fscanner.Scan() {
 			line := s.fscanner.Bytes()
 
-			dict, err := JSONToDictionary(line)
+			var dict model.Dictionary
+			var err error
+
+			if s.packed {
+				dict, err = JSONToDictionary(line)
+			} else {
+				dict, err = JSONToPackedDictionary(line)
+			}
+
 			if err != nil {
 				yield(dict, err)
 				return

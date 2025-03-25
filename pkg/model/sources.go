@@ -34,3 +34,34 @@ func (s *SliceSource) Values() iter.Seq2[Dictionary, error] {
 		}
 	}
 }
+
+type MutableSource struct {
+	data []Dictionary
+}
+
+func NewMutableSource() *MutableSource {
+	return &MutableSource{}
+}
+
+func (s *MutableSource) Open() error {
+	return nil
+}
+
+func (s *MutableSource) Close() error {
+	return nil
+}
+
+func (s *MutableSource) SetValues(values ...Dictionary) {
+	s.data = values
+}
+
+// Values returns a sequence of dictionaries from the source.
+func (s *MutableSource) Values() iter.Seq2[Dictionary, error] {
+	return func(yield func(Dictionary, error) bool) {
+		for _, entry := range s.data {
+			if !yield(entry, nil) {
+				return
+			}
+		}
+	}
+}

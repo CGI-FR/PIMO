@@ -200,14 +200,14 @@ func BuildPipeline(pipeline Pipeline, conf Definition, caches map[string]Cache, 
 		pipeline = pipeline.Process(cleaner)
 	}
 
-	if repeatCondition != "" {
-		repeatSource := NewTempSource(pipeline.Source())
-		processor, err := NewRepeaterUntilProcess(repeatSource, repeatCondition, repeatConditionMode, skipLogFile)
-		if err != nil {
-			return pipeline, caches, fmt.Errorf("Cannot build pipeline: %w", err)
-		}
-		pipeline = pipeline.Process(processor).WithSource(repeatSource)
-	}
+	// if repeatCondition != "" {
+	// 	repeatSource := NewTempSource(pipeline.Source())
+	// 	processor, err := NewRepeaterUntilProcess(repeatSource, repeatCondition, repeatConditionMode, skipLogFile)
+	// 	if err != nil {
+	// 		return pipeline, caches, fmt.Errorf("Cannot build pipeline: %w", err)
+	// 	}
+	// 	pipeline = pipeline.Process(processor).WithSource(repeatSource)
+	// }
 
 	// unpack data from the container
 	pipeline = pipeline.Process(NewUnpackProcess())

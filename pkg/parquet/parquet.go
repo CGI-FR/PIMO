@@ -29,6 +29,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"iter"
 
 	over "github.com/adrienaury/zeromdc"
 	"github.com/apache/arrow/go/v12/arrow"
@@ -96,6 +97,11 @@ func (s *Source) Open() error {
 	return nil
 }
 
+func (s *Source) Close() error {
+	log.Trace().Msg("close parquet file")
+	return s.fileReader.ParquetReader().Close()
+}
+
 // NextBatch read next batch in parquet file
 func (s *Source) NextBatch() bool {
 	log.Trace().Msg("read batch of rows")
@@ -133,6 +139,16 @@ func (s *Source) Value() model.Entry {
 
 func (s *Source) Err() error {
 	return s.err
+}
+
+func (s *Source) Values() iter.Seq2[model.Dictionary, error] {
+	return func(yield func(model.Dictionary, error) bool) {
+		for s.Next() {
+			if !yield(s.Value().(model.Dictionary), nil) {
+				return
+			}
+		}
+	}
 }
 
 // NewSink creates a new Sink.

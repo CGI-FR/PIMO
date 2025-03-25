@@ -3,16 +3,27 @@ package model
 import "iter"
 
 type ProcessWrapper struct {
-	input Iterable[Dictionary]
-	p     Processor
-	queue *QueueCollector
+	input     Iterable[Dictionary]
+	processor Processor
+	queue     *QueueCollector
 }
 
 func (c *ProcessWrapper) Open() error {
-	return nil
+	if err := c.input.Open(); err != nil {
+		return err
+	}
+
+	if err := c.queue.Open(); err != nil {
+		return err
+	}
+
+	return c.processor.Open()
 }
 
 func (c *ProcessWrapper) Close() error {
+	if err := c.input.Close(); err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -24,7 +35,7 @@ func (c *ProcessWrapper) Values() iter.Seq2[Dictionary, error] {
 				return
 			}
 
-			if err := c.p.ProcessDictionary(item, c.queue); err != nil {
+			if err := c.processor.ProcessDictionary(item, c.queue); err != nil {
 				yield(item, err)
 				return
 			}
@@ -38,6 +49,6 @@ func (c *ProcessWrapper) Values() iter.Seq2[Dictionary, error] {
 	}
 }
 
-func NewProcessWrapper(input Iterable[Dictionary], p Processor) Iterable[Dictionary] {
+func NewProcessWrapper(input Iterable[Dictionary], p Processor) *ProcessWrapper {
 	return &ProcessWrapper{input, p, NewCollector()}
 }
