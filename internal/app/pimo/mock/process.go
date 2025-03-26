@@ -46,7 +46,7 @@ func NewProcessor(maskingFile string, globalSeed *int64, caches map[string]model
 
 	source := model.NewMutableSource()
 
-	pipeline, caches, err := model.BuildPipeline(model.NewPipeline(source), pdef, caches, nil, "", "")
+	pipeline, caches, err := model.BuildPipeline(model.NewPipeline(source), pdef, caches, nil)
 	if err != nil {
 		return nil, caches, err
 	}

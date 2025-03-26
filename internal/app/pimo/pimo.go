@@ -157,9 +157,6 @@ func (ctx *Context) Configure(cfg Config) error {
 		ctx.source = source
 	}
 
-	ctx.repeatWhile = cfg.RepeatWhile
-	ctx.repeatUntil = cfg.RepeatUntil
-
 	ctx.pipeline = model.NewPipeline(ctx.source).
 		Process(model.NewCounterProcessWithCallback("input-line", 0, updateContext))
 	over.AddGlobalFields("input-line")
@@ -170,7 +167,7 @@ func (ctx *Context) Configure(cfg Config) error {
 	model.InjectConfig(cfg.SkipLineOnError, cfg.SkipFieldOnError, cfg.SkipLogFile)
 
 	var err error
-	ctx.pipeline, ctx.caches, err = model.BuildPipeline(ctx.pipeline, ctx.pdef, nil, nil, ctx.repeatWhile, ctx.repeatUntil)
+	ctx.pipeline, ctx.caches, err = model.BuildPipeline(ctx.pipeline, ctx.pdef, nil, nil)
 	if err != nil {
 		return fmt.Errorf("Cannot build pipeline: %w", err)
 	}

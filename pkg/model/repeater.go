@@ -78,7 +78,7 @@ func NewTemplatePredicate(text string) (*TemplatePredicate, error) {
 func (t *TemplatePredicate) Test(value Entry) bool {
 	var output bytes.Buffer
 
-	err := t.tmpl.Execute(&output, Unpack(Untyped(value)))
+	err := t.tmpl.Execute(&output, Untyped(Unpack(value)))
 	if err != nil {
 		t.err = err
 		return false
@@ -118,15 +118,20 @@ func NewCountRepeater(input Source, count int) *Repeater {
 }
 
 func NewTemplateRepeater(input Source, while, until string) (*Repeater, error) {
-	var whilePredicate, untilPredicate *TemplatePredicate
+	var whilePredicate Predicate = &TruePredicate{}
+	var untilPredicate Predicate = &FalsePredicate{}
 	var err error
 
-	if whilePredicate, err = NewTemplatePredicate(while); err != nil {
-		return nil, err
+	if while != "" {
+		if whilePredicate, err = NewTemplatePredicate(while); err != nil {
+			return nil, err
+		}
 	}
 
-	if untilPredicate, err = NewTemplatePredicate(until); err != nil {
-		return nil, err
+	if until != "" {
+		if untilPredicate, err = NewTemplatePredicate(until); err != nil {
+			return nil, err
+		}
 	}
 
 	return NewRepeater(input, whilePredicate, untilPredicate), nil
@@ -152,12 +157,16 @@ func (r *Repeater) Values() iter.Seq2[Entry, error] {
 
 			vcopy := Copy(value)
 
-			for r.while.Test(vcopy) {
+			for {
 				if !yield(vcopy, nil) {
 					return
 				}
 
-				if r.until.Test(vcopy) {
+				if r.until.Test(vcopy) || r.until.Error() != nil {
+					break
+				}
+
+				if !r.while.Test(vcopy) || r.while.Error() != nil {
 					break
 				}
 
@@ -170,7 +179,7 @@ func (r *Repeater) Values() iter.Seq2[Entry, error] {
 			}
 
 			if r.until.Error() != nil {
-				yield(vcopy, r.while.Error())
+				yield(vcopy, r.until.Error())
 				return
 			}
 		}
