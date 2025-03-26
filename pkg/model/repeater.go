@@ -78,11 +78,11 @@ func NewTemplatePredicate(text string) (*TemplatePredicate, error) {
 func (t *TemplatePredicate) Test(value Entry) bool {
 	var output bytes.Buffer
 
-	// err := t.tmpl.Execute(&output, value.UnpackUntyped())
-	// if err != nil {
-	// 	t.err = err
-	// 	return false
-	// }
+	err := t.tmpl.Execute(&output, Unpack(Untyped(value)))
+	if err != nil {
+		t.err = err
+		return false
+	}
 
 	return output.String() == "true"
 }
