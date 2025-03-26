@@ -66,7 +66,7 @@ func (s *Source) Err() error {
 	panic("parquet is not supported on your environment")
 }
 
-func (s *Source) Values() iter.Seq2[model.Dictionary, error] {
+func (s *Source) Values() iter.Seq2[model.Entry, error] {
 	panic("parquet is not supported on your environment")
 }
 
