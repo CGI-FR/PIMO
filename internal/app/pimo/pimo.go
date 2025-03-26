@@ -149,15 +149,15 @@ func (ctx *Context) Configure(cfg Config) error {
 		ctx.source = model.NewCountRepeater(ctx.source, cfg.Iteration)
 	}
 
-	ctx.pipeline = model.NewPipeline(ctx.source).
-		Process(model.NewCounterProcessWithCallback("input-line", 0, updateContext))
-
 	ctx.repeatCondition = cfg.RepeatWhile
 	ctx.repeatConditionMode = "while"
 	if cfg.RepeatUntil != "" {
 		ctx.repeatCondition = cfg.RepeatUntil
 		ctx.repeatConditionMode = "until"
 	}
+
+	ctx.pipeline = model.NewPipeline(ctx.source).
+		Process(model.NewCounterProcessWithCallback("input-line", 0, updateContext))
 
 	over.AddGlobalFields("input-line")
 

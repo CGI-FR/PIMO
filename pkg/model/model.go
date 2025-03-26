@@ -459,7 +459,7 @@ func (p RepeaterUntilProcess) ProcessDictionary(dictionary Dictionary, out Colle
 }
 
 func NewTempSource(sourceValue Source) *TempSource {
-	return &TempSource{repeat: false, source: sourceValue, value: NewPackedDictionary()}
+	return &TempSource{repeat: true, source: sourceValue, value: NewPackedDictionary()}
 }
 
 type TempSource struct {
