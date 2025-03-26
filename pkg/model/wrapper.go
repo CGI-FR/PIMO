@@ -40,7 +40,7 @@ func (c *ProcessWrapper) Values() iter.Seq2[Dictionary, error] {
 				return
 			}
 
-			if c.queue.Next() {
+			for c.queue.Next() {
 				if !yield(c.queue.Value().(Dictionary), nil) {
 					return
 				}
