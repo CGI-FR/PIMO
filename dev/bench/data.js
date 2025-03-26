@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1742829117467,
+  "lastUpdate": 1742998071134,
   "repoUrl": "https://github.com/CGI-FR/PIMO",
   "entries": {
     "Benchmark": [
@@ -15498,6 +15498,126 @@ window.BENCHMARK_DATA = {
             "value": 280,
             "unit": "allocs/op",
             "extra": "392030 times\n4 procs"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "44274230+adrienaury@users.noreply.github.com",
+            "name": "Adrien Aury",
+            "username": "adrienaury"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "c98c9f7127805ea6e37ab4168522ad6c58896abd",
+          "message": "fix(repeat): memory leak (#413)\n\n* test: add repeat non regression test\n\n* fix(profiler): recognize mem keyword\n\n* refactor(process): wip! rewrite processor with go iterators\n\n* refactor(process): wip! impact pipeline api\n\n* refactor(process): wip! dry queue\n\n* refactor(process): wip! deprecate repeater process\n\n* refactor(process): wip! fix failed unit tests\n\n* refactor(process): wip! fix wasm build\n\n* refactor(process): wip! fix caches\n\n* refactor(process): wip! fix conversion with non dict selector\n\n* refactor(process): wip! fix wasm build\n\n* refactor(process): wip! repeat until and while\n\n* refactor(process): wip! refactor until and while\n\n* refactor(process): wip! rollback repeatCondition\n\n* refactor(process): wip! rollback repeater\n\n* refactor(process): wip! fix TempSource\n\n* refactor(process): wip! fix repeat while\n\n* refactor(process): changelog\n\n* refactor(repeat): cleanup unused code",
+          "timestamp": "2025-03-26T14:57:12+01:00",
+          "tree_id": "0ef76a089d6ebe7c4398f534f1987a9691d07aa5",
+          "url": "https://github.com/CGI-FR/PIMO/commit/c98c9f7127805ea6e37ab4168522ad6c58896abd"
+        },
+        "date": 1742998070474,
+        "tool": "go",
+        "benches": [
+          {
+            "name": "BenchmarkPimoRun",
+            "value": 24772,
+            "unit": "ns/op\t   16953 B/op\t     154 allocs/op",
+            "extra": "472077 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkPimoRun - ns/op",
+            "value": 24772,
+            "unit": "ns/op",
+            "extra": "472077 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkPimoRun - B/op",
+            "value": 16953,
+            "unit": "B/op",
+            "extra": "472077 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkPimoRun - allocs/op",
+            "value": 154,
+            "unit": "allocs/op",
+            "extra": "472077 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge",
+            "value": 1306174,
+            "unit": "ns/op\t  567811 B/op\t    1957 allocs/op",
+            "extra": "9033 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge - ns/op",
+            "value": 1306174,
+            "unit": "ns/op",
+            "extra": "9033 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge - B/op",
+            "value": 567811,
+            "unit": "B/op",
+            "extra": "9033 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge - allocs/op",
+            "value": 1957,
+            "unit": "allocs/op",
+            "extra": "9033 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkFindInCSVIteration",
+            "value": 2079580,
+            "unit": "ns/op\t 1515596 B/op\t   20850 allocs/op",
+            "extra": "5734 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkFindInCSVIteration - ns/op",
+            "value": 2079580,
+            "unit": "ns/op",
+            "extra": "5734 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkFindInCSVIteration - B/op",
+            "value": 1515596,
+            "unit": "B/op",
+            "extra": "5734 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkFindInCSVIteration - allocs/op",
+            "value": 20850,
+            "unit": "allocs/op",
+            "extra": "5734 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkFindInCSVLargeVolume",
+            "value": 33073,
+            "unit": "ns/op\t   23839 B/op\t     280 allocs/op",
+            "extra": "389016 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkFindInCSVLargeVolume - ns/op",
+            "value": 33073,
+            "unit": "ns/op",
+            "extra": "389016 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkFindInCSVLargeVolume - B/op",
+            "value": 23839,
+            "unit": "B/op",
+            "extra": "389016 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkFindInCSVLargeVolume - allocs/op",
+            "value": 280,
+            "unit": "allocs/op",
+            "extra": "389016 times\n4 procs"
           }
         ]
       }
