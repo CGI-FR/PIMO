@@ -596,7 +596,13 @@ func (c *QueueCollector) Close() error {
 }
 
 func (c *QueueCollector) Values() iter.Seq2[Dictionary, error] {
-	panic("Not implemented")
+	return func(yield func(Dictionary, error) bool) {
+		for c.Next() {
+			if !yield(c.Value().(Dictionary), nil) {
+				return
+			}
+		}
+	}
 }
 
 func (c *QueueCollector) Collect(dictionary Entry) {
