@@ -93,13 +93,13 @@ type Config struct {
 }
 
 type Context struct {
-	cfg                 Config
-	pdef                model.Definition
-	pipeline            model.Pipeline
-	source              model.Source
-	repeatCondition     string
-	repeatConditionMode string
-	caches              map[string]model.Cache
+	cfg         Config
+	pdef        model.Definition
+	pipeline    model.Pipeline
+	source      model.Source
+	repeatUntil string
+	repeatWhile string
+	caches      map[string]model.Cache
 }
 
 func NewContext(pdef model.Definition) Context {
@@ -145,16 +145,15 @@ func (ctx *Context) Configure(cfg Config) error {
 		return fmt.Errorf("Cannot use repeatUntil and repeatWhile options together")
 	}
 
-	ctx.repeatCondition = cfg.RepeatWhile
-	ctx.repeatConditionMode = "while"
-	if cfg.RepeatUntil != "" {
-		ctx.repeatCondition = cfg.RepeatUntil
-		ctx.repeatConditionMode = "until"
+	if cfg.Iteration > 0 {
+		ctx.source = model.NewCountRepeater(ctx.source, cfg.Iteration)
 	}
 
+	ctx.repeatWhile = cfg.RepeatWhile
+	ctx.repeatUntil = cfg.RepeatUntil
+
 	ctx.pipeline = model.NewPipeline(ctx.source).
-		Process(model.NewCounterProcessWithCallback("input-line", 0, updateContext)).
-		Process(model.NewRepeaterProcess(cfg.Iteration))
+		Process(model.NewCounterProcessWithCallback("input-line", 0, updateContext))
 	over.AddGlobalFields("input-line")
 
 	injectTemplateFuncs()
@@ -163,7 +162,7 @@ func (ctx *Context) Configure(cfg Config) error {
 	model.InjectConfig(cfg.SkipLineOnError, cfg.SkipFieldOnError, cfg.SkipLogFile)
 
 	var err error
-	ctx.pipeline, ctx.caches, err = model.BuildPipeline(ctx.pipeline, ctx.pdef, nil, nil, ctx.repeatCondition, ctx.repeatConditionMode)
+	ctx.pipeline, ctx.caches, err = model.BuildPipeline(ctx.pipeline, ctx.pdef, nil, nil, ctx.repeatWhile, ctx.repeatUntil)
 	if err != nil {
 		return fmt.Errorf("Cannot build pipeline: %w", err)
 	}

@@ -476,25 +476,6 @@ func (s *TempSource) Close() error {
 	return s.source.Open()
 }
 
-func NewRepeaterProcess(times int) Processor {
-	return RepeaterProcess{times}
-}
-
-type RepeaterProcess struct {
-	times int
-}
-
-func (p RepeaterProcess) Open() error {
-	return nil
-}
-
-func (p RepeaterProcess) ProcessDictionary(dictionary Dictionary, out Collector) error {
-	for i := 0; i < p.times; i++ {
-		out.Collect(dictionary.Copy())
-	}
-	return nil
-}
-
 type MapProcess struct {
 	mapper Mapper
 }
