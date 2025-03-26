@@ -459,7 +459,7 @@ func (p RepeaterUntilProcess) ProcessDictionary(dictionary Dictionary, out Colle
 }
 
 func NewTempSource(sourceValue Source) *TempSource {
-	return &TempSource{repeat: true, source: sourceValue, value: NewPackedDictionary()}
+	return &TempSource{repeat: false, source: sourceValue, value: NewPackedDictionary()}
 }
 
 type TempSource struct {
@@ -478,9 +478,18 @@ func (s *TempSource) Close() error {
 
 func (s *TempSource) Values() iter.Seq2[Entry, error] {
 	return func(yield func(Entry, error) bool) {
-		for value := range s.source.Values() {
+		for value, err := range s.source.Values() {
+			if err != nil {
+				yield(value, err)
+				return
+			}
+
+			if !yield(Copy(value), nil) {
+				return
+			}
+
 			for s.repeat {
-				if !yield(value, nil) {
+				if !yield(Copy(value), nil) {
 					return
 				}
 			}
