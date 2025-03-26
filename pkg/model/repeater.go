@@ -1,11 +1,7 @@
 package model
 
 import (
-	"bytes"
 	"iter"
-	tmpl "text/template"
-
-	"github.com/cgi-fr/pimo/pkg/template"
 )
 
 type Predicate interface {
@@ -61,40 +57,6 @@ func (c *CountPredicate) Error() error {
 	return nil
 }
 
-type TemplatePredicate struct {
-	tmpl *template.Engine
-	err  error
-}
-
-func NewTemplatePredicate(text string) (*TemplatePredicate, error) {
-	t, err := template.NewEngine(text, tmpl.FuncMap{}, 0, "")
-	if err != nil {
-		return nil, err
-	}
-
-	return &TemplatePredicate{t, nil}, nil
-}
-
-func (t *TemplatePredicate) Test(value Entry) bool {
-	var output bytes.Buffer
-
-	err := t.tmpl.Execute(&output, Untyped(Unpack(value)))
-	if err != nil {
-		t.err = err
-		return false
-	}
-
-	return output.String() == "true"
-}
-
-func (t *TemplatePredicate) Reset() error {
-	return nil
-}
-
-func (t *TemplatePredicate) Error() error {
-	return t.err
-}
-
 type Repeater struct {
 	input Source
 	while Predicate
@@ -115,26 +77,6 @@ func NewRepeater(input Source, while Predicate, until Predicate) *Repeater {
 
 func NewCountRepeater(input Source, count int) *Repeater {
 	return NewRepeater(input, &CountPredicate{count, 0}, &FalsePredicate{})
-}
-
-func NewTemplateRepeater(input Source, while, until string) (*Repeater, error) {
-	var whilePredicate Predicate = &TruePredicate{}
-	var untilPredicate Predicate = &FalsePredicate{}
-	var err error
-
-	if while != "" {
-		if whilePredicate, err = NewTemplatePredicate(while); err != nil {
-			return nil, err
-		}
-	}
-
-	if until != "" {
-		if untilPredicate, err = NewTemplatePredicate(until); err != nil {
-			return nil, err
-		}
-	}
-
-	return NewRepeater(input, whilePredicate, untilPredicate), nil
 }
 
 func (r *Repeater) Values() iter.Seq2[Entry, error] {
