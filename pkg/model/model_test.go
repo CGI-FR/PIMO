@@ -20,6 +20,7 @@ package model
 import (
 	"encoding/json"
 	"fmt"
+	"iter"
 	"strings"
 	"testing"
 
@@ -112,10 +113,10 @@ func TestPipelineWithRepeaterProcessor(t *testing.T) {
 	}
 	var result []Entry
 
-	pipeline := NewPipelineFromSlice(mySlice).
-		Process(NewRepeaterProcess(2)).
-		AddSink(NewSinkToSlice(&result))
-	err := pipeline.Run()
+	pipeline := NewPipelineFromSlice(mySlice)
+	pipeline = pipeline.WithSource(NewCountRepeater(pipeline.Source(), 2))
+	sinked := pipeline.AddSink(NewSinkToSlice(&result))
+	err := sinked.Run()
 
 	assert.Nil(t, err)
 
@@ -141,14 +142,14 @@ func TestPipelineWithRepeaterAndMapChainedProcessor(t *testing.T) {
 	}
 	var result []Entry
 
-	pipeline := NewPipelineFromSlice(mySlice).
-		Process(NewRepeaterProcess(2)).
+	pipeline := NewPipelineFromSlice(mySlice)
+	pipeline = pipeline.WithSource(NewCountRepeater(pipeline.Source(), 2)).
 		Process(NewMapProcess(func(d Dictionary) (Dictionary, error) {
 			value := d.Get("v").(int)
 			return NewDictionary().With("v", value*value), nil
-		})).
-		AddSink(NewSinkToSlice(&result))
-	err := pipeline.Run()
+		}))
+	sinked := pipeline.AddSink(NewSinkToSlice(&result))
+	err := sinked.Run()
 
 	assert.Nil(t, err)
 
@@ -534,7 +535,17 @@ func (s ErrorSource) Value() Entry {
 	return NewDictionary()
 }
 
+func (s ErrorSource) Values() iter.Seq2[Entry, error] {
+	return func(yield func(Entry, error) bool) {
+		yield(NewDictionary(), fmt.Errorf("Test error"))
+	}
+}
+
 func (s ErrorSource) Open() error {
+	return nil
+}
+
+func (s ErrorSource) Close() error {
 	return nil
 }
 
@@ -579,27 +590,4 @@ func TestCacheShouldProvide(t *testing.T) {
 	}
 
 	assert.Equal(t, wanted, result)
-}
-
-func TestCallableMapSource(t *testing.T) {
-	source := NewCallableMapSource()
-	assert.NotNil(t, source)
-}
-
-func TestCallableMapSourceNextShouldReturnFalseBeforeValueIsSetted(t *testing.T) {
-	source := NewCallableMapSource()
-	assert.False(t, source.Next())
-}
-
-func TestCallableMapSourceNextShouldReturnTrueAfterValueIsSetted(t *testing.T) {
-	source := NewCallableMapSource()
-	source.SetValue(NewDictionary())
-	assert.True(t, source.Next())
-}
-
-func TestCallableMapSourceNextShouldReturnFalseAfterNextCalledTwice(t *testing.T) {
-	source := NewCallableMapSource()
-	source.SetValue(NewDictionary())
-	assert.True(t, source.Next())
-	assert.False(t, source.Next())
 }

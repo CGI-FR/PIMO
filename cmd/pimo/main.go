@@ -328,7 +328,7 @@ func run(cmd *cobra.Command) {
 
 	if profiling == "cpu" {
 		profiler = profile.Start(profile.CPUProfile, profile.ProfilePath("."), profile.Quiet)
-	} else if profiling == "memory" {
+	} else if profiling == "memory" || profiling == "mem" {
 		profiler = profile.Start(profile.MemProfile, profile.ProfilePath("."), profile.Quiet)
 	}
 
@@ -355,7 +355,7 @@ func run(cmd *cobra.Command) {
 		dumpStats(stats)
 	}
 
-	if profiling == "cpu" || profiling == "memory" {
+	if profiling == "cpu" || profiling == "memory" || profiling == "mem" {
 		profiler.Stop()
 	}
 

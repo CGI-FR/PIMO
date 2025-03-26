@@ -22,7 +22,7 @@ func (s BlackHoleSink) ProcessDictionary(value model.Entry) error {
 
 type Processor struct {
 	mutex    *sync.Mutex
-	source   *model.CallableMapSource
+	source   *model.MutableSource
 	pipeline model.SinkedPipeline
 }
 
@@ -44,7 +44,7 @@ func NewProcessor(maskingFile string, globalSeed *int64, caches map[string]model
 		}
 	}
 
-	source := model.NewCallableMapSource()
+	source := model.NewMutableSource()
 
 	pipeline, caches, err := model.BuildPipeline(model.NewPipeline(source), pdef, caches, nil, "", "")
 	if err != nil {
@@ -62,7 +62,7 @@ func (p *Processor) Process(dict model.Dictionary) error {
 	p.mutex.Lock()
 	defer p.mutex.Unlock()
 
-	p.source.SetValue(dict)
+	p.source.SetValues(dict)
 
 	err := p.pipeline.Run()
 

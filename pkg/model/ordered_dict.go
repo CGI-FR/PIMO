@@ -34,6 +34,15 @@ func Copy(other Entry) Entry {
 	}
 }
 
+func Unpack(e Entry) Entry {
+	switch d := e.(type) {
+	case Dictionary:
+		return d.Unpack()
+	default:
+		return e
+	}
+}
+
 // CopyDictionary clone deeply dictionary
 func CopyDictionary(other Dictionary) Dictionary {
 	if other.OrderedMap == nil {

@@ -122,13 +122,13 @@ func (ctx *Context) Configure(cfg Config) error {
 	switch {
 	case cfg.XMLCallback:
 		over.MDC().Set("context", "callback-input")
-		ctx.source = model.NewCallableMapSource()
+		ctx.source = model.NewMutableSource()
 	case cfg.EmptyInput:
 		over.MDC().Set("context", "empty-input")
-		ctx.source = model.NewSourceFromSlice([]model.Dictionary{model.NewPackedDictionary()})
+		ctx.source = model.NewSliceSource([]model.Dictionary{model.NewPackedDictionary()})
 	case cfg.SingleInput != nil:
 		over.MDC().Set("context", "single-input")
-		ctx.source = model.NewSourceFromSlice([]model.Dictionary{cfg.SingleInput.Pack()})
+		ctx.source = model.NewSliceSource([]model.Dictionary{cfg.SingleInput.Pack()})
 	case cfg.ParquetInput != "":
 		over.MDC().Set("context", "parquet")
 		source, err := parquet.NewPackedSource(cfg.ParquetInput)
@@ -145,6 +145,10 @@ func (ctx *Context) Configure(cfg Config) error {
 		return fmt.Errorf("Cannot use repeatUntil and repeatWhile options together")
 	}
 
+	if cfg.Iteration > 1 {
+		ctx.source = model.NewCountRepeater(ctx.source, cfg.Iteration)
+	}
+
 	ctx.repeatCondition = cfg.RepeatWhile
 	ctx.repeatConditionMode = "while"
 	if cfg.RepeatUntil != "" {
@@ -153,8 +157,8 @@ func (ctx *Context) Configure(cfg Config) error {
 	}
 
 	ctx.pipeline = model.NewPipeline(ctx.source).
-		Process(model.NewCounterProcessWithCallback("input-line", 0, updateContext)).
-		Process(model.NewRepeaterProcess(cfg.Iteration))
+		Process(model.NewCounterProcessWithCallback("input-line", 0, updateContext))
+
 	over.AddGlobalFields("input-line")
 
 	injectTemplateFuncs()
@@ -399,11 +403,11 @@ func (ctx *Context) ExecuteMap(data map[string]any) (map[string]any, error) {
 	for k, v := range data {
 		input = input.With(k, v)
 	}
-	source, ok := ctx.source.(*model.CallableMapSource)
+	source, ok := ctx.source.(*model.MutableSource)
 	if !ok {
-		return nil, fmt.Errorf("Source is not CallableMapSource")
+		return nil, fmt.Errorf("Source is not MutableSource")
 	}
-	source.SetValue(input)
+	source.SetValues(input)
 	result := []model.Entry{}
 	err := ctx.pipeline.AddSink(model.NewSinkToSlice(&result)).Run()
 	if err != nil {

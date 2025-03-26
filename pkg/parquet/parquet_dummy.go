@@ -22,6 +22,7 @@ package parquet
 
 import (
 	"io"
+	"iter"
 
 	"github.com/apache/arrow/go/v12/arrow"
 	"github.com/cgi-fr/pimo/pkg/model"
@@ -45,6 +46,10 @@ func (s *Source) Open() error {
 	panic("parquet is not supported on your environment")
 }
 
+func (s *Source) Close() error {
+	panic("parquet is not supported on your environment")
+}
+
 func (s *Source) NextBatch() bool {
 	panic("parquet is not supported on your environment")
 }
@@ -58,6 +63,10 @@ func (s *Source) Value() model.Entry {
 }
 
 func (s *Source) Err() error {
+	panic("parquet is not supported on your environment")
+}
+
+func (s *Source) Values() iter.Seq2[model.Entry, error] {
 	panic("parquet is not supported on your environment")
 }
 

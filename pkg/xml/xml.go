@@ -66,7 +66,7 @@ func (engine MaskEngine) Mask(e model.Entry, context ...model.Dictionary) (model
 	var resultBuffer bytes.Buffer
 	// Create xml parser
 	parser := xixo.NewXMLParser(contentReader, &resultBuffer).EnableXpath()
-	source := model.NewCallableMapSource()
+	source := model.NewMutableSource()
 	input := model.NewDictionary()
 	// Get injectParent
 	if len(engine.injectParent) > 0 {
@@ -117,12 +117,12 @@ func isXMLValid(xmlString string) bool {
 	return err == nil
 }
 
-func (engine MaskEngine) xmlCallback(xmlMap map[string]string, source *model.CallableMapSource, input model.Dictionary) (map[string]string, error) {
+func (engine MaskEngine) xmlCallback(xmlMap map[string]string, source *model.MutableSource, input model.Dictionary) (map[string]string, error) {
 	for k, v := range xmlMap {
 		input = input.With(k, v)
 	}
 
-	source.SetValue(input)
+	source.SetValues(input)
 	result := []model.Entry{}
 	err := engine.pipeline.WithSource(source).AddSink(model.NewSinkToSlice(&result)).Run()
 	if err != nil {

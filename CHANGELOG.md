@@ -14,6 +14,10 @@ Types of changes
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [1.31.1]
+
+- `Fixed` memory leak with `--repeat` option
+
 ## [1.31.0]
 
 - `Added` insecure, proxy, proxy-user and user flags to mock command

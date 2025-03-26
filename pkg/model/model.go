@@ -21,6 +21,7 @@ import (
 	"bytes"
 	"fmt"
 	"hash/fnv"
+	"iter"
 	tmpl "text/template"
 	"time"
 
@@ -375,13 +376,8 @@ type SinkedPipeline interface {
 	Run() error
 }
 
-// Source is an iterator over Dictionary
-type Source interface {
-	Open() error
-	Next() bool
-	Value() Entry
-	Err() error
-}
+// Source is an iterator over Entry
+type Source Iterable[Entry]
 
 type Mapper func(Dictionary) (Dictionary, error)
 
@@ -390,35 +386,11 @@ type Mapper func(Dictionary) (Dictionary, error)
  ******************/
 
 func NewPipelineFromSlice(dictionaries []Dictionary) Pipeline {
-	return SimplePipeline{source: &SourceFromSlice{dictionaries: dictionaries, offset: 0}}
+	return SimplePipeline{source: &SliceSource{dictionaries}}
 }
 
 func NewSourceFromSlice(dictionaries []Dictionary) Source {
-	return &SourceFromSlice{dictionaries: dictionaries, offset: 0}
-}
-
-type SourceFromSlice struct {
-	dictionaries []Dictionary
-	offset       int
-}
-
-func (source *SourceFromSlice) Next() bool {
-	result := source.offset < len(source.dictionaries)
-	source.offset++
-	return result
-}
-
-func (source *SourceFromSlice) Value() Entry {
-	return source.dictionaries[source.offset-1]
-}
-
-func (source *SourceFromSlice) Err() error {
-	return nil
-}
-
-func (source *SourceFromSlice) Open() error {
-	source.offset = 0
-	return nil
+	return &SliceSource{dictionaries}
 }
 
 func NewRepeaterUntilProcess(source *TempSource, text, mode string, skipLogFile string) (Processor, error) {
@@ -500,40 +472,29 @@ func (s *TempSource) Open() error {
 	return s.source.Open()
 }
 
-func (s *TempSource) Next() bool {
-	if s.repeat {
-		return true
+func (s *TempSource) Close() error {
+	return s.source.Open()
+}
+
+func (s *TempSource) Values() iter.Seq2[Entry, error] {
+	return func(yield func(Entry, error) bool) {
+		for value, err := range s.source.Values() {
+			if err != nil {
+				yield(value, err)
+				return
+			}
+
+			if !yield(Copy(value), nil) {
+				return
+			}
+
+			for s.repeat {
+				if !yield(Copy(value), nil) {
+					return
+				}
+			}
+		}
 	}
-	if s.source.Next() {
-		s.value = s.source.Value()
-		return true
-	}
-	return false
-}
-
-func (s *TempSource) Err() error { return s.source.Err() }
-
-func (s *TempSource) Value() Entry {
-	return s.value
-}
-
-func NewRepeaterProcess(times int) Processor {
-	return RepeaterProcess{times}
-}
-
-type RepeaterProcess struct {
-	times int
-}
-
-func (p RepeaterProcess) Open() error {
-	return nil
-}
-
-func (p RepeaterProcess) ProcessDictionary(dictionary Dictionary, out Collector) error {
-	for i := 0; i < p.times; i++ {
-		out.Collect(dictionary.Copy())
-	}
-	return nil
 }
 
 type MapProcess struct {
@@ -622,20 +583,16 @@ func (pipeline SimplePipeline) AddSink(sink SinkProcess) SinkedPipeline {
 	return SimpleSinkedPipeline{pipeline, sink}
 }
 
-func (pipeline SimplePipeline) Next() bool {
-	return pipeline.source.Next()
-}
-
-func (pipeline SimplePipeline) Value() Entry {
-	return pipeline.source.Value()
-}
-
-func (pipeline SimplePipeline) Err() error {
-	return pipeline.source.Err()
-}
-
 func (pipeline SimplePipeline) Open() error {
 	return pipeline.source.Open()
+}
+
+func (pipeline SimplePipeline) Close() error {
+	return pipeline.source.Close()
+}
+
+func (pipeline SimplePipeline) Values() iter.Seq2[Entry, error] {
+	return pipeline.source.Values()
 }
 
 func NewCollector() *QueueCollector {
@@ -653,6 +610,20 @@ func (c *QueueCollector) Err() error {
 
 func (c *QueueCollector) Open() error {
 	return nil
+}
+
+func (c *QueueCollector) Close() error {
+	return nil
+}
+
+func (c *QueueCollector) Values() iter.Seq2[Entry, error] {
+	return func(yield func(Entry, error) bool) {
+		for c.Next() {
+			if !yield(c.Value(), nil) {
+				return
+			}
+		}
+	}
 }
 
 func (c *QueueCollector) Collect(dictionary Entry) {
@@ -673,48 +644,11 @@ func (c *QueueCollector) Value() Entry {
 }
 
 func NewProcessPipeline(source Source, process Processor) Pipeline {
-	return &ProcessPipeline{NewCollector(), source, process, nil}
+	return &ProcessPipeline{NewProcessWrapper(source, process)}
 }
 
 type ProcessPipeline struct {
-	collector *QueueCollector
-	source    Source
-	Processor
-	err error
-}
-
-func (p *ProcessPipeline) Open() error {
-	err := p.Processor.Open()
-	if err != nil {
-		return err
-	}
-
-	return p.source.Open()
-}
-
-func (p *ProcessPipeline) Next() bool {
-	if p.collector.Next() {
-		return true
-	}
-	for p.source.Next() {
-		p.err = p.ProcessDictionary(p.source.Value().(Dictionary), p.collector)
-		if p.err != nil {
-			return false
-		}
-		if p.collector.Next() {
-			return true
-		}
-	}
-	p.err = p.source.Err()
-	return false
-}
-
-func (p *ProcessPipeline) Value() Entry {
-	return p.collector.Value()
-}
-
-func (p *ProcessPipeline) Err() error {
-	return p.err
+	*ProcessWrapper
 }
 
 func (p *ProcessPipeline) AddSink(sink SinkProcess) SinkedPipeline {
@@ -726,14 +660,14 @@ func (p *ProcessPipeline) Process(process Processor) Pipeline {
 }
 
 func (p *ProcessPipeline) Source() Source {
-	return p.source
+	return p.input
 }
 
 func (p *ProcessPipeline) WithSource(source Source) Pipeline {
-	if s, ok := p.source.(*ProcessPipeline); ok {
-		return &ProcessPipeline{NewCollector(), s.WithSource(source).(Source), p.Processor, nil}
+	if s, ok := p.input.(*ProcessPipeline); ok {
+		return NewProcessPipeline(s.WithSource(source).(Source), p.processor)
 	}
-	return &ProcessPipeline{NewCollector(), source, p.Processor, nil}
+	return NewProcessPipeline(source, p.processor)
 }
 
 func (pipeline SimpleSinkedPipeline) Run() (err error) {
@@ -747,13 +681,17 @@ func (pipeline SimpleSinkedPipeline) Run() (err error) {
 		return err
 	}
 
-	for pipeline.source.Next() {
-		err := pipeline.sink.ProcessDictionary(pipeline.source.Value())
+	for item, err := range pipeline.source.Values() {
+		if err != nil {
+			return err
+		}
+
+		err := pipeline.sink.ProcessDictionary(item)
 		if err != nil {
 			return err
 		}
 	}
-	return pipeline.source.Err()
+	return nil
 }
 
 type Seeder func(Dictionary) (int64, bool, error)
@@ -779,35 +717,4 @@ func NewSeeder(sourceField string, seed int64) Seeder {
 		}
 	}
 	return seeder
-}
-
-func NewCallableMapSource() *CallableMapSource {
-	return &CallableMapSource{}
-}
-
-type CallableMapSource struct {
-	value     Entry
-	nextValue Entry
-}
-
-func (source *CallableMapSource) Open() error {
-	return nil
-}
-
-func (source *CallableMapSource) Next() bool {
-	source.value = source.nextValue
-	source.nextValue = nil
-	return source.value != nil
-}
-
-func (source *CallableMapSource) SetValue(value Entry) {
-	source.nextValue = value
-}
-
-func (source *CallableMapSource) Value() Entry {
-	return source.value
-}
-
-func (source *CallableMapSource) Err() error {
-	return nil
 }
