@@ -113,10 +113,10 @@ func TestPipelineWithRepeaterProcessor(t *testing.T) {
 	}
 	var result []Entry
 
-	pipeline := NewPipelineFromSlice(mySlice).
-		Process(NewRepeaterProcess(2)).
-		AddSink(NewSinkToSlice(&result))
-	err := pipeline.Run()
+	pipeline := NewPipelineFromSlice(mySlice)
+	pipeline = pipeline.WithSource(NewCountRepeater(pipeline.Source(), 2))
+	sinked := pipeline.AddSink(NewSinkToSlice(&result))
+	err := sinked.Run()
 
 	assert.Nil(t, err)
 
@@ -142,14 +142,14 @@ func TestPipelineWithRepeaterAndMapChainedProcessor(t *testing.T) {
 	}
 	var result []Entry
 
-	pipeline := NewPipelineFromSlice(mySlice).
-		Process(NewRepeaterProcess(2)).
+	pipeline := NewPipelineFromSlice(mySlice)
+	pipeline = pipeline.WithSource(NewCountRepeater(pipeline.Source(), 2)).
 		Process(NewMapProcess(func(d Dictionary) (Dictionary, error) {
 			value := d.Get("v").(int)
 			return NewDictionary().With("v", value*value), nil
-		})).
-		AddSink(NewSinkToSlice(&result))
-	err := pipeline.Run()
+		}))
+	sinked := pipeline.AddSink(NewSinkToSlice(&result))
+	err := sinked.Run()
 
 	assert.Nil(t, err)
 

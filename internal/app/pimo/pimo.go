@@ -145,7 +145,7 @@ func (ctx *Context) Configure(cfg Config) error {
 		return fmt.Errorf("Cannot use repeatUntil and repeatWhile options together")
 	}
 
-	if cfg.Iteration > 0 {
+	if cfg.Iteration > 1 {
 		ctx.source = model.NewCountRepeater(ctx.source, cfg.Iteration)
 	}
 
@@ -400,7 +400,7 @@ func (ctx *Context) ExecuteMap(data map[string]any) (map[string]any, error) {
 	}
 	source, ok := ctx.source.(*model.MutableSource)
 	if !ok {
-		return nil, fmt.Errorf("Source is not CallableMapSource")
+		return nil, fmt.Errorf("Source is not MutableSource")
 	}
 	source.SetValues(input)
 	result := []model.Entry{}

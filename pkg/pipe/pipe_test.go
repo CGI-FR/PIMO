@@ -49,12 +49,11 @@ func TestMaskEngineShouldMaskNestedArray(t *testing.T) {
 		})
 	assert.Nil(t, err)
 
-	pipeline := model.NewPipelineFromSlice(mySlice).
-		Process(model.NewRepeaterProcess(2)).
-		Process(model.NewMaskContextEngineProcess(model.NewPathSelector("address.city"), pipe, "")).
-		AddSink(model.NewSinkToSlice(&result))
-
-	err = pipeline.Run()
+	pipeline := model.NewPipelineFromSlice(mySlice)
+	pipeline = pipeline.WithSource(model.NewCountRepeater(pipeline.Source(), 2)).
+		Process(model.NewMaskContextEngineProcess(model.NewPathSelector("address.city"), pipe, ""))
+	sinked := pipeline.AddSink(model.NewSinkToSlice(&result))
+	err = sinked.Run()
 
 	assert.Nil(t, err)
 

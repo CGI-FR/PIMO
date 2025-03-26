@@ -68,9 +68,9 @@ func (s *Source) Values() iter.Seq2[model.Dictionary, error] {
 			var err error
 
 			if s.packed {
-				dict, err = JSONToDictionary(line)
-			} else {
 				dict, err = JSONToPackedDictionary(line)
+			} else {
+				dict, err = JSONToDictionary(line)
 			}
 
 			if err != nil {
