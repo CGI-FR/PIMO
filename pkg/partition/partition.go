@@ -59,7 +59,7 @@ func NewMask(partitions []model.PartitionType, caches map[string]model.Cache, fn
 
 		definition := buildDefinition(partition.Then, seed)
 		pipeline := model.NewPipeline(nil)
-		pipeline, _, err = model.BuildPipeline(pipeline, definition, caches, fns)
+		pipeline, _, err = model.BuildPipeline(pipeline, definition, caches, fns, "", "")
 		if err != nil {
 			return MaskEngine{}, err
 		}

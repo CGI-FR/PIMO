@@ -46,7 +46,7 @@ func NewMask(segment model.SegmentType, caches map[string]model.Cache, fns tmpl.
 	for groupname, masks := range segment.Match {
 		definition := buildDefinition(masks, seed)
 		pipeline := model.NewPipeline(nil)
-		pipeline, _, err = model.BuildPipeline(pipeline, definition, caches, fns)
+		pipeline, _, err = model.BuildPipeline(pipeline, definition, caches, fns, "", "")
 		if err != nil {
 			return MaskEngine{}, err
 		}
@@ -56,7 +56,7 @@ func NewMask(segment model.SegmentType, caches map[string]model.Cache, fns tmpl.
 
 	nomatchdef := buildDefinition(segment.NoMatch, seed)
 	nomatchpip := model.NewPipeline(nil)
-	nomatchpip, _, err = model.BuildPipeline(nomatchpip, nomatchdef, caches, fns)
+	nomatchpip, _, err = model.BuildPipeline(nomatchpip, nomatchdef, caches, fns, "", "")
 	if err != nil {
 		return MaskEngine{}, err
 	}

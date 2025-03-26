@@ -88,7 +88,7 @@ func BuildFuncMap(funcs map[string]Function, fns tmpl.FuncMap) (tmpl.FuncMap, er
 	return b.Build(fns)
 }
 
-func BuildPipeline(pipeline Pipeline, conf Definition, caches map[string]Cache, functions tmpl.FuncMap) (Pipeline, map[string]Cache, error) {
+func BuildPipeline(pipeline Pipeline, conf Definition, caches map[string]Cache, functions tmpl.FuncMap, repeatCondition, repeatConditionMode string) (Pipeline, map[string]Cache, error) {
 	caches = BuildCaches(conf.Caches, caches)
 	functions, err := BuildFuncMap(conf.Functions, functions)
 	if err != nil {
@@ -198,6 +198,15 @@ func BuildPipeline(pipeline Pipeline, conf Definition, caches map[string]Cache, 
 	}
 	for _, cleaner := range cleaners {
 		pipeline = pipeline.Process(cleaner)
+	}
+
+	if repeatCondition != "" {
+		repeatSource := NewTempSource(pipeline.Source())
+		processor, err := NewRepeaterUntilProcess(repeatSource, repeatCondition, repeatConditionMode, skipLogFile)
+		if err != nil {
+			return pipeline, nil, fmt.Errorf("Cannot build pipeline: %w", err)
+		}
+		pipeline = pipeline.Process(processor).WithSource(repeatSource)
 	}
 
 	// unpack data from the container

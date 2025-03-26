@@ -476,6 +476,18 @@ func (s *TempSource) Close() error {
 	return s.source.Open()
 }
 
+func (s *TempSource) Values() iter.Seq2[Entry, error] {
+	return func(yield func(Entry, error) bool) {
+		for value := range s.source.Values() {
+			for s.repeat {
+				if !yield(value, nil) {
+					return
+				}
+			}
+		}
+	}
+}
+
 type MapProcess struct {
 	mapper Mapper
 }

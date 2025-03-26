@@ -45,7 +45,7 @@ func NewMask(seed int64, caches map[string]model.Cache, fns template.FuncMap, ur
 	}
 
 	pipeline := model.NewPipeline(nil)
-	pipeline, _, err = model.BuildPipeline(pipeline, definition, caches, fns)
+	pipeline, _, err = model.BuildPipeline(pipeline, definition, caches, fns, "", "")
 
 	return MaskEngine{pipeline}, err
 }

@@ -44,7 +44,7 @@ func NewMask(xPath, injectParent string, caches map[string]model.Cache, fns temp
 
 	definition = model.Definition{Seed: seed + 1, Masking: subMasking}
 	pipeline := model.NewPipeline(nil)
-	pipeline, _, err = model.BuildPipeline(pipeline, definition, caches, fns)
+	pipeline, _, err = model.BuildPipeline(pipeline, definition, caches, fns, "", "")
 	return MaskEngine{xPath, injectParent, pipeline}, err
 }
 
