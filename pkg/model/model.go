@@ -376,8 +376,8 @@ type SinkedPipeline interface {
 	Run() error
 }
 
-// Source is an iterator over Dictionary
-type Source Iterable[Dictionary]
+// Source is an iterator over Entry
+type Source Iterable[Entry]
 
 type Mapper func(Dictionary) (Dictionary, error)
 
@@ -570,7 +570,7 @@ func (pipeline SimplePipeline) Close() error {
 	return pipeline.source.Close()
 }
 
-func (pipeline SimplePipeline) Values() iter.Seq2[Dictionary, error] {
+func (pipeline SimplePipeline) Values() iter.Seq2[Entry, error] {
 	return pipeline.source.Values()
 }
 
@@ -595,10 +595,10 @@ func (c *QueueCollector) Close() error {
 	return nil
 }
 
-func (c *QueueCollector) Values() iter.Seq2[Dictionary, error] {
-	return func(yield func(Dictionary, error) bool) {
+func (c *QueueCollector) Values() iter.Seq2[Entry, error] {
+	return func(yield func(Entry, error) bool) {
 		for c.Next() {
-			if !yield(c.Value().(Dictionary), nil) {
+			if !yield(c.Value(), nil) {
 				return
 			}
 		}

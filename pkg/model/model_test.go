@@ -535,8 +535,8 @@ func (s ErrorSource) Value() Entry {
 	return NewDictionary()
 }
 
-func (s ErrorSource) Values() iter.Seq2[Dictionary, error] {
-	return func(yield func(Dictionary, error) bool) {
+func (s ErrorSource) Values() iter.Seq2[Entry, error] {
+	return func(yield func(Entry, error) bool) {
 		yield(NewDictionary(), fmt.Errorf("Test error"))
 	}
 }

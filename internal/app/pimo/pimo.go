@@ -149,6 +149,14 @@ func (ctx *Context) Configure(cfg Config) error {
 		ctx.source = model.NewCountRepeater(ctx.source, cfg.Iteration)
 	}
 
+	if cfg.RepeatWhile != "" || cfg.RepeatUntil != "" {
+		source, err := model.NewTemplateRepeater(ctx.source, cfg.RepeatWhile, cfg.RepeatUntil)
+		if err != nil {
+			return err
+		}
+		ctx.source = source
+	}
+
 	ctx.repeatWhile = cfg.RepeatWhile
 	ctx.repeatUntil = cfg.RepeatUntil
 

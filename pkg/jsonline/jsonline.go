@@ -59,8 +59,8 @@ func (s *Source) Close() error {
 	return nil
 }
 
-func (s *Source) Values() iter.Seq2[model.Dictionary, error] {
-	return func(yield func(model.Dictionary, error) bool) {
+func (s *Source) Values() iter.Seq2[model.Entry, error] {
+	return func(yield func(model.Entry, error) bool) {
 		for s.fscanner.Scan() {
 			line := s.fscanner.Bytes()
 

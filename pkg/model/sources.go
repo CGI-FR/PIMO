@@ -10,7 +10,7 @@ type SliceSource struct {
 }
 
 // NewSliceSource creates a new slice source from the given data.
-func NewSliceSource(data []Dictionary) Iterable[Dictionary] {
+func NewSliceSource(data []Dictionary) Source {
 	return &SliceSource{data}
 }
 
@@ -25,8 +25,8 @@ func (s *SliceSource) Close() error {
 }
 
 // Values returns a sequence of dictionaries from the source.
-func (s *SliceSource) Values() iter.Seq2[Dictionary, error] {
-	return func(yield func(Dictionary, error) bool) {
+func (s *SliceSource) Values() iter.Seq2[Entry, error] {
+	return func(yield func(Entry, error) bool) {
 		for _, entry := range s.data {
 			if !yield(entry, nil) {
 				return
@@ -56,8 +56,8 @@ func (s *MutableSource) SetValues(values ...Dictionary) {
 }
 
 // Values returns a sequence of dictionaries from the source.
-func (s *MutableSource) Values() iter.Seq2[Dictionary, error] {
-	return func(yield func(Dictionary, error) bool) {
+func (s *MutableSource) Values() iter.Seq2[Entry, error] {
+	return func(yield func(Entry, error) bool) {
 		for _, entry := range s.data {
 			if !yield(entry, nil) {
 				return

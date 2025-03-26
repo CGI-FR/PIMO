@@ -1,76 +1,156 @@
 package model
 
-import "iter"
+import (
+	"bytes"
+	"iter"
+	tmpl "text/template"
 
-type Predicate[T any] interface {
-	Reset()
-	Test(value T) bool
+	"github.com/cgi-fr/pimo/pkg/template"
+)
+
+type Predicate interface {
+	Reset() error
+	Test(value Entry) bool
+	Error() error
 }
 
-type TruePredicate[T any] struct{}
+type TruePredicate struct{}
 
-func (TruePredicate[T]) Test(T) bool {
+func (TruePredicate) Test(Entry) bool {
 	return true
 }
 
-func (TruePredicate[T]) Reset() {}
+func (TruePredicate) Reset() error {
+	return nil
+}
 
-type FalsePredicate[T any] struct{}
+func (TruePredicate) Error() error {
+	return nil
+}
 
-func (FalsePredicate[T]) Test(T) bool {
+type FalsePredicate struct{}
+
+func (FalsePredicate) Test(Entry) bool {
 	return false
 }
 
-func (FalsePredicate[T]) Reset() {}
+func (FalsePredicate) Reset() error {
+	return nil
+}
 
-type CountPredicate[T any] struct {
+func (FalsePredicate) Error() error {
+	return nil
+}
+
+type CountPredicate struct {
 	max   int
 	count int
 }
 
-func (c *CountPredicate[T]) Test(T) bool {
+func (c *CountPredicate) Test(Entry) bool {
 	c.count++
 	return c.count <= c.max
 }
 
-func (c *CountPredicate[T]) Reset() {
+func (c *CountPredicate) Reset() error {
 	c.count = 0
+	return nil
 }
 
-type Repeater[T Cloneable[T]] struct {
-	input Iterable[T]
-	while Predicate[T]
-	until Predicate[T]
+func (c *CountPredicate) Error() error {
+	return nil
 }
 
-func (r *Repeater[T]) Open() error {
+type TemplatePredicate struct {
+	tmpl *template.Engine
+	err  error
+}
+
+func NewTemplatePredicate(text string) (*TemplatePredicate, error) {
+	t, err := template.NewEngine(text, tmpl.FuncMap{}, 0, "")
+	if err != nil {
+		return nil, err
+	}
+
+	return &TemplatePredicate{t, nil}, nil
+}
+
+func (t *TemplatePredicate) Test(value Entry) bool {
+	var output bytes.Buffer
+
+	// err := t.tmpl.Execute(&output, value.UnpackUntyped())
+	// if err != nil {
+	// 	t.err = err
+	// 	return false
+	// }
+
+	return output.String() == "true"
+}
+
+func (t *TemplatePredicate) Reset() error {
+	return nil
+}
+
+func (t *TemplatePredicate) Error() error {
+	return t.err
+}
+
+type Repeater struct {
+	input Source
+	while Predicate
+	until Predicate
+}
+
+func (r *Repeater) Open() error {
 	return r.input.Open()
 }
 
-func (r *Repeater[T]) Close() error {
+func (r *Repeater) Close() error {
 	return r.input.Close()
 }
 
-func NewRepeater[T Cloneable[T]](input Iterable[T], while Predicate[T], until Predicate[T]) Iterable[T] {
-	return &Repeater[T]{input, while, until}
+func NewRepeater(input Source, while Predicate, until Predicate) *Repeater {
+	return &Repeater{input, while, until}
 }
 
-func NewCountRepeater[T Cloneable[T]](input Iterable[T], count int) Iterable[T] {
-	return NewRepeater(input, &CountPredicate[T]{count, 0}, &FalsePredicate[T]{})
+func NewCountRepeater(input Source, count int) *Repeater {
+	return NewRepeater(input, &CountPredicate{count, 0}, &FalsePredicate{})
 }
 
-func (r *Repeater[T]) Values() iter.Seq2[T, error] {
-	return func(yield func(T, error) bool) {
+func NewTemplateRepeater(input Source, while, until string) (*Repeater, error) {
+	var whilePredicate, untilPredicate *TemplatePredicate
+	var err error
+
+	if whilePredicate, err = NewTemplatePredicate(while); err != nil {
+		return nil, err
+	}
+
+	if untilPredicate, err = NewTemplatePredicate(until); err != nil {
+		return nil, err
+	}
+
+	return NewRepeater(input, whilePredicate, untilPredicate), nil
+}
+
+func (r *Repeater) Values() iter.Seq2[Entry, error] {
+	return func(yield func(Entry, error) bool) {
 		for value, err := range r.input.Values() {
 			if err != nil {
 				yield(value, err)
 				return
 			}
 
-			r.while.Reset()
-			r.until.Reset()
+			if err := r.while.Reset(); err != nil {
+				yield(value, err)
+				return
+			}
 
-			vcopy := value.Copy()
+			if err := r.until.Reset(); err != nil {
+				yield(value, err)
+				return
+			}
+
+			vcopy := Copy(value)
 
 			for r.while.Test(vcopy) {
 				if !yield(vcopy, nil) {
@@ -81,7 +161,17 @@ func (r *Repeater[T]) Values() iter.Seq2[T, error] {
 					break
 				}
 
-				vcopy = value.Copy()
+				vcopy = Copy(value)
+			}
+
+			if r.while.Error() != nil {
+				yield(vcopy, r.while.Error())
+				return
+			}
+
+			if r.until.Error() != nil {
+				yield(vcopy, r.while.Error())
+				return
 			}
 		}
 	}
