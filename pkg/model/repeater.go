@@ -157,16 +157,12 @@ func (r *Repeater) Values() iter.Seq2[Entry, error] {
 
 			vcopy := Copy(value)
 
-			for {
+			for r.while.Test(vcopy) {
 				if !yield(vcopy, nil) {
 					return
 				}
 
 				if r.until.Test(vcopy) || r.until.Error() != nil {
-					break
-				}
-
-				if !r.while.Test(vcopy) || r.while.Error() != nil {
 					break
 				}
 
