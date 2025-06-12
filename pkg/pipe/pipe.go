@@ -70,7 +70,7 @@ func (me MaskEngine) MaskContext(entry model.Dictionary, key string, context ...
 			elemInput.Set(me.injectParent, entry)
 		}
 		if len(me.injectRoot) > 0 {
-			elemInput.Set(me.injectRoot, model.CopyDictionary(context[0]))
+			elemInput.Set(me.injectRoot, context[0].UnpackUnordered())
 		}
 		input = append(input, elemInput)
 	}

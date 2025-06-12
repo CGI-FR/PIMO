@@ -14,6 +14,10 @@ Types of changes
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [1.31.2]
+
+- `Fixed` mask `pipe` with `injectRoot` option
+
 ## [1.31.1]
 
 - `Fixed` memory leak with `--repeat` option
