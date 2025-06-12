@@ -90,8 +90,8 @@ github.com/labstack/gommon v0.4.2 h1:F8qTUNXgG1+6WQmqoUWnz8WiEU60mXVVw0P4ht1WRA0
 github.com/labstack/gommon v0.4.2/go.mod h1:QlUFxVM+SNXhDL/Z7YhocGIBYOiwB0mXm1+1bAPHPyU=
 github.com/mailru/easyjson v0.7.7 h1:UGYAvKxe3sBsEDzO8ZeWOSlIQfWFlxbzLZe7hwFURr0=
 github.com/mailru/easyjson v0.7.7/go.mod h1:xzfreul335JAWq5oZzymOObrkdz5UnU4kGfJJLY9Nlc=
-github.com/mattn/anko v0.1.9 h1:OpdRDvjOY/FQXoGXkN0n7b0br4a4fHB5hhsaq0Cd3ds=
-github.com/mattn/anko v0.1.9/go.mod h1:gjrudvzf1t7FWTZo1Nbywnr75g3uDnGjXdp2nkguBjQ=
+github.com/mattn/anko v0.1.10 h1:3QcIxCLirIxOZhIVtvo9eWz8tym/iZ9Nb29VCnzaMvc=
+github.com/mattn/anko v0.1.10/go.mod h1:gjrudvzf1t7FWTZo1Nbywnr75g3uDnGjXdp2nkguBjQ=
 github.com/mattn/go-colorable v0.1.13 h1:fFA4WZxdEF4tXPZVKMLwD8oUnCTTo08duU7wxecdEvA=
 github.com/mattn/go-colorable v0.1.13/go.mod h1:7S9/ev0klgBDR4GtXTXX8a3vIGJpMovkB8vQcUbaXHg=
 github.com/mattn/go-isatty v0.0.16/go.mod h1:kYGgaQfpe5nmfYZH+SKPsOc2e4SrIfOl2e/yFXSvRLM=
