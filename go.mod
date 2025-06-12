@@ -14,7 +14,7 @@ require (
 	github.com/invopop/jsonschema v0.13.0
 	github.com/kenshaw/baseconv v0.1.1
 	github.com/labstack/echo/v4 v4.13.3
-	github.com/mattn/anko v0.1.9
+	github.com/mattn/anko v0.1.10
 	github.com/mattn/go-isatty v0.0.20
 	github.com/pkg/profile v1.7.0
 	github.com/rs/zerolog v1.34.0
