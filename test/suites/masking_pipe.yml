@@ -11,6 +11,33 @@ testcases:
     - >
       result.systemout ShouldEqual {"organizations":[{"domain":"company.com","persons":[{"name":"Leona","surname":"Miller","email":"leona.miller@company.com"},{"name":"Joe","surname":"Davis","email":"joe.davis@company.com"}]}]}
     - result.systemerr ShouldBeEmpty
+- name: simple pipe with root context
+  steps:
+  - script: rm -f masking.yml
+  - script: |-
+      cat > masking.yml <<EOF
+      version: "1"
+      seed: 42
+      masking:
+        - selector:
+            jsonpath: "level1.level2"
+          mask:
+            pipe:
+              injectRoot: "root"
+              masking:
+                - selector:
+                    jsonpath: "name"
+                  mask:
+                    add: '{{.root.name}}'
+      EOF
+  - script: |-
+      pimo <<EOF
+      {"name":"blue","level1":[{"level2":[{}]},{"level2":[{}]}]}
+      EOF
+    assertions:
+    - result.code ShouldEqual 0
+    - 'result.systemout ShouldContainSubstring {"name":"blue","level1":[{"level2":[{"name":"blue"}]},{"level2":[{"name":"blue"}]}]}'
+    - result.systemerr ShouldBeEmpty
 - name: simple pipe with cache
   steps:
   - script: rm -f masking.yml
