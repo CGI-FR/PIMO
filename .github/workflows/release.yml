@@ -61,4 +61,4 @@ jobs:
           source-directory: 'web/play/dist'
           destination-github-username: 'CGI-FR'
           destination-repository-name: 'pimo-play'
-          target-branch: main
+          target-branch: gh-pages
