@@ -15,7 +15,7 @@
     "dependencies": {
         "d3": "^7.6.1",
         "lz-string": "^1.4.4",
-        "mermaid": "^9.1.4",
+        "mermaid": "^10.9.3",
         "monaco-editor": "^0.33.0",
         "monaco-editor-webpack-plugin": "^7.0.0",
         "monaco-yaml": "^4.0.0-alpha.3"
