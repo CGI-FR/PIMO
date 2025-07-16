@@ -14,6 +14,10 @@ Types of changes
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [1.31.3]
+
+- `Fixed` `hashInCSV` consistency when used in different jsonpath
+
 ## [1.31.2]
 
 - `Fixed` mask `pipe` with `injectRoot` option
