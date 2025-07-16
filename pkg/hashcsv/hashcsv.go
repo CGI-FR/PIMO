@@ -166,7 +166,7 @@ func (mrl MaskEngine) GenIdentifierIfNeeded(obj model.Dictionary, e model.Entry,
 func Factory(conf model.MaskFactoryConfiguration) (model.MaskEngine, bool, error) {
 	seeder := model.NewSeeder(conf.Masking.Seed.Field, conf.Seed)
 
-	// do not! set differents seeds for differents jsonpath
+	// do not set different seeds for different jsonpaths
 	// h := fnv.New64a()
 	// h.Write([]byte(conf.Masking.Selector.Jsonpath))
 	// conf.Seed += int64(h.Sum64()) //nolint:gosec
