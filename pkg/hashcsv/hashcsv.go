@@ -167,9 +167,6 @@ func Factory(conf model.MaskFactoryConfiguration) (model.MaskEngine, bool, error
 	seeder := model.NewSeeder(conf.Masking.Seed.Field, conf.Seed)
 
 	// do not set different seeds for different jsonpaths
-	// h := fnv.New64a()
-	// h.Write([]byte(conf.Masking.Selector.Jsonpath))
-	// conf.Seed += int64(h.Sum64()) //nolint:gosec
 
 	if len(conf.Masking.Mask.HashInCSV.URI) != 0 {
 		mask, err := NewMask(conf.Masking.Mask.HashInCSV, conf.Seed, seeder)
