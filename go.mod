@@ -18,7 +18,7 @@ require (
 	github.com/mattn/go-isatty v0.0.20
 	github.com/pkg/profile v1.7.0
 	github.com/rs/zerolog v1.34.0
-	github.com/spf13/cast v1.9.2
+	github.com/spf13/cast v1.10.0
 	github.com/spf13/cobra v1.10.1
 	github.com/stretchr/testify v1.11.1
 	github.com/zach-klippenstein/goregen v0.0.0-20160303162051-795b5e3961ea
