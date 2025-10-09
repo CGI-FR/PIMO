@@ -24,7 +24,7 @@ require (
 	github.com/zach-klippenstein/goregen v0.0.0-20160303162051-795b5e3961ea
 	golang.org/x/crypto v0.42.0
 	golang.org/x/exp v0.0.0-20240707233637-46b078467d37
-	golang.org/x/term v0.35.0
+	golang.org/x/term v0.36.0
 	golang.org/x/text v0.29.0
 )
 
@@ -70,7 +70,7 @@ require (
 	golang.org/x/mod v0.27.0 // indirect
 	golang.org/x/net v0.43.0 // indirect
 	golang.org/x/sync v0.17.0 // indirect
-	golang.org/x/sys v0.36.0 // indirect
+	golang.org/x/sys v0.37.0 // indirect
 	golang.org/x/time v0.11.0 // indirect
 	golang.org/x/tools v0.36.0 // indirect
 	golang.org/x/xerrors v0.0.0-20220609144429-65e65417b02f // indirect
