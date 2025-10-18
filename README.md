@@ -479,7 +479,7 @@ This example will mask the `date` field of the input jsonlines with a random dat
       duration: "-P2D"
 ```
 
-This example will mask the `last_contact` field of the input jsonlines by decreasing its value by 2 days. The duration field should match the ISO 8601 standard for durations.
+This example will mask the `last_contact` field of the input jsonlines by decreasing its value by 2 days. The duration field must conform to the ISO 8601 standard for durations.
 
 [Return to list of masks](#possible-masks)
 
@@ -496,7 +496,7 @@ This example will mask the `last_contact` field of the input jsonlines by decrea
         outputFormat: "01/02/06"
 ```
 
-This example will change every date from the date field from the `inputFormat` to the `outputFormat`. The format should always display the following date : `Mon Jan 2 15:04:05 -0700 MST 2006`. Either field is optional and in case a field is not defined, the default format is RFC3339, which is the base format for PIMO, needed for `duration` mask and given by `randDate` mask. It is possible to use the Unix time format by specifying `inputFormat: "unixEpoch"` or `outputFormat: "unixEpoch"`.
+This example will convert every date in the date field from the `inputFormat` to the `outputFormat`. The format must always display the following reference date: `Mon Jan 2 15:04:05 -0700 MST 2006`. Both fields are optional; if a field is not defined, the default format is RFC3339, which is the base format for PIMO, required by the `duration` mask and produced by the `randDate` mask. You can use the Unix time format by specifying `inputFormat: "unixEpoch"` or `outputFormat: "unixEpoch"`.
 
 [Return to list of masks](#possible-masks)
 
@@ -530,7 +530,7 @@ This example will mask the `date` field of the input jsonlines by decreasing its
         increment: 1
 ```
 
-This example will mask the `id` field of the input jsonlines with incremental values. The first jsonline's `id` will be masked by 1, the second's by 2, etc...
+This example will mask the `id` field of the input jsonlines with incremental values. The first jsonline's `id` will be masked to 1, the second to 2, and so on.
 
 [Return to list of masks](#possible-masks)
 
@@ -546,9 +546,9 @@ This example will mask the `id` field of the input jsonlines with incremental va
         format: "ERR-0000"
 ```
 
-This example will generate the `id` field of the input jsonlines with sequenced values. The first jsonline's `id` will be masked by `ERR-0000`, the second's by `ERR-0001`, etc...
+This example will generate the `id` field of the input jsonlines with sequenced values. The first jsonline's `id` will be masked to `ERR-0000`, the second to `ERR-0001`, and so on.
 
-By default, the varying part of the ID is numbers, but this can be changed :
+By default, the varying part of the ID consists of numbers, but this can be changed:
 
 ```yaml
   - selector:
@@ -559,7 +559,7 @@ By default, the varying part of the ID is numbers, but this can be changed :
         varying: "ER"
 ```
 
-With this configuration, the first jsonline's `id` will be masked by `EEE-0000`, the second's by `EER-0000`, the third by `ERE-0000` etc...
+With this configuration, the first jsonline's `id` will be masked to `EEE-0000`, the second to `EER-0000`, the third to `ERE-0000`, and so on.
 
 [Return to list of masks](#possible-masks)
 
@@ -574,7 +574,7 @@ With this configuration, the first jsonline's `id` will be masked by `EEE-0000`,
       replacement: "name"
 ```
 
-This example will mask the `name4` field of the input jsonlines with the field `name` of the jsonline. This selector must be placed after the `name` selector to be masked with the new value and it must be placed before the `name` selector to be masked by the previous value.
+This example will mask the `name4` field of the input jsonlines with the value of the `name` field from the jsonline. This selector must be placed after the `name` selector to use the masked value, or before the `name` selector to use the original value.
 
 [Return to list of masks](#possible-masks)
 
@@ -589,7 +589,7 @@ This example will mask the `name4` field of the input jsonlines with the field `
       template: "{{.surname}}.{{.name}}@gmail.com"
 ```
 
-This example will mask the `mail` field of the input jsonlines respecting the given template. In the `masking.yml` config file, this selector must be placed after the fields contained in the template to mask with the new values and before the other fields to be masked with the old values. In the case of a nested json, the template must respect the following example :
+This example will mask the `mail` field of the input jsonlines using the given template. In the `masking.yml` config file, this selector must be placed after the fields referenced in the template to use the masked values, or before them to use the original values. For nested JSON structures, the template must follow this example:
 
 ```yaml
   - selector:
@@ -598,9 +598,9 @@ This example will mask the `mail` field of the input jsonlines respecting the gi
       template: "{{.user.surname}}.{{.user.name}}@gmail.com"
 ```
 
-The format for the template should respect the `text/template` package : <https://golang.org/pkg/text/template/>
+The template format must comply with the `text/template` package: <https://golang.org/pkg/text/template/>
 
-The template mask can format the fields used. The following example will create a mail address without accent or upper case:
+The template mask can format the fields used. The following example will create an email address without accents or uppercase letters:
 
 ```yaml
   - selector:
@@ -636,12 +636,12 @@ Most masks will be available as functions in template in the form : MaskCapitali
         item: "value"
 ```
 
-This will affect every values in the array field. The field must be an array (`{"array": ["value1", "value2"]}`).
-The `item` property is optional and defines the name of the current item in the templating string (defaults to "it"). There is another optional property `index`, if defined then a property with the given name will be available in the templating string (e.g. : `index: "idx"` can be used in template with `{{.idx}}`).
+This will apply to every value in the array field. The field must be an array (`{"array": ["value1", "value2"]}`).
+The `item` property is optional and defines the name of the current item in the template string (defaults to "it"). There is another optional property, `index`; if defined, a property with the given name will be available in the template string (e.g., `index: "idx"` can be used in the template as `{{.idx}}`).
 
-The format for the template should respect the `text/template` package : <https://golang.org/pkg/text/template/>
+The template format must comply with the `text/template` package: <https://golang.org/pkg/text/template/>
 
-See also the [Template mask](#template) for other options, all functions are applicable on template-each.
+See also the [Template mask](#template) for other options; all functions are applicable to template-each.
 
 [Return to list of masks](#possible-masks)
 
@@ -656,7 +656,7 @@ See also the [Template mask](#template) for other options, all functions are app
       fromjson: "sourcefield"
 ```
 
-This example will mask the `targetfield` field of the input jsonlines with the parsed JSON from field `sourcefield` of the jsonline. This mask changes the type of the input string (`sourcefield`) :
+This example will mask the `targetfield` field of the input jsonlines with the parsed JSON from the `sourcefield` field of the jsonline. This mask changes the type of the input string (`sourcefield`):
 
 * null : nil
 * string: string
@@ -678,7 +678,7 @@ This example will mask the `targetfield` field of the input jsonlines with the p
       remove: true
 ```
 
-This field will mask the `useless-field` of the input jsonlines by completely deleting it.
+This example will mask the `useless-field` of the input jsonlines by completely deleting it.
 
 [Return to list of masks](#possible-masks)
 
@@ -693,11 +693,11 @@ This field will mask the `useless-field` of the input jsonlines by completely de
       add: "newvalue"
 ```
 
-This example will create the field `newField` containing the value `newvalue`. This value can be a string, a number, a boolean...
+This example will create the field `newField` containing the value `newvalue`. This value can be a string, a number, a boolean, etc.
 
-The field will be created in every input jsonline that doesn't already contains this field.
+The field will be created in every input jsonline that doesn't already contain this field.
 
-Note: add can contains template strings (see the [Template](#template) mask for more information).
+Note: add can contain template strings (see the [Template](#template) mask for more information).
 
 [Return to list of masks](#possible-masks)
 
@@ -712,13 +712,13 @@ Note: add can contains template strings (see the [Template](#template) mask for 
       add-transient: "newvalue"
 ```
 
-This example will create the field `newField` containing the value `newvalue`. This value can be a string, a number, a boolean... It can also be a [template](#template).
+This example will create the field `newField` containing the value `newvalue`. This value can be a string, a number, a boolean, etc. It can also be a [template](#template).
 
-The field will be created in every input jsonline that doesn't already contains this field, and it will be removed from the final JSONLine output.
+The field will be created in every input jsonline that doesn't already contain this field, and it will be removed from the final JSONLine output.
 
-This mask is used for temporary field that is only available to other fields during the execution.
+This mask is used for temporary fields that are only available to other fields during execution.
 
-Note: add-transient can contains template strings (see the [Template](#template) mask for more information).
+Note: add-transient can contain template strings (see the [Template](#template) mask for more information).
 
 [Return to list of masks](#possible-masks)
 
@@ -733,7 +733,7 @@ Note: add-transient can contains template strings (see the [Template](#template)
       fluxURI: "file://id.csv"
 ```
 
-This example will create an `id` field in every output jsonline. The values will be the ones contained in the `id.csv` file in the same order as in the file. If the field already exist on the input jsonline it will be replaced and if every value of the file has already been assigned, the input jsonlines won't be modified.
+This example will create an `id` field in every output jsonline. The values will be the ones contained in the `id.csv` file in the same order as in the file. If the field already exists in the input jsonline, it will be replaced. If all values from the file have been assigned, the input jsonlines will not be modified.
 
 [Return to list of masks](#possible-masks)
 
@@ -750,9 +750,9 @@ This example will create an `id` field in every output jsonline. The values will
       reverse: false
 ```
 
-This example will replace the content of `id` field by the matching content in the cache `fakeId`. Cache have to be declared in the `caches` section.
-Cache content can be loaded from jsonfile with the `--load-cache fakeId=fakeId.jsonl` option or by the `cache` option on another field.
-If no matching is found in the cache, `fromCache` block the current line and the next lines are processing until a matching content go into the cache.
+This example will replace the content of the `id` field with the matching content in the cache `fakeId`. The cache must be declared in the `caches` section.
+Cache content can be loaded from a JSON file using the `--load-cache fakeId=fakeId.jsonl` option or via the `cache` option on another field.
+If no match is found in the cache, `fromCache` blocks the current line, and subsequent lines are processed until matching content is added to the cache.
 A `reverse` option is available in the `caches` section to use the reverse cache dictionary.
 
 [Return to list of masks](#possible-masks)
@@ -771,9 +771,9 @@ A `reverse` option is available in the `caches` section to use the reverse cache
         onError: "Invalid value = {{ .siret }}" # if set, this template will be executed on error
 ```
 
-This example will encrypt the `siret` column with the private key base64-encoded in the FF1_ENCRYPTION_KEY environment variable. Use the same mask with the option `decrypt: true` to re-identify the unmasked value.
+This example will encrypt the `siret` column using the private key base64-encoded in the FF1_ENCRYPTION_KEY environment variable. Use the same mask with the option `decrypt: true` to re-identify the original value.
 
-Characters outside of the domain can be preserved with `preserve: true` option.
+Characters outside the domain can be preserved with the `preserve: true` option.
 
 Be sure to check [the full FPE demo](demo/demo7) to get more details about this mask.
 
@@ -783,9 +783,9 @@ Be sure to check [the full FPE demo](demo/demo7) to get more details about this 
 
 [![Try it](https://img.shields.io/badge/-Try%20it%20in%20PIMO%20Play-brightgreen)](https://cgi-fr.github.io/pimo-play/#c=G4UwTgzglg9gdgLgAQCICMKBQEQgCbJoBMAzJgLYCGEA1lHAOYKZJIC0SOANiAMYAuMMM1aikAKwjwADpX4ALZChBUoXLGKq0RYzvMokdupD0YLCRJAGIk+iPKSCkAOSQAjAJ78QEADRJeGC4uKGh4JDAfUP5KOF4QJFCkIgA9AApnACoAFgBKFmMkPBhVRFQABmISbIBWADYAdgAOAE4UawD4UDB+Rxh3agS0cqQAdygFIqgGCYgkcrYWzCA&i=N4KABGBECmC2CGBLANpAXFAdvW0B0AzgK4BO2uAAgCYD2CimeAxnZCAL5A)
 
-The sha3 mask will apply a variable length cryptographic hash (SHAKE variable-output-length hash function defined by FIPS-202) and then apply a base-conversion to the output.
+The sha3 mask applies a variable-length cryptographic hash (SHAKE variable-output-length hash function defined by FIPS-202) and then applies a base conversion to the output.
 
-This is useful to mask any input data into a coherent and collision resistant ID.
+This is useful for masking any input data into a coherent and collision-resistant ID.
 
 ```yaml
 version: "1"
@@ -799,7 +799,7 @@ masking:
         domain: "0123456789" # convert to base 10 with digits 0-9
 ```
 
-In this example, the email will be replaced with a 29-digit collision resistant number. The collision resistance will be considered very good if the number of ID generated is less than `2^(12*8/2)`.
+In this example, the email will be replaced with a 29-digit collision-resistant number. The collision resistance will be considered very good if the number of IDs generated is less than `2^(12*8/2)`.
 
 An alternative configuration to the previous example is :
 
@@ -815,9 +815,9 @@ masking:
         domain: "0123456789" # convert to base 10 with digits 0-9
 ```
 
-Here the length parameter is not given, but with the `resistance` parameter set to 10M, the mask will calculate the minimum length required (6 bytes in this example because 2^(6*8/2) > 10M).
+In this case, the length parameter is not given, but with the `resistance` parameter set to 10M, the mask will calculate the minimum required length (6 bytes in this example because 2^(6*8/2) > 10M).
 
-It can be difficult to anticipate what will be the maximum identifier string length (in characters) because it depends to the `domain` and the value of the `length` parameter (which can be invisible in the masking configuration because it is deduced from the `resistance` parameter). Therefore an optional parameter named `maxstrlen` was created, it's only purpose is to inform with an error if the maximum length (in characters) of identifier that can be produced is greater than a threshold.
+It can be difficult to anticipate the maximum identifier string length (in characters) because it depends on the `domain` and the value of the `length` parameter (which may be invisible in the masking configuration because it is deduced from the `resistance` parameter). Therefore, an optional parameter named `maxstrlen` was created; its only purpose is to raise an error if the maximum length (in characters) of identifiers that can be produced exceeds a threshold.
 
 [Return to list of masks](#possible-masks)
 
