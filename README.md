@@ -220,7 +220,7 @@ Then go to [http://localhost:3010/](http://localhost:3010/) in your browser.
 
 ## Examples
 
-This section will give examples for every types of mask.
+This section provides examples for every type of mask.
 
 Please check the [demo folder](demo) for more advanced examples.
 
@@ -313,14 +313,14 @@ The selected field's data will be masked with random values selected from a CSV 
 
 Here is a detailed breakdown of the example configuration:
 
-* selector: The jsonpath: "pokemon" line means that this masking configuration is meant to apply to the field named "pokemon" in the JSON data.
+* selector: The `jsonpath: "pokemon"` line means this masking configuration applies to the field named "pokemon" in the JSON data.
 * mask: This defines the masking operation to be performed on the "pokemon" field.
 * randomChoiceInCSV: The mask will replace the value in the "pokemon" field with a random choice from the CSV file at the specified URL.
-* uri: The location of the CSV file to use for replacement values, `file` and `http`/`https` schemes can be used. This parameter can be a template.
+* uri: The location of the CSV file to use for replacement values; `file` and `http`/`https` schemes can be used. This parameter can be a template.
 * header: This optional parameter is set to true, meaning the CSV file contains a header line that names the fields.
 * separator: This optional parameter specifies that the CSV values are separated by a comma, which is the default separator in CSV files.
-* comment: This optional parameter specifies that the CSV file may contain comments that start with a '#'.
-* fieldsPerRecord: This optional parameter is set to 0, meaning the number of fields per record will be set to the number of fields in the first record by default. If negative, no check is made and records may have a variable number of fields.
+* comment: This optional parameter specifies that the CSV file may contain comments starting with a '#'.
+* fieldsPerRecord: This optional parameter is set to 0, meaning the number of fields per record will be set to the number of fields in the first record by default. If negative, no check is made, and records may have a variable number of fields.
 * trim: This optional parameter is set to true, meaning any spaces in values and headers in the CSV file will be trimmed.
 
 [Return to list of masks](#possible-masks)
@@ -1415,12 +1415,12 @@ masking:
             - template: "{{index . \"date\"}}"
 ```
 
-This example masks the original attribute value with the specified template value. `jsonpath: "content"` point to the key in json that contains target XML content to be masked. The `masking` section applies all masks to the target attribute or tag in XML.
+This example masks the original attribute value with the specified template value. `jsonpath: "content"` points to the key in the JSON that contains the target XML content to be masked. The `masking` section applies all masks to the target attribute or tag in the XML.
 
-the parent object (a domain) will be accessible with the "_" variable name.
-To use a parent value in template: `{{. + injectParentName + . + jsonKey}}`
+The parent object (a domain) will be accessible using the "_" variable name.
+To use a parent value in a template: `{{. + injectParentName + . + jsonKey}}`
 
-For more infomation on pasing XML files. refer to [Parsing-XML-files](#parsing-xml-files)
+For more information on parsing XML files, refer to [Parsing-XML-files](#parsing-xml-files).
 
 **`Output JSON`**
 
@@ -1435,18 +1435,18 @@ For more infomation on pasing XML files. refer to [Parsing-XML-files](#parsing-x
 
 ### Parsing-XML-files
 
-To use PIMO to masking data in an XML file, use in the following way :
+To use PIMO to mask data in an XML file, use the following command:
 
 ```bash
   cat data.xml | pimo xml --subscriber parentTagName=MaskName.yml > maskedData.xml
 ```
 
-Pimo selects specific tags within a predefined parent tag to replace the text and store the entire data in a new XML file. These specific tags should not contain any other nested tags.
+PIMO selects specific tags within a predefined parent tag to replace the text and stores the entire data in a new XML file. These specific tags should not contain any other nested tags.
 
-To mask values of attributes, follow the rules to define your choice in jsonpath in masking.yml.
+To mask values of attributes, follow these rules to define your selection in jsonpath in masking.yml:
 
-* For attributes of parent tag, we use: `@attributeName` in jsonpath.
-* For attributes of child tag, we use: `childTagName@attributeName` in jsonpath.
+* For attributes of the parent tag, use: `@attributeName` in jsonpath.
+* For attributes of a child tag, use: `childTagName@attributeName` in jsonpath.
 
 For example, consider an XML file named data.xml:
 
@@ -1555,9 +1555,9 @@ After executing the command with the correct configuration, here is the expected
 
 ### Parsing Parquet files
 
-Warning: parquet support is still an experimental feature, we are currently considering to migrate this feature to a new dataconnector type in LINO (might be dropped from PIMO in future releases)
+Warning: Parquet support is still an experimental feature. We are currently considering migrating this feature to a new dataconnector type in LINO (it might be dropped from PIMO in future releases).
 
-To mask data in a Parquet file using PIMO with the correct configuration option, follow this updated approach:
+To mask data in a Parquet file using PIMO with the correct configuration option, use the following approach:
 
 ```bash
   pimo parquet data.parquet maskedData.parquet --config masking.yml
@@ -1627,18 +1627,18 @@ This example demonstrates how to mask specific columns using PIMO, applying rand
 
 ## `pimo://` scheme
 
-Pimo embed a usefule list of fake data. URIs that begin with a pimo:// sheme point to the pseudo files bellow.
+PIMO embeds a useful list of fake data. URIs that begin with the pimo:// scheme point to the pseudo files below.
 
 name       | description
 -----------|-----------------------------
-`nameEN`   | english female or male names
-`nameENF`  | english female names
-`nameENM`  | english male names
-`nameFR`   | french female or male names
-`nameFRF`  | french female names
-`nameFRM`  | french male names
-`surnameFR`| french surnames
-`townFR`   | french towns names
+`nameEN`   | English female or male names
+`nameENF`  | English female names
+`nameENM`  | English male names
+`nameFR`   | French female or male names
+`nameFRF`  | French female names
+`nameFRM`  | French male names
+`surnameFR`| French surnames
+`townFR`   | French town names
 
 The content of built-in lists are in [the `maskingdata` package](pkg/maskingdata)
 
@@ -1646,15 +1646,15 @@ The content of built-in lists are in [the `maskingdata` package](pkg/maskingdata
 
 PIMO can generate a Mermaid syntax flow chart to visualize the transformation process.
 
-for example the command `pimo flow masking.yml > masing.mmd` with that [masking.yml](masking.yml) file generate following chart :
+For example, the command `pimo flow masking.yml > masking.mmd` with that [masking.yml](masking.yml) file generates the following chart:
 
 [![](https://mermaid.ink/img/pako:eNqtltFumzAUhl_F9RXRSESArQoXVbVQaZMWbUo77SJElQsOWAMbga02SvNEfYy92GxDUHDoBdoQCvZ_Dieffx9HOcCYJRgGcJez5zhDFQff1hEF8roitBR8Y-nHZAum0xsQi5qzAlezMmMUN3m1eEorVGZG8LFOm7i6-iFV6jWCa5ziF8vZzKfXWwtYG2e62E4O7nFy8I-TCL6aBedNPUyTZmCGNeEVE1zy3nzXj-37S6GoMBegpB62ElrYJaM1R5Rbn0meazqdbTI14ngSdwDFvWBxT84hmrBimTESY2tF4t_oz1turxDPCBbyWcU4z3FH6Q5iumM5UWoaJpUeo5z3CL9Kv1aEBsD9aIMVegmA52oq9aLJpLXxznkDznkXznndNhaFRLNwnDEQsorxbN_55A365I2lqkU10Fyt2iNrtZbtFyZpxnHS7msoSkY5uAULWw8TOZxr1lMpk7bTR-5rklS4rmecPVNzg89C_Z0-C7T4X1CdWXfyPKI8AUvC9_ZaPO2b0T0qy4xUWM-aDjivfNEKveC41SSIm9YrqUevhLNGDeXUUh-6V-eLa2fqzOUNHCfQN_jgyAv8fFjaQOepVnYd9_08vUb9vebaGnF8n_sDfe5f9Lnf_baWOYpxgeUJVHrX4_5gj_tjiQpEcgNIST0eJbQ4D7iQPNLlw2HWdunxOJOTZnSbqtxZzArNqSvNL45Jw_jP1f5Tqc6_RhxnX45q_hjL441ibth4HurZeR5o6UNRIU4YtaY_PjmhRuy9bqL2g0PI0IbyBMslJfI_wUG9FUGeyT6KYCCHCd4hkfMIRvQoU0WpuvkuIZxVMNihvMY2RIKz-z2NYcArgU9JIUFyfUWbdfwLdee3Rg)](https://mermaid.live/edit/#pako:eNqtltFumzAUhl_F9RXRSESArQoXVbVQaZMWbUo77SJElQsOWAMbga02SvNEfYy92GxDUHDoBdoQCvZ_Dieffx9HOcCYJRgGcJez5zhDFQff1hEF8roitBR8Y-nHZAum0xsQi5qzAlezMmMUN3m1eEorVGZG8LFOm7i6-iFV6jWCa5ziF8vZzKfXWwtYG2e62E4O7nFy8I-TCL6aBedNPUyTZmCGNeEVE1zy3nzXj-37S6GoMBegpB62ElrYJaM1R5Rbn0meazqdbTI14ngSdwDFvWBxT84hmrBimTESY2tF4t_oz1turxDPCBbyWcU4z3FH6Q5iumM5UWoaJpUeo5z3CL9Kv1aEBsD9aIMVegmA52oq9aLJpLXxznkDznkXznndNhaFRLNwnDEQsorxbN_55A365I2lqkU10Fyt2iNrtZbtFyZpxnHS7msoSkY5uAULWw8TOZxr1lMpk7bTR-5rklS4rmecPVNzg89C_Z0-C7T4X1CdWXfyPKI8AUvC9_ZaPO2b0T0qy4xUWM-aDjivfNEKveC41SSIm9YrqUevhLNGDeXUUh-6V-eLa2fqzOUNHCfQN_jgyAv8fFjaQOepVnYd9_08vUb9vebaGnF8n_sDfe5f9Lnf_baWOYpxgeUJVHrX4_5gj_tjiQpEcgNIST0eJbQ4D7iQPNLlw2HWdunxOJOTZnSbqtxZzArNqSvNL45Jw_jP1f5Tqc6_RhxnX45q_hjL441ibth4HurZeR5o6UNRIU4YtaY_PjmhRuy9bqL2g0PI0IbyBMslJfI_wUG9FUGeyT6KYCCHCd4hkfMIRvQoU0WpuvkuIZxVMNihvMY2RIKz-z2NYcArgU9JIUFyfUWbdfwLdee3Rg)
 
 ## Visual Studio Code
 
-To integrate with Visual Studio Code (opens new window), download the [YAML extension](https://marketplace.visualstudio.com/items?itemName=redhat.vscode-yaml).
+To integrate with Visual Studio Code, download the [YAML extension](https://marketplace.visualstudio.com/items?itemName=redhat.vscode-yaml).
 
-Then, edit your Visual Studio Code settings `yaml.schemas` to containing the following configuration:
+Then, edit your Visual Studio Code settings `yaml.schemas` to contain the following configuration:
 
 ```json
 {
@@ -1664,7 +1664,7 @@ Then, edit your Visual Studio Code settings `yaml.schemas` to containing the fol
 }
 ```
 
-Using this configuration, the schema will be applied on every YAML file containing the word `masking`` in their name.
+Using this configuration, the schema will be applied to every YAML file containing the word `masking` in its name.
 
 ## Contributors
 
@@ -1672,7 +1672,7 @@ Using this configuration, the schema will be applied on every YAML file containi
 * Pôle Emploi
 * BGPN - Groupe La Poste
 
-## Licence
+## License
 
 Copyright (C) 2021 CGI France
 
@@ -1683,9 +1683,9 @@ the Free Software Foundation, either version 3 of the License, or
 
 PIMO is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
- along with PIMO.  If not, see <http://www.gnu.org/licenses/>.
+along with PIMO. If not, see <http://www.gnu.org/licenses/>.
 
