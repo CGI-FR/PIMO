@@ -8,27 +8,27 @@
 
 # PIMO : Private Input, Masked Output
 
-PIMO is a tool for data masking. It can mask data from a JSONline stream and return another JSONline stream thanks to a masking configuration contained in a yaml file.
+PIMO is a tool for data masking. It can mask data from a JSONline stream and return another JSONline stream using a masking configuration contained in a YAML file.
 
 ![pimo](doc/img/pimo.png)
 
-You can use [LINO](https://github.com/CGI-FR/LINO) to extract sample data from a database, which you can then use as input data for PIMO's data masking.
-You can also generate data with a simple yaml configuration file.
+You can use [LINO](https://github.com/CGI-FR/LINO) to extract sample data from a database and then use it as input for PIMO's data masking.
+You can also generate data using a simple YAML configuration file.
 
 **Capabilities**
 
-- credibility : generated data is not distinguishable from real data
-- data synthesis : generate data from nothing
-- data masking, including
-  - randomization : protect personal or sensitive data by writing over it
-  - pseudonymization, on 3 levels
-    - consistent pseudonymisation : real value A is always replaced by pseudo-value X but X can be attributed to other values than A
-    - identifiant pseudonymisation : real value A is always replaced by pseudo-value X and X *CANNOT* be attributed to other values than A
-    - reversible pseudonymisation : real value A can be generated from pseudo-value X
+- credibility: generated data is indistinguishable from real data
+- data synthesis: generate data from scratch
+- data masking, including:
+  - randomization: protect personal or sensitive data by overwriting it
+  - pseudonymization, at 3 levels:
+    - consistent pseudonymization: real value A is always replaced by pseudo-value X, but X can be attributed to other values besides A
+    - identifier pseudonymization: real value A is always replaced by pseudo-value X, and X *CANNOT* be attributed to any values other than A
+    - reversible pseudonymization: real value A can be generated from pseudo-value X
 
-## Configuration file needed
+## Configuration file required
 
-PIMO requires a yaml configuration file to works. By default, the file is named `masking.yml` and is placed in the working directory. The file must respect the following format :
+PIMO requires a YAML configuration file to work. By default, the file is named `masking.yml` and is located in the working directory. The file must follow this format:
 
 ```yaml
 version: "1"
@@ -63,18 +63,17 @@ caches:
 ```
 
 `version` is the version of the masking file.
-`seed` is to give every random mask the same seed, it is optional and if it is not defined, the seed is derived from the current time to increase randomness.
-`functions` is used to define the functions that can be used in the te mask `template`, `template-each`, `add`, and `add-transient`.
-`masking` is used to define the pipeline of masks that is going to be applied.
-`selector` is made of a jsonpath and a mask.
-`jsonpath` defines the path of the entry that has to be masked in the json file.
-`mask` defines the mask that will be used for the entry defined by `selector`.
-`cache` is optional, if the current entry is already in the cache as key the associated value is returned without executing the mask. Otherwise the mask is executed and a new entry is added in the cache with the orignal content as `key` and the masked result as `value`. The cache have to be declared in the `caches` section of the YAML file.
-`preserve` is optional, and is used to keep some values unmasked in the json file. Allowed `preserve` options are: `"null"` (null values), `"empty"` (empty string `""`), and
-`"blank"` (both `empty` and `null` values). Additionally, `preserve` can be used with mask [`fromCache`](#fromCache) to preserve uncached values. (usage: `preserve: "notInCache"`)
+`seed` provides a seed value for all random masks. It is optional; if not defined, the seed is derived from the current time to increase randomness.
+`functions` defines custom functions that can be used in the `template`, `template-each`, `add`, and `add-transient` masks.
+`masking` defines the pipeline of masks to be applied.
+`selector` consists of a jsonpath and a mask.
+`jsonpath` defines the path of the entry to be masked in the JSON file.
+`mask` defines the mask to be used for the entry specified by `selector`.
+`cache` is optional. If the current entry already exists in the cache as a key, the associated value is returned without executing the mask. Otherwise, the mask is executed and a new entry is added to the cache with the original content as the `key` and the masked result as the `value`. The cache must be declared in the `caches` section of the YAML file.
+`preserve` is optional and is used to keep certain values unmasked in the JSON file. Allowed `preserve` options are: `"null"` (null values), `"empty"` (empty string `""`), and `"blank"` (both `empty` and `null` values). Additionally, `preserve` can be used with the [`fromCache`](#fromCache) mask to preserve uncached values. (usage: `preserve: "notInCache"`)
 `preserve-list` is optional and is used to ignore specific values
 
-Multiple masks can be applied on the same jsonpath location, like in this example :
+Multiple masks can be applied to the same jsonpath location, as shown in this example:
 
 ```yaml
   - selector:
@@ -85,7 +84,7 @@ Multiple masks can be applied on the same jsonpath location, like in this exampl
       - remove: true
 ```
 
-Masks can be applied on multiple selectors, like in this example:
+Masks can be applied to multiple selectors, as shown in this example:
 
 ```yaml
   - selectors:
@@ -95,7 +94,7 @@ Masks can be applied on multiple selectors, like in this example:
       add: "hello"
 ```
 
-It is possible to define functions and reuse them later in the masks, like in this example:
+It is possible to define functions and reuse them later in masks, as shown in this example:
 
 ```yaml
 functions:
@@ -123,88 +122,88 @@ masking:
 
 ## Possible masks
 
-The following types of masks can be used :
+The following types of masks can be used:
 
 * Pure randomization masks
-  * [`regex`](#regex) is to mask using a regular expression given in argument.
-  * [`randomInt`](#randomint) is to mask with a random int from a range with arguments min and max.
-  * [`randomDecimal`](#randomdecimal) is to mask with a random decimal from a range with arguments min, max and precision.
-  * [`randDate`](#randdate) is to mask a date with a random date between `dateMin` and `dateMax`.
-  * [`randomDuration`](#randomduration) is to mask a date by adding or removing a random time between `Min` and `Max`.
-  * [`randomChoice`](#randomchoice) is to mask with a random value from a list in argument.
-  * [`weightedChoice`](#weightedchoice) is to mask with a random value from a list with probability, both given with the arguments `choice` and `weight`.
-  * [`randomChoiceInUri`](#randomchoiceinuri) is to mask with a random value from an external resource.
-  * [`randomChoiceInCSV`](#randomchoiceincsv) is to mask with a random value from an external CSV resource.
-  * [`transcode`](#transcode) is to mask a value randomly with character class preservation.
-  * [`timeline`](#timeline) to generate a set of dates related to each other (by rules and constraints)
+  * [`regex`](#regex) masks using a regular expression provided as an argument.
+  * [`randomInt`](#randomint) masks with a random integer from a range with arguments min and max.
+  * [`randomDecimal`](#randomdecimal) masks with a random decimal from a range with arguments min, max, and precision.
+  * [`randDate`](#randdate) masks a date with a random date between `dateMin` and `dateMax`.
+  * [`randomDuration`](#randomduration) masks a date by adding or removing a random time between `Min` and `Max`.
+  * [`randomChoice`](#randomchoice) masks with a random value from a list provided as an argument.
+  * [`weightedChoice`](#weightedchoice) masks with a random value from a list with probabilities, both provided with the arguments `choice` and `weight`.
+  * [`randomChoiceInUri`](#randomchoiceinuri) masks with a random value from an external resource.
+  * [`randomChoiceInCSV`](#randomchoiceincsv) masks with a random value from an external CSV resource.
+  * [`transcode`](#transcode) masks a value randomly while preserving character classes.
+  * [`timeline`](#timeline) generates a set of dates related to each other (by rules and constraints)
 * K-Anonymization
-  * [`range`](#range) is to mask a integer value by a range of value (e.g. replace `5` by `[0,10]`).
-  * [`duration`](#duration) is to mask a date by adding or removing a certain number of days.
+  * [`range`](#range) masks an integer value with a range of values (e.g., replace `5` with `[0,10]`).
+  * [`duration`](#duration) masks a date by adding or removing a certain number of days.
 * Re-identification and coherence preservation
-  * [`hash`](#hash) is to mask with a value from a list by matching the original value, allowing to mask a value the same way every time.
-  * [`hashInUri`](#hashinuri) is to mask with a value from an external resource, by matching the original value, allowing to mask a value the same way every time.
-  * [`hashInCSV`](#hashincsv) is to mask with a value from an external CSV resource, by matching the original value, allowing to mask a value the same way every time.
-  * [`fromCache`](#fromcache) is a mask to obtain a value from a cache.
-  * [`ff1`](#ff1) mask allows the use of <abbr title="Format Preserving Encryption">FPE</abbr> which enable private-key based re-identification.
-  * [`sha3`](#sha3) masks will apply a variable length cryptographic hash (SHAKE variable-output-length hash function defined by FIPS-202) and then apply a base-conversion to the output.
+  * [`hash`](#hash) masks with a value from a list by matching the original value, allowing the same value to be masked consistently.
+  * [`hashInUri`](#hashinuri) masks with a value from an external resource by matching the original value, allowing the same value to be masked consistently.
+  * [`hashInCSV`](#hashincsv) masks with a value from an external CSV resource by matching the original value, allowing the same value to be masked consistently.
+  * [`fromCache`](#fromcache) obtains a value from a cache.
+  * [`ff1`](#ff1) enables the use of <abbr title="Format Preserving Encryption">FPE</abbr>, which enables private-key based re-identification.
+  * [`sha3`](#sha3) applies a variable-length cryptographic hash (SHAKE variable-output-length hash function defined by FIPS-202) and then applies a base conversion to the output.
 * Formatting
-  * [`dateParser`](#dateparser) is to change a date format.
-  * [`template`](#template) is to mask a data with a template using other values from the jsonline.
-  * [`template-each`](#template-each) is like template but will apply on each value of an array.
-  * [`fromjson`](#fromjson) is to convert string field values to parsed JSON, e.g. "[1,2,3]" -> [1,2,3].
+  * [`dateParser`](#dateparser) changes a date format.
+  * [`template`](#template) masks data using a template with other values from the jsonline.
+  * [`template-each`](#template-each) is like template but applies to each value of an array.
+  * [`fromjson`](#fromjson) converts string field values to parsed JSON, e.g., "[1,2,3]" -> [1,2,3].
 * Data structure manipulation
-  * [`remove`](#remove) is to mask a field by completely removing it.
-  * [`add`](#add) is a mask to add a field to the jsonline.
-  * [`add-transient`](#add-transient) same as `add` but the field is not exported in the output jsonline.
+  * [`remove`](#remove) masks a field by completely removing it.
+  * [`add`](#add) adds a field to the jsonline.
+  * [`add-transient`](#add-transient) is the same as `add`, but the field is not exported in the output jsonline.
 * Others
-  * [`constant`](#constant) is to mask the value by a constant value given in argument.
-  * [`command`](#command) is to mask with the output of a console command given in argument.
-  * [`incremental`](#incremental) is to mask data with incremental value starting from `start` with a step of `increment`.
-  * [`sequence`](#sequence) generate sequenced IDs of any format.
-  * [`fluxUri`](#fluxuri) is to replace by a sequence of values defined in an external resource.
-  * [`replacement`](#replacement) is to mask a data with another data from the jsonline.
-  * [`pipe`](#pipe) is a mask to handle complex nested array structures, it can read an array as an object stream and process it with a sub-pipeline.
-  * [`apply`](#apply) process selected data with a sub-pipeline.
-  * [`partitions`](#partitions) will rely on conditions to identify specific cases.
-  * [`segments`](#segments) allow transformations on specific parts of a field's value using regular expressions subgroups captures.
-  * [`luhn`](#luhn) can generate valid numbers using the Luhn algorithm (e.g. french SIRET or SIREN).
-  * [`markov`](#markov) can generate pseudo text based on a sample text.
-  * [`findInCSV`](#findincsv) get one or multiple csv lines which matched with Json entry value from CSV files.
-  * [`xml`](#xml) can manipulate XML content within JSON values.
-  * [`log`](#log) will output a log.
+  * [`constant`](#constant) masks the value with a constant value provided as an argument.
+  * [`command`](#command) masks with the output of a console command provided as an argument.
+  * [`incremental`](#incremental) masks data with an incremental value starting from `start` with a step of `increment`.
+  * [`sequence`](#sequence) generates sequenced IDs of any format.
+  * [`fluxUri`](#fluxuri) replaces with a sequence of values defined in an external resource.
+  * [`replacement`](#replacement) masks data with another data field from the jsonline.
+  * [`pipe`](#pipe) handles complex nested array structures; it can read an array as an object stream and process it with a sub-pipeline.
+  * [`apply`](#apply) processes selected data with a sub-pipeline.
+  * [`partitions`](#partitions) relies on conditions to identify specific cases.
+  * [`segments`](#segments) allows transformations on specific parts of a field's value using regular expression subgroup captures.
+  * [`luhn`](#luhn) generates valid numbers using the Luhn algorithm (e.g., French SIRET or SIREN).
+  * [`markov`](#markov) generates pseudo text based on a sample text.
+  * [`findInCSV`](#findincsv) retrieves one or multiple CSV lines that match the JSON entry value from CSV files.
+  * [`xml`](#xml) manipulates XML content within JSON values.
+  * [`log`](#log) outputs a log.
 
-A full `masking.yml` file example, using every kind of mask, is given with the source code.
+A full `masking.yml` file example, using every kind of mask, is provided with the source code.
 
-In case two types of mask are entered with the same selector, the program can't extract the masking configuration and will return an error. The file `wrongMasking.yml` provided with the source illustrate that error.
+If two mask types are entered with the same selector, the program cannot extract the masking configuration and will return an error. The file `wrongMasking.yml` provided with the source code illustrates this error.
 
 ## Usage
 
-To use PIMO to mask a `data.json`, use in the following way :
+To use PIMO to mask a `data.json` file, use the following command:
 
 ```bash
 ./pimo <data.json >maskedData.json
 ```
 
-This takes the `data.json` file, masks the data contained inside it and put the result in a `maskedData.json` file. If data are in a table (for example multiple names), then each field of this table will be masked using the given mask. The following flags can be used:
+This takes the `data.json` file, masks the data contained in it, and outputs the result to a `maskedData.json` file. If the data is in an array (for example, multiple names), then each field in the array will be masked using the specified mask. The following flags can be used:
 
-* `--repeat=N` This flag will make pimo mask every input N-times (useful for dataset generation).
-* `--skip-line-on-error` This flag will totally skip a line if an error occurs masking a field.
-* `--skip-field-on-error` This flag will return output without a field if an error occurs masking this field.
+* `--repeat=N` This flag makes PIMO mask every input N times (useful for dataset generation).
+* `--skip-line-on-error` This flag skips a line entirely if an error occurs while masking a field.
+* `--skip-field-on-error` This flag returns output without a field if an error occurs while masking that field.
 * `--skip-log-file <filename>` Skipped lines will be written to `<filename>`.
 * `--catch-errors <filename>` or `-e <filename>` Equivalent to `--skip-line-on-error --skip-log-file <filename>`.
-* `--empty-input` This flag will give PIMO a `{}` input, usable with `--repeat` flag.
-* `--config=filename.yml` This flag allow to use another file for config than the default `masking.yml`.
-* `--load-cache cacheName=filename.json` This flag load an initial cache content from a file (json line format `{"key":"a", "value":"b"}`).
-* `--dump-cache cacheName=filename.json` This flag dump final cache content to a file (json line format `{"key":"a", "value":"b"}`).
-* `--verbosity <level>` or `-v<level>` This flag increase verbosity on the stderr output, possible values: none (0), error (1), warn (2), info (3), debug (4), trace (5).
-* `--debug` This flag complete the logs with debug information (source file, line number).
-* `--log-json` Set this flag to produce JSON formatted logs ([demo9](demo/demo9) goes deeper into logging and structured logging)
-* `--seed <int>` Set this flage to declare seed in command line.
-* `--mask` Declare a simple masking definition in command line (minified YAML format: `--mask "value={fluxUri: 'pimo://nameFR'}"`, or `--mask "value=[{add: ''},{fluxUri: 'pimo://nameFR'}]"` for multiple masks). For advanced use case (e.g. if caches needed) `masking.yml` file definition will be preferred.
-* `--repeat-until <condition>` This flag will make PIMO keep masking every input until the condition is met. Condition format is using [Template](https://pkg.go.dev/text/template). Last output verifies the condition.
-* `--repeat-while <condition>` This flag will make PIMO keep masking every input while the condition is met. Condition format is using [Template](https://pkg.go.dev/text/template).
-* `--stats <filename | url>` This flag either outputs run statistics to the specified file or send them to specified url (has to start with `http` or `https`).
-* `--statsTemplate <string>` This flag will have PIMO use the value as a template to generate statistics. Please use go templating format to include statistics. To include them you have to specify them as `{{ .Stats }}`. (i.e. `{"software":"PIMO","stats":{{ .Stats }}}`)
+* `--empty-input` This flag provides PIMO with a `{}` input, usable with the `--repeat` flag.
+* `--config=filename.yml` This flag allows using another file for configuration instead of the default `masking.yml`.
+* `--load-cache cacheName=filename.json` This flag loads an initial cache content from a file (JSON line format `{"key":"a", "value":"b"}`).
+* `--dump-cache cacheName=filename.json` This flag dumps the final cache content to a file (JSON line format `{"key":"a", "value":"b"}`).
+* `--verbosity <level>` or `-v<level>` This flag increases verbosity on the stderr output. Possible values: none (0), error (1), warn (2), info (3), debug (4), trace (5).
+* `--debug` This flag completes the logs with debug information (source file, line number).
+* `--log-json` Set this flag to produce JSON-formatted logs ([demo9](demo/demo9) goes deeper into logging and structured logging).
+* `--seed <int>` Set this flag to declare a seed on the command line.
+* `--mask` Declare a simple masking definition on the command line (minified YAML format: `--mask "value={fluxUri: 'pimo://nameFR'}"`, or `--mask "value=[{add: ''},{fluxUri: 'pimo://nameFR'}]"` for multiple masks). For advanced use cases (e.g., if caches are needed), the `masking.yml` file definition is preferred.
+* `--repeat-until <condition>` This flag makes PIMO keep masking every input until the condition is met. Condition format uses [Template](https://pkg.go.dev/text/template). The last output verifies the condition.
+* `--repeat-while <condition>` This flag makes PIMO keep masking every input while the condition is met. Condition format uses [Template](https://pkg.go.dev/text/template).
+* `--stats <filename | url>` This flag either outputs run statistics to the specified file or sends them to the specified URL (must start with `http` or `https`).
+* `--statsTemplate <string>` This flag makes PIMO use the value as a template to generate statistics. Use Go templating format to include statistics. To include them, specify them as `{{ .Stats }}`. (e.g., `{"software":"PIMO","stats":{{ .Stats }}}`)
 
 ### PIMO Play
 
@@ -236,7 +235,7 @@ Please check the [demo folder](demo) for more advanced examples.
       regex: "0[1-7]( ([0-9]){2}){4}"
 ```
 
-This example will mask the `phone` field of the input jsonlines with a random string respecting the regular expression.
+This example will mask the `phone` field of the input jsonlines with a random string that matches the regular expression.
 
 [Return to list of masks](#possible-masks)
 
@@ -251,7 +250,7 @@ This example will mask the `phone` field of the input jsonlines with a random st
       constant: "Bill"
 ```
 
-This example will mask the `name` field of the input jsonlines with the value of the `constant` field.
+This example will mask the `name` field of the input jsonlines with the value specified in the `constant` field.
 
 [Return to list of masks](#possible-masks)
 
@@ -284,9 +283,9 @@ This example will mask the `name` field of the input jsonlines with random value
       randomChoiceInUri: "file://names.txt"
 ```
 
-This example will mask the `name` field of the input jsonlines with random values from the list contained in the name.txt file. The different URI usable with this selector are : `pimo`, `file` and `http`/`https`.
+This example will mask the `name` field of the input jsonlines with random values from the list contained in the names.txt file. The different URI schemes supported by this selector are: `pimo`, `file`, and `http`/`https`.
 
-A value can be injected in URI with the template syntax. For example, `file://name{{.gender}}.txt` select a line in `name_F.txt` if the current jsonline is `{gender : "F"}`.
+A value can be injected into the URI using template syntax. For example, `file://name{{.gender}}.txt` selects a line from `name_F.txt` if the current jsonline is `{gender : "F"}`.
 
 [Return to list of masks](#possible-masks)
 
@@ -339,7 +338,7 @@ Here is a detailed breakdown of the example configuration:
         max: 32
 ```
 
-This example will mask the `age` field of the input jsonlines with a random number between `min` and `max` included.
+This example will mask the `age` field of the input jsonlines with a random number between `min` and `max`, inclusive.
 
 [Return to list of masks](#possible-masks)
 
@@ -357,7 +356,7 @@ This example will mask the `age` field of the input jsonlines with a random numb
         precision: 2
 ```
 
-This example will mask the `score` field of the input jsonlines with a random float between `min` and `max`, with the number of decimal chosen in the `precision` field.
+This example will mask the `score` field of the input jsonlines with a random float between `min` and `max`, with the number of decimal places specified in the `precision` field.
 
 [Return to list of masks](#possible-masks)
 
@@ -389,7 +388,7 @@ This example will mask the `name` field of the input jsonlines with the output o
           weight: 1
 ```
 
-This example will mask the `surname` field of the input jsonlines with a random value in the `weightedChoice` list with a probability proportional at the `weight` field.
+This example will mask the `surname` field of the input jsonlines with a random value from the `weightedChoice` list, with a probability proportional to the `weight` field.
 
 [Return to list of masks](#possible-masks)
 
@@ -407,7 +406,7 @@ This example will mask the `surname` field of the input jsonlines with a random 
         - "Sapphire City"
 ```
 
-This example will mask the `town` field of the input jsonlines with a value from the `hash` list. The value will be chosen thanks to a hashing of the original value, allowing the output to be always the same in case of identical inputs.
+This example will mask the `town` field of the input jsonlines with a value from the `hash` list. The value will be chosen based on a hash of the original value, ensuring that identical inputs always produce the same output.
 
 [Return to list of masks](#possible-masks)
 
@@ -422,7 +421,7 @@ This example will mask the `town` field of the input jsonlines with a value from
       hashInUri: "pimo://nameFR"
 ```
 
-This example will mask the `name` field of the input jsonlines with a value from the list nameFR contained in pimo, the same way as for `hash` mask. The different URI usable with this selector are : `pimo`, `file` and `http`/`https`.
+This example will mask the `name` field of the input jsonlines with a value from the nameFR list contained in PIMO, in the same way as the `hash` mask. The different URI schemes supported by this selector are: `pimo`, `file`, and `http`/`https`.
 
 [Return to list of masks](#possible-masks)
 
@@ -446,7 +445,7 @@ masking:
         trim: true            # optional: trim space in values and headers, default: false
 ```
 
-The selected field's data will be masked with random values selected from a CSV file available at the specified URL (a GitHub gist in this case). The value will be chosen thanks to a hashing of the original value, allowing the output to be always the same in case of identical inputs.
+The selected field's data will be masked with random values selected from a CSV file available at the specified URL (a GitHub gist in this case). The value will be chosen based on a hash of the original value, ensuring that identical inputs always produce the same output.
 
 See [RandomChoiceInCSV](#randomchoiceincsv) for a detailed breakdown of the example configuration.
 
