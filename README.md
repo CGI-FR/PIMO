@@ -1635,6 +1635,9 @@ name       | description
 `nameEN`   | english female or male names
 `nameENF`  | english female names
 `nameENM`  | english male names
+`nameES`   | spanish female or male names
+`nameESF`  | spanish female names
+`nameESM`  | spanish male names
 `nameFR`   | french female or male names
 `nameFRF`  | french female names
 `nameFRM`  | french male names
