@@ -1638,7 +1638,11 @@ name       | description
 `nameFR`   | french female or male names
 `nameFRF`  | french female names
 `nameFRM`  | french male names
+`nameGE`   | german female or male names
+`nameGEF`  | german female names
+`nameGEM`  | german male names
 `surnameFR`| french surnames
+`surnameGE`| german surnames
 `townFR`   | french towns names
 
 The content of built-in lists are in [the `maskingdata` package](pkg/maskingdata)
