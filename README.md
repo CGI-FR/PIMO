@@ -1642,6 +1642,7 @@ name       | description
 `nameFRF`  | french female names
 `nameFRM`  | french male names
 `surnameFR`| french surnames
+`surnameES`| spanish surnames
 `townFR`   | french towns names
 
 The content of built-in lists are in [the `maskingdata` package](pkg/maskingdata)

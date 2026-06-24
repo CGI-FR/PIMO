@@ -28,5 +28,6 @@ var MapData = map[string][]string{
 	"nameESM":   NameESM,
 	"nameESF":   NameESF,
 	"surnameFR": SurnameFR,
+	"surnameES": SurnameES,
 	"townFR":    TownFR,
 }
