@@ -75,7 +75,6 @@ var NameGEM = []string{
 	"Claas",
 	"Claudio",
 	"Claus",
-	" Clemens",
 	"Clemens",
 	"Conrad",
 	"Constantin",
