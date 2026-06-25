@@ -384,7 +384,6 @@ var NameGEM = []string{
 	"Wesley",
 	"Wilfried",
 	"Wilhelm",
-	"Willi",
 	"William",
 	"Willy",
 	"Winfried",
