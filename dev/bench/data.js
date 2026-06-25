@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1758101987879,
+  "lastUpdate": 1782380616194,
   "repoUrl": "https://github.com/CGI-FR/PIMO",
   "entries": {
     "Benchmark": [
@@ -17898,6 +17898,126 @@ window.BENCHMARK_DATA = {
             "value": 280,
             "unit": "allocs/op",
             "extra": "385261 times\n4 procs"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "eldragon4499@gmail.com",
+            "name": "LeoVrrn",
+            "username": "LeoVrrn"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "c18abb2275c6fd0bf1d0de173258f6b23e4ce67f",
+          "message": "adding spanish names to pimo (#454)\n\n* feat: implement PIMO masking framework with comprehensive data processing packages and test suites\n\n* spanish surnames added to pimo\n\n* doc edit changelog",
+          "timestamp": "2026-06-25T11:32:50+02:00",
+          "tree_id": "96cab5f11592577f308c938a3cfa247914927923",
+          "url": "https://github.com/CGI-FR/PIMO/commit/c18abb2275c6fd0bf1d0de173258f6b23e4ce67f"
+        },
+        "date": 1782380615950,
+        "tool": "go",
+        "benches": [
+          {
+            "name": "BenchmarkPimoRun (github.com/cgi-fr/pimo/internal/app/pimo)",
+            "value": 23933,
+            "unit": "ns/op\t   16937 B/op\t     154 allocs/op",
+            "extra": "480580 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkPimoRun (github.com/cgi-fr/pimo/internal/app/pimo) - ns/op",
+            "value": 23933,
+            "unit": "ns/op",
+            "extra": "480580 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkPimoRun (github.com/cgi-fr/pimo/internal/app/pimo) - B/op",
+            "value": 16937,
+            "unit": "B/op",
+            "extra": "480580 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkPimoRun (github.com/cgi-fr/pimo/internal/app/pimo) - allocs/op",
+            "value": 154,
+            "unit": "allocs/op",
+            "extra": "480580 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge (github.com/cgi-fr/pimo/internal/app/pimo)",
+            "value": 1289271,
+            "unit": "ns/op\t  548159 B/op\t    1951 allocs/op",
+            "extra": "9195 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge (github.com/cgi-fr/pimo/internal/app/pimo) - ns/op",
+            "value": 1289271,
+            "unit": "ns/op",
+            "extra": "9195 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge (github.com/cgi-fr/pimo/internal/app/pimo) - B/op",
+            "value": 548159,
+            "unit": "B/op",
+            "extra": "9195 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge (github.com/cgi-fr/pimo/internal/app/pimo) - allocs/op",
+            "value": 1951,
+            "unit": "allocs/op",
+            "extra": "9195 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkFindInCSVIteration (github.com/cgi-fr/pimo/internal/app/pimo)",
+            "value": 1974855,
+            "unit": "ns/op\t 1513224 B/op\t   20850 allocs/op",
+            "extra": "5811 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkFindInCSVIteration (github.com/cgi-fr/pimo/internal/app/pimo) - ns/op",
+            "value": 1974855,
+            "unit": "ns/op",
+            "extra": "5811 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkFindInCSVIteration (github.com/cgi-fr/pimo/internal/app/pimo) - B/op",
+            "value": 1513224,
+            "unit": "B/op",
+            "extra": "5811 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkFindInCSVIteration (github.com/cgi-fr/pimo/internal/app/pimo) - allocs/op",
+            "value": 20850,
+            "unit": "allocs/op",
+            "extra": "5811 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkFindInCSVLargeVolume (github.com/cgi-fr/pimo/pkg/findincsv)",
+            "value": 29403,
+            "unit": "ns/op\t   23969 B/op\t     280 allocs/op",
+            "extra": "415879 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkFindInCSVLargeVolume (github.com/cgi-fr/pimo/pkg/findincsv) - ns/op",
+            "value": 29403,
+            "unit": "ns/op",
+            "extra": "415879 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkFindInCSVLargeVolume (github.com/cgi-fr/pimo/pkg/findincsv) - B/op",
+            "value": 23969,
+            "unit": "B/op",
+            "extra": "415879 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkFindInCSVLargeVolume (github.com/cgi-fr/pimo/pkg/findincsv) - allocs/op",
+            "value": 280,
+            "unit": "allocs/op",
+            "extra": "415879 times\n4 procs"
           }
         ]
       }
