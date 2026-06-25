@@ -32,7 +32,6 @@ var MapData = map[string][]string{
 	"nameES":    append(NameESM, NameESF...),
 	"nameESM":   NameESM,
 	"nameESF":   NameESF,
-	"surnameFR": SurnameFR,
 	"surnameES": SurnameES,
 	"townFR":    TownFR,
 }
