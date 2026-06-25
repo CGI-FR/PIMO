@@ -411,7 +411,6 @@ var SurnameGE = []string{
 	"Wilhelmi",
 	"Wilk",
 	"Will",
-	"Wille",
 	"Willi",
 	"Willmann",
 	"Willmer",
