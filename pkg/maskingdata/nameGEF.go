@@ -85,7 +85,6 @@ var NameGEF = []string{
 	"Chiara",
 	"Christel",
 	"Christiane",
-	"Christin",
 	"Christina",
 	"Christine",
 	"Cindy",
