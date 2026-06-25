@@ -54,4 +54,22 @@ func TestUriReaderShouldCreateListFromInsideFiles(t *testing.T) {
 	for i := range waitedList {
 		assert.Equal(t, waitedList[i], nameList.Get(i), "Should return the right list")
 	}
+
+	nameListES, err := Read("pimo://nameES")
+	if err != nil {
+		assert.Fail(t, err.Error())
+	}
+	// nolint: gocritic
+	waitedListES := append(maskingdata.NameESM, maskingdata.NameESF...)
+	for i := range waitedListES {
+		assert.Equal(t, waitedListES[i], nameListES.Get(i), "Should return the right list")
+	}
+
+	surnameListES, err := Read("pimo://surnameES")
+	if err != nil {
+		assert.Fail(t, err.Error())
+	}
+	for i := range maskingdata.SurnameES {
+		assert.Equal(t, maskingdata.SurnameES[i], surnameListES.Get(i), "Should return the right list")
+	}
 }
