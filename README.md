@@ -1635,6 +1635,9 @@ name       | description
 `nameEN`   | english female or male names
 `nameENF`  | english female names
 `nameENM`  | english male names
+`nameES`   | spanish female or male names
+`nameESF`  | spanish female names
+`nameESM`  | spanish male names
 `nameFR`   | french female or male names
 `nameFRF`  | french female names
 `nameFRM`  | french male names
@@ -1643,6 +1646,7 @@ name       | description
 `nameGEM`  | german male names
 `surnameFR`| french surnames
 `surnameGE`| german surnames
+`surnameES`| spanish surnames
 `townFR`   | french towns names
 
 The content of built-in lists are in [the `maskingdata` package](pkg/maskingdata)

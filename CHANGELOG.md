@@ -14,6 +14,10 @@ Types of changes
 - `Fixed` for any bug fixes.
 - `Security` in case of vulnerabilities.
 
+## [1.32.0]
+
+- `Added` spanish names and surnames to maskingdata
+
 ## [1.31.3]
 
 - `Fixed` `hashInCSV` consistency when used in different jsonpath

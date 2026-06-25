@@ -29,5 +29,10 @@ var MapData = map[string][]string{
 	"nameGEF":   NameGEF,
 	"surnameFR": SurnameFR,
 	"surnameGE": SurnameGE,
+	"nameES":    append(NameESM, NameESF...),
+	"nameESM":   NameESM,
+	"nameESF":   NameESF,
+	"surnameFR": SurnameFR,
+	"surnameES": SurnameES,
 	"townFR":    TownFR,
 }
