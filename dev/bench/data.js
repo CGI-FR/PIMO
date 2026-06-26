@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1782463059123,
+  "lastUpdate": 1782487997803,
   "repoUrl": "https://github.com/CGI-FR/PIMO",
   "entries": {
     "Benchmark": [
@@ -18258,6 +18258,126 @@ window.BENCHMARK_DATA = {
             "value": 280,
             "unit": "allocs/op",
             "extra": "351135 times\n4 procs"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "spikyfire44@gmail.com",
+            "name": "spikyfire44-code",
+            "username": "spikyfire44-code"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "1836e37e525e99ac4e0d59f3d19167938fb2246e",
+          "message": "Fix add german names (#457)\n\n* feat: add German names and surnames to maskingdata\n\n* doc: Add German names to the README and update URI test cases\n\n* feat: Add German names to the masking data\n\n* feat: add German names to nameGEM.go\n\n* feat-add-german-names\n\n* feat-add-german-names\n\n* fix: remove the duplicate names in german name and surname list\n\n* fix:delete restore_some.py and trim_prompt.py, add German names to nameGEM.go\n\n* fix:changed the nameGEM.go file to include German names and removed unnecessary files restore_some.py and trim_prompt.py\n\n* fix:change the german names to be more accurate and change the titles\n\n* fix:uppercase german names in maskingdata.go\n\n* fix: add uppercase for title case for German names and add line to the end of the file to avoid issues with some editors\n\n---------\n\nCo-authored-by: Youen Péron <youen.peron@gmail.com>",
+          "timestamp": "2026-06-26T17:22:56+02:00",
+          "tree_id": "90c4d20dc8a24777130bb93ae5ced995fe952b88",
+          "url": "https://github.com/CGI-FR/PIMO/commit/1836e37e525e99ac4e0d59f3d19167938fb2246e"
+        },
+        "date": 1782487997407,
+        "tool": "go",
+        "benches": [
+          {
+            "name": "BenchmarkPimoRun (github.com/cgi-fr/pimo/internal/app/pimo)",
+            "value": 24010,
+            "unit": "ns/op\t   16952 B/op\t     154 allocs/op",
+            "extra": "485776 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkPimoRun (github.com/cgi-fr/pimo/internal/app/pimo) - ns/op",
+            "value": 24010,
+            "unit": "ns/op",
+            "extra": "485776 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkPimoRun (github.com/cgi-fr/pimo/internal/app/pimo) - B/op",
+            "value": 16952,
+            "unit": "B/op",
+            "extra": "485776 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkPimoRun (github.com/cgi-fr/pimo/internal/app/pimo) - allocs/op",
+            "value": 154,
+            "unit": "allocs/op",
+            "extra": "485776 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge (github.com/cgi-fr/pimo/internal/app/pimo)",
+            "value": 1155186,
+            "unit": "ns/op\t  563251 B/op\t    1956 allocs/op",
+            "extra": "10000 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge (github.com/cgi-fr/pimo/internal/app/pimo) - ns/op",
+            "value": 1155186,
+            "unit": "ns/op",
+            "extra": "10000 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge (github.com/cgi-fr/pimo/internal/app/pimo) - B/op",
+            "value": 563251,
+            "unit": "B/op",
+            "extra": "10000 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkPimoRunLarge (github.com/cgi-fr/pimo/internal/app/pimo) - allocs/op",
+            "value": 1956,
+            "unit": "allocs/op",
+            "extra": "10000 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkFindInCSVIteration (github.com/cgi-fr/pimo/internal/app/pimo)",
+            "value": 2016215,
+            "unit": "ns/op\t 1513646 B/op\t   20850 allocs/op",
+            "extra": "5809 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkFindInCSVIteration (github.com/cgi-fr/pimo/internal/app/pimo) - ns/op",
+            "value": 2016215,
+            "unit": "ns/op",
+            "extra": "5809 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkFindInCSVIteration (github.com/cgi-fr/pimo/internal/app/pimo) - B/op",
+            "value": 1513646,
+            "unit": "B/op",
+            "extra": "5809 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkFindInCSVIteration (github.com/cgi-fr/pimo/internal/app/pimo) - allocs/op",
+            "value": 20850,
+            "unit": "allocs/op",
+            "extra": "5809 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkFindInCSVLargeVolume (github.com/cgi-fr/pimo/pkg/findincsv)",
+            "value": 32783,
+            "unit": "ns/op\t   23785 B/op\t     280 allocs/op",
+            "extra": "397400 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkFindInCSVLargeVolume (github.com/cgi-fr/pimo/pkg/findincsv) - ns/op",
+            "value": 32783,
+            "unit": "ns/op",
+            "extra": "397400 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkFindInCSVLargeVolume (github.com/cgi-fr/pimo/pkg/findincsv) - B/op",
+            "value": 23785,
+            "unit": "B/op",
+            "extra": "397400 times\n4 procs"
+          },
+          {
+            "name": "BenchmarkFindInCSVLargeVolume (github.com/cgi-fr/pimo/pkg/findincsv) - allocs/op",
+            "value": 280,
+            "unit": "allocs/op",
+            "extra": "397400 times\n4 procs"
           }
         ]
       }
