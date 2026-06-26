@@ -75,23 +75,23 @@ func TestUriReaderShouldCreateListFromInsideFiles(t *testing.T) {
 }
 
 func TestUriReaderShouldCreateGermanNameListFromInsideFiles(t *testing.T) {
-	nameList, err := Read("pimo://nameGE")
+	nameList, err := Read("pimo://nameDE")
 	if err != nil {
 		assert.Fail(t, err.Error())
 	}
 	// nolint: gocritic
-	waitedList := append(maskingdata.NameGEM, maskingdata.NameGEF...)
+	waitedList := append(maskingdata.NameDEM, maskingdata.NameDEF...)
 	for i := range waitedList {
 		assert.Equal(t, waitedList[i], nameList.Get(i), "Should return the right list")
 	}
 }
 
 func TestUriReaderShouldCreateGermanSurnameListFromInsideFiles(t *testing.T) {
-	nameList, err := Read("pimo://surnameGE")
+	nameList, err := Read("pimo://surnameDE")
 	if err != nil {
 		assert.Fail(t, err.Error())
 	}
-	waitedList := maskingdata.SurnameGE
+	waitedList := maskingdata.SurnameDE
 	for i := range waitedList {
 		assert.Equal(t, waitedList[i], nameList.Get(i), "Should return the right list")
 	}

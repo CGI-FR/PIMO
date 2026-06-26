@@ -1641,11 +1641,11 @@ name       | description
 `nameFR`   | french female or male names
 `nameFRF`  | french female names
 `nameFRM`  | french male names
-`nameGE`   | german female or male names
-`nameGEF`  | german female names
-`nameGEM`  | german male names
+`nameDE`   | german female or male names
+`nameDEF`  | german female names
+`nameDEM`  | german male names
 `surnameFR`| french surnames
-`surnameGE`| german surnames
+`surnameDE`| german surnames
 `surnameES`| spanish surnames
 `townFR`   | french towns names
 
