@@ -80,7 +80,7 @@ func TestUriReaderShouldCreateGermanNameListFromInsideFiles(t *testing.T) {
 		assert.Fail(t, err.Error())
 	}
 	// nolint: gocritic
-	waitedList := append(maskingdata.nameDEM, maskingdata.nameDEF...)
+	waitedList := append(maskingdata.NameDEM, maskingdata.NameDEF...)
 	for i := range waitedList {
 		assert.Equal(t, waitedList[i], nameList.Get(i), "Should return the right list")
 	}
