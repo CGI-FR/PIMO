@@ -17,6 +17,7 @@ Types of changes
 ## [1.32.0]
 
 - `Added` spanish names and surnames to maskingdata
+- `Added` German names and surnames to maskingdata
 
 ## [1.31.3]
 
