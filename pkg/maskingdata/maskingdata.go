@@ -17,11 +17,21 @@
 
 package maskingdata
 
-import "github.com/cgi-fr/pimo/pkg/model"
-
-var MapData = map[string][]model.Entry{
-	"nameDE":    append(NameDEM, NameDEF...),
-	"nameDEM":   NameDEM,
-	"nameDEF":   NameDEF,
+var MapData = map[string][]string{
+	"nameFR":    append(NameFRM, NameFRF...),
+	"nameFRM":   NameFRM,
+	"nameFRF":   NameFRF,
+	"nameEN":    append(NameENM, NameENF...),
+	"nameENM":   NameENM,
+	"nameENF":   NameENF,
+	"nameES":    append(NameESM, NameESF...),
+	"nameESM":   NameESM,
+	"nameESF":   NameESF,
+	"surnameFR": SurnameFR,
+	"surnameES": SurnameES,
+	"townFR":    TownFR,
+	"nameDE":    append(nameDEM, nameDEF...),
+	"nameDEM":   nameDEM,
+	"nameDEF":   nameDEF,
 	"surnameDE": SurnameDE,
 }
